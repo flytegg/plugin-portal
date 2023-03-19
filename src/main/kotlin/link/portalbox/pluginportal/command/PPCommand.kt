@@ -17,21 +17,25 @@ class PPCommand : CommandExecutor, TabCompleter {
         put(SubCommandType.LIST, ListSubCommand())
         put(SubCommandType.UPDATE, UpdateSubCommand())
         put(SubCommandType.DELETE, DeleteSubCommand())
-
     }
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
-        var type = SubCommandType.HELP
+        var type = if (args.isEmpty()) SubCommandType.HELP else null
         if (args.isNotEmpty()) {
-            try {
-                type = SubCommandType.valueOf(args[0].uppercase(Locale.getDefault()))
-            } catch (e: IllegalArgumentException) {
+            for (subType in SubCommandType.values()) {
+                if (args[0].equals(subType.name, true) || args[0].equals(subType.alias, true)) {
+                    type = subType
+                    break
+                }
+            }
+
+            if (type == null) {
                 sender.sendMessage("Invalid argument provided.")
                 return false;
             }
         }
 
-        if (!sender.hasPermission(type.permission)) {
+        if (!sender.hasPermission(type!!.permission)) {
             sender.sendMessage("no permiission")
             return false;
         }
