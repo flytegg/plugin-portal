@@ -1,6 +1,7 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.7.21'
     id 'application'
+    id 'org.jetbrains.kotlin.jvm' version '1.7.21'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
 }
 
 group = 'link.portalbox'
@@ -16,8 +17,9 @@ repositories {
 
 dependencies {
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
-    implementation 'org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT'
-    implementation 'org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT'
+    implementation 'org.bstats:bstats-bukkit:3.0.0'
 }
 
 test {
@@ -34,4 +36,11 @@ compileTestKotlin {
 
 application {
     mainClassName = 'MainKt'
+}
+
+shadowJar {
+    relocate 'org.bstats', 'link.portalbox.bstats'
+    relocate 'kotlin', 'link.portalbox.kotlin'
+    relocate 'org.jetbrains.annotations', 'link.portalbox.jetbrains.annotations'
+    relocate 'org.intellij.lang.annotations', 'link.portalbox.intellij.lang.annotations'
 }
