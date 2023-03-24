@@ -4,6 +4,7 @@ import PreviewUtil
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.util.ChatColor.color
 import link.portalbox.pplib.manager.MarketplaceManager
+import link.portalbox.pplib.type.SpigetPlugin
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
 
@@ -20,9 +21,9 @@ class PreviewSubCommand : SubCommand() {
             return
         }
 
-        val marketplacePlugin = MarketplaceManager.getPlugin(MarketplaceManager.getId(args[1]))
+        val spigetPlugin = SpigetPlugin(MarketplaceManager.getId(args[1]))
 
-        PreviewUtil.sendPreview(sender, marketplacePlugin, true);
+        PreviewUtil.sendPreview(sender, spigetPlugin, true);
     }
 
     override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {

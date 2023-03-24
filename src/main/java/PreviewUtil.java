@@ -1,4 +1,5 @@
 import link.portalbox.pplib.type.MarketplacePlugin;
+import link.portalbox.pplib.type.SpigetPlugin;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -19,16 +20,20 @@ public class PreviewUtil {
 
     /* This awful class still needs converted. */
 
-    public static void sendPreview(CommandSender player, MarketplacePlugin spigetPlugin, boolean containDownloadPrompt) {
+    public static void sendPreview(CommandSender player, SpigetPlugin spigetPlugin, boolean containDownloadPrompt) {
         player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&8&m                                                       "));
+
+        MarketplacePlugin marketplacePlugin = spigetPlugin.getMarketplacePlugin();
+
+        String downloadUrl = spigetPlugin.externalUrl == null ? "https://api.spiget.org/v2/resources/" + spigetPlugin.id + "/download" : spigetPlugin.externalUrl;
 
         ArrayList<TextComponent> informationAsComponents = new ArrayList<>();
         try {
-            TextComponent component = new TextComponent(ChatColor.translateAlternateColorCodes('&', " &7Name: &b" + spigetPlugin.spigotName));
+            TextComponent component = new TextComponent(ChatColor.translateAlternateColorCodes('&', " &7Name: &b" + spigetPlugin.name));
             informationAsComponents.add(component);
 
             component = new TextComponent(ChatColor.translateAlternateColorCodes('&', " &7Description: &b&l[Hover Here]"));
-            component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(ChatColor.AQUA + spigetPlugin.tag)));
+            component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(ChatColor.AQUA + spigetPlugin.description)));
             informationAsComponents.add(component);
 
             component = new TextComponent(ChatColor.translateAlternateColorCodes('&', " &7Downloads: &b" + String.format("%,d", spigetPlugin.downloads)));
@@ -37,8 +42,11 @@ public class PreviewUtil {
             component = new TextComponent( ChatColor.translateAlternateColorCodes('&'," &7Rating: &b" + spigetPlugin.rating + "&e⭐"));
             informationAsComponents.add(component);
 
-            component = new TextComponent(ChatColor.translateAlternateColorCodes('&', " &7Supported Versions: &b" + getVersionRange(Arrays.asList(spigetPlugin.supportedVersions))));
-            informationAsComponents.add(component);
+//            System.out.println(marketplacePlugin.supportedVersions);
+//            System.out.println(new ArrayList<>(marketplacePlugin.supportedVersions));
+//
+//            component = new TextComponent(ChatColor.translateAlternateColorCodes('&', " &7Supported Versions: &b" + getVersionRange(new ArrayList<>(marketplacePlugin.supportedVersions))));
+//            informationAsComponents.add(component);
 
             if (spigetPlugin.premium) {
                 component = new TextComponent(ChatColor.translateAlternateColorCodes('&', " &7Premium: &b" + "Yes ($" + spigetPlugin.price + ")"));
@@ -54,14 +62,11 @@ public class PreviewUtil {
             component = new TextComponent( ChatColor.translateAlternateColorCodes('&'," &7Last Updated: &b" + toDateString(cal)));
             informationAsComponents.add(component);
 
-            component = new TextComponent(ChatColor.translateAlternateColorCodes('&', " &7Directly Downloadable: &b" + (spigetPlugin.fileType.isSupported() ? "Yes" : "No")));
-            informationAsComponents.add(component);
-
-            if (!spigetPlugin.findDownloadURL().toString().contains("api.spiget.org")) {
-                component = new TextComponent(ChatColor.translateAlternateColorCodes('&', " &bExternal Link: &b"));
+            if (!downloadUrl.toString().contains("api.spiget.org")) {
+                component = new TextComponent(ChatColor.translateAlternateColorCodes('&', " &7External Link: &b"));
 
                 TextComponent link = new TextComponent(ChatColor.translateAlternateColorCodes('&', "&b&l[Click Here]"));
-                link.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, spigetPlugin.findDownloadURL().toString()));
+                link.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, spigetPlugin.toString()));
                 link.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(ChatColor.AQUA + "Click to open the external download link")));
 
                 component.addExtra(link);
@@ -72,11 +77,11 @@ public class PreviewUtil {
             informationAsComponents.add(component);
 
             component = new TextComponent(ChatColor.translateAlternateColorCodes('&', " &b&l[Click to Download]"));
-            component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pp install " + spigetPlugin.spigotName));
+            component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pp install " + spigetPlugin.name));
             informationAsComponents.add(component);
         } catch (Exception exception) {
             exception.printStackTrace();
-            informationAsComponents.add(new TextComponent("&cError ID: " + spigetPlugin.id + ". Please report this to our discord."));
+            informationAsComponents.add(new TextComponent(ChatColor.RED + " Error"));
         }
 
 

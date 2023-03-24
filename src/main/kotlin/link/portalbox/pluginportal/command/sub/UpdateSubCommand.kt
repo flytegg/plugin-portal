@@ -7,10 +7,11 @@ import link.portalbox.pluginportal.util.ChatColor.color
 import link.portalbox.pluginportal.util.delete
 import link.portalbox.pluginportal.util.install
 import link.portalbox.pplib.manager.MarketplaceManager
-import link.portalbox.pplib.type.MarketplacePlugin
+import link.portalbox.pplib.type.SpigetPlugin
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
+import java.net.URL
 
 class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
 
@@ -23,13 +24,13 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
                 return
             }
 
-            val marketplacePlugin = MarketplaceManager.getPlugin(id)
-            if (marketplacePlugin.version == localPlugin.version) {
+            val spigetPlugin = SpigetPlugin(id)
+            if (spigetPlugin.onlineVersion == localPlugin.version) {
                 sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &a${args[1]} &7is already up to date.".color())
                 return
             }
 
-            val downloadUrl = marketplacePlugin.findDownloadURL()
+            val downloadUrl = if (spigetPlugin.externalUrl == null) "https://api.spiget.org/v2/resources/${spigetPlugin.id}/download" else spigetPlugin.externalUrl
             if (downloadUrl == null) {
                 sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &7We couldn't find a download link for &c${args[1]}&7. This happens when they use an external link and we can't always identify the correct file to download. Please report this to our Discord @ discord.gg/portalbox so we manually support this.".color())
                 return
@@ -38,23 +39,23 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &a${args[1]} &7is being updated...".color())
 
             if (!delete(pluginPortal, localPlugin)) {
-                sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &c${args[1]} &7has not been updated due to an error. Please report this on our Discord @ discord.gg/portalbox.".color())
+                sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &c${args[1]} &7has not been updated due to an error. Tip: the plugin must be enabled before you delete it. Did you restart the server after installing?".color())
                 return
             }
 
             Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
-                install(marketplacePlugin, downloadUrl)
+                install(spigetPlugin, URL(downloadUrl))
 
                 sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &a${args[1]} &7has been updated. Please restart your server for the download to take effect (we are adding auto starting soon!).".color())
             })
             return
         }
 
-        val needUpdating = mutableListOf<MarketplacePlugin>()
+        val needUpdating = mutableListOf<SpigetPlugin>()
         for (plugin in Data.installedPlugins) {
-            val marketplacePlugin = MarketplaceManager.getPlugin(plugin.id)
-            if (marketplacePlugin.version != plugin.version) {
-                needUpdating.add(marketplacePlugin)
+            val spigetPlugin = SpigetPlugin(plugin.id)
+            if (spigetPlugin.onlineVersion != plugin.version) {
+                needUpdating.add(spigetPlugin)
             }
         }
 
@@ -64,8 +65,8 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         }
 
         sender.sendMessage("\"&7&l[&b&lPP&7&l] &8&l> &7Listing all plugins that can be updated:".color())
-        for (marketplacePlugin in needUpdating) {
-            sender.sendMessage("&a+ &b${marketplacePlugin.spigotName}".color())
+        for (spigetPlugin in needUpdating) {
+            sender.sendMessage("&a+ &b${spigetPlugin.name}".color())
         }
     }
 
