@@ -3,7 +3,9 @@ package link.portalbox.pluginportal
 import link.portalbox.pluginportal.command.PPCommand
 import link.portalbox.pluginportal.file.Config
 import link.portalbox.pluginportal.file.Data
+import link.portalbox.pluginportal.listener.PluginValidator
 import link.portalbox.pluginportal.listener.UpdateListener
+import link.portalbox.pplib.manager.MarketplaceManager
 import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -15,11 +17,14 @@ class PluginPortal : JavaPlugin() {
         Config.init(this)
         Data.init(this)
 
-        server.pluginManager.registerEvents(UpdateListener(this), this)
-
-        val command = PPCommand()
+        val command = PPCommand(this)
         getCommand("pluginportal")!!.setExecutor(command)
         getCommand("pluginportal")!!.tabCompleter = command
+
+        MarketplaceManager()
+
+        server.pluginManager.registerEvents(UpdateListener(this), this)
+        server.pluginManager.registerEvents(PluginValidator(), this)
 
         Metrics(this, 18005)
     }

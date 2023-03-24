@@ -13,13 +13,15 @@ repositories {
     maven {
         url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
     }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
     compileOnly 'org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT'
-    compileOnly 'org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT'
     implementation 'org.bstats:bstats-bukkit:3.0.0'
+    implementation 'com.github.portal-box:pp-lib:1.0.4'
+    compileOnly 'commons-io:commons-io:2.11.0'
 }
 
 test {
@@ -36,6 +38,10 @@ compileTestKotlin {
 
 application {
     mainClassName = 'MainKt'
+}
+
+compileJava {
+    options.encoding("UTF-8")
 }
 
 shadowJar {

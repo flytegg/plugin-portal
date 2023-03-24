@@ -9,39 +9,42 @@ object Data {
     private lateinit var file: File
     private lateinit var config: YamlConfiguration
 
+    var installedPlugins = mutableListOf<LocalPlugin>()
+
     fun init(pluginPortal: PluginPortal) {
         file = File(pluginPortal.dataFolder, "data.yml");
         if (!file.exists()) {
             file.createNewFile()
         }
         config = YamlConfiguration.loadConfiguration(file)
-    }
 
-    val installedPlugins: List<LocalPlugin>
-        get() {
-            val pluginIds = config.getKeys(false)
-            return pluginIds.mapNotNull { id ->
-                val pluginSection = config.getConfigurationSection("plugins.$id") ?: return@mapNotNull null
-                val version = pluginSection.getString("version") ?: return@mapNotNull null
-                val fileSha = pluginSection.getString("fileSha") ?: return@mapNotNull null
-                LocalPlugin(id.toInt(), version, fileSha)
+        config.getKeys(false).forEach { id ->
+            val pluginSection = config.getConfigurationSection("$id")
+            if (pluginSection != null) {
+                installedPlugins.add(LocalPlugin(id.toInt(), pluginSection.getString("version")!!, pluginSection.getString("file")!!))
             }
         }
-
-    fun getPlugin(id: Int): LocalPlugin? {
-        return if (config.isConfigurationSection(id.toString())) {
-            null
-        } else {
-            LocalPlugin(id, config.getString("${id}.version")!!, config.getString("${id}.file")!!)
-        }
     }
-
-
 
     fun update(id: Int, version: String, fileSha: String) {
         config.set("${id}.version", version)
         config.set("${id}.file", fileSha)
         config.save(file)
+
+        val plugin = installedPlugins.find { it.id == id }
+        if (plugin != null) {
+            plugin.version = version
+            plugin.fileSha = fileSha
+        } else {
+            installedPlugins.add(LocalPlugin(id, version, fileSha))
+        }
+    }
+
+    fun delete(id: Int) {
+        config.set(id.toString(), null)
+        config.save(file)
+
+        installedPlugins.removeIf { it.id == id }
     }
 
 }

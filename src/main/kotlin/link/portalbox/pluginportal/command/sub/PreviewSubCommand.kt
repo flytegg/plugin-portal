@@ -1,8 +1,11 @@
 package link.portalbox.pluginportal.command.sub
 
+import PreviewUtil
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.util.ChatColor.color
+import link.portalbox.pplib.manager.MarketplaceManager
 import org.bukkit.command.CommandSender
+import org.bukkit.util.StringUtil
 
 class PreviewSubCommand : SubCommand() {
 
@@ -12,26 +15,24 @@ class PreviewSubCommand : SubCommand() {
             return
         }
 
-        val spigotName = args[1]
-        sender.sendMessage("acknowledged")
-//        if (!marketplaceManager.getAllNames().contains(spigotName)) {
-//                sender.sendMessage(ChatUtil.format("&7&l[&b&lPP&7&l] &8&l> &cPlugin does not exist."));
-//                return;
-//            }
-//
-//            int id = marketplaceManager.getId(spigotName);
-//            SpigetPlugin spigetPlugin = new SpigetPlugin(id);
-//
-//            if (!marketplaceManager.getAllNames().contains(spigotName)) {
-//                sender.sendMessage(ChatUtil.format("&7&l[&b&lPP&7&l] &8&l> &cPlugin does not exist."));
-//                return;
-//            }
-//
-//            PreviewUtil.sendPreview((Player) sender, spigetPlugin, true);
+        if (!MarketplaceManager.marketplaceCache.inverse().contains(args[1])) {
+            sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &cPlugin does not exist.".color())
+            return
+        }
+
+        val marketplacePlugin = MarketplaceManager.getPlugin(MarketplaceManager.getId(args[1]))
+
+        PreviewUtil.sendPreview(sender, marketplacePlugin, true);
     }
 
-    override fun tabComplete(sender: CommandSender, args: Array<out String>) {
-        TODO("Not yet implemented")
+    override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {
+        if (args.size != 2) return null
+        return if (args[1].length <= 2) {
+            mutableListOf("Keep Typing...")
+        } else StringUtil.copyPartialMatches(
+            args[1],
+            MarketplaceManager.marketplaceCache.values,
+            mutableListOf())
     }
 
 }

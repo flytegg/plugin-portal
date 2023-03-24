@@ -1,10 +1,16 @@
 package link.portalbox.pluginportal.command.sub
 
+import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
+import link.portalbox.pluginportal.file.Data
 import link.portalbox.pluginportal.util.ChatColor.color
+import link.portalbox.pluginportal.util.install
+import link.portalbox.pplib.manager.MarketplaceManager
+import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
+import org.bukkit.util.StringUtil
 
-class InstallSubCommand : SubCommand() {
+class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
 
     override fun execute(sender: CommandSender, args: Array<out String>) {
         if (args.size <= 1) {
@@ -12,50 +18,45 @@ class InstallSubCommand : SubCommand() {
             return
         }
 
-        sender.sendMessage("acknowledgd")
+        if (!MarketplaceManager.marketplaceCache.inverse().containsKey(args[1])) {
+            sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &cYou specified an invalid plugin.".color())
+            return
+        }
 
-//        String spigotName = args[1];
-//        int id = PluginPortal.getInstance().getMarketplaceManager().getId(spigotName);
-//
-//        if (!PluginPortal.getInstance().getMarketplaceManager().getAllNames().contains(spigotName)) {
-//            sender.sendMessage(ChatUtil.format("&7&l[&b&lPP&7&l] &8&l> &cPlugin does not exist."));
-//            return;
-//        }
-//
-//        SpigetPlugin spigetPlugin = new SpigetPlugin(id);
-//
-//        if (PluginPortal.getInstance().getLocalPluginManager().getPlugins().containsKey(PluginPortal.getInstance().getMarketplaceManager().getMarketplaceCache().get(id))) {
-//            sender.sendMessage(ChatUtil.format("&7&l[&b&lPP&7&l] &8&l> &7Plugin is already installed."));
-//            return;
-//        }
-//
-//        if (spigetPlugin.isPremium()) {
-//            sender.sendMessage(ChatUtil.format("&7&l[&b&lPP&7&l] &8&l> &cThis plugin is a premium plugin. Please purchase it on spigotmc.org to install it!"));
-//            return;
-//        }
-//
-//        if (spigetPlugin.getFileType() == FileType.EXTERNAL) {
-//            if (!flags.contains(Flags.FORCE)) {
-//                PreviewUtil.sendPreview((Player) sender, spigetPlugin, true);
-//                return;
-//            } else if (flags.contains(Flags.GITHUB)) {
-//                int argIndex = 0;
-//                for (String string : args) {
-//                    if (string.equalsIgnoreCase("-g") || string.equalsIgnoreCase("--github")) {
-//                        JsonParser parser = new JsonParser();
-//                        JsonObject object = parser.parse(HttpUtil.convertGithubToApi(spigetPlugin.getExternalUrl().replace("latest", "assets?name=" + args[argIndex+1]))).getAsJsonObject();
-//                        PluginPortal.getInstance().getDownloadManager().download(spigetPlugin, object.get("browser_download_url").getAsString());
-//
-//                    }
-//
-//                    argIndex++;
-//                }
-//            }
-//        }
-    }
+        val id = MarketplaceManager.getId(args[1])
+        if (Data.installedPlugins.find { it.id == id } != null) {
+            sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &7Plugin is already installed.".color())
+            return
+        }
 
-    override fun tabComplete(sender: CommandSender, args: Array<out String>) {
-        TODO("Not yet implemented")
+        val marketplacePlugin = MarketplaceManager.getPlugin(id)
+        if (marketplacePlugin.premium) {
+            sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &cThis plugin is premium so you can't download it through PP. Purchase: https://www.spigotmc.org/resources/108700".color())
+            return
+        }
+
+        val downloadUrl = marketplacePlugin.findDownloadURL()
+        if (downloadUrl == null) {
+            sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &7We couldn't find a download link for &c${args[1]}&7. This happens when they use an external link and we can't always identify the correct file to download. Please report this to our Discord @ discord.gg/portalbox so we manually support this.".color())
+            return
+        }
+
+        sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &a${args[1]} &7is being installed...".color())
+
+        Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
+            install(marketplacePlugin, downloadUrl)
+            sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &a${args[1]} &7has been installed. Please restart your server for the download to take effect (we are adding auto starting soon!).".color())
+        })
+     }
+
+    override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {
+        if (args.size != 2) return null
+        return if (args[1].length <= 2) {
+            mutableListOf("Keep Typing...")
+        } else StringUtil.copyPartialMatches(
+            args[1],
+            MarketplaceManager.marketplaceCache.values,
+            mutableListOf())
     }
 
 }
