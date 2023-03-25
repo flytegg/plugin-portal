@@ -53,4 +53,6 @@ shadowJar {
     relocate 'kotlin', 'link.portalbox.kotlin'
     relocate 'org.jetbrains.annotations', 'link.portalbox.jetbrains.annotations'
     relocate 'org.intellij.lang.annotations', 'link.portalbox.intellij.lang.annotations'
+    destinationDirectory.set(file("C:/Users/revelcw/Projects/1.19.2 Testing Server/plugins"))
+
 }

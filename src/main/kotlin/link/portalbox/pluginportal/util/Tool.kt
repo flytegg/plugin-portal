@@ -1,5 +1,7 @@
 package link.portalbox.pluginportal.util
 
+import net.md_5.bungee.api.chat.TextComponent
+import org.bukkit.ChatColor
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.File
@@ -22,6 +24,8 @@ fun getSha(file: File): String {
     }
     return sb.toString()
 }
+
+fun String.coloredComponent() = TextComponent(ChatColor.translateAlternateColorCodes('&', this))
 
 fun getAverageColor(bi: BufferedImage): Color {
     val step = 5
