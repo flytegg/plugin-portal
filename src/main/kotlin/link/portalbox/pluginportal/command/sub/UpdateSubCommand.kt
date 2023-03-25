@@ -4,6 +4,7 @@ import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.file.Data
 import link.portalbox.pluginportal.util.ChatColor.color
+import link.portalbox.pluginportal.util.ChatColor.colorOutput
 import link.portalbox.pluginportal.util.delete
 import link.portalbox.pluginportal.util.install
 import link.portalbox.pplib.manager.MarketplaceManager
@@ -20,33 +21,33 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             val id = MarketplaceManager.getId(args[1])
             val localPlugin = Data.installedPlugins.find { it.id == id }
             if (localPlugin == null) {
-                sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &c${args[1]} &7is not installed or recognised by Plugin Portal. Did you mean to run &b/pp install ${args[1]}&7?".color())
+                sender.sendMessage("&c${args[1]} &7is not installed or recognised by Plugin Portal. Did you mean to run &b/pp install ${args[1]}&7?".colorOutput())
                 return
             }
 
             val spigetPlugin = SpigetPlugin(id)
             if (spigetPlugin.onlineVersion == localPlugin.version) {
-                sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &a${args[1]} &7is already up to date.".color())
+                sender.sendMessage("&a${args[1]} &7is already up to date.".colorOutput())
                 return
             }
 
             val downloadUrl = if (spigetPlugin.externalUrl == null) "https://api.spiget.org/v2/resources/${spigetPlugin.id}/download" else spigetPlugin.externalUrl
             if (downloadUrl == null) {
-                sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &7We couldn't find a download link for &c${args[1]}&7. This happens when they use an external link and we can't always identify the correct file to download. Please report this to our Discord @ discord.gg/portalbox so we manually support this.".color())
+                sender.sendMessage("&7We couldn't find a download link for &c${args[1]}&7. This happens when they use an external link and we can't always identify the correct file to download. Please report this to our Discord @ discord.gg/portalbox so we manually support this.".colorOutput())
                 return
             }
 
-            sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &a${args[1]} &7is being updated...".color())
+            sender.sendMessage("&a${args[1]} &7is being updated...".colorOutput())
 
             if (!delete(pluginPortal, localPlugin)) {
-                sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &c${args[1]} &7has not been updated due to an error. Tip: the plugin must be enabled before you delete it. Did you restart the server after installing?".color())
+                sender.sendMessage("&c${args[1]} &7has not been updated due to an error. Tip: the plugin must be enabled before you delete it. Did you restart the server after installing?".colorOutput())
                 return
             }
 
             Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
                 install(spigetPlugin, URL(downloadUrl))
 
-                sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &a${args[1]} &7has been updated. Please restart your server for the download to take effect (we are adding auto starting soon!).".color())
+                sender.sendMessage("&a${args[1]} &7has been updated. Please restart your server for the download to take effect (we are adding auto starting soon!).".colorOutput())
             })
             return
         }
@@ -60,11 +61,11 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         }
 
         if (needUpdating.isEmpty()) {
-            sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &7No plugins require an update.".color())
+            sender.sendMessage("&7No plugins require an update.".color())
             return;
         }
 
-        sender.sendMessage("\"&7&l[&b&lPP&7&l] &8&l> &7Listing all plugins that can be updated:".color())
+        sender.sendMessage("\"&7Listing all plugins that can be updated:".color())
         for (spigetPlugin in needUpdating) {
             sender.sendMessage("&a+ &b${spigetPlugin.name}".color())
         }

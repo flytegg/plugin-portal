@@ -19,7 +19,7 @@ object Data {
         config = YamlConfiguration.loadConfiguration(file)
 
         config.getKeys(false).forEach { id ->
-            val pluginSection = config.getConfigurationSection("$id")
+            val pluginSection = config.getConfigurationSection(id)
             if (pluginSection != null) {
                 installedPlugins.add(LocalPlugin(id.toInt(), pluginSection.getString("version")!!, pluginSection.getString("file")!!))
             }
