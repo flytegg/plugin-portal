@@ -29,7 +29,7 @@ class DeleteSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         }
 
         if (!delete(pluginPortal, localPlugin)) {
-            sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &c${args[1]} &7has not been deleted due to an error. Please report this on our Discord @ discord.gg/portalbox.".color())
+            sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &c${args[1]} &7has not been deleted due to an error. If you just installed this plugin and didn't restart, that is probably the cause. Be sure to restart and run this command again.".color())
             return
         }
 
