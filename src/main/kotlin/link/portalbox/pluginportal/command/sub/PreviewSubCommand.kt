@@ -1,8 +1,7 @@
 package link.portalbox.pluginportal.command.sub
-
-import PreviewUtil
 import link.portalbox.pluginportal.command.SubCommand
-import link.portalbox.pluginportal.util.ChatColor.color
+import link.portalbox.pluginportal.util.ChatColor.colorOutput
+import link.portalbox.pluginportal.util.sendPreview
 import link.portalbox.pplib.manager.MarketplaceManager
 import link.portalbox.pplib.type.SpigetPlugin
 import org.bukkit.command.CommandSender
@@ -12,18 +11,18 @@ class PreviewSubCommand : SubCommand() {
 
     override fun execute(sender: CommandSender, args: Array<out String>) {
         if (args.size <= 1) {
-            sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &cPlease specify a plugin to preview!".color())
+            sender.sendMessage("&cPlease specify a plugin to preview!".colorOutput())
             return
         }
 
         if (!MarketplaceManager.marketplaceCache.inverse().contains(args[1])) {
-            sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &cPlugin does not exist.".color())
+            sender.sendMessage("&cPlugin does not exist.".colorOutput())
             return
         }
 
         val spigetPlugin = SpigetPlugin(MarketplaceManager.getId(args[1]))
 
-        PreviewUtil.sendPreview(sender, spigetPlugin, true);
+        sendPreview(sender, spigetPlugin, true);
     }
 
     override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {
