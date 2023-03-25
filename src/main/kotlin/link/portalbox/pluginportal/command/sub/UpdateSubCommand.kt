@@ -8,6 +8,7 @@ import link.portalbox.pluginportal.util.ChatColor.colorOutput
 import link.portalbox.pluginportal.util.delete
 import link.portalbox.pluginportal.util.install
 import link.portalbox.pplib.manager.MarketplaceManager
+import link.portalbox.pplib.type.MarketplacePlugin
 import link.portalbox.pplib.type.SpigetPlugin
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
@@ -25,14 +26,13 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
                 return
             }
 
-            val spigetPlugin = SpigetPlugin(id)
-            if (spigetPlugin.onlineVersion == localPlugin.version) {
+            val plugin: MarketplacePlugin = SpigetPlugin(id).marketplacePlugin
+            if (plugin.onlineVersion == localPlugin.version) {
                 sender.sendMessage("&a${args[1]} &7is already up to date.".colorOutput())
                 return
             }
 
-            val downloadUrl = if (spigetPlugin.externalUrl == null) "https://api.spiget.org/v2/resources/${spigetPlugin.id}/download" else spigetPlugin.externalUrl
-            if (downloadUrl == null) {
+            if (plugin.downloadURL == null) {
                 sender.sendMessage("&7We couldn't find a download link for &c${args[1]}&7. This happens when they use an external link and we can't always identify the correct file to download. Please report this to our Discord @ discord.gg/portalbox so we manually support this.".colorOutput())
                 return
             }
@@ -45,7 +45,7 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             }
 
             Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
-                install(spigetPlugin, URL(downloadUrl))
+                install(plugin, plugin.downloadURL)
 
                 sender.sendMessage("&a${args[1]} &7has been updated. Please restart your server for the download to take effect (we are adding auto starting soon!).".colorOutput())
             })

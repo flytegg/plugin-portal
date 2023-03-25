@@ -2,6 +2,7 @@ package link.portalbox.pluginportal.util
 
 import link.portalbox.pluginportal.util.ChatColor.color
 import link.portalbox.pluginportal.util.ChatColor.coloredComponent
+import link.portalbox.pplib.type.MarketplacePlugin
 import link.portalbox.pplib.type.SpigetPlugin
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
@@ -21,26 +22,24 @@ import kotlin.math.roundToInt
 
 const val SEPARATOR = "&8&m                                                       "
 
-fun sendPreview(player: CommandSender, spigetPlugin: SpigetPlugin, containDownloadPrompt: Boolean) {
-  val downloadUrl = spigetPlugin.externalUrl ?: "https://api.spiget.org/v2/resources/${spigetPlugin.id}/download"
-
+fun sendPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloadPrompt: Boolean) {
   val information = mutableListOf(
-    infoComp("Name: &b${spigetPlugin.name}"),
+    infoComp("Name: &b${plugin.name}"),
     infoComp("Description: &b&l[Hover Here]").apply {
       hoverEvent = HoverEvent(
-        HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("${ChatColor.AQUA} ${spigetPlugin.description}")
+        HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("${ChatColor.AQUA} ${plugin.description}")
       )
     },
-    infoComp("Downloads: &b${String.format("%,d", spigetPlugin.downloads)}"),
-    infoComp("Rating: &b${spigetPlugin.rating}&e ⭐"),
-    infoComp("Premium: &b${if (spigetPlugin.premium) "Yes (${spigetPlugin.price})" else "No"}"),
-    infoComp("Last Updated: &b${formatDate(spigetPlugin.updateDate * 1000L)}"),
+    infoComp("Downloads: &b${String.format("%,d", plugin.downloads)}"),
+    infoComp("Rating: &b${plugin.rating}&e ⭐"),
+    infoComp("Premium: &b${if (plugin.premium) "Yes (${plugin.price})" else "No"}"),
+    infoComp("Last Updated: &b${formatDate(plugin.updateDate * 1000L)}"),
   )
 
-  if (!downloadUrl.contains("api.spiget.org")) {
+  if (!plugin.downloadURL.toString().contains("api.spiget.org")) {
     val label = infoComp("&7External Link: &b")
     val link = infoComp("&b&l[Click Here]").apply {
-      clickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, downloadUrl)
+      clickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, plugin.downloadURL.toString())
       hoverEvent = HoverEvent(
         HoverEvent.Action.SHOW_TEXT,
         TextComponent.fromLegacyText(ChatColor.AQUA.toString() + "Click to open the external download link")
@@ -51,13 +50,13 @@ fun sendPreview(player: CommandSender, spigetPlugin: SpigetPlugin, containDownlo
   }
   information.add(TextComponent(" "))
 
-  val image = fetchImageAsBuffer(spigetPlugin.iconUrl)
+  val image = fetchImageAsBuffer(plugin.iconUrl)
 
   listOf(
     "┌──────┐", "│ Download │", "└──────┘"
   ).forEach { line ->
     val component = infoComp("&b&l$line").apply {
-      clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pp install ${spigetPlugin.name}")
+      clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pp install ${plugin.name}")
       hoverEvent =
         HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("${ChatColor.AQUA}Click to download ${
           image?.let {
@@ -67,7 +66,7 @@ fun sendPreview(player: CommandSender, spigetPlugin: SpigetPlugin, containDownlo
               )
             )
           } ?: ChatColor.AQUA
-        }${spigetPlugin.name}"))
+        }${plugin.name}"))
     }
     information.add(component)
   }

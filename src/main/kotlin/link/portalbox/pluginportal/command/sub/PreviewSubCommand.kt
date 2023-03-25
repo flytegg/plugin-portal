@@ -21,9 +21,7 @@ class PreviewSubCommand : SubCommand() {
       return
     }
 
-    val spigetPlugin = SpigetPlugin(MarketplaceManager.getId(args[1]))
-
-    sendPreview(sender, spigetPlugin, true);
+    sendPreview(sender, SpigetPlugin(MarketplaceManager.getId(args[1])).marketplacePlugin, true);
   }
 
   override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {
