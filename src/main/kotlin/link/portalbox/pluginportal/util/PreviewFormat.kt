@@ -3,7 +3,6 @@ package link.portalbox.pluginportal.util
 import link.portalbox.pluginportal.util.ChatColor.color
 import link.portalbox.pluginportal.util.ChatColor.coloredComponent
 import link.portalbox.pplib.type.MarketplacePlugin
-import link.portalbox.pplib.type.SpigetPlugin
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.HoverEvent
@@ -23,23 +22,29 @@ import kotlin.math.roundToInt
 const val SEPARATOR = "&8&m                                                       "
 
 fun sendPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloadPrompt: Boolean) {
+  val downloadUrl = plugin.downloadURL.toString() ?: "https://api.spiget.org/v2/resources/${plugin.id}/download"
+  val above1_8 = getVersion(Bukkit.getVersion()) > GameVersion(1, 8, 8)
+
+  val price = if (plugin.premium) "$${plugin.price}" else "Free"
+  val descriptionComponents = createDescriptionLines(plugin.description)
+
   val information = mutableListOf(
-    infoComp("Name: &b${plugin.name}"),
-    infoComp("Description: &b&l[Hover Here]").apply {
-      hoverEvent = HoverEvent(
-        HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("${ChatColor.AQUA} ${plugin.description}")
-      )
-    },
-    infoComp("Downloads: &b${String.format("%,d", plugin.downloads)}"),
-    infoComp("Rating: &b${plugin.rating}&e ⭐"),
-    infoComp("Premium: &b${if (plugin.premium) "Yes (${plugin.price})" else "No"}"),
-    infoComp("Last Updated: &b${formatDate(plugin.updateDate * 1000L)}"),
+    infoComp("┌ &b&l${plugin.name}"),
+    infoComp(
+      "├─ &b${
+        String.format(
+          "%,d", plugin.downloads
+        )
+      } &n&l⬇&r&7 | &b${plugin.rating}&e ⭐ &7| &b${price}"
+    ),
+    *descriptionComponents,
+//    infoComp("Last Update: &b${formatDate(spigetPlugin.updateDate * 1000L)}"),
   )
 
-  if (!plugin.downloadURL.toString().contains("api.spiget.org")) {
+  if (!downloadUrl.contains("api.spiget.org")) {
     val label = infoComp("&7External Link: &b")
     val link = infoComp("&b&l[Click Here]").apply {
-      clickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, plugin.downloadURL.toString())
+      clickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, downloadUrl)
       hoverEvent = HoverEvent(
         HoverEvent.Action.SHOW_TEXT,
         TextComponent.fromLegacyText(ChatColor.AQUA.toString() + "Click to open the external download link")
@@ -50,26 +55,16 @@ fun sendPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloa
   }
   information.add(TextComponent(" "))
 
-  val image = fetchImageAsBuffer(plugin.iconUrl)
-
-  listOf(
-    "┌──────┐", "│ Download │", "└──────┘"
-  ).forEach { line ->
-    val component = infoComp("&b&l$line").apply {
-      clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pp install ${plugin.name}")
-      hoverEvent =
-        HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("${ChatColor.AQUA}Click to download ${
-          image?.let {
-            ChatColor.of(
-              getAverageColor(
-                image
-              )
-            )
-          } ?: ChatColor.AQUA
-        }${plugin.name}"))
+  information.addAll(
+    if (above1_8) createButton(plugin)
+    else {
+      listOf(
+        infoComp("/pp install ${plugin.name.replace(" ", "-")}")
+      )
     }
-    information.add(component)
-  }
+  )
+
+  val image = fetchImageAsBuffer(plugin.iconUrl)
 
   val imageGrid = image?.let { createImageGrid(image, 11, 13) } ?: emptyArray()
 
@@ -97,6 +92,58 @@ fun sendPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloa
   player.sendMessage(SEPARATOR.color())
 }
 
+fun createDescriptionLines(description: String, showHover: Boolean = true): Array<TextComponent> {
+  val descriptionLines = description.chunked(35)
+
+  val descriptionComponents = if (descriptionLines.size > 3) {
+    val hoverDesc = if (showHover) {
+      HoverEvent(
+        HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(
+          "${ChatColor.AQUA}$description"
+        )
+      )
+    } else null
+
+    val comps = descriptionLines.subList(0, 2).map { " &7│ $it".coloredComponent().apply { hoverEvent = hoverDesc } }
+      .toMutableList()
+    comps.add(" &7│ ${descriptionLines[2]}...".coloredComponent().apply { hoverEvent = hoverDesc })
+    comps
+  } else {
+    descriptionLines.map { " &7│ $it".coloredComponent() }
+  }.toTypedArray()
+
+  return descriptionComponents
+}
+
+fun createButton(plugin: MarketplacePlugin): List<TextComponent> {
+  val hoverText = when (plugin.premium) {
+    false -> "&bClick to Download"
+    true -> "&4This plugin is paid so you cannot download it through Plugin Portal. Click to view the plugin on SpigotMC."
+  }
+
+  val onClick = when (plugin.premium) {
+    false -> ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pp install ${plugin.name.replace("", "-")}")
+    true -> ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/${plugin.id}")
+  }
+
+  val button = when (plugin.premium) {
+    false -> listOf(
+      "&b&l┌──────┐", "&b&l│ Download │", "&b&l└──────┘"
+    )
+
+    true -> listOf(
+      "&e&l┌───&r&e──&l┐", "&e&l│   Buy   │", "&e&l└───&r&e──&l┘"
+    )
+  }
+
+  return button.map { line ->
+    " &b&l$line".coloredComponent().apply {
+      clickEvent = onClick
+      hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(hoverText.color()))
+    }
+  }
+}
+
 /**
  * Creates a TextComponent with the given string and colors it and truncates it if it is too long with a hover event.
  *
@@ -104,9 +151,11 @@ fun sendPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloa
  * @return The TextComponent
  */
 fun infoComp(string: String): TextComponent {
-  if (string.length < 36) return " &7$string".coloredComponent()
+  val above1_8 = getVersion(Bukkit.getVersion()) > GameVersion(1, 8, 8)
 
-  return " &7${string.substring(0, 35)} &8[...]".coloredComponent().apply {
+  if (string.length < 50) return " &7$string".coloredComponent()
+
+  return " &7${string.substring(0, 40)} &8[...]".coloredComponent().applyIf(above1_8) {
     hoverEvent = HoverEvent(
       HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(string.color())
     )
