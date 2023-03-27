@@ -46,7 +46,13 @@ fun getSha(file: File): String {
 //    )
 //}
 
-data class GameVersion(val major: Int, val minor: Int, val patch: Int)
+data class GameVersion(val major: Int, val minor: Int, val patch: Int) {
+  operator fun compareTo(other: GameVersion): Int {
+    if (major != other.major) return major - other.major
+    if (minor != other.minor) return minor - other.minor
+    return patch - other.patch
+  }
+}
 
 fun getVersion(versionString: String): GameVersion {
   val parts = Regex("(\\d+)\\.(\\d+)\\.(\\d+)").find(versionString) ?: return GameVersion(0, 0, 0)
@@ -60,11 +66,17 @@ fun getVersion(versionString: String): GameVersion {
 
 fun getVersionRange(versions: List<String>): String {
   assert(versions.isNotEmpty())
-  val sortedVersions = versions.sortedBy { it.replace(".", "").toInt() }
+  val sortedVersions = versions.sortedWith { a, b -> getVersion(a).compareTo(getVersion(b)) }
 
   val oldest = getVersion(sortedVersions.first()).run { "${major}.${minor}" }
   val latest = getVersion(sortedVersions.last()).run { "${major}.${minor}" }
 
   if (oldest == latest) return oldest
   return "$oldest-$latest"
+}
+
+inline fun <T> T.applyIf(shouldApply: Boolean, block: T.() -> Unit): T = apply {
+  if (shouldApply) {
+    block(this)
+  }
 }
