@@ -3,6 +3,7 @@ package link.portalbox.pluginportal.util
 import link.portalbox.pluginportal.util.ChatColor.color
 import link.portalbox.pluginportal.util.ChatColor.coloredComponent
 import link.portalbox.pplib.type.MarketplacePlugin
+import link.portalbox.pplib.util.HttpUtil
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.HoverEvent
@@ -22,8 +23,7 @@ import kotlin.math.roundToInt
 const val SEPARATOR = "&8&m                                                       "
 
 fun sendPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloadPrompt: Boolean) {
-  val downloadUrl = plugin.downloadURL.toString() ?: "https://api.spiget.org/v2/resources/${plugin.id}/download"
-  val above1_8 = getVersion(Bukkit.getVersion()) > GameVersion(1, 8, 8)
+  val above1_16 = getVersion(Bukkit.getVersion()) > GameVersion(1, 16, 4)
 
   val price = if (plugin.premium) "$${plugin.price}" else "Free"
   val descriptionComponents = createDescriptionLines(plugin.description)
@@ -41,10 +41,10 @@ fun sendPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloa
 //    infoComp("Last Update: &b${formatDate(spigetPlugin.updateDate * 1000L)}"),
   )
 
-  if (!downloadUrl.contains("api.spiget.org")) {
+  if (!HttpUtil.isDirectDownload(plugin.downloadURL.toString())) {
     val label = infoComp("&7External Link: &b")
     val link = infoComp("&b&l[Click Here]").apply {
-      clickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, downloadUrl)
+      clickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, plugin.downloadURL.toString())
       hoverEvent = HoverEvent(
         HoverEvent.Action.SHOW_TEXT,
         TextComponent.fromLegacyText(ChatColor.AQUA.toString() + "Click to open the external download link")
@@ -56,7 +56,7 @@ fun sendPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloa
   information.add(TextComponent(" "))
 
   information.addAll(
-    if (above1_8) createButton(plugin)
+    if (above1_16) createButton(plugin)
     else {
       listOf(
         infoComp("/pp install ${plugin.name.replace(" ", "-")}")
