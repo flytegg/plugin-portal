@@ -14,9 +14,6 @@ import java.awt.Color
 import java.awt.image.BufferedImage
 import java.net.HttpURLConnection
 import java.net.URL
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
 import javax.imageio.ImageIO
 import kotlin.math.roundToInt
 
@@ -25,6 +22,16 @@ const val SEPARATOR = "&8&m                                                     
 fun sendPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloadPrompt: Boolean) {
   val above1_16 = getVersion(Bukkit.getVersion()) > GameVersion(1, 16, 4)
 
+  if (above1_16) {
+    sendModernPreview(player, plugin, containDownloadPrompt)
+    return
+  } else {
+    sendLegacyPreview(player, plugin, containDownloadPrompt)
+    return
+  }
+}
+
+fun sendModernPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloadPrompt: Boolean) {
   val price = if (plugin.premium) "$${plugin.price}" else "Free"
   val descriptionComponents = createDescriptionLines(plugin.description)
 
@@ -40,29 +47,24 @@ fun sendPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloa
     *descriptionComponents,
 //    infoComp("Last Update: &b${formatDate(spigetPlugin.updateDate * 1000L)}"),
   )
-
-  if (!HttpUtil.isDirectDownload(plugin.downloadURL.toString())) {
-    val label = infoComp("&7External Link: &b")
-    val link = infoComp("&b&l[Click Here]").apply {
-      clickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, plugin.downloadURL.toString())
-      hoverEvent = HoverEvent(
-        HoverEvent.Action.SHOW_TEXT,
-        TextComponent.fromLegacyText(ChatColor.AQUA.toString() + "Click to open the external download link")
-      )
+  /*
+    if (!HttpUtil.isDirectDownload(plugin.downloadURL.toString())) {
+      val label = infoComp("&7External Link: &b")
+      val link = infoComp("&b&l[Click Here]").apply {
+        clickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, plugin.downloadURL.toString())
+        hoverEvent = HoverEvent(
+          HoverEvent.Action.SHOW_TEXT,
+          TextComponent.fromLegacyText(ChatColor.AQUA.toString() + "Click to open the external download link")
+        )
+      }
+      label.addExtra(link)
+      information.add(label)
     }
-    label.addExtra(link)
-    information.add(label)
-  }
+   */
+
   information.add(TextComponent(" "))
 
-  information.addAll(
-    if (above1_16) createButton(plugin)
-    else {
-      listOf(
-        infoComp("/pp install ${plugin.name.replace(" ", "-")}")
-      )
-    }
-  )
+  information.addAll(createButton(plugin))
 
   val image = fetchImageAsBuffer(plugin.iconUrl)
 
@@ -92,6 +94,46 @@ fun sendPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloa
   player.sendMessage(SEPARATOR.color())
 }
 
+fun sendLegacyPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloadPrompt: Boolean) {
+  val price = if (plugin.premium) "$${plugin.price}" else "Free"
+  val descriptionComponents = createDescriptionLines(plugin.description)
+
+  val information = mutableListOf(
+    infoComp("┌ &b&l${plugin.name}"),
+    infoComp(
+      "├─ &b${
+        String.format(
+          "%,d", plugin.downloads
+        )
+      } &n&l⬇&r&7 | &b${plugin.rating}&e ⭐ &7| &b${price}"
+    ),
+    *descriptionComponents,
+//    infoComp("Last Update: &b${formatDate(spigetPlugin.updateDate * 1000L)}"),
+  )
+
+  information.add(TextComponent(" "))
+
+  information.addAll(createButton(plugin))
+
+  val image = fetchImageAsBuffer(plugin.iconUrl)
+
+  val imageGrid = image?.let { createImageGrid(image, 11, 13) } ?: emptyArray()
+
+  player.sendMessage(SEPARATOR.color())
+
+  for ((rowIndex) in imageGrid.withIndex()) {
+    val rowComponent = TextComponent()
+    information.getOrNull(rowIndex)?.let { rowComponent.addExtra(it) }
+    player.sendMessage(rowComponent.toLegacyText())
+
+  }
+
+  player.sendMessage(SEPARATOR.color())
+
+}
+
+
+
 fun createDescriptionLines(description: String, showHover: Boolean = true): Array<TextComponent> {
   val descriptionLines = description.chunked(35)
 
@@ -118,11 +160,14 @@ fun createDescriptionLines(description: String, showHover: Boolean = true): Arra
 fun createButton(plugin: MarketplacePlugin): List<TextComponent> {
   val hoverText = when (plugin.premium) {
     false -> "&bClick to Download"
-    true -> "&4This plugin is paid so you cannot download it through Plugin Portal. Click to view the plugin on SpigotMC."
+    true ->  when (HttpUtil.isDirectDownload(plugin.downloadURL.toString())) {
+      false -> "&4This plugin is external, Click to view the plugin online."
+        true -> "&4We are unable to download paid plugins, Click to view the plugin online."
+    }
   }
 
-  val onClick = when (plugin.premium) {
-    false -> ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pp install ${plugin.name.replace("", "-")}")
+  val onClick = when (plugin.premium || HttpUtil.isDirectDownload(plugin.downloadURL.toString())) {
+    false -> ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pp install ${plugin.name}")
     true -> ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/${plugin.id}")
   }
 
@@ -237,25 +282,4 @@ fun getAverageColor(image: BufferedImage): Color {
     (sumG / sampled).toFloat().roundToInt(),
     (sumB / sampled).toFloat().roundToInt()
   )
-}
-
-/**sg
- * Formats the given epoch millis into a date string.
- *
- * @param millis The epoch millis to format.
- * @return The formatted date string. *e.g. 1st January 2021*
- */
-private fun formatDate(millis: Long): String {
-  val date: LocalDate = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate()
-
-  val dayOfMonth = date.dayOfMonth
-  val dayOfMonthStr = when {
-    dayOfMonth % 10 == 1 && dayOfMonth != 11 -> "st"
-    dayOfMonth % 10 == 2 && dayOfMonth != 12 -> "nd"
-    dayOfMonth % 10 == 3 && dayOfMonth != 13 -> "rd"
-    else -> "th"
-  }
-  val monthStr = date.month.toString().lowercase().replaceFirstChar { it.uppercase() }
-  val yearStr = date.year.toString()
-  return "$dayOfMonth$dayOfMonthStr $monthStr $yearStr"
 }
