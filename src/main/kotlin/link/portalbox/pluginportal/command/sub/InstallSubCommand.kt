@@ -11,7 +11,6 @@ import link.portalbox.pplib.type.SpigetPlugin
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
-import java.net.URL
 
 class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
 

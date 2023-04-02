@@ -6,6 +6,7 @@ import link.portalbox.pluginportal.file.LocalPlugin
 import link.portalbox.pplib.type.MarketplacePlugin
 import link.portalbox.pplib.type.SpigetPlugin
 import link.portalbox.pplib.util.FileUtil
+import link.portalbox.pplib.util.HttpUtil
 import org.apache.commons.io.FileUtils
 import java.io.File
 import java.io.FileNotFoundException
