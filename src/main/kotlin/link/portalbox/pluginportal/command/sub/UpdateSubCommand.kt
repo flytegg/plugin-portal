@@ -65,7 +65,7 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             return;
         }
 
-        sender.sendMessage("\"&7Listing all plugins that can be updated:".color())
+        sender.sendMessage("&7Listing all plugins that can be updated:".color())
         for (spigetPlugin in needUpdating) {
             sender.sendMessage("&a+ &b${spigetPlugin.name}".color())
         }

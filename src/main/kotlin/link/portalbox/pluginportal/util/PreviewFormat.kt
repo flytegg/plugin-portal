@@ -2,6 +2,7 @@ package link.portalbox.pluginportal.util
 
 import link.portalbox.pluginportal.util.ChatColor.color
 import link.portalbox.pluginportal.util.ChatColor.coloredComponent
+import link.portalbox.pplib.manager.MarketplaceManager
 import link.portalbox.pplib.type.MarketplacePlugin
 import link.portalbox.pplib.util.HttpUtil
 import net.md_5.bungee.api.ChatColor
@@ -113,19 +114,17 @@ fun sendLegacyPreview(player: CommandSender, plugin: MarketplacePlugin, containD
 
   information.add(TextComponent(" "))
 
-  information.addAll(createButton(plugin))
-
-  val image = fetchImageAsBuffer(plugin.iconUrl)
-
-  val imageGrid = image?.let { createImageGrid(image, 11, 13) } ?: emptyArray()
+  if (plugin.downloadURL == null) {
+    information.add(TextComponent(" &7├─&b https://www.spigotmc.org/resources/${plugin.id}/".color()))
+  } else {
+    information.add(TextComponent(" &7├─ &b/pp install ${plugin.name}".color()))
+  }
 
   player.sendMessage(SEPARATOR.color())
 
-  for ((rowIndex) in imageGrid.withIndex()) {
-    val rowComponent = TextComponent()
-    information.getOrNull(rowIndex)?.let { rowComponent.addExtra(it) }
-    player.sendMessage(rowComponent.toLegacyText())
 
+  for (component in information) {
+    player.sendMessage(component.toLegacyText())
   }
 
   player.sendMessage(SEPARATOR.color())
@@ -161,14 +160,14 @@ fun createButton(plugin: MarketplacePlugin): List<TextComponent> {
   val hoverText = when (plugin.premium) {
     false -> "&bClick to Download"
     true ->  when (HttpUtil.isDirectDownload(plugin.downloadURL.toString())) {
-      false -> "&4This plugin is external, Click to view the plugin online."
-        true -> "&4We are unable to download paid plugins, Click to view the plugin online."
+      false -> "&4This plugin is external. Click to view the plugin online."
+        true -> "&4We are unable to download paid plugins. Click to view the plugin online."
     }
   }
 
-  val onClick = when (plugin.premium || HttpUtil.isDirectDownload(plugin.downloadURL.toString())) {
-    false -> ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pp install ${plugin.name}")
+  val onClick = when (plugin.downloadURL == null || plugin.premium) {
     true -> ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/${plugin.id}")
+    false -> ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pp install ${MarketplaceManager.getName(Integer.parseInt(plugin.id))}")
   }
 
   val button = when (plugin.premium) {
