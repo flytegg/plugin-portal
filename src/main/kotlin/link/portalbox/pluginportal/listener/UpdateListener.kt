@@ -33,6 +33,13 @@ class UpdateListener(private val pluginPortal: PluginPortal) : Listener {
         } else {
             pluginPortal.logger.fine("Having problems? Join our support Discord @ discord.gg/portalbox.")
             setupMetrics(Metrics(pluginPortal, 18005))
+            for (file in pluginPortal.dataFolder.listFiles()!!) {
+                if (file.name.contains("PluginPortal-")) {
+                    if (!file.name.contains(versionNumber!!)) {
+                        file.delete()
+                    }
+                }
+            }
         }
     }
 
