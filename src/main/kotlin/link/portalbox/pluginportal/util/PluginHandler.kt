@@ -37,4 +37,5 @@ fun install(plugin: MarketplacePlugin, downloadURL: URL) {
     val outputFile = File("plugins", "${plugin.name}-${plugin.onlineVersion} (PP).jar")
     FileUtil.download(downloadURL, outputFile)
     Data.update(plugin.id.toInt(), plugin.onlineVersion, getSha(outputFile))
+    addValueToPieChart(Chart.MOSTDOWNLOADED, plugin.id)
 }

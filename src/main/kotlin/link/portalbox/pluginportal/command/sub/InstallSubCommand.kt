@@ -3,7 +3,9 @@ package link.portalbox.pluginportal.command.sub
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.file.Data
+import link.portalbox.pluginportal.util.Chart
 import link.portalbox.pluginportal.util.ChatColor.colorOutput
+import link.portalbox.pluginportal.util.addValueToPieChart
 import link.portalbox.pluginportal.util.install
 import link.portalbox.pplib.manager.MarketplaceManager
 import link.portalbox.pplib.type.MarketplacePlugin
@@ -39,6 +41,7 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
 
     if (plugin.downloadURL == null) {
       sender.sendMessage("&7We couldn't find a download link for &c${args[1]}&7. This happens when they use an external link and we can't always identify the correct file to download. Please report this to our Discord @ discord.gg/portalbox so we manually support this.".colorOutput())
+      addValueToPieChart(Chart.MOSTINVALIDDOWNLOADS, plugin.id)
       return
     }
 
