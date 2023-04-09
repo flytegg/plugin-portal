@@ -7,32 +7,32 @@ import link.portalbox.pluginportal.util.ChatColor.color
 import link.portalbox.pluginportal.util.ChatColor.colorOutput
 import link.portalbox.pluginportal.util.delete
 import link.portalbox.pluginportal.util.install
-import link.portalbox.pplib.manager.MarketplaceManager
+import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
-import link.portalbox.pplib.type.SpigetPlugin
+import link.portalbox.pplib.type.MarketplaceService
+import link.portalbox.pplib.util.getURL
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
-import java.net.URL
 
 class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
 
     override fun execute(sender: CommandSender, args: Array<out String>) {
         if (args.size >= 2) {
-            val id = MarketplaceManager.getId(args[1])
+            val id = MarketplacePluginManager.marketplaceCache.inverse()[args[1]]
             val localPlugin = Data.installedPlugins.find { it.id == id }
             if (localPlugin == null) {
                 sender.sendMessage("&c${args[1]} &7is not installed or recognised by Plugin Portal. Did you mean to run &b/pp install ${args[1]}&7?".colorOutput())
                 return
             }
 
-            val plugin: MarketplacePlugin = SpigetPlugin(id).marketplacePlugin
-            if (plugin.onlineVersion == localPlugin.version) {
+            val plugin: MarketplacePlugin = MarketplacePluginManager.getPlugin(MarketplaceService.SPIGOTMC, id!!)
+            if (plugin.version == localPlugin.version) {
                 sender.sendMessage("&a${args[1]} &7is already up to date.".colorOutput())
                 return
             }
 
-            if (plugin.downloadURL == null) {
+            if (plugin.downloadURL.isEmpty()) {
                 sender.sendMessage("&7We couldn't find a download link for &c${args[1]}&7. This happens when they use an external link and we can't always identify the correct file to download. Please report this to our Discord @ discord.gg/portalbox so we manually support this.".colorOutput())
                 return
             }
@@ -45,16 +45,16 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             }
 
             Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
-                install(plugin, plugin.downloadURL)
+                install(plugin, getURL(plugin.downloadURL)!!)
                 sender.sendMessage("&a${args[1]} &7has been updated. Please restart your server for the download to take effect (we are adding auto starting soon!).".colorOutput())
             })
             return
         }
 
-        val needUpdating = mutableListOf<SpigetPlugin>()
+        val needUpdating = mutableListOf<MarketplacePlugin>()
         for (plugin in Data.installedPlugins) {
-            val spigetPlugin = SpigetPlugin(plugin.id)
-            if (spigetPlugin.onlineVersion != plugin.version) {
+            val spigetPlugin = MarketplacePluginManager.getPlugin(MarketplaceService.SPIGOTMC, plugin.id)
+            if (spigetPlugin.version != plugin.version) {
                 needUpdating.add(spigetPlugin)
             }
         }
@@ -74,7 +74,7 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         if (args.size != 2) return null
         return StringUtil.copyPartialMatches(
             args[1],
-            Data.installedPlugins.map { MarketplaceManager.getName(it.id) },
+            Data.installedPlugins.map { MarketplacePluginManager.marketplaceCache[it.id] },
             mutableListOf())
     }
 
