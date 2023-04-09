@@ -3,7 +3,7 @@ package link.portalbox.pluginportal.listener
 import link.portalbox.pluginportal.file.Data
 import link.portalbox.pluginportal.util.ChatColor.color
 import link.portalbox.pluginportal.util.getSha
-import link.portalbox.pplib.manager.MarketplaceManager
+import link.portalbox.pplib.manager.MarketplacePluginManager
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
@@ -25,7 +25,7 @@ class PluginValidator : Listener {
         val pluginsToDelete = mutableListOf<Int>()
         for (plugin in Data.installedPlugins) {
             if (!installedShas.contains(plugin.fileSha)) {
-                removedPlugins.add(MarketplaceManager.getName(plugin.id))
+                removedPlugins.add(MarketplacePluginManager.marketplaceCache[plugin.id]!!)
                 pluginsToDelete.add(plugin.id)
             }
         }
