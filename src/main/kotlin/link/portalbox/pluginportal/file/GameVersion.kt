@@ -1,4 +1,4 @@
-package link.portalbox.pluginportal.listener
+package link.portalbox.pluginportal.file
 
 data class GameVersion(val major: Int, val minor: Int, val patch: Int) {
     operator fun compareTo(other: GameVersion): Int {

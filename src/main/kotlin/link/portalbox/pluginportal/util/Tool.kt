@@ -1,6 +1,6 @@
 package link.portalbox.pluginportal.util
 
-import link.portalbox.pluginportal.listener.GameVersion
+import link.portalbox.pluginportal.file.GameVersion
 import java.io.File
 import java.io.FileInputStream
 import java.security.MessageDigest
