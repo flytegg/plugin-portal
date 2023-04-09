@@ -2,9 +2,9 @@ package link.portalbox.pluginportal.util
 
 import link.portalbox.pluginportal.util.ChatColor.color
 import link.portalbox.pluginportal.util.ChatColor.coloredComponent
-import link.portalbox.pplib.manager.MarketplaceManager
+import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
-import link.portalbox.pplib.util.HttpUtil
+import link.portalbox.pplib.util.isDirectDownload
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.HoverEvent
@@ -33,7 +33,7 @@ fun sendPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloa
 }
 
 fun sendModernPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloadPrompt: Boolean) {
-  val price = if (plugin.premium) "$${plugin.price}" else "Free"
+  val price = if (plugin.isPremium) "$${plugin.price}" else "Free"
   val descriptionComponents = createDescriptionLines(plugin.description)
   player.spigot()
   val information = mutableListOf(
@@ -43,7 +43,7 @@ fun sendModernPreview(player: CommandSender, plugin: MarketplacePlugin, containD
         String.format(
           "%,d", plugin.downloads
         )
-      } &n&l⬇&r&7 | &b${plugin.rating}&e ⭐ &7| &b${price}"
+      } &n&l⬇&r&7 | &b${plugin.ratingAverage}&e ⭐ &7| &b${price}"
     ),
     *descriptionComponents,
 //    infoComp("Last Update: &b${formatDate(spigetPlugin.updateDate * 1000L)}"),
@@ -67,7 +67,7 @@ fun sendModernPreview(player: CommandSender, plugin: MarketplacePlugin, containD
 
   information.addAll(createButton(plugin))
 
-  val image = fetchImageAsBuffer(plugin.iconUrl)
+  val image = fetchImageAsBuffer(plugin.iconURL)
 
   val imageGrid = image?.let { createImageGrid(image, 11, 13) } ?: emptyArray()
 
@@ -96,7 +96,7 @@ fun sendModernPreview(player: CommandSender, plugin: MarketplacePlugin, containD
 }
 
 fun sendLegacyPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloadPrompt: Boolean) {
-  val price = if (plugin.premium) "$${plugin.price}" else "Free"
+  val price = if (plugin.isPremium) "$${plugin.price}" else "Free"
   val descriptionComponents = createDescriptionLines(plugin.description)
 
   val information = mutableListOf(
@@ -106,7 +106,7 @@ fun sendLegacyPreview(player: CommandSender, plugin: MarketplacePlugin, containD
         String.format(
           "%,d", plugin.downloads
         )
-      } &n&l⬇&r&7 | &b${plugin.rating}&e ⭐ &7| &b${price}"
+      } &n&l⬇&r&7 | &b${plugin.ratingAverage}&e ⭐ &7| &b${price}"
     ),
     *descriptionComponents,
 //    infoComp("Last Update: &b${formatDate(spigetPlugin.updateDate * 1000L)}"),
@@ -114,7 +114,7 @@ fun sendLegacyPreview(player: CommandSender, plugin: MarketplacePlugin, containD
 
   information.add(TextComponent(" "))
 
-  if (plugin.downloadURL == null) {
+  if (plugin.downloadURL.isEmpty()) {
     information.add(TextComponent(" &7├─&b https://www.spigotmc.org/resources/${plugin.id}/".color()))
   } else {
     information.add(TextComponent(" &7├─ &b/pp install ${plugin.name}".color()))
@@ -157,20 +157,20 @@ fun createDescriptionLines(description: String, showHover: Boolean = true): Arra
 }
 
 fun createButton(plugin: MarketplacePlugin): List<TextComponent> {
-  val hoverText = when (plugin.premium) {
+  val hoverText = when (plugin.isPremium) {
     false -> "&bClick to Download"
-    true ->  when (HttpUtil.isDirectDownload(plugin.downloadURL.toString())) {
+    true ->  when (isDirectDownload(plugin.downloadURL.toString())) {
       false -> "&4This plugin is external. Click to view the plugin online."
         true -> "&4We are unable to download paid plugins. Click to view the plugin online."
     }
   }
 
-  val onClick = when (plugin.downloadURL == null || plugin.premium) {
+  val onClick = when (plugin.downloadURL == null || plugin.isPremium) {
     true -> ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/${plugin.id}")
-    false -> ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pp install ${MarketplaceManager.getName(Integer.parseInt(plugin.id))}")
+    false -> ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pp install ${MarketplacePluginManager.marketplaceCache[Integer.parseInt(plugin.id)]}")
   }
 
-  val button = when (plugin.premium) {
+  val button = when (plugin.isPremium) {
     false -> listOf(
       "&b&l┌──────┐", "&b&l│ Download │", "&b&l└──────┘"
     )
