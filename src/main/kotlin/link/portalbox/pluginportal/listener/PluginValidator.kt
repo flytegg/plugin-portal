@@ -1,7 +1,7 @@
 package link.portalbox.pluginportal.listener
 
 import link.portalbox.pluginportal.file.Data
-import link.portalbox.pluginportal.util.ChatColor.color
+import link.portalbox.pluginportal.util.color
 import link.portalbox.pluginportal.util.getSHA
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import org.bukkit.event.EventHandler

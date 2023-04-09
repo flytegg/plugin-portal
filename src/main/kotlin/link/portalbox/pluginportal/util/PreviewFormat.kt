@@ -1,8 +1,6 @@
 package link.portalbox.pluginportal.util
 
 import link.portalbox.pluginportal.listener.GameVersion
-import link.portalbox.pluginportal.util.ChatColor.color
-import link.portalbox.pluginportal.util.ChatColor.coloredComponent
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
 import link.portalbox.pplib.util.isDirectDownload

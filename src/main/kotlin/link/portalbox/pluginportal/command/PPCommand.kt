@@ -2,7 +2,7 @@ package link.portalbox.pluginportal.command
 
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.sub.*
-import link.portalbox.pluginportal.util.ChatColor.color
+import link.portalbox.pluginportal.util.color
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender

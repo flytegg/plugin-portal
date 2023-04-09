@@ -4,8 +4,8 @@ import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.file.Data
 import link.portalbox.pluginportal.util.Chart
-import link.portalbox.pluginportal.util.ChatColor.colorOutput
 import link.portalbox.pluginportal.util.addValueToPieChart
+import link.portalbox.pluginportal.util.colorOutput
 import link.portalbox.pluginportal.util.install
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin

@@ -2,7 +2,7 @@ package link.portalbox.pluginportal.command.sub
 
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.command.SubCommandType
-import link.portalbox.pluginportal.util.ChatColor.color
+import link.portalbox.pluginportal.util.color
 import org.bukkit.command.CommandSender
 
 class HelpSubCommand : SubCommand() {

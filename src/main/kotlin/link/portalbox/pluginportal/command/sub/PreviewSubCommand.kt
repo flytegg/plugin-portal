@@ -1,7 +1,7 @@
 package link.portalbox.pluginportal.command.sub
 
 import link.portalbox.pluginportal.command.SubCommand
-import link.portalbox.pluginportal.util.ChatColor.colorOutput
+import link.portalbox.pluginportal.util.colorOutput
 import link.portalbox.pluginportal.util.sendPreview
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplaceService

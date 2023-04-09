@@ -1,7 +1,7 @@
 package link.portalbox.pluginportal.listener
 
 import link.portalbox.pluginportal.PluginPortal
-import link.portalbox.pluginportal.util.ChatColor.color
+import link.portalbox.pluginportal.util.color
 import link.portalbox.pluginportal.util.install
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplaceService
