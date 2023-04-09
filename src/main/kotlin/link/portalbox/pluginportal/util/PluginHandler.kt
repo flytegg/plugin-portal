@@ -14,7 +14,7 @@ fun delete(pluginPortal: PluginPortal, localPlugin: LocalPlugin): Boolean {
         val pluginClass = loadedPlugin.javaClass
         val codeSource = pluginClass.protectionDomain.codeSource
         if (codeSource != null) {
-            try {
+            runCatching {
                 val file = File(codeSource.location.toURI().path)
                 if (localPlugin.fileSha == getSHA(file)) {
                     pluginPortal.server.pluginManager.disablePlugin(loadedPlugin)
@@ -22,8 +22,6 @@ fun delete(pluginPortal: PluginPortal, localPlugin: LocalPlugin): Boolean {
                     Data.delete(localPlugin.id)
                     return true
                 }
-            } catch (x: FileNotFoundException) {
-                continue
             }
         }
     }
