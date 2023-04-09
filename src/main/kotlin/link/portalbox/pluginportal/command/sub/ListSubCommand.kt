@@ -4,7 +4,6 @@ import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.file.Data
 import link.portalbox.pluginportal.util.ChatColor.color
 import link.portalbox.pluginportal.util.ChatColor.colorOutput
-import link.portalbox.pplib.manager.MarketplaceManager
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import org.bukkit.command.CommandSender
 
