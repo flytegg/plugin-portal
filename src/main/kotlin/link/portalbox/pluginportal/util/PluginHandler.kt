@@ -16,7 +16,7 @@ fun delete(pluginPortal: PluginPortal, localPlugin: LocalPlugin): Boolean {
         if (codeSource != null) {
             try {
                 val file = File(codeSource.location.toURI().path)
-                if (localPlugin.fileSha == getSha(file)) {
+                if (localPlugin.fileSha == getSHA(file)) {
                     pluginPortal.server.pluginManager.disablePlugin(loadedPlugin)
                     file.delete()
                     Data.delete(localPlugin.id)
@@ -33,6 +33,6 @@ fun delete(pluginPortal: PluginPortal, localPlugin: LocalPlugin): Boolean {
 fun install(plugin: MarketplacePlugin, downloadURL: URL) {
     val outputFile = File("plugins", "${plugin.name}-${plugin.version} (PP).jar")
     download(downloadURL, outputFile)
-    Data.update(plugin.id.toInt(), plugin.version, getSha(outputFile))
+    Data.update(plugin.id.toInt(), plugin.version, getSHA(outputFile))
     addValueToPieChart(Chart.MOSTDOWNLOADED, plugin.id)
 }

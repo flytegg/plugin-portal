@@ -2,7 +2,7 @@ package link.portalbox.pluginportal.listener
 
 import link.portalbox.pluginportal.file.Data
 import link.portalbox.pluginportal.util.ChatColor.color
-import link.portalbox.pluginportal.util.getSha
+import link.portalbox.pluginportal.util.getSHA
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -18,7 +18,7 @@ class PluginValidator : Listener {
         val installedShas = mutableListOf<String>()
         for (file in File("plugins").listFiles()) {
             if (!file.isDirectory) {
-                installedShas.add(getSha(file))
+                installedShas.add(getSHA(file))
             }
         }
 
