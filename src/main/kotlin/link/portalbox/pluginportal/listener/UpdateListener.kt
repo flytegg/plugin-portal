@@ -36,12 +36,12 @@ class UpdateListener(private val pluginPortal: PluginPortal) : Listener {
     }
 
     @EventHandler
-    fun onJoin(e: PlayerJoinEvent) {
-        if (!e.player.isOp) return
+    fun onJoin(event: PlayerJoinEvent) {
+        if (!event.player.isOp) return
         if (pluginPortal.LATEST_VERSION) return
 
         val component = TextComponent("&7&l[&b&lPP&7&l] &8&l> &7Plugin Portal needs to be updated. Please download the latest version from: &b&l[CLICK HERE]".color())
         component.clickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/plugin-portal.108700/")
-        e.player.spigot().sendMessage(component)
+        event.player.spigot().sendMessage(component)
     }
 }

@@ -35,10 +35,10 @@ class PluginValidator : Listener {
     }
 
     @EventHandler
-    fun onJoin(e: PlayerJoinEvent) {
+    fun onJoin(event: PlayerJoinEvent) {
         if (removedPlugins.isEmpty()) return
         if (notified) return
-        if (!e.player.isOp) return
+        if (!event.player.isOp) return
 
         val plugins = when (removedPlugins.size) {
             1 -> "${removedPlugins[0]}"
@@ -46,7 +46,7 @@ class PluginValidator : Listener {
             else -> removedPlugins.dropLast(1).joinToString(", ") + " and " + removedPlugins.last()
         }
 
-        e.player.sendMessage("&7&l[&b&lPP&7&l] &8&l> &7We noticed you manually removed &c$plugins&7. To prevent issues, we have removed ${if (removedPlugins.size > 1) "them" else "it"} from our data store too.".color())
+        event.player.sendMessage("&7&l[&b&lPP&7&l] &8&l> &7We noticed you manually removed &c$plugins&7. To prevent issues, we have removed ${if (removedPlugins.size > 1) "them" else "it"} from our data store too.".color())
         notified = true
     }
 }
