@@ -10,7 +10,6 @@ import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
 
 class DeleteSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
-
     override fun execute(sender: CommandSender, args: Array<out String>) {
         if (args.size <= 1) {
             sender.sendMessage("&cPlease specify a plugin to delete!".colorOutput())

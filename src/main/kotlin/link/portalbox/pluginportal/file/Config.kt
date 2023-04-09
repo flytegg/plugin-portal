@@ -4,7 +4,6 @@ import link.portalbox.pluginportal.PluginPortal
 import org.bukkit.configuration.file.FileConfiguration
 
 object Config {
-
     private lateinit var config: FileConfiguration
 
     private val testDeleteLater get() = config.getString("")
@@ -13,5 +12,4 @@ object Config {
         pluginPortal.saveDefaultConfig()
         config = pluginPortal.config
     }
-
 }

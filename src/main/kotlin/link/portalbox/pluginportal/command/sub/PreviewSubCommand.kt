@@ -9,7 +9,6 @@ import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
 
 class PreviewSubCommand : SubCommand() {
-
     override fun execute(sender: CommandSender, args: Array<out String>) {
         if (args.size <= 1) {
             sender.sendMessage("&cPlease specify a plugin to preview!".colorOutput())
@@ -35,5 +34,4 @@ class PreviewSubCommand : SubCommand() {
                 args[1], MarketplacePluginManager.marketplaceCache.values, mutableListOf()
         )
     }
-
 }

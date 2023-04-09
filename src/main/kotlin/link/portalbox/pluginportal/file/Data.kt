@@ -5,7 +5,6 @@ import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 
 object Data {
-
     private lateinit var file: File
     private lateinit var config: YamlConfiguration
 
@@ -46,5 +45,4 @@ object Data {
 
         installedPlugins.removeIf { it.id == id }
     }
-
 }

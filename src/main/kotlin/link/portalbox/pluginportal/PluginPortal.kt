@@ -14,7 +14,6 @@ import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.java.JavaPlugin
 
 class PluginPortal : JavaPlugin() {
-
     var LATEST_VERSION = true
 
     override fun onEnable() {
@@ -40,5 +39,4 @@ class PluginPortal : JavaPlugin() {
             logger.severe("Download Link: https://www.spigotmc.org/resources/plugin-portal.108700/")
         }
     }
-
 }

@@ -8,7 +8,6 @@ import link.portalbox.pplib.manager.MarketplacePluginManager
 import org.bukkit.command.CommandSender
 
 class ListSubCommand : SubCommand() {
-
     override fun execute(sender: CommandSender, args: Array<out String>) {
         val installedPlugins = Data.installedPlugins
         if (installedPlugins.isEmpty()) {
@@ -25,5 +24,4 @@ class ListSubCommand : SubCommand() {
     override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {
         return null
     }
-
 }

@@ -34,7 +34,6 @@ fun sendPreview(player: CommandSender, plugin: MarketplacePlugin) {
 fun sendModernPreview(player: CommandSender, plugin: MarketplacePlugin) {
     val price = if (plugin.isPremium) "$${plugin.price}" else "Free"
     val descriptionComponents = createDescriptionLines(plugin.description)
-    player.spigot()
     val information = mutableListOf(
         infoComp("┌ &b&l${plugin.name}"),
         infoComp(
@@ -74,7 +73,6 @@ fun sendModernPreview(player: CommandSender, plugin: MarketplacePlugin) {
 fun sendLegacyPreview(player: CommandSender, plugin: MarketplacePlugin) {
     val price = if (plugin.isPremium) "$${plugin.price}" else "Free"
     val descriptionComponents = createDescriptionLines(plugin.description)
-
     val information = mutableListOf(
         infoComp("┌ &b&l${plugin.name}"),
         infoComp(

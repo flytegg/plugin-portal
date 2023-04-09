@@ -6,7 +6,6 @@ import link.portalbox.pluginportal.util.color
 import org.bukkit.command.CommandSender
 
 class HelpSubCommand : SubCommand() {
-
     override fun execute(sender: CommandSender, args: Array<out String>) {
         sender.sendMessage("&8&m                        &7 [&b&lPP&7] &8&m                        ".color())
         for (command in SubCommandType.values()) {
@@ -18,5 +17,4 @@ class HelpSubCommand : SubCommand() {
     override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {
         return null
     }
-
 }

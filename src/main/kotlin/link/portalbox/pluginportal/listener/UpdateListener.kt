@@ -16,7 +16,6 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 class UpdateListener(private val pluginPortal: PluginPortal) : Listener {
-
     init {
         val matcher: Matcher = Pattern.compile("\"version\":\"([\\d\\.]+)\"").matcher(getLatestPPVersion())
         val versionNumber: String? = if (matcher.find()) matcher.group(1) else null
@@ -45,5 +44,4 @@ class UpdateListener(private val pluginPortal: PluginPortal) : Listener {
         component.clickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/plugin-portal.108700/")
         e.player.spigot().sendMessage(component)
     }
-
 }

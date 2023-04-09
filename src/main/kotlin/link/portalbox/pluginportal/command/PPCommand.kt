@@ -12,7 +12,6 @@ import java.util.*
 import java.util.stream.Collectors
 
 class PPCommand(pluginPortal: PluginPortal) : CommandExecutor, TabCompleter {
-
     private val subcommands = HashMap<SubCommandType, SubCommand>().apply {
         put(SubCommandType.HELP, HelpSubCommand())
         put(SubCommandType.PREVIEW, PreviewSubCommand())
@@ -59,5 +58,4 @@ class PPCommand(pluginPortal: PluginPortal) : CommandExecutor, TabCompleter {
 
         return subcommands[type]!!.tabComplete(sender, args)
     }
-
 }

@@ -10,9 +10,8 @@ import org.bukkit.event.player.PlayerJoinEvent
 import java.io.File
 
 class PluginValidator : Listener {
-
-    val removedPlugins = mutableListOf<String>()
-    var notified = false
+    private val removedPlugins = mutableListOf<String>()
+    private var notified = false
 
     init {
         val installedShas = mutableListOf<String>()
@@ -50,5 +49,4 @@ class PluginValidator : Listener {
         e.player.sendMessage("&7&l[&b&lPP&7&l] &8&l> &7We noticed you manually removed &c$plugins&7. To prevent issues, we have removed ${if (removedPlugins.size > 1) "them" else "it"} from our data store too.".color())
         notified = true
     }
-
 }

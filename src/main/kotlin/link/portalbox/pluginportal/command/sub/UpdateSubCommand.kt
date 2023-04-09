@@ -16,7 +16,6 @@ import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
 
 class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
-
     override fun execute(sender: CommandSender, args: Array<out String>) {
         if (args.size >= 2) {
             val id = MarketplacePluginManager.marketplaceCache.inverse()[args[1]]
@@ -77,5 +76,4 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
                 Data.installedPlugins.map { MarketplacePluginManager.marketplaceCache[it.id] },
                 mutableListOf())
     }
-
 }
