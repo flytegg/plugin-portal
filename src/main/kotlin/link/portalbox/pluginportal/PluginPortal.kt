@@ -32,12 +32,6 @@ class PluginPortal : JavaPlugin() {
         server.pluginManager.registerEvents(UpdateListener(this), this)
 
         setupMetrics(Metrics(this, 18005))
-
-        /*
-        if (!LATEST_VERSION) {
-            return;
-        }
-         */
     }
 
     override fun onDisable() {
