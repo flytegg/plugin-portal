@@ -21,60 +21,38 @@ import kotlin.math.roundToInt
 
 const val SEPARATOR = "&8&m                                                       "
 
-fun sendPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloadPrompt: Boolean) {
+fun sendPreview(player: CommandSender, plugin: MarketplacePlugin) {
     val above1_16 = getVersion(Bukkit.getVersion()) > GameVersion(1, 16, 4)
 
     if (above1_16) {
-        sendModernPreview(player, plugin, containDownloadPrompt)
+        sendModernPreview(player, plugin)
         return
     } else {
-        sendLegacyPreview(player, plugin, containDownloadPrompt)
+        sendLegacyPreview(player, plugin)
         return
     }
 }
 
-fun sendModernPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloadPrompt: Boolean) {
+fun sendModernPreview(player: CommandSender, plugin: MarketplacePlugin) {
     val price = if (plugin.isPremium) "$${plugin.price}" else "Free"
     val descriptionComponents = createDescriptionLines(plugin.description)
     player.spigot()
     val information = mutableListOf(
-            infoComp("┌ &b&l${plugin.name}"),
-            infoComp(
-                    "├─ &b${
-                        String.format(
-                                "%,d", plugin.downloads
-                        )
-                    } &n&l⬇&r&7 | &b${plugin.ratingAverage}&e ⭐ &7| &b${price}"
-            ),
-            *descriptionComponents,
-//    infoComp("Last Update: &b${formatDate(spigetPlugin.updateDate * 1000L)}"),
+        infoComp("┌ &b&l${plugin.name}"),
+        infoComp(
+            "├─ &b${plugin.downloads} &n&l⬇&r&7 | &b${plugin.ratingAverage}&e ⭐ &7| &b${price}"
+        ),
+        *descriptionComponents,
     )
-    /*
-      if (!HttpUtil.isDirectDownload(plugin.downloadURL.toString())) {
-        val label = infoComp("&7External Link: &b")
-        val link = infoComp("&b&l[Click Here]").apply {
-          clickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, plugin.downloadURL.toString())
-          hoverEvent = HoverEvent(
-            HoverEvent.Action.SHOW_TEXT,
-            TextComponent.fromLegacyText(ChatColor.AQUA.toString() + "Click to open the external download link")
-          )
-        }
-        label.addExtra(link)
-        information.add(label)
-      }
-     */
 
     information.add(TextComponent(" "))
-
     information.addAll(createButton(plugin))
 
     val image = fetchImageAsBuffer(plugin.iconURL)
-
     val imageGrid = image?.let { createImageGrid(image, 11, 13) } ?: emptyArray()
 
     player.sendMessage(SEPARATOR.color())
-
-    for ((rowIndex, row) in imageGrid.withIndex()) {
+    imageGrid.withIndex().forEach { (rowIndex, row) ->
         val rowComponent = TextComponent()
 
         row.forEach { gridSquare ->
@@ -92,25 +70,19 @@ fun sendModernPreview(player: CommandSender, plugin: MarketplacePlugin, containD
             player.sendMessage(rowComponent.toLegacyText())
         }
     }
-
     player.sendMessage(SEPARATOR.color())
 }
 
-fun sendLegacyPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloadPrompt: Boolean) {
+fun sendLegacyPreview(player: CommandSender, plugin: MarketplacePlugin) {
     val price = if (plugin.isPremium) "$${plugin.price}" else "Free"
     val descriptionComponents = createDescriptionLines(plugin.description)
 
     val information = mutableListOf(
-            infoComp("┌ &b&l${plugin.name}"),
-            infoComp(
-                    "├─ &b${
-                        String.format(
-                                "%,d", plugin.downloads
-                        )
-                    } &n&l⬇&r&7 | &b${plugin.ratingAverage}&e ⭐ &7| &b${price}"
-            ),
-            *descriptionComponents,
-//    infoComp("Last Update: &b${formatDate(spigetPlugin.updateDate * 1000L)}"),
+        infoComp("┌ &b&l${plugin.name}"),
+        infoComp(
+        "├─ &b${plugin.downloads} &n&l⬇&r&7 | &b${plugin.ratingAverage}&e ⭐ &7| &b${price}"
+        ),
+        *descriptionComponents,
     )
 
     information.add(TextComponent(" "))
@@ -122,44 +94,38 @@ fun sendLegacyPreview(player: CommandSender, plugin: MarketplacePlugin, containD
     }
 
     player.sendMessage(SEPARATOR.color())
-
-
     for (component in information) {
         player.sendMessage(component.toLegacyText())
     }
-
     player.sendMessage(SEPARATOR.color())
-
 }
 
 
 fun createDescriptionLines(description: String, showHover: Boolean = true): Array<TextComponent> {
     val descriptionLines = description.chunked(35)
 
-    val descriptionComponents = if (descriptionLines.size > 3) {
+    return if (descriptionLines.size > 3) {
         val hoverDesc = if (showHover) {
             HoverEvent(
-                    HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(
+                HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(
                     "${ChatColor.AQUA}$description"
-            )
+                )
             )
         } else null
 
-        val comps = descriptionLines.subList(0, 2).map { " &7│ $it".coloredComponent().apply { hoverEvent = hoverDesc } }
-                .toMutableList()
+        val comps = descriptionLines.subList(0, 2).map { " &7│ $it".coloredComponent().apply { hoverEvent = hoverDesc } }.toMutableList()
         comps.add(" &7│ ${descriptionLines[2]}...".coloredComponent().apply { hoverEvent = hoverDesc })
-        comps
+
+        comps // Will return 'comps'
     } else {
         descriptionLines.map { " &7│ $it".coloredComponent() }
     }.toTypedArray()
-
-    return descriptionComponents
 }
 
 fun createButton(plugin: MarketplacePlugin): List<TextComponent> {
     val hoverText = when (plugin.isPremium) {
         false -> "&bClick to Download"
-        true -> when (isDirectDownload(plugin.downloadURL.toString())) {
+        true -> when (isDirectDownload(plugin.downloadURL)) {
             false -> "&4This plugin is external. Click to view the plugin online."
             true -> "&4We are unable to download paid plugins. Click to view the plugin online."
         }
@@ -172,11 +138,11 @@ fun createButton(plugin: MarketplacePlugin): List<TextComponent> {
 
     val button = when (plugin.isPremium) {
         false -> listOf(
-                "&b&l┌──────┐", "&b&l│ Download │", "&b&l└──────┘"
+            "&b&l┌──────┐", "&b&l│ Download │", "&b&l└──────┘"
         )
 
         true -> listOf(
-                "&e&l┌───&r&e──&l┐", "&e&l│   Buy   │", "&e&l└───&r&e──&l┘"
+            "&e&l┌───&r&e──&l┐", "&e&l│   Buy   │", "&e&l└───&r&e──&l┘"
         )
     }
 
@@ -201,7 +167,7 @@ fun infoComp(string: String): TextComponent {
 
     return " &7${string.substring(0, 40)} &8[...]".coloredComponent().applyIf(above1_8) {
         hoverEvent = HoverEvent(
-                HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(string.color())
+            HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(string.color())
         )
     }
 }
@@ -214,11 +180,10 @@ fun infoComp(string: String): TextComponent {
  */
 fun fetchImageAsBuffer(imageUrl: String): BufferedImage? {
     return runCatching {
-        val url =
-                URL(imageUrl.ifEmpty { "https://cdn.discordapp.com/emojis/1065698008815112302.webp?size=128&quality=lossless" })
+        val url = URL(imageUrl.ifEmpty { "https://cdn.discordapp.com/emojis/1065698008815112302.webp?size=128&quality=lossless" })
         val connection = url.openConnection() as HttpURLConnection
         connection.setRequestProperty(
-                "User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:37.0) Gecko/20100101 Firefox/37.0"
+            "User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:37.0) Gecko/20100101 Firefox/37.0"
         )
 
         ImageIO.read(connection.inputStream).also { connection.inputStream.close() }
@@ -277,8 +242,8 @@ fun getAverageColor(image: BufferedImage): Color {
         }
     }
     return Color(
-            (sumR / sampled).toFloat().roundToInt(),
-            (sumG / sampled).toFloat().roundToInt(),
-            (sumB / sampled).toFloat().roundToInt()
+        (sumR / sampled).toFloat().roundToInt(),
+        (sumG / sampled).toFloat().roundToInt(),
+        (sumB / sampled).toFloat().roundToInt()
     )
 }
