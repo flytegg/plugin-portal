@@ -3,7 +3,6 @@ package link.portalbox.pluginportal.util
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.SimplePie
 
-
 var metrics: Metrics? = null
 
 fun setupMetrics(bMetrics: Metrics) {
@@ -15,6 +14,6 @@ fun addValueToPieChart(chartType: Chart, value: String) {
 }
 
 enum class Chart(val id: String) {
-    MOSTDOWNLOADED("most_downloaded"),
-    MOSTINVALIDDOWNLOADS("most_invalid_downloads");
+    MOST_DOWNLOADED("most_downloaded"),
+    MOST_INVALID_DOWNLOADS("most_invalid_downloads");
 }

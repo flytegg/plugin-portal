@@ -42,7 +42,7 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
 
         if (plugin.downloadURL.isNullOrEmpty()) {
             sender.sendMessage("&7We couldn't find a download link for &c${args[1]}&7. This happens when they use an external link and we can't always identify the correct file to download. Please report this to our Discord @ discord.gg/portalbox so we manually support this.".colorOutput())
-            addValueToPieChart(Chart.MOSTINVALIDDOWNLOADS, plugin.id)
+            addValueToPieChart(Chart.MOST_INVALID_DOWNLOADS, plugin.id)
             return
         }
 
