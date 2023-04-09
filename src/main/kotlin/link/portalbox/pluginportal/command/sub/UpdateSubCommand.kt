@@ -61,7 +61,7 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
 
         if (needUpdating.isEmpty()) {
             sender.sendMessage("&7No plugins require an update.".color())
-            return;
+            return
         }
 
         sender.sendMessage("&7Listing all plugins that can be updated:".color())
@@ -73,9 +73,9 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
     override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {
         if (args.size != 2) return null
         return StringUtil.copyPartialMatches(
-            args[1],
-            Data.installedPlugins.map { MarketplacePluginManager.marketplaceCache[it.id] },
-            mutableListOf())
+                args[1],
+                Data.installedPlugins.map { MarketplacePluginManager.marketplaceCache[it.id] },
+                mutableListOf())
     }
 
 }

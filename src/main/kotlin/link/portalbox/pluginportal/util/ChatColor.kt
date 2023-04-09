@@ -7,7 +7,8 @@ object ChatColor {
 
     fun String?.color(): String = this?.let { ChatColor.translateAlternateColorCodes('&', it) } ?: ""
 
-    fun String?.colorOutput(): String = this?.let { ChatColor.translateAlternateColorCodes('&', "&7&l[&b&lPP&7&l] &8&l> $it") } ?: ""
+    fun String?.colorOutput(): String = this?.let { ChatColor.translateAlternateColorCodes('&', "&7&l[&b&lPP&7&l] &8&l> $it") }
+            ?: ""
 
 
     fun String.coloredComponent() = TextComponent(ChatColor.translateAlternateColorCodes('&', this))

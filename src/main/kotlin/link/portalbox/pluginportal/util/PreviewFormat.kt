@@ -21,171 +21,170 @@ import kotlin.math.roundToInt
 const val SEPARATOR = "&8&m                                                       "
 
 fun sendPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloadPrompt: Boolean) {
-  val above1_16 = getVersion(Bukkit.getVersion()) > GameVersion(1, 16, 4)
+    val above1_16 = getVersion(Bukkit.getVersion()) > GameVersion(1, 16, 4)
 
-  if (above1_16) {
-    sendModernPreview(player, plugin, containDownloadPrompt)
-    return
-  } else {
-    sendLegacyPreview(player, plugin, containDownloadPrompt)
-    return
-  }
+    if (above1_16) {
+        sendModernPreview(player, plugin, containDownloadPrompt)
+        return
+    } else {
+        sendLegacyPreview(player, plugin, containDownloadPrompt)
+        return
+    }
 }
 
 fun sendModernPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloadPrompt: Boolean) {
-  val price = if (plugin.isPremium) "$${plugin.price}" else "Free"
-  val descriptionComponents = createDescriptionLines(plugin.description)
-  player.spigot()
-  val information = mutableListOf(
-    infoComp("┌ &b&l${plugin.name}"),
-    infoComp(
-      "├─ &b${
-        String.format(
-          "%,d", plugin.downloads
-        )
-      } &n&l⬇&r&7 | &b${plugin.ratingAverage}&e ⭐ &7| &b${price}"
-    ),
-    *descriptionComponents,
+    val price = if (plugin.isPremium) "$${plugin.price}" else "Free"
+    val descriptionComponents = createDescriptionLines(plugin.description)
+    player.spigot()
+    val information = mutableListOf(
+            infoComp("┌ &b&l${plugin.name}"),
+            infoComp(
+                    "├─ &b${
+                        String.format(
+                                "%,d", plugin.downloads
+                        )
+                    } &n&l⬇&r&7 | &b${plugin.ratingAverage}&e ⭐ &7| &b${price}"
+            ),
+            *descriptionComponents,
 //    infoComp("Last Update: &b${formatDate(spigetPlugin.updateDate * 1000L)}"),
-  )
-  /*
-    if (!HttpUtil.isDirectDownload(plugin.downloadURL.toString())) {
-      val label = infoComp("&7External Link: &b")
-      val link = infoComp("&b&l[Click Here]").apply {
-        clickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, plugin.downloadURL.toString())
-        hoverEvent = HoverEvent(
-          HoverEvent.Action.SHOW_TEXT,
-          TextComponent.fromLegacyText(ChatColor.AQUA.toString() + "Click to open the external download link")
-        )
+    )
+    /*
+      if (!HttpUtil.isDirectDownload(plugin.downloadURL.toString())) {
+        val label = infoComp("&7External Link: &b")
+        val link = infoComp("&b&l[Click Here]").apply {
+          clickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, plugin.downloadURL.toString())
+          hoverEvent = HoverEvent(
+            HoverEvent.Action.SHOW_TEXT,
+            TextComponent.fromLegacyText(ChatColor.AQUA.toString() + "Click to open the external download link")
+          )
+        }
+        label.addExtra(link)
+        information.add(label)
       }
-      label.addExtra(link)
-      information.add(label)
+     */
+
+    information.add(TextComponent(" "))
+
+    information.addAll(createButton(plugin))
+
+    val image = fetchImageAsBuffer(plugin.iconURL)
+
+    val imageGrid = image?.let { createImageGrid(image, 11, 13) } ?: emptyArray()
+
+    player.sendMessage(SEPARATOR.color())
+
+    for ((rowIndex, row) in imageGrid.withIndex()) {
+        val rowComponent = TextComponent()
+
+        row.forEach { gridSquare ->
+            rowComponent.addExtra(TextComponent("▉").apply {
+                color = ChatColor.of(getAverageColor(gridSquare))
+            })
+        }
+
+        information.getOrNull(rowIndex)?.let { rowComponent.addExtra(it) }
+
+        val post1_16 = (getVersion(Bukkit.getVersion()).minor) >= 16
+        if (post1_16) {
+            player.spigot().sendMessage(rowComponent)
+        } else {
+            player.sendMessage(rowComponent.toLegacyText())
+        }
     }
-   */
 
-  information.add(TextComponent(" "))
-
-  information.addAll(createButton(plugin))
-
-  val image = fetchImageAsBuffer(plugin.iconURL)
-
-  val imageGrid = image?.let { createImageGrid(image, 11, 13) } ?: emptyArray()
-
-  player.sendMessage(SEPARATOR.color())
-
-  for ((rowIndex, row) in imageGrid.withIndex()) {
-    val rowComponent = TextComponent()
-
-    row.forEach { gridSquare ->
-      rowComponent.addExtra(TextComponent("▉").apply {
-        color = ChatColor.of(getAverageColor(gridSquare))
-      })
-    }
-
-    information.getOrNull(rowIndex)?.let { rowComponent.addExtra(it) }
-
-    val post1_16 = (getVersion(Bukkit.getVersion()).minor) >= 16
-    if (post1_16) {
-      player.spigot().sendMessage(rowComponent)
-    } else {
-      player.sendMessage(rowComponent.toLegacyText())
-    }
-  }
-
-  player.sendMessage(SEPARATOR.color())
+    player.sendMessage(SEPARATOR.color())
 }
 
 fun sendLegacyPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloadPrompt: Boolean) {
-  val price = if (plugin.isPremium) "$${plugin.price}" else "Free"
-  val descriptionComponents = createDescriptionLines(plugin.description)
+    val price = if (plugin.isPremium) "$${plugin.price}" else "Free"
+    val descriptionComponents = createDescriptionLines(plugin.description)
 
-  val information = mutableListOf(
-    infoComp("┌ &b&l${plugin.name}"),
-    infoComp(
-      "├─ &b${
-        String.format(
-          "%,d", plugin.downloads
-        )
-      } &n&l⬇&r&7 | &b${plugin.ratingAverage}&e ⭐ &7| &b${price}"
-    ),
-    *descriptionComponents,
+    val information = mutableListOf(
+            infoComp("┌ &b&l${plugin.name}"),
+            infoComp(
+                    "├─ &b${
+                        String.format(
+                                "%,d", plugin.downloads
+                        )
+                    } &n&l⬇&r&7 | &b${plugin.ratingAverage}&e ⭐ &7| &b${price}"
+            ),
+            *descriptionComponents,
 //    infoComp("Last Update: &b${formatDate(spigetPlugin.updateDate * 1000L)}"),
-  )
+    )
 
-  information.add(TextComponent(" "))
+    information.add(TextComponent(" "))
 
-  if (plugin.downloadURL.isEmpty()) {
-    information.add(TextComponent(" &7├─&b https://www.spigotmc.org/resources/${plugin.id}/".color()))
-  } else {
-    information.add(TextComponent(" &7├─ &b/pp install ${plugin.name}".color()))
-  }
+    if (plugin.downloadURL.isEmpty()) {
+        information.add(TextComponent(" &7├─&b https://www.spigotmc.org/resources/${plugin.id}/".color()))
+    } else {
+        information.add(TextComponent(" &7├─ &b/pp install ${plugin.name}".color()))
+    }
 
-  player.sendMessage(SEPARATOR.color())
+    player.sendMessage(SEPARATOR.color())
 
 
-  for (component in information) {
-    player.sendMessage(component.toLegacyText())
-  }
+    for (component in information) {
+        player.sendMessage(component.toLegacyText())
+    }
 
-  player.sendMessage(SEPARATOR.color())
+    player.sendMessage(SEPARATOR.color())
 
 }
-
 
 
 fun createDescriptionLines(description: String, showHover: Boolean = true): Array<TextComponent> {
-  val descriptionLines = description.chunked(35)
+    val descriptionLines = description.chunked(35)
 
-  val descriptionComponents = if (descriptionLines.size > 3) {
-    val hoverDesc = if (showHover) {
-      HoverEvent(
-        HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(
-          "${ChatColor.AQUA}$description"
-        )
-      )
-    } else null
+    val descriptionComponents = if (descriptionLines.size > 3) {
+        val hoverDesc = if (showHover) {
+            HoverEvent(
+                    HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(
+                    "${ChatColor.AQUA}$description"
+            )
+            )
+        } else null
 
-    val comps = descriptionLines.subList(0, 2).map { " &7│ $it".coloredComponent().apply { hoverEvent = hoverDesc } }
-      .toMutableList()
-    comps.add(" &7│ ${descriptionLines[2]}...".coloredComponent().apply { hoverEvent = hoverDesc })
-    comps
-  } else {
-    descriptionLines.map { " &7│ $it".coloredComponent() }
-  }.toTypedArray()
+        val comps = descriptionLines.subList(0, 2).map { " &7│ $it".coloredComponent().apply { hoverEvent = hoverDesc } }
+                .toMutableList()
+        comps.add(" &7│ ${descriptionLines[2]}...".coloredComponent().apply { hoverEvent = hoverDesc })
+        comps
+    } else {
+        descriptionLines.map { " &7│ $it".coloredComponent() }
+    }.toTypedArray()
 
-  return descriptionComponents
+    return descriptionComponents
 }
 
 fun createButton(plugin: MarketplacePlugin): List<TextComponent> {
-  val hoverText = when (plugin.isPremium) {
-    false -> "&bClick to Download"
-    true ->  when (isDirectDownload(plugin.downloadURL.toString())) {
-      false -> "&4This plugin is external. Click to view the plugin online."
-        true -> "&4We are unable to download paid plugins. Click to view the plugin online."
+    val hoverText = when (plugin.isPremium) {
+        false -> "&bClick to Download"
+        true -> when (isDirectDownload(plugin.downloadURL.toString())) {
+            false -> "&4This plugin is external. Click to view the plugin online."
+            true -> "&4We are unable to download paid plugins. Click to view the plugin online."
+        }
     }
-  }
 
-  val onClick = when (plugin.downloadURL == null || plugin.isPremium) {
-    true -> ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/${plugin.id}")
-    false -> ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pp install ${MarketplacePluginManager.marketplaceCache[Integer.parseInt(plugin.id)]}")
-  }
-
-  val button = when (plugin.isPremium) {
-    false -> listOf(
-      "&b&l┌──────┐", "&b&l│ Download │", "&b&l└──────┘"
-    )
-
-    true -> listOf(
-      "&e&l┌───&r&e──&l┐", "&e&l│   Buy   │", "&e&l└───&r&e──&l┘"
-    )
-  }
-
-  return button.map { line ->
-    " &b&l$line".coloredComponent().apply {
-      clickEvent = onClick
-      hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(hoverText.color()))
+    val onClick = when (plugin.downloadURL == null || plugin.isPremium) {
+        true -> ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/${plugin.id}")
+        false -> ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pp install ${MarketplacePluginManager.marketplaceCache[Integer.parseInt(plugin.id)]}")
     }
-  }
+
+    val button = when (plugin.isPremium) {
+        false -> listOf(
+                "&b&l┌──────┐", "&b&l│ Download │", "&b&l└──────┘"
+        )
+
+        true -> listOf(
+                "&e&l┌───&r&e──&l┐", "&e&l│   Buy   │", "&e&l└───&r&e──&l┘"
+        )
+    }
+
+    return button.map { line ->
+        " &b&l$line".coloredComponent().apply {
+            clickEvent = onClick
+            hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(hoverText.color()))
+        }
+    }
 }
 
 /**
@@ -195,15 +194,15 @@ fun createButton(plugin: MarketplacePlugin): List<TextComponent> {
  * @return The TextComponent
  */
 fun infoComp(string: String): TextComponent {
-  val above1_8 = getVersion(Bukkit.getVersion()) > GameVersion(1, 8, 8)
+    val above1_8 = getVersion(Bukkit.getVersion()) > GameVersion(1, 8, 8)
 
-  if (string.length < 50) return " &7$string".coloredComponent()
+    if (string.length < 50) return " &7$string".coloredComponent()
 
-  return " &7${string.substring(0, 40)} &8[...]".coloredComponent().applyIf(above1_8) {
-    hoverEvent = HoverEvent(
-      HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(string.color())
-    )
-  }
+    return " &7${string.substring(0, 40)} &8[...]".coloredComponent().applyIf(above1_8) {
+        hoverEvent = HoverEvent(
+                HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(string.color())
+        )
+    }
 }
 
 /**
@@ -213,16 +212,16 @@ fun infoComp(string: String): TextComponent {
  * @return The image as a BufferedImage, or null if the image could not be fetched.
  */
 fun fetchImageAsBuffer(imageUrl: String): BufferedImage? {
-  return runCatching {
-    val url =
-      URL(imageUrl.ifEmpty { "https://cdn.discordapp.com/emojis/1065698008815112302.webp?size=128&quality=lossless" })
-    val connection = url.openConnection() as HttpURLConnection
-    connection.setRequestProperty(
-      "User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:37.0) Gecko/20100101 Firefox/37.0"
-    )
+    return runCatching {
+        val url =
+                URL(imageUrl.ifEmpty { "https://cdn.discordapp.com/emojis/1065698008815112302.webp?size=128&quality=lossless" })
+        val connection = url.openConnection() as HttpURLConnection
+        connection.setRequestProperty(
+                "User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:37.0) Gecko/20100101 Firefox/37.0"
+        )
 
-    ImageIO.read(connection.inputStream).also { connection.inputStream.close() }
-  }.getOrNull()
+        ImageIO.read(connection.inputStream).also { connection.inputStream.close() }
+    }.getOrNull()
 }
 
 /**
@@ -234,23 +233,23 @@ fun fetchImageAsBuffer(imageUrl: String): BufferedImage? {
  * @return A 2D array of BufferedImages.
  */
 fun createImageGrid(image: BufferedImage, rows: Int, cols: Int): Array<Array<BufferedImage>> {
-  val blackedImage = BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_RGB)
-  val graphics = blackedImage.createGraphics()
-  graphics.drawImage(image, 0, 0, null)
-  graphics.dispose()
+    val blackedImage = BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_RGB)
+    val graphics = blackedImage.createGraphics()
+    graphics.drawImage(image, 0, 0, null)
+    graphics.dispose()
 
-  val chunkWidth = image.width / cols
-  val chunkHeight = image.height / rows
-  val chunks = Array(rows) { Array(cols) { BufferedImage(chunkWidth, chunkHeight, BufferedImage.TYPE_INT_RGB) } }
+    val chunkWidth = image.width / cols
+    val chunkHeight = image.height / rows
+    val chunks = Array(rows) { Array(cols) { BufferedImage(chunkWidth, chunkHeight, BufferedImage.TYPE_INT_RGB) } }
 
-  for (row in 0 until rows) {
-    for (col in 0 until cols) {
-      chunks[row][col] = blackedImage.getSubimage(
-        col * chunkWidth, row * chunkHeight, chunkWidth, chunkHeight
-      )
+    for (row in 0 until rows) {
+        for (col in 0 until cols) {
+            chunks[row][col] = blackedImage.getSubimage(
+                    col * chunkWidth, row * chunkHeight, chunkWidth, chunkHeight
+            )
+        }
     }
-  }
-  return chunks
+    return chunks
 }
 
 /**
@@ -260,25 +259,25 @@ fun createImageGrid(image: BufferedImage, rows: Int, cols: Int): Array<Array<Buf
  * @return The average color of the image.
  */
 fun getAverageColor(image: BufferedImage): Color {
-  val step = 5
-  var sampled = 0
-  var sumR: Long = 0
-  var sumG: Long = 0
-  var sumB: Long = 0
-  for (x in 0 until image.width) {
-    for (y in 0 until image.height) {
-      if (x % step == 0 && y % step == 0) {
-        val pixel = Color(image.getRGB(x, y))
-        sumR += pixel.red.toLong()
-        sumG += pixel.green.toLong()
-        sumB += pixel.blue.toLong()
-        sampled++
-      }
+    val step = 5
+    var sampled = 0
+    var sumR: Long = 0
+    var sumG: Long = 0
+    var sumB: Long = 0
+    for (x in 0 until image.width) {
+        for (y in 0 until image.height) {
+            if (x % step == 0 && y % step == 0) {
+                val pixel = Color(image.getRGB(x, y))
+                sumR += pixel.red.toLong()
+                sumG += pixel.green.toLong()
+                sumB += pixel.blue.toLong()
+                sampled++
+            }
+        }
     }
-  }
-  return Color(
-    (sumR / sampled).toFloat().roundToInt(),
-    (sumG / sampled).toFloat().roundToInt(),
-    (sumB / sampled).toFloat().roundToInt()
-  )
+    return Color(
+            (sumR / sampled).toFloat().roundToInt(),
+            (sumG / sampled).toFloat().roundToInt(),
+            (sumB / sampled).toFloat().roundToInt()
+    )
 }

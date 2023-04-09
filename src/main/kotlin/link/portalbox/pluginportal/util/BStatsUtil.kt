@@ -4,7 +4,7 @@ import org.bstats.bukkit.Metrics
 import org.bstats.charts.SimplePie
 
 
-var metrics: Metrics? = null;
+var metrics: Metrics? = null
 
 fun setupMetrics(bMetrics: Metrics) {
     metrics = bMetrics

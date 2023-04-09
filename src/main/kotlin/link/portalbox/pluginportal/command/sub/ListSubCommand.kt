@@ -22,6 +22,8 @@ class ListSubCommand : SubCommand() {
         }
     }
 
-    override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? { return null }
+    override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {
+        return null
+    }
 
 }

@@ -28,7 +28,7 @@ class PPCommand(pluginPortal: PluginPortal) : CommandExecutor, TabCompleter {
             type = SubCommandType.values().find { args[0].equals(it.name, true) || args[0].equals(it.alias, true) }
             if (type == null) {
                 sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &7Illegal arguments provided. Try &b/pp help&7.".color())
-                return false;
+                return false
             }
         }
 
@@ -44,15 +44,18 @@ class PPCommand(pluginPortal: PluginPortal) : CommandExecutor, TabCompleter {
     override fun onTabComplete(sender: CommandSender, command: Command, label: String, args: Array<out String>): MutableList<String>? {
         if (args.size == 1) {
             return StringUtil.copyPartialMatches(
-                args[0],
-                Arrays.stream(SubCommandType.values())
-                    .map { subCommandEnum -> subCommandEnum.command.lowercase(Locale.getDefault()) }
-                    .collect(Collectors.toList()),
-                ArrayList())
+                    args[0],
+                    Arrays.stream(SubCommandType.values())
+                            .map { subCommandEnum -> subCommandEnum.command.lowercase(Locale.getDefault()) }
+                            .collect(Collectors.toList()),
+                    ArrayList())
         }
 
-        val type = SubCommandType.values().find { args[0].equals(it.name, true) || args[0].equals(it.alias, true) } ?: return null
-        if (!sender.hasPermission(type.permission)) { return null }
+        val type = SubCommandType.values().find { args[0].equals(it.name, true) || args[0].equals(it.alias, true) }
+                ?: return null
+        if (!sender.hasPermission(type.permission)) {
+            return null
+        }
 
         return subcommands[type]!!.tabComplete(sender, args)
     }
