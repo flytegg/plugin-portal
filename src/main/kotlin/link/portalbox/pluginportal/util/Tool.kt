@@ -1,9 +1,13 @@
 package link.portalbox.pluginportal.util
 
+import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.file.GameVersion
+import link.portalbox.pplib.util.getLatestPPVersion
 import java.io.File
 import java.io.FileInputStream
 import java.security.MessageDigest
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 fun getSHA(file: File): String {
     val messageDigest = MessageDigest.getInstance("SHA-256")
@@ -33,4 +37,8 @@ inline fun <T> T.applyIf(shouldApply: Boolean, block: T.() -> Unit): T = apply {
     if (shouldApply) {
         block(this)
     }
+}
+
+fun isLatestVersion(pluginPortal: PluginPortal): Boolean {
+    return getLatestPPVersion() == pluginPortal.description.version
 }
