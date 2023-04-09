@@ -3,23 +3,22 @@ package link.portalbox.pluginportal.listener
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.util.ChatColor.color
 import link.portalbox.pluginportal.util.install
-import link.portalbox.pluginportal.util.setupMetrics
-import link.portalbox.pplib.type.MarketplacePlugin
-import link.portalbox.pplib.type.SpigetPlugin
-import link.portalbox.pplib.util.PPApiUtil
+import link.portalbox.pplib.manager.MarketplacePluginManager
+import link.portalbox.pplib.type.MarketplaceService
+import link.portalbox.pplib.util.getLatestPPVersion
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.TextComponent
-import org.bstats.bukkit.Metrics
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
+import java.net.URL
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 class UpdateListener(private val pluginPortal: PluginPortal) : Listener {
 
     init {
-        val matcher: Matcher = Pattern.compile("\"version\":\"([\\d\\.]+)\"").matcher(PPApiUtil.getPPVersion())
+        val matcher: Matcher = Pattern.compile("\"version\":\"([\\d\\.]+)\"").matcher(getLatestPPVersion())
         val versionNumber: String? = if (matcher.find()) matcher.group(1) else null
         pluginPortal.LATEST_VERSION = versionNumber == pluginPortal.description.version
         if (!pluginPortal.LATEST_VERSION) {
@@ -27,19 +26,13 @@ class UpdateListener(private val pluginPortal: PluginPortal) : Listener {
             pluginPortal.logger.severe("Download Link: https://www.spigotmc.org/resources/plugin-portal.108700")
             pluginPortal.logger.severe("Current Version: ${pluginPortal.description.version}")
             pluginPortal.logger.severe("Latest Version: $versionNumber")
-            val plugin: MarketplacePlugin = SpigetPlugin(108700).marketplacePlugin
-            install(plugin, plugin.downloadURL)
-            pluginPortal.pluginLoader.disablePlugin(pluginPortal)
+
+            val plugin = MarketplacePluginManager.getPlugin(MarketplaceService.SPIGOTMC, 108700)
+            install(plugin, URL(plugin.downloadURL))
+
         } else {
             pluginPortal.logger.fine("Having problems? Join our support Discord @ discord.gg/portalbox.")
-            setupMetrics(Metrics(pluginPortal, 18005))
-            for (file in pluginPortal.dataFolder.listFiles()!!) {
-                if (file.name.contains("PluginPortal-")) {
-                    if (!file.name.contains(versionNumber!!)) {
-                        file.delete()
-                    }
-                }
-            }
+
         }
     }
 

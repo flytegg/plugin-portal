@@ -5,6 +5,7 @@ import link.portalbox.pluginportal.file.Data
 import link.portalbox.pluginportal.util.ChatColor.color
 import link.portalbox.pluginportal.util.ChatColor.colorOutput
 import link.portalbox.pplib.manager.MarketplaceManager
+import link.portalbox.pplib.manager.MarketplacePluginManager
 import org.bukkit.command.CommandSender
 
 class ListSubCommand : SubCommand() {
@@ -18,7 +19,7 @@ class ListSubCommand : SubCommand() {
 
         sender.sendMessage("&7Listing all installed plugins...".colorOutput())
         for (plugin in installedPlugins) {
-            sender.sendMessage("&a+ &b${MarketplaceManager.getName(plugin.id)}".color())
+            sender.sendMessage("&a+ &b${MarketplacePluginManager.marketplaceCache[plugin.id]}".color())
         }
     }
 

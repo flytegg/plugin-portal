@@ -35,7 +35,7 @@ fun sendPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloa
 fun sendModernPreview(player: CommandSender, plugin: MarketplacePlugin, containDownloadPrompt: Boolean) {
   val price = if (plugin.premium) "$${plugin.price}" else "Free"
   val descriptionComponents = createDescriptionLines(plugin.description)
-
+  player.spigot()
   val information = mutableListOf(
     infoComp("┌ &b&l${plugin.name}"),
     infoComp(

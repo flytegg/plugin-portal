@@ -6,7 +6,10 @@ import link.portalbox.pluginportal.file.Data
 import link.portalbox.pluginportal.listener.PluginValidator
 import link.portalbox.pluginportal.listener.UpdateListener
 import link.portalbox.pluginportal.util.setupMetrics
-import link.portalbox.pplib.manager.MarketplaceManager
+import link.portalbox.pplib.manager.MarketplacePluginManager
+import link.portalbox.pplib.manager.MarketplacePluginManager.loadIndex
+import link.portalbox.pplib.service.SpigotMCService
+import link.portalbox.pplib.type.MarketplaceService
 import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -22,10 +25,19 @@ class PluginPortal : JavaPlugin() {
         getCommand("pluginportal")!!.setExecutor(command)
         getCommand("pluginportal")!!.tabCompleter = command
 
-        MarketplaceManager()
+        MarketplacePluginManager.registerService(MarketplaceService.SPIGOTMC, SpigotMCService())
+        loadIndex()
 
-        server.pluginManager.registerEvents(UpdateListener(this), this)
         server.pluginManager.registerEvents(PluginValidator(), this)
+        server.pluginManager.registerEvents(UpdateListener(this), this)
+
+        setupMetrics(Metrics(this, 18005))
+
+        /*
+        if (!LATEST_VERSION) {
+            return;
+        }
+         */
     }
 
     override fun onDisable() {

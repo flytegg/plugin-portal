@@ -7,9 +7,10 @@ import link.portalbox.pluginportal.util.Chart
 import link.portalbox.pluginportal.util.ChatColor.colorOutput
 import link.portalbox.pluginportal.util.addValueToPieChart
 import link.portalbox.pluginportal.util.install
-import link.portalbox.pplib.manager.MarketplaceManager
+import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
-import link.portalbox.pplib.type.SpigetPlugin
+import link.portalbox.pplib.type.MarketplaceService
+import link.portalbox.pplib.util.getURL
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
@@ -22,19 +23,19 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
       return
     }
 
-    if (!MarketplaceManager.marketplaceCache.inverse().containsKey(args[1])) {
+    if (!MarketplacePluginManager.marketplaceCache.inverse().containsKey(args[1])) {
       sender.sendMessage("&cYou specified an invalid plugin.".colorOutput())
       return
     }
 
-    val id = MarketplaceManager.getId(args[1])
+    val id = MarketplacePluginManager.marketplaceCache.inverse()[args[1]]
     if (Data.installedPlugins.find { it.id == id } != null) {
       sender.sendMessage("&7Plugin is already installed.".colorOutput())
       return
     }
 
-    val plugin: MarketplacePlugin = SpigetPlugin(id).marketplacePlugin;
-    if (plugin.premium) {
+    val plugin: MarketplacePlugin = MarketplacePluginManager.getPlugin(MarketplaceService.SPIGOTMC, id!!)
+    if (plugin.isPremium) {
       sender.sendMessage("&cThis plugin is premium so you can't download it through PP. Purchase: https://www.spigotmc.org/resources/108700".colorOutput())
       return
     }
@@ -48,7 +49,7 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
     sender.sendMessage("&a${args[1]} &7is being installed...".colorOutput())
 
     Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
-      install(plugin, plugin.downloadURL)
+      install(plugin, getURL(plugin.downloadURL)!!)
       sender.sendMessage("&a${args[1]} &7has been installed. Please restart your server for the download to take effect (we are adding auto starting soon!).".colorOutput())
     })
   }
@@ -58,7 +59,7 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
     return if (args[1].length <= 2) {
       mutableListOf("Keep Typing...")
     } else StringUtil.copyPartialMatches(
-      args[1], MarketplaceManager.marketplaceCache.values, mutableListOf()
+      args[1], MarketplacePluginManager.marketplaceCache.values, mutableListOf()
     )
   }
 

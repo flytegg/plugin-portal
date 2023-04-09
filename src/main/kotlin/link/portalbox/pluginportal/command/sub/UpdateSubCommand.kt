@@ -46,7 +46,6 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
 
             Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
                 install(plugin, plugin.downloadURL)
-
                 sender.sendMessage("&a${args[1]} &7has been updated. Please restart your server for the download to take effect (we are adding auto starting soon!).".colorOutput())
             })
             return
