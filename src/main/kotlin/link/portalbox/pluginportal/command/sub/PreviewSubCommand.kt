@@ -24,7 +24,7 @@ class PreviewSubCommand : SubCommand() {
         sendPreview(sender, MarketplacePluginManager.getPlugin(
                 MarketplaceService.SPIGOTMC,
                 MarketplacePluginManager.marketplaceCache.inverse()[args[1]]!!
-        ), true)
+        ))
     }
 
     override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {
