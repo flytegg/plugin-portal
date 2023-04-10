@@ -11,7 +11,7 @@ object Data {
     var installedPlugins = mutableListOf<LocalPlugin>()
 
     fun init(pluginPortal: PluginPortal) {
-        file = File(pluginPortal.dataFolder, "data.yml")
+        file = File(File(pluginPortal.dataFolder.parent, "PluginPortal"), "data.yml")
         if (!file.exists()) {
             file.createNewFile()
         }
