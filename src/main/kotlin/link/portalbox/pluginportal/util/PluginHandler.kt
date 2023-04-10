@@ -41,7 +41,7 @@ fun install(plugin: MarketplacePlugin, downloadURL: URL, enable: Boolean) {
     download(downloadURL, outputFile)
     Data.update(plugin.id.toInt(), plugin.version, getSHA(outputFile))
     addValueToPieChart(Chart.MOST_DOWNLOADED, plugin.id)
-    if (enable || Config.enable_plugins_on_install_very_experimental_dont_recommend_enabling_will_cause_corruption) {
+    if (enable || Config.startupOnInstall) {
         enablePlugin(Bukkit.getPluginManager().loadPlugin(outputFile))
     }
 }

@@ -1,1 +1,1 @@
-enable-plugins-on-install-very-experimental-dont-recommend-enabling-will-cause-corruption: false # WE DO NOT RECOMMEND YOU TO CHANGE THIS, MAY CAUSE CORRUPTION, CRASHING, AND OTHER ISSUES`
+startup-on-install: false # Allows a plugin to load upon /pp install. This is currently experimental and has the chance to cause issues. Use at your own risk.
