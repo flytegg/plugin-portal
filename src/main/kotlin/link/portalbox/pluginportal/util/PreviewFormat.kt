@@ -49,9 +49,7 @@ fun sendModernPreview(player: CommandSender, plugin: MarketplacePlugin) {
     information.addAll(createButton(plugin))
 
     val image = fetchImageAsBuffer((plugin.iconURL.substringBeforeLast(".jpg")) + ".jpg")
-    println(image.toString())
     val imageGrid = image?.let { createImageGrid(image, 11, 13) } ?: emptyArray()
-    println(imageGrid.toString())
 
     player.sendMessage(SEPARATOR.color())
     imageGrid.withIndex().forEach { (rowIndex, row) ->
@@ -127,7 +125,7 @@ fun createButton(plugin: MarketplacePlugin): List<TextComponent> {
         }
     }
 
-    val onClick = when (plugin.downloadURL == null || plugin.isPremium) {
+    val onClick = when (plugin.downloadURL.isEmpty() || plugin.isPremium) {
         true -> ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/${plugin.id}")
         false -> ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pp install ${MarketplacePluginManager.marketplaceCache[Integer.parseInt(plugin.id)]}")
     }

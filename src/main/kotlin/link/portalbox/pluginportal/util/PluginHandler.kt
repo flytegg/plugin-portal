@@ -52,7 +52,9 @@ fun enablePlugin(plugin: Plugin?) {
         return
     }
     try {
+        plugin.onLoad()
         Bukkit.getPluginManager().enablePlugin(plugin)
+        plugin.onEnable()
     } catch (e: NoSuchMethodError) {
         e.printStackTrace()
     } catch (e: UnknownDependencyException) {
