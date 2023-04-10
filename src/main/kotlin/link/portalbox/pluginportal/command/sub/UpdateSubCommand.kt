@@ -2,6 +2,7 @@ package link.portalbox.pluginportal.command.sub
 
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
+import link.portalbox.pluginportal.file.Config
 import link.portalbox.pluginportal.file.Data
 import link.portalbox.pluginportal.util.color
 import link.portalbox.pluginportal.util.colorOutput
@@ -45,7 +46,9 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
 
             Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
                 install(plugin, getURL(plugin.downloadURL)!!)
-                sender.sendMessage("&a${args[1]} &7has been updated. Please restart your server for the download to take effect (we are adding auto starting soon!).".colorOutput())
+                sender.sendMessage("&a${args[1]} &7has been updated." +
+                    if (Config.startupOnInstall) "Plugin has automatically started but contain issues. A restart may be needed for plugin to take effect."
+                    else "Please restart your server for the install to take effect.".colorOutput())
             })
             return
         }
