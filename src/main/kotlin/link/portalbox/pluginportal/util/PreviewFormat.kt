@@ -3,6 +3,7 @@ package link.portalbox.pluginportal.util
 import link.portalbox.pluginportal.file.GameVersion
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
+import link.portalbox.pplib.util.getURL
 import link.portalbox.pplib.util.isDirectDownload
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
@@ -12,9 +13,11 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import java.awt.Color
 import java.awt.image.BufferedImage
+import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 import javax.imageio.ImageIO
+import javax.net.ssl.HttpsURLConnection
 import kotlin.math.roundToInt
 
 const val SEPARATOR = "&8&m                                                       "
@@ -45,8 +48,10 @@ fun sendModernPreview(player: CommandSender, plugin: MarketplacePlugin) {
     information.add(TextComponent(" "))
     information.addAll(createButton(plugin))
 
-    val image = fetchImageAsBuffer(plugin.iconURL)
+    val image = fetchImageAsBuffer((plugin.iconURL.substringBeforeLast(".jpg")) + ".jpg")
+    println(image.toString())
     val imageGrid = image?.let { createImageGrid(image, 11, 13) } ?: emptyArray()
+    println(imageGrid.toString())
 
     player.sendMessage(SEPARATOR.color())
     imageGrid.withIndex().forEach { (rowIndex, row) ->
@@ -59,13 +64,8 @@ fun sendModernPreview(player: CommandSender, plugin: MarketplacePlugin) {
         }
 
         information.getOrNull(rowIndex)?.let { rowComponent.addExtra(it) }
+        player.spigot().sendMessage(rowComponent)
 
-        val post1_16 = (getVersion(Bukkit.getVersion()).minor) >= 16
-        if (post1_16) {
-            player.spigot().sendMessage(rowComponent)
-        } else {
-            player.sendMessage(rowComponent.toLegacyText())
-        }
     }
     player.sendMessage(SEPARATOR.color())
 }
@@ -86,7 +86,7 @@ fun sendLegacyPreview(player: CommandSender, plugin: MarketplacePlugin) {
     if (plugin.downloadURL.isEmpty()) {
         information.add(TextComponent(" &7├─&b https://www.spigotmc.org/resources/${plugin.id}/".color()))
     } else {
-        information.add(TextComponent(" &7├─ &b/pp install ${plugin.name}".color()))
+        information.add(TextComponent(" &7├─ &b/pp install ${MarketplacePluginManager.marketplaceCache.inverse()[plugin.id]}".color()))
     }
 
     player.sendMessage(SEPARATOR.color())
@@ -175,15 +175,7 @@ fun infoComp(string: String): TextComponent {
  * @return The image as a BufferedImage, or null if the image could not be fetched.
  */
 fun fetchImageAsBuffer(imageUrl: String): BufferedImage? {
-    return runCatching {
-        val url = URL(imageUrl.ifEmpty { "https://cdn.discordapp.com/emojis/1065698008815112302.webp?size=128&quality=lossless" })
-        val connection = url.openConnection() as HttpURLConnection
-        connection.setRequestProperty(
-            "User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:37.0) Gecko/20100101 Firefox/37.0"
-        )
-
-        ImageIO.read(connection.inputStream).also { connection.inputStream.close() }
-    }.getOrNull()
+    return ImageIO.read(getURL(imageUrl))
 }
 
 /**
