@@ -47,8 +47,8 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
                 install(plugin, getURL(plugin.downloadURL)!!)
                 sender.sendMessage(("&a${args[1]} &7has been updated." +
-                    if (Config.startupOnInstall) "Plugin has automatically started but contain issues. A restart may be needed for plugin to take effect."
-                    else "Please restart your server for the install to take effect.").colorOutput())
+                    if (Config.startupOnInstall) " Plugin has automatically started but contain issues. A restart may be needed for plugin to take effect."
+                    else " Please restart your server for the install to take effect.").colorOutput())
             })
             return
         }
