@@ -24,8 +24,10 @@ class PluginValidator : Listener {
         val pluginsToDelete = mutableListOf<Int>()
         for (plugin in Data.installedPlugins) {
             if (!installedShas.contains(plugin.fileSha)) {
-                removedPlugins.add(MarketplacePluginManager.marketplaceCache[plugin.id]!!)
-                pluginsToDelete.add(plugin.id)
+                runCatching {
+                    removedPlugins.add(MarketplacePluginManager.marketplaceCache[plugin.id]!!)
+                    pluginsToDelete.add(plugin.id)
+                }
             }
         }
 

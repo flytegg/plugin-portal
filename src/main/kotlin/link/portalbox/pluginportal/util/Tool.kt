@@ -3,6 +3,7 @@ package link.portalbox.pluginportal.util
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.file.GameVersion
 import link.portalbox.pplib.util.getLatestPPVersion
+import link.portalbox.pplib.util.getPPVersions
 import java.io.File
 import java.io.FileInputStream
 import java.security.MessageDigest
@@ -10,6 +11,8 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 fun getSHA(file: File): String {
+    if (file.isDirectory) return ""
+
     val messageDigest = MessageDigest.getInstance("SHA-256")
 
     FileInputStream(file).use { fileInputStream ->
@@ -41,4 +44,16 @@ inline fun <T> T.applyIf(shouldApply: Boolean, block: T.() -> Unit): T = apply {
 
 fun isLatestVersion(pluginPortal: PluginPortal): Boolean {
     return getLatestPPVersion() == pluginPortal.description.version
+}
+
+fun deleteOutdatedPP(pluginPortal: PluginPortal) {
+    var sha256 = getPPVersions()?.values
+    for (file in pluginPortal.dataFolder.parentFile.listFiles() ?: return) {
+        runCatching {
+            if (getSHA(file) in sha256!!) {
+                println("Deleting ${file.name}...")
+                file.delete()
+            }
+        }
+    }
 }
