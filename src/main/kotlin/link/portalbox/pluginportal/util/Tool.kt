@@ -45,15 +45,3 @@ inline fun <T> T.applyIf(shouldApply: Boolean, block: T.() -> Unit): T = apply {
 fun isLatestVersion(pluginPortal: PluginPortal): Boolean {
     return getLatestPPVersion() == pluginPortal.description.version
 }
-
-fun deleteOutdatedPP(pluginPortal: PluginPortal) {
-    var sha256 = getPPVersions()?.values
-    for (file in pluginPortal.dataFolder.parentFile.listFiles() ?: return) {
-        runCatching {
-            if (getSHA(file) in sha256!!) {
-                println("Deleting ${file.name}...")
-                file.delete()
-            }
-        }
-    }
-}
