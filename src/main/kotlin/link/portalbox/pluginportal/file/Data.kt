@@ -35,7 +35,7 @@ object Data {
 
         }
 
-        file = File(File(pluginPortal.dataFolder.parent, "PluginPortal"), "data.yml")
+        file = File(pluginPortal.dataFolder, "data.yml")
         if (!file.exists()) {
             file.createNewFile()
         }
