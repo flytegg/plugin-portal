@@ -8,9 +8,33 @@ object Data {
     private lateinit var file: File
     private lateinit var config: YamlConfiguration
 
-    var installedPlugins = mutableListOf<LocalPlugin>()
+    val installedPlugins: HashSet<LocalPlugin> = HashSet()
 
     fun init(pluginPortal: PluginPortal) {
+        for (file in pluginPortal.dataFolder.parentFile.listFiles()!!) {
+            if (!file.name.lowercase().contains("pluginportal")) return
+            if (!file.isDirectory) return
+
+            runCatching {
+                val dataFile = YamlConfiguration.loadConfiguration(File(file, "data.yml"))
+                dataFile.getKeys(false).forEach { id ->
+                    val pluginSection = dataFile.getConfigurationSection(id)
+                    if (pluginSection != null) {
+                        installedPlugins.add(
+                            LocalPlugin(
+                                id.toInt(),
+                                pluginSection.getString("version")!!,
+                                pluginSection.getString("file")!!
+                            )
+                        )
+                    }
+                }
+
+                println("${file.name} is an old plugin folder!")
+            }
+
+        }
+
         file = File(File(pluginPortal.dataFolder.parent, "PluginPortal"), "data.yml")
         if (!file.exists()) {
             file.createNewFile()

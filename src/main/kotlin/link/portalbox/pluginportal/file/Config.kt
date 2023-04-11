@@ -11,12 +11,7 @@ object Config {
     val startupOnInstall get() = config.getBoolean("startup-on-install")
 
     fun init(pluginPortal: PluginPortal) {
-        if (!(pluginPortal.dataFolder.parentFile.listFiles()?.contains(File("PluginPortal")))!!) {
-            var folder = File(pluginPortal.dataFolder.parentFile, "PluginPortal")
-            folder.mkdir()
-            pluginPortal.saveResource("config.yml", true)
-        }
-
-        config = YamlConfiguration.loadConfiguration(File(pluginPortal.dataFolder.parentFile, "PluginPortal"))
+        pluginPortal.saveDefaultConfig()
+        config = pluginPortal.config
     }
 }
