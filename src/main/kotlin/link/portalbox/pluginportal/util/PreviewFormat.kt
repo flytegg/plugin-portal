@@ -84,7 +84,7 @@ fun sendLegacyPreview(player: CommandSender, plugin: MarketplacePlugin) {
     if (plugin.downloadURL.isEmpty()) {
         information.add(TextComponent(" &7├─&b https://www.spigotmc.org/resources/${plugin.id}/".color()))
     } else {
-        information.add(TextComponent(" &7├─ &b/pp install ${MarketplacePluginManager.marketplaceCache.inverse()[plugin.id]}".color()))
+        information.add(TextComponent(" &7├─ &b/pp install ${plugin.name.replace(" ", "")}".color()))
     }
 
     player.sendMessage(SEPARATOR.color())
@@ -127,7 +127,7 @@ fun createButton(plugin: MarketplacePlugin): List<TextComponent> {
 
     val onClick = when (plugin.downloadURL.isEmpty() || plugin.isPremium) {
         true -> ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/${plugin.id}")
-        false -> ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pp install ${MarketplacePluginManager.marketplaceCache[Integer.parseInt(plugin.id)]}")
+        false -> ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pp install ${plugin.name.replace(" ", "")}")
     }
 
     val button = when (plugin.isPremium) {

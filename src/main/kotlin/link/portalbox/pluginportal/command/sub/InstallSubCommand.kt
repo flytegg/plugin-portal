@@ -36,7 +36,7 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
 
         val plugin: MarketplacePlugin = MarketplacePluginManager.getPlugin(MarketplaceService.SPIGOTMC, id!!)
         if (plugin.isPremium) {
-            sender.sendMessage("&cThis plugin is premium so you can't download it through PP. Purchase: https://www.spigotmc.org/resources/108700".colorOutput())
+            sender.sendMessage("&cThis plugin is premium so you can't download it through PP. Purchase: https://www.spigotmc.org/resources/${plugin.id}".colorOutput())
             return
         }
 
