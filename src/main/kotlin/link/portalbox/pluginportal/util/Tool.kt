@@ -43,5 +43,14 @@ inline fun <T> T.applyIf(shouldApply: Boolean, block: T.() -> Unit): T = apply {
 }
 
 fun isLatestVersion(pluginPortal: PluginPortal): Boolean {
-    return getLatestPPVersion() == pluginPortal.description.version
+    var latestVersion: String = "";
+    runCatching {
+        latestVersion = getLatestPPVersion().toString()
+    }
+
+    return if (latestVersion.isEmpty()) {
+        true
+    } else {
+        pluginPortal.description.version == latestVersion
+    }
 }
