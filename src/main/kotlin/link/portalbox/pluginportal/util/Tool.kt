@@ -40,7 +40,7 @@ inline fun <T> T.applyIf(shouldApply: Boolean, block: T.() -> Unit): T = apply {
 }
 
 fun isLatestVersion(pluginPortal: PluginPortal): Boolean {
-    var latestVersion= ""
+    var latestVersion = ""
     runCatching {
         latestVersion = getLatestPPVersion().toString()
     }

@@ -4,7 +4,6 @@ import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.file.Config
 import link.portalbox.pluginportal.file.Data
 import link.portalbox.pluginportal.file.LocalPlugin
-import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
 import link.portalbox.pplib.util.download
 import org.bukkit.Bukkit
