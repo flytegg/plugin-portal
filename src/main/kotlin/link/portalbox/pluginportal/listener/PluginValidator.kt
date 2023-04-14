@@ -15,7 +15,7 @@ class PluginValidator : Listener {
 
     init {
         val installedShas = mutableListOf<String>()
-        for (file in File("plugins").listFiles()) {
+        for (file in File("plugins").listFiles()!!) {
             if (!file.isDirectory) {
                 installedShas.add(getSHA(file))
             }
