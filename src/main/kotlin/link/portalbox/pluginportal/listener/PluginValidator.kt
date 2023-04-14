@@ -43,7 +43,7 @@ class PluginValidator : Listener {
         if (!event.player.isOp) return
 
         val plugins = when (removedPlugins.size) {
-            1 -> "${removedPlugins[0]}"
+            1 -> removedPlugins[0]
             2 -> "${removedPlugins[0]} and ${removedPlugins[1]}"
             else -> removedPlugins.dropLast(1).joinToString(", ") + " and " + removedPlugins.last()
         }

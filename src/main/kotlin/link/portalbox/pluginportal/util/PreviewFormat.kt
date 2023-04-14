@@ -1,7 +1,6 @@
 package link.portalbox.pluginportal.util
 
 import link.portalbox.pluginportal.file.GameVersion
-import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
 import link.portalbox.pplib.util.getURL
 import link.portalbox.pplib.util.isDirectDownload
@@ -13,11 +12,7 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import java.awt.Color
 import java.awt.image.BufferedImage
-import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
 import javax.imageio.ImageIO
-import javax.net.ssl.HttpsURLConnection
 import kotlin.math.roundToInt
 
 const val SEPARATOR = "&8&m                                                       "
