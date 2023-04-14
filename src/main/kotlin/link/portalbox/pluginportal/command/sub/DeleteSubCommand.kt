@@ -21,7 +21,7 @@ class DeleteSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             return
         }
 
-        val localPlugin = Data.installedPlugins.find { it.id == MarketplacePluginManager.marketplaceCache.inverse().get(args[1]) }
+        val localPlugin = Data.installedPlugins.find { it.id == MarketplacePluginManager.marketplaceCache.inverse()[args[1]] }
         if (localPlugin == null) {
             sender.sendMessage("&c${args[1]} &7is not installed.".colorOutput())
             return
