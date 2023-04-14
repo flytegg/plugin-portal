@@ -3,12 +3,9 @@ package link.portalbox.pluginportal.util
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.file.GameVersion
 import link.portalbox.pplib.util.getLatestPPVersion
-import link.portalbox.pplib.util.getPPVersions
 import java.io.File
 import java.io.FileInputStream
 import java.security.MessageDigest
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 
 fun getSHA(file: File): String {
     if (file.isDirectory) return ""
@@ -43,7 +40,7 @@ inline fun <T> T.applyIf(shouldApply: Boolean, block: T.() -> Unit): T = apply {
 }
 
 fun isLatestVersion(pluginPortal: PluginPortal): Boolean {
-    var latestVersion: String = "";
+    var latestVersion= "";
     runCatching {
         latestVersion = getLatestPPVersion().toString()
     }
