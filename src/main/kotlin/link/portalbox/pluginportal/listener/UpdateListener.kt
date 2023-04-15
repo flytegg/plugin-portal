@@ -14,7 +14,7 @@ class UpdateListener(private val pluginPortal: PluginPortal) : Listener {
     @EventHandler
     fun onJoin(e: PlayerJoinEvent) {
         if (!e.player.isOp) return;
-        if (pluginPortal.versionType != VersionType.LATEST) return;
+        if (pluginPortal.versionType == VersionType.LATEST || pluginPortal.versionType == VersionType.PATCH) return;
 
         runCatching {
             val component = TextComponent("&7Plugin Portal needs to be updated. Please download the latest version from: &b&l[CLICK HERE]".colorOutput())
