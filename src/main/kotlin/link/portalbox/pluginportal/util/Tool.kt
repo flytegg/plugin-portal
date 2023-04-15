@@ -49,6 +49,7 @@ fun isLatestVersion(pluginPortal: PluginPortal): Boolean {
         pluginPortal.logger.warning("Could not check for latest version of PluginPortal. Please check manually.")
         true
     } else {
+
         pluginPortal.description.version == latestVersion
     }
 }

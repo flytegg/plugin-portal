@@ -23,6 +23,8 @@ object Data {
                 installedPlugins.add(LocalPlugin(id.toInt(), pluginSection.getString("version")!!, pluginSection.getString("file")!!))
             }
         }
+
+
     }
 
     fun update(id: Int, version: String, fileSha: String) {
