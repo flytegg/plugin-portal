@@ -19,6 +19,7 @@ class PPCommand(pluginPortal: PluginPortal) : CommandExecutor, TabCompleter {
         put(SubCommandType.LIST, ListSubCommand())
         put(SubCommandType.UPDATE, UpdateSubCommand(pluginPortal))
         put(SubCommandType.DELETE, DeleteSubCommand(pluginPortal))
+        put(SubCommandType.UPDATEALL, UpdateAllSubCommand(pluginPortal))
     }
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {

@@ -11,6 +11,7 @@ enum class SubCommandType(
     INSTALL("Install", "/pp install (Plugin Name)", "i", "pluginportal.install"),
     LIST("List", "/pp list", "l", "pluginportal.list"),
     UPDATE("Update", "/pp update (Plugin Name)", "u", "pluginportal.update"),
-    DELETE("Delete", "/pp delete (File Name)", "d", "pluginportal.delete")
+    DELETE("Delete", "/pp delete (File Name)", "d", "pluginportal.delete"),
+    UPDATEALL("UpdateAll", "/pp updateall", "ua", "pluginportal.updateall"),
 
 }

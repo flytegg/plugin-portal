@@ -5,23 +5,19 @@ plugins {
 }
 
 group = 'link.portalbox'
-version = '1.2.3'
+version = '1.2.4'
 
 repositories {
     mavenCentral()
     mavenLocal()
-    maven {
-        url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
-    }
+    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { url 'https://jitpack.io' }
 }
 
 dependencies {
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
-    compileOnly("org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT") {
-        exclude group: 'com.google.code.gson'
-    }
-
+    implementation("org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT")
     implementation 'org.bstats:bstats-bukkit:3.0.0'
     implementation 'com.github.portal-box:pp-lib:1.2.7'
     compileOnly 'commons-io:commons-io:2.11.0'
