@@ -1,5 +1,4 @@
 plugins {
-    application
     kotlin("jvm") version "1.7.21"
     id("com.github.johnrengelman.shadow") version "7.0.0"
     id("xyz.jpenilla.run-paper") version "2.0.1"
@@ -31,10 +30,6 @@ tasks {
 
     compileTestKotlin {
         kotlinOptions.jvmTarget = "1.8"
-    }
-
-    application {
-        mainClassName = "MainKt"
     }
 
     shadowJar {
