@@ -2,6 +2,7 @@ plugins {
     application
     kotlin("jvm") version "1.7.21"
     id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("xyz.jpenilla.run-paper") version "2.0.1"
 }
 
 group = "link.portalbox"
@@ -41,5 +42,9 @@ tasks {
         relocate("kotlin", "link.portalbox.kotlin")
         relocate("org.jetbrains.annotations", "link.portalbox.jetbrains.annotations")
         relocate("org.intellij.lang.annotations", "link.portalbox.intellij.lang.annotations")
+    }
+
+    runServer {
+        minecraftVersion("1.19.4")
     }
 }
