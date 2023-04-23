@@ -16,7 +16,7 @@ repositories {
 
 dependencies {
     implementation("org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT")
-    implementation ("org.bstats:bstats-bukkit:3.0.0")
+    implementation ("org.bstats:bstats-bukkit:3.0.2")
     implementation("com.github.portal-box:pp-lib:1.2.7")
     compileOnly("commons-io:commons-io:2.11.0")
     compileOnly("com.google.code.gson:gson:2.10.1")
