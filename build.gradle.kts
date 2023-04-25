@@ -39,11 +39,13 @@ hangarPublish {
 
         namespace(owner, slug)
         version.set(project.version as String)
-        channel.set(if(version.get().endsWith("-SNAPSHOT")) "prerelease" else "release")
 
-        val commitLog = getCommitHistory(project.properties["release-start-commit"] as String)
+        provider {
+            channel.set(if(version.get().endsWith("-SNAPSHOT")) "prerelease" else "release")
+            val commitLog = getCommitHistory(project.properties["release-start-commit"] as String)
 
-        changelog.set("# Release ${project.version}\n ${commitLog.joinToString(separator = "") { formatCommitLog(it) }} \n")
+            changelog.set("# Release ${project.version}\n ${commitLog.joinToString(separator = "") { formatCommitLog(it) }} \n")
+        }
 
         platforms {
             register(Platforms.PAPER) {
