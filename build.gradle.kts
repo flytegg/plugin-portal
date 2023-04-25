@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "link.portalbox"
-version = "1.2.4"
+version = "1.2.4-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -27,10 +27,11 @@ dependencies {
 }
 
 hangarPublish {
-    val owner = "stephen"
-    val slug = "PluginPortal"
+    val owner = "Nucker"
+    val slug = "plugin-portal-test"
     val versions: List<String> = listOf("1.8-1.19.4")
 
+    // To be run every github release
     publications.register("Release") {
         if(project.properties["hangar-publish-plugin.use-dev-endpoint"] as String == "true") {
             apiEndpoint.set("https://hangar.papermc.dev/api/v1/")
@@ -43,6 +44,30 @@ hangarPublish {
         val commitLog = getCommitHistory(project.properties["release-start-commit"] as String)
 
         changelog.set("# Release ${project.version}\n ${commitLog.joinToString(separator = "") { formatCommitLog(it) }} \n")
+
+        platforms {
+            register(Platforms.PAPER) {
+                jar.set(tasks.jar.flatMap { it.archiveFile })
+                platformVersions.set(versions)
+            }
+        }
+    }
+
+    // To be run every commit
+    publications.register("Nightly") {
+        if(project.properties["hangar-publish-plugin.use-dev-endpoint"] as String == "true") {
+            apiEndpoint.set("https://hangar.papermc.dev/api/v1/")
+        }
+        namespace(owner, slug)
+
+        val commitLog = getLatestCommit()
+        version.set(getCommitHashFromLog(commitLog))
+        channel.set("nightly")
+
+        changelog.set("# Nightly Release " +
+                "[${version.get()}](https://github.com/Nuckerr/plugin-portal/commit/${version.get()})" +
+                "\n ${getCommitMessageFromLog(commitLog)}  " +
+                "\n*Remember this build is unstable (is the bleeding edge)*")
 
         platforms {
             register(Platforms.PAPER) {
@@ -86,10 +111,26 @@ fun getCommitHistory(startHash: String, endHash: String = "HEAD"): List<String> 
     return output.split("\n")
 }
 
+fun getLatestCommit(): String {
+    val output: String = ByteArrayOutputStream().use { outputStream ->
+        project.exec {
+            executable("git")
+            args("log",  "-n", "1", "--format=format:%h %s")
+            standardOutput = outputStream
+        }
+        outputStream.toString()
+    }
+    return output
+}
+
+// Assuming log is in the format: 2059265 Commit message here
+//println("fixing $commitLog")
+fun getCommitHashFromLog(commitLog: String) = commitLog.take(7)
+
+fun getCommitMessageFromLog(commitLog: String) = commitLog.substring(8) // Get message after commit hash + space between
+
 fun formatCommitLog(commitLog: String): String {
-    // Assuming log is in the format: 2059265 Commit message here
-    //println("fixing $commitLog")
-    val hash = commitLog.take(7)
-    val message = commitLog.substring(8) // Get message after commit hash + space between
+    val hash = getCommitHashFromLog(commitLog)
+    val message = getCommitMessageFromLog(commitLog)
     return "* [$hash](https://github.com/Nuckerr/plugin-portal/commit/$hash) $message\n"
 }
