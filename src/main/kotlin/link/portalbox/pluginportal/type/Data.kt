@@ -1,7 +1,6 @@
-package link.portalbox.pluginportal.file
+package link.portalbox.pluginportal.type
 
 import link.portalbox.pluginportal.PluginPortal
-import link.portalbox.pluginportal.listener.UpdateListener
 import link.portalbox.pplib.type.VersionType
 import link.portalbox.pplib.util.getLatestVersion
 import org.bukkit.configuration.file.YamlConfiguration

@@ -2,7 +2,7 @@ package link.portalbox.pluginportal.command.sub
 
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
-import link.portalbox.pluginportal.file.Data
+import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.util.colorOutput
 import link.portalbox.pluginportal.util.delete
 import link.portalbox.pplib.manager.MarketplacePluginManager

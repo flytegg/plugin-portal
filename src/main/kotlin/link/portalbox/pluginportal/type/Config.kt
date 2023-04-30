@@ -1,4 +1,4 @@
-package link.portalbox.pluginportal.file
+package link.portalbox.pluginportal.type
 
 import link.portalbox.pluginportal.PluginPortal
 import org.bukkit.configuration.file.FileConfiguration

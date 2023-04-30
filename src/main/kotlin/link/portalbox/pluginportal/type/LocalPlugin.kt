@@ -1,4 +1,4 @@
-package link.portalbox.pluginportal.file
+package link.portalbox.pluginportal.type
 
 data class LocalPlugin(
         val id: Int,

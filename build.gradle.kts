@@ -26,9 +26,10 @@ dependencies {
     compileOnly("com.google.code.gson:gson:2.10.1")
 }
 
+/* SET THIS UP SOON
 hangarPublish {
-    val owner = "Nucker"
-    val slug = "plugin-portal-test"
+    val owner = "stephen"
+    val slug = "plugin-portal"
     val versions: List<String> = listOf("1.8-1.19.4")
 
     // To be run every github release
@@ -79,6 +80,7 @@ hangarPublish {
         }
     }
 }
+ */
 
 tasks {
     compileKotlin {

@@ -1,7 +1,7 @@
 package link.portalbox.pluginportal.command.sub
 
 import link.portalbox.pluginportal.command.SubCommand
-import link.portalbox.pluginportal.file.Data
+import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.util.color
 import link.portalbox.pluginportal.util.colorOutput
 import link.portalbox.pplib.manager.MarketplacePluginManager

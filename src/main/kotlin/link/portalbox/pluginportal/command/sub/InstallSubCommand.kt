@@ -2,8 +2,8 @@ package link.portalbox.pluginportal.command.sub
 
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
-import link.portalbox.pluginportal.file.Config
-import link.portalbox.pluginportal.file.Data
+import link.portalbox.pluginportal.type.Config
+import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.util.Chart
 import link.portalbox.pluginportal.util.addValueToPieChart
 import link.portalbox.pluginportal.util.colorOutput

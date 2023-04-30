@@ -1,7 +1,7 @@
 package link.portalbox.pluginportal.util
 
 import link.portalbox.pluginportal.PluginPortal
-import link.portalbox.pluginportal.file.GameVersion
+import link.portalbox.pluginportal.type.GameVersion
 import link.portalbox.pplib.util.getLatestPPVersion
 import java.io.File
 import java.io.FileInputStream

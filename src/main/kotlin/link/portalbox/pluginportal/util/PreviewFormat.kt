@@ -1,6 +1,6 @@
 package link.portalbox.pluginportal.util
 
-import link.portalbox.pluginportal.file.GameVersion
+import link.portalbox.pluginportal.type.GameVersion
 import link.portalbox.pplib.type.MarketplacePlugin
 import link.portalbox.pplib.util.getURL
 import link.portalbox.pplib.util.isDirectDownload
