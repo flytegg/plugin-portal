@@ -52,6 +52,11 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             return
         }
 
+        if (plugin.service != Config.marketplaceService) {
+            sender.sendMessage("&7This plugin is not available on &c${Config.marketplaceService?.name}, change the supported service in the config.yml or buy premium (Coming Soon)!".colorOutput())
+            return
+        }
+
         sender.sendMessage("&a$pluginName &7is being installed...".colorOutput())
 
         Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {

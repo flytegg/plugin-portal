@@ -1,3 +1,3 @@
-marketplace-service: HANGAR # USE "HANGAR" or "SPIGOTMC", this chooses which plugin marketplace you are able to download from.
+marketplace-service: SPIGOTMC # USE "HANGAR" or "SPIGOTMC", this chooses which plugin marketplace you are able to download from.
 cache-time-in-minutes: 10 # How long we should keep the cache for all the plugins.
 startup-on-install: false # Allows a plugin to load upon /pp install. This is currently experimental and has the chance to cause issues. Use at your own risk.

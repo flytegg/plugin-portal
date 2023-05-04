@@ -35,5 +35,6 @@ class PluginPortal : JavaPlugin() {
 
         setupMetrics(Metrics(this, 18005))
 
+        Math.abs(-1)
     }
 }
