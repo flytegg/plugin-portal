@@ -1,4 +1,4 @@
-import io.papermc.hangarpublishplugin.model.Platforms
+    import io.papermc.hangarpublishplugin.model.Platforms
 import java.io.ByteArrayOutputStream
 
 plugins {
@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "link.portalbox"
-version = "1.2.4-SNAPSHOT"
+version = "1.3.0"
 
 repositories {
     mavenCentral()
@@ -19,9 +19,13 @@ repositories {
 }
 
 dependencies {
-    implementation("org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT")
+    implementation("org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT") {
+        // Use in-house version of gson
+        exclude(group = "com.google.code.gson", module = "gson")
+    }
+
     implementation ("org.bstats:bstats-bukkit:3.0.2")
-    implementation("com.github.portal-box:pp-lib:1.2.7")
+    implementation("com.github.portal-box:pp-lib:1.3.6")
     compileOnly("commons-io:commons-io:2.11.0")
     compileOnly("com.google.code.gson:gson:2.10.1")
 }
@@ -96,6 +100,7 @@ tasks {
         relocate("kotlin", "link.portalbox.kotlin")
         relocate("org.jetbrains.annotations", "link.portalbox.jetbrains.annotations")
         relocate("org.intellij.lang.annotations", "link.portalbox.intellij.lang.annotations")
+        relocate("com.google.gson", "link.portalbox.gson")
     }
 
     runServer {

@@ -4,14 +4,11 @@ import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Config
 import link.portalbox.pluginportal.type.Data
-import link.portalbox.pluginportal.util.Chart
-import link.portalbox.pluginportal.util.addValueToPieChart
-import link.portalbox.pluginportal.util.colorOutput
-import link.portalbox.pluginportal.util.install
+import link.portalbox.pluginportal.util.*
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
-import link.portalbox.pplib.type.MarketplaceService
 import link.portalbox.pplib.util.getURL
+import link.portalbox.pplib.util.requestPlugin
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
@@ -23,34 +20,43 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             return
         }
 
-        if (!MarketplacePluginManager.marketplaceCache.inverse().containsKey(args[1])) {
+        var pluginName = ""
+        if (args[1].contains(":")) {
+            val split: List<String> = args[1].split(":")
+            if (split.size == 2) {
+                pluginName = "${split[0].uppercase()}:${split[1]}"
+            }
+        }
+
+        if (!getMarketplaceCache().inverse().containsKey(pluginName)) {
             sender.sendMessage("&cYou specified an invalid plugin.".colorOutput())
             return
         }
 
-        val id = MarketplacePluginManager.marketplaceCache.inverse()[args[1]]
-        if (Data.installedPlugins.find { it.id == id } != null) {
+        val id: String = getMarketplaceCache().inverse()[pluginName]?: return
+        if (Data.installedPlugins.find { it.id.equals(id) } != null) {
             sender.sendMessage("&7Plugin is already installed.".colorOutput())
             return
         }
 
-        val plugin: MarketplacePlugin = MarketplacePluginManager.getPlugin(MarketplaceService.SPIGOTMC, id!!)
+        val plugin: MarketplacePlugin = MarketplacePluginManager.getPlugin(id)
         if (plugin.isPremium) {
             sender.sendMessage("&cThis plugin is premium so you can't download it through PP. Purchase: https://www.spigotmc.org/resources/${plugin.id}".colorOutput())
             return
         }
 
-        if (plugin.downloadURL.isNullOrEmpty()) {
-            sender.sendMessage("&7We couldn't find a download link for &c${args[1]}&7. This happens when they use an external link and we can't always identify the correct file to download. Please report this to our Discord @ discord.gg/portalbox so we manually support this.".colorOutput())
+        if (plugin.downloadURL.isEmpty()) {
+            sender.sendMessage("&7We couldn't find a download link for &c$pluginName &7. This happens when they use an external link and we can't always identify the correct file to download. We have automatically sent this to our staff members".colorOutput())
             addValueToPieChart(Chart.MOST_INVALID_DOWNLOADS, plugin.id)
+            requestPlugin(plugin.toRequestPlugin("External Download URL"))
             return
         }
 
-        sender.sendMessage("&a${args[1]} &7is being installed...".colorOutput())
+        sender.sendMessage("&a$pluginName &7is being installed...".colorOutput())
 
         Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
             install(plugin, getURL(plugin.downloadURL)!!)
-            sender.sendMessage(("&a${args[1]} &7has been installed." +
+            sender.sendMessage(("&a$pluginName &7has been installed." +
                 if (Config.startupOnInstall) " Plugin has automatically started but contain issues. A restart may be needed for plugin to take effect."
                 else " Please restart your server for the install to take effect.").colorOutput())
         })
@@ -60,8 +66,7 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         if (args.size != 2) return null
         return if (args[1].length <= 2) {
             mutableListOf("Keep Typing...")
-        } else StringUtil.copyPartialMatches(
-                args[1], MarketplacePluginManager.marketplaceCache.values, mutableListOf()
-        )
+        } else copyPartialMatchesWithService(args[1], getMarketplaceCache().values, mutableListOf()).toMutableList()
+
     }
 }

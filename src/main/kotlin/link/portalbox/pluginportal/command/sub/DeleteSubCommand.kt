@@ -5,6 +5,7 @@ import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.util.colorOutput
 import link.portalbox.pluginportal.util.delete
+import link.portalbox.pluginportal.util.getMarketplaceCache
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
@@ -16,12 +17,12 @@ class DeleteSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             return
         }
 
-        if (!MarketplacePluginManager.marketplaceCache.inverse().containsKey(args[1])) {
+        if (!getMarketplaceCache().inverse().containsKey(args[1])) {
             sender.sendMessage("&cYou specified an invalid plugin.".colorOutput())
             return
         }
 
-        val localPlugin = Data.installedPlugins.find { it.id == MarketplacePluginManager.marketplaceCache.inverse()[args[1]] }
+        val localPlugin = Data.installedPlugins.find { it.id == getMarketplaceCache().inverse()[args[1]] }
         if (localPlugin == null) {
             sender.sendMessage("&c${args[1]} &7is not installed.".colorOutput())
             return
@@ -39,7 +40,7 @@ class DeleteSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         if (args.size != 2) return null
         return StringUtil.copyPartialMatches(
                 args[1],
-                Data.installedPlugins.map { MarketplacePluginManager.marketplaceCache[it.id] },
+                Data.installedPlugins.map { getMarketplaceCache()[it.id] },
                 mutableListOf()
         )
     }

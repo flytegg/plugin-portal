@@ -2,7 +2,11 @@ package link.portalbox.pluginportal.util
 
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.type.GameVersion
+import link.portalbox.pplib.type.MarketplacePlugin
+import link.portalbox.pplib.type.RequestPlugin
 import link.portalbox.pplib.util.getLatestPPVersion
+import org.apache.commons.lang.StringUtils.startsWithIgnoreCase
+import org.apache.commons.lang.Validate
 import java.io.File
 import java.io.FileInputStream
 import java.security.MessageDigest
@@ -39,6 +43,11 @@ inline fun <T> T.applyIf(shouldApply: Boolean, block: T.() -> Unit): T = apply {
     }
 }
 
+// Convert MarketplacePlugin to RequestPlugin, with an input of "reasonForRequest"
+fun MarketplacePlugin.toRequestPlugin(reasonForRequest: String): RequestPlugin {
+    return RequestPlugin(id, service, name, reasonForRequest)
+}
+
 fun isLatestVersion(pluginPortal: PluginPortal): Boolean {
     var latestVersion = ""
     runCatching {
@@ -52,4 +61,23 @@ fun isLatestVersion(pluginPortal: PluginPortal): Boolean {
 
         pluginPortal.description.version == latestVersion
     }
+}
+
+
+fun copyPartialMatchesWithService(
+    input: String,
+    originals: Iterable<String>,
+    matches: MutableCollection<String>
+): MutableCollection<String> {
+    Validate.notNull(input, "Search token cannot be null")
+    Validate.notNull(matches, "Collection cannot be null")
+    Validate.notNull(originals, "Originals cannot be null")
+
+    for (string in originals) {
+        if (startsWithIgnoreCase(string.split(":")[1], input)) {
+            matches.add("${string.split(":")[0].lowercase()}:${string.split(":")[1]}")
+        }
+    }
+
+    return matches
 }

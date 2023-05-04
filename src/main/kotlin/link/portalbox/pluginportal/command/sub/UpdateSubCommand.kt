@@ -4,10 +4,7 @@ import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Config
 import link.portalbox.pluginportal.type.Data
-import link.portalbox.pluginportal.util.color
-import link.portalbox.pluginportal.util.colorOutput
-import link.portalbox.pluginportal.util.delete
-import link.portalbox.pluginportal.util.install
+import link.portalbox.pluginportal.util.*
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
 import link.portalbox.pplib.type.MarketplaceService
@@ -19,14 +16,14 @@ import org.bukkit.util.StringUtil
 class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
     override fun execute(sender: CommandSender, args: Array<out String>) {
         if (args.size >= 2) {
-            val id = MarketplacePluginManager.marketplaceCache.inverse()[args[1]]
+            val id = getMarketplaceCache().inverse()[args[1]]
             val localPlugin = Data.installedPlugins.find { it.id == id }
             if (localPlugin == null) {
                 sender.sendMessage("&c${args[1]} &7is not installed or recognised by Plugin Portal. Did you mean to run &b/pp install ${args[1]}&7?".colorOutput())
                 return
             }
 
-            val plugin: MarketplacePlugin = MarketplacePluginManager.getPlugin(MarketplaceService.SPIGOTMC, id!!)
+            val plugin: MarketplacePlugin = MarketplacePluginManager.getPlugin(id!!)
             if (plugin.version == localPlugin.version) {
                 sender.sendMessage("&a${args[1]} &7is already up to date.".colorOutput())
                 return
@@ -55,7 +52,7 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
 
         val needUpdating = mutableListOf<MarketplacePlugin>()
         for (plugin in Data.installedPlugins) {
-            val spigetPlugin = MarketplacePluginManager.getPlugin(MarketplaceService.SPIGOTMC, plugin.id)
+            val spigetPlugin = MarketplacePluginManager.getPlugin(plugin.id)
             if (spigetPlugin.version != plugin.version) {
                 needUpdating.add(spigetPlugin)
             }
@@ -76,7 +73,7 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         if (args.size != 2) return null
         return StringUtil.copyPartialMatches(
                 args[1],
-                Data.installedPlugins.map { MarketplacePluginManager.marketplaceCache[it.id] },
+                Data.installedPlugins.map { getMarketplaceCache()[it.id] },
                 mutableListOf())
     }
 }

@@ -1,6 +1,6 @@
 package link.portalbox.pluginportal.type
 
 data class LocalPlugin(
-        val id: Int,
+        val id: String,
         var version: String,
         var fileSha: String)

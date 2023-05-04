@@ -2,8 +2,10 @@ package link.portalbox.pluginportal.util
 
 import link.portalbox.pluginportal.type.GameVersion
 import link.portalbox.pplib.type.MarketplacePlugin
+import link.portalbox.pplib.type.MarketplaceService
 import link.portalbox.pplib.util.getURL
 import link.portalbox.pplib.util.isDirectDownload
+import link.portalbox.pplib.util.requestPlugin
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.HoverEvent
@@ -122,7 +124,11 @@ fun createButton(plugin: MarketplacePlugin): List<TextComponent> {
 
     val onClick = when (plugin.downloadURL.isEmpty() || plugin.isPremium) {
         true -> ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/${plugin.id}")
-        false -> ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pp install ${plugin.name.replace(" ", "")}")
+        false -> ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pp install ${plugin.service.name}:${plugin.name.replace(" ", "")}")
+    }
+
+    if (onClick.action == ClickEvent.Action.OPEN_URL && !plugin.isPremium) {
+        requestPlugin(plugin.toRequestPlugin("External Download URL"))
     }
 
     val button = when (plugin.isPremium) {

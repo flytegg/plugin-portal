@@ -5,6 +5,7 @@ import link.portalbox.pluginportal.type.Config
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.LocalPlugin
 import link.portalbox.pplib.type.MarketplacePlugin
+import link.portalbox.pplib.type.MarketplaceService
 import link.portalbox.pplib.util.download
 import org.bukkit.Bukkit
 import org.bukkit.plugin.Plugin
@@ -39,7 +40,18 @@ fun install(plugin: MarketplacePlugin, downloadURL: URL) {
 fun install(plugin: MarketplacePlugin, downloadURL: URL, enable: Boolean) {
     val outputFile = File("plugins", "${plugin.name}-${plugin.version} (PP).jar")
     download(downloadURL, outputFile)
-    Data.update(plugin.id.toInt(), plugin.version, getSHA(outputFile))
+    // find the plugins name using id
+    // extract author and slug from download url if service == service.HANGAR
+    var id = "${plugin.service}:${plugin.id}"
+    if (plugin.service == MarketplaceService.HANGAR) {
+        val url = plugin.downloadURL
+        val author = url.split("/")[6]
+        val slug = url.split("/")[7]
+
+        id = "${plugin.service}:${author}:${slug}"
+    }
+
+    Data.update(id, plugin.version, getSHA(outputFile))
     addValueToPieChart(Chart.MOST_DOWNLOADED, plugin.id)
     if (enable || Config.startupOnInstall) {
         enablePlugin(Bukkit.getPluginManager().loadPlugin(outputFile))

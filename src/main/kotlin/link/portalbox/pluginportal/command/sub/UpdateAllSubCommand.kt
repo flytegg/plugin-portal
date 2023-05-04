@@ -4,24 +4,20 @@ import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Config
 import link.portalbox.pluginportal.type.Data
-import link.portalbox.pluginportal.util.color
-import link.portalbox.pluginportal.util.colorOutput
-import link.portalbox.pluginportal.util.delete
-import link.portalbox.pluginportal.util.install
+import link.portalbox.pluginportal.util.*
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
-import link.portalbox.pplib.type.MarketplaceService
 import link.portalbox.pplib.util.getURL
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 
 class UpdateAllSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
     override fun execute(sender: CommandSender, args: Array<out String>) {
-        // /pp updateall
 
         val needUpdating = mutableListOf<MarketplacePlugin>()
         for (plugin in Data.installedPlugins) {
-            val spigetPlugin = MarketplacePluginManager.getPlugin(MarketplaceService.SPIGOTMC, plugin.id)
+
+            val spigetPlugin = MarketplacePluginManager.getPlugin(plugin.id)
             if (spigetPlugin.version != plugin.version) {
                 needUpdating.add(spigetPlugin)
             }
@@ -33,11 +29,11 @@ class UpdateAllSubCommand(private val pluginPortal: PluginPortal) : SubCommand()
         }
 
         sender.sendMessage("&7Updating plugins...".color())
-        for (plugin in needUpdating) {
-            val id = MarketplacePluginManager.marketplaceCache.inverse()[plugin.name]
+        for (outdatedPlugin in needUpdating) {
+            val id = getMarketplaceCache().inverse()[outdatedPlugin.name]
             val localPlugin = Data.installedPlugins.find { it.id == id } ?: return
 
-            val plugin: MarketplacePlugin = MarketplacePluginManager.getPlugin(MarketplaceService.SPIGOTMC, id!!)
+            val plugin: MarketplacePlugin = MarketplacePluginManager.getPlugin(id!!)
             if (plugin.version == localPlugin.version) return
 
             if (plugin.downloadURL.isEmpty()) {

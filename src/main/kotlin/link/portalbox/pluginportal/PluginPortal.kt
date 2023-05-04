@@ -8,6 +8,7 @@ import link.portalbox.pluginportal.listener.UpdateListener
 import link.portalbox.pluginportal.util.*
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.manager.MarketplacePluginManager.loadIndex
+import link.portalbox.pplib.service.HangarService
 import link.portalbox.pplib.service.SpigotMCService
 import link.portalbox.pplib.type.MarketplaceService
 import link.portalbox.pplib.type.VersionType
@@ -22,7 +23,8 @@ class PluginPortal : JavaPlugin() {
         Data.init(this)
 
         MarketplacePluginManager.registerService(MarketplaceService.SPIGOTMC, SpigotMCService())
-        loadIndex()
+        MarketplacePluginManager.registerService(MarketplaceService.HANGAR, HangarService())
+        startCacheTask(this)
 
         val command = PPCommand(this)
         getCommand("pluginportal")!!.setExecutor(command)

@@ -2,6 +2,7 @@ package link.portalbox.pluginportal.listener
 
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.util.color
+import link.portalbox.pluginportal.util.getMarketplaceCache
 import link.portalbox.pluginportal.util.getSHA
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import org.bukkit.event.EventHandler
@@ -21,11 +22,11 @@ class PluginValidator : Listener {
             }
         }
 
-        val pluginsToDelete = mutableListOf<Int>()
+        val pluginsToDelete = mutableListOf<String>()
         for (plugin in Data.installedPlugins) {
             if (!installedShas.contains(plugin.fileSha)) {
                 runCatching {
-                    removedPlugins.add(MarketplacePluginManager.marketplaceCache[plugin.id]!!)
+                    removedPlugins.add(getMarketplaceCache()[plugin.id]!!)
                     pluginsToDelete.add(plugin.id)
                 }
             }

@@ -19,10 +19,33 @@ object Data {
         }
         config = YamlConfiguration.loadConfiguration(file)
 
-        config.getKeys(false).forEach { id ->
-            val pluginSection = config.getConfigurationSection(id)
+        // Create a new YamlConfiguration object with updated keys
+        val updatedConfig = YamlConfiguration()
+
+        for (key in config.getKeys(false)) {
+            val value = config.getConfigurationSection(key)
+
+            // Check if the key is in the old format
+            val oldKey = key.split(":")
+            if (oldKey.size == 1) {
+                println("Updating key $key to new format")
+                // Update the key to the new format
+                val newKey = "SPIGOTMC:${oldKey[0]}"
+                updatedConfig.set(newKey, value)
+            } else {
+                // Use the key as is
+                updatedConfig.set(key, value)
+            }
+        }
+
+        // Save the updated YAML file
+        updatedConfig.save(file)
+        config = updatedConfig
+
+        updatedConfig.getKeys(false).forEach { id ->
+            val pluginSection = updatedConfig.getConfigurationSection(id)
             if (pluginSection != null) {
-                installedPlugins.add(LocalPlugin(id.toInt(), pluginSection.getString("version")!!, pluginSection.getString("file")!!))
+                installedPlugins.add(LocalPlugin(id, pluginSection.getString("version")!!, pluginSection.getString("file")!!))
             }
         }
 
@@ -31,12 +54,10 @@ object Data {
             for (i in 0..2) {
                 pluginPortal.logger.info("Plugin Portal is outdated. Download the new version here: https://www.spigotmc.org/resources/plugin-portal.108700/")
             }
-
         }
-
     }
 
-    fun update(id: Int, version: String, fileSha: String) {
+    fun update(id: String, version: String, fileSha: String) {
         config.set("${id}.version", version)
         config.set("${id}.file", fileSha)
         config.save(file)
@@ -50,8 +71,8 @@ object Data {
         }
     }
 
-    fun delete(id: Int) {
-        config.set(id.toString(), null)
+    fun delete(id: String) {
+        config.set(id, null)
         config.save(file)
 
         installedPlugins.removeIf { it.id == id }

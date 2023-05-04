@@ -4,6 +4,7 @@ import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.util.color
 import link.portalbox.pluginportal.util.colorOutput
+import link.portalbox.pluginportal.util.getMarketplaceCache
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import org.bukkit.command.CommandSender
 
@@ -17,7 +18,7 @@ class ListSubCommand : SubCommand() {
 
         sender.sendMessage("&7Listing all installed plugins...".colorOutput())
         for (plugin in installedPlugins) {
-            sender.sendMessage("&a+ &b${MarketplacePluginManager.marketplaceCache[plugin.id]}".color())
+            sender.sendMessage("&a+ &b${getMarketplaceCache()[plugin.id]}".color())
         }
     }
 
