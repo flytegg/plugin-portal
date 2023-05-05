@@ -18,10 +18,15 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
+    compileOnly("com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT")
+    compileOnly("net.kyori:adventure-platform-bukkit:4.13.1") {
+        exclude("adventure-bom")
+        exclude("adventure-api")
+        exclude("adventure-nbt")
+    }
+
     implementation ("org.bstats:bstats-bukkit:3.0.2")
     implementation("com.github.portal-box:pp-lib:1.3.6")
-    compileOnly("com.google.code.gson:gson:2.10.1")
 }
 
 /* SET THIS UP SOON

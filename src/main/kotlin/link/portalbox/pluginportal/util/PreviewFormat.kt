@@ -54,7 +54,8 @@ fun sendModernPreview(player: CommandSender, plugin: MarketplacePlugin) {
 
         row.forEach { gridSquare ->
             rowComponent.addExtra(TextComponent("▉").apply {
-                color = ChatColor.of(getAverageColor(gridSquare))
+                //color = ChatColor.of(getAverageColor(gridSquare))
+                color = ChatColor.WHITE
             })
         }
 

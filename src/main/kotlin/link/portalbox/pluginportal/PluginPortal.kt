@@ -1,5 +1,6 @@
 package link.portalbox.pluginportal
 
+import com.destroystokyo.paper.event.server.PaperServerListPingEvent
 import link.portalbox.pluginportal.command.PPCommand
 import link.portalbox.pluginportal.type.Config
 import link.portalbox.pluginportal.type.Data
@@ -34,7 +35,5 @@ class PluginPortal : JavaPlugin() {
         server.pluginManager.registerEvents(UpdateListener(this), this)
 
         setupMetrics(Metrics(this, 18005))
-
-        Math.abs(-1)
     }
 }
