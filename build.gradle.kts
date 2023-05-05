@@ -1,4 +1,3 @@
-    import io.papermc.hangarpublishplugin.model.Platforms
 import java.io.ByteArrayOutputStream
 
 plugins {

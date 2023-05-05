@@ -48,22 +48,6 @@ fun MarketplacePlugin.toRequestPlugin(reasonForRequest: String): RequestPlugin {
     return RequestPlugin(id, service, name, reasonForRequest)
 }
 
-fun isLatestVersion(pluginPortal: PluginPortal): Boolean {
-    var latestVersion = ""
-    runCatching {
-        latestVersion = getLatestPPVersion().toString()
-    }
-
-    return if (latestVersion.isEmpty()) {
-        pluginPortal.logger.warning("Could not check for latest version of PluginPortal. Please check manually.")
-        true
-    } else {
-
-        pluginPortal.description.version == latestVersion
-    }
-}
-
-
 fun copyPartialMatchesWithService(
     input: String,
     originals: Iterable<String>,
