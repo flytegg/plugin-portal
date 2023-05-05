@@ -47,7 +47,7 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         if (plugin.downloadURL.isEmpty()) {
             sender.sendMessage("&7We couldn't find a download link for &c$pluginName &7. This happens when they use an external link and we can't always identify the correct file to download. We have automatically sent this to our staff members".colorOutput())
             addValueToPieChart(Chart.MOST_INVALID_DOWNLOADS, plugin.id)
-            requestPlugin(plugin.toRequestPlugin("External Download URL"))
+            requestPlugin(plugin.toRequestPlugin("External Download URL", sender.name))
             return
         }
 

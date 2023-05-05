@@ -42,8 +42,8 @@ inline fun <T> T.applyIf(shouldApply: Boolean, block: T.() -> Unit): T = apply {
 }
 
 // Convert MarketplacePlugin to RequestPlugin, with an input of "reasonForRequest"
-fun MarketplacePlugin.toRequestPlugin(reasonForRequest: String): RequestPlugin {
-    return RequestPlugin(id, service, name, reasonForRequest)
+fun MarketplacePlugin.toRequestPlugin(reasonForRequest: String, username: String): RequestPlugin {
+    return RequestPlugin(id, service, username, reasonForRequest)
 }
 
 fun copyPartialMatchesWithService(

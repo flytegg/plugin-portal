@@ -42,7 +42,7 @@ class RequestSubCommand : SubCommand() {
         if (isJarFile) {
             sender.sendMessage("&7This plugin is already supported.".colorOutput())
         } else {
-            requestPlugin(plugin.toRequestPlugin("External Download, /pp request"))
+            requestPlugin(plugin.toRequestPlugin("External Download, /pp request", sender.name))
             sender.sendMessage("&7Plugin has been requested.".colorOutput())
         }
     }

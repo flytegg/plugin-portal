@@ -43,7 +43,7 @@ fun sendModernPreview(player: CommandSender, plugin: MarketplacePlugin) {
     )
 
     information.add(TextComponent(" "))
-    information.addAll(createButton(plugin))
+    information.addAll(createButton(plugin, player))
 
     val image = fetchImageAsBuffer((plugin.iconURL.substringBeforeLast(".jpg")) + ".jpg")
     val imageGrid = image?.let { createImageGrid(image, 11, 13) } ?: emptyArray()
@@ -113,7 +113,7 @@ fun createDescriptionLines(description: String, showHover: Boolean = true): Arra
     }.toTypedArray()
 }
 
-fun createButton(plugin: MarketplacePlugin): List<TextComponent> {
+fun createButton(plugin: MarketplacePlugin, sender: CommandSender): List<TextComponent> {
     val hoverText = when (plugin.isPremium) {
         false -> "&bClick to Download"
         true -> when (isDirectDownload(plugin.downloadURL)) {
@@ -128,7 +128,7 @@ fun createButton(plugin: MarketplacePlugin): List<TextComponent> {
     }
 
     if (onClick.action == ClickEvent.Action.OPEN_URL && !plugin.isPremium) {
-        requestPlugin(plugin.toRequestPlugin("External Download URL"))
+        requestPlugin(plugin.toRequestPlugin("External Download URL", sender.name))
     }
 
     val button = when (plugin.isPremium) {
