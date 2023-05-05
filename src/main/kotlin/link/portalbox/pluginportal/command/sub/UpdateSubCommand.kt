@@ -59,7 +59,7 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         }
 
         if (needUpdating.isEmpty()) {
-            sender.sendMessage("&7No plugins require an update.".color())
+            sender.sendMessage("&7No plugins require an update.".colorOutput())
             return
         }
 

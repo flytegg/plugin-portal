@@ -24,11 +24,11 @@ class UpdateAllSubCommand(private val pluginPortal: PluginPortal) : SubCommand()
         }
 
         if (needUpdating.isEmpty()) {
-            sender.sendMessage("&7No plugins require an update.".color())
+            sender.sendMessage("&7No plugins require an update.".colorOutput())
             return
         }
 
-        sender.sendMessage("&7Updating plugins...".color())
+        sender.sendMessage("&7Updating plugins...".colorOutput())
         for (outdatedPlugin in needUpdating) {
             val id = getMarketplaceCache().inverse()[outdatedPlugin.name]
             val localPlugin = Data.installedPlugins.find { it.id == id } ?: return
@@ -57,7 +57,7 @@ class UpdateAllSubCommand(private val pluginPortal: PluginPortal) : SubCommand()
         }
     }
 
-    override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {
+    override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String> {
         return mutableListOf()
     }
 }

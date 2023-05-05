@@ -1,10 +1,8 @@
 package link.portalbox.pluginportal.util
 
-import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.type.GameVersion
 import link.portalbox.pplib.type.MarketplacePlugin
 import link.portalbox.pplib.type.RequestPlugin
-import link.portalbox.pplib.util.getLatestPPVersion
 import org.apache.commons.lang.StringUtils.startsWithIgnoreCase
 import org.apache.commons.lang.Validate
 import java.io.File

@@ -11,7 +11,6 @@ import link.portalbox.pplib.util.getURL
 import link.portalbox.pplib.util.requestPlugin
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
-import org.bukkit.util.StringUtil
 
 class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
     override fun execute(sender: CommandSender, args: Array<out String>) {
