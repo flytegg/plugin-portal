@@ -13,5 +13,6 @@ enum class SubCommandType(
     UPDATE("Update", "/pp update (Plugin Name)", "u", "pluginportal.update"),
     DELETE("Delete", "/pp delete (File Name)", "d", "pluginportal.delete"),
     UPDATEALL("UpdateAll", "/pp updateall", "ua", "pluginportal.updateall"),
+    REQUEST("Request", "/pp request (Plugin Name)", "r", "pluginportal.request"),
 
 }
