@@ -3,11 +3,6 @@ name: Publish release
 on:
   release:
     types: created
-    
-permissions:
-  repo: write
-  releases: write
-
 
 jobs:
   build:
