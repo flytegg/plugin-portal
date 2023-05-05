@@ -1,3 +1,4 @@
+import io.papermc.hangarpublishplugin.model.Platforms
 import java.io.ByteArrayOutputStream
 
 plugins {
@@ -28,7 +29,7 @@ dependencies {
     compileOnly("com.google.code.gson:gson:2.10.1")
 }
 
-/* SET THIS UP SOON
+// SET THIS UP SOON
 hangarPublish {
     val owner = "stephen"
     val slug = "plugin-portal"
@@ -82,7 +83,6 @@ hangarPublish {
         }
     }
 }
- */
 
 tasks {
     compileKotlin {
