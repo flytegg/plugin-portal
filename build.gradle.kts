@@ -13,16 +13,12 @@ version = "1.3.3"
 repositories {
     mavenCentral()
     mavenLocal()
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     maven("https://jitpack.io")
+    maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
-    implementation("org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT") {
-        // Use in-house version of gson
-        exclude(group = "com.google.code.gson", module = "gson")
-    }
-
+    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
     implementation ("org.bstats:bstats-bukkit:3.0.2")
     implementation("com.github.portal-box:pp-lib:1.3.6")
     compileOnly("com.google.code.gson:gson:2.10.1")
