@@ -37,7 +37,7 @@ class RequestSubCommand : SubCommand() {
 
         var isJarFile = false
         runCatching {
-            isJarFile = (isJarFile(URL(plugin.downloadURL)) || isJarFile(URL(getPluginJSON(plugin.id).get("alternateDownload").toString()?: "")))
+            isJarFile = (isJarFile(URL(plugin.downloadURL)) || isJarFile(URL(getPluginJSON(plugin.id).get("alternateDownload").toString())))
         }
 
         if (isJarFile) {
