@@ -6,6 +6,7 @@ import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.TextReplacementConfig
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.Tag
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags
 import org.bukkit.configuration.file.FileConfiguration
@@ -16,7 +17,13 @@ object Message {
     private lateinit var config: FileConfiguration
 
     private val prefix get() = config.getString("prefix") ?: ""
-    val outdatedPlugin get() = parseString(config.getString("outdated-plugin"))
+
+    val noPermission get() = parseString(config.getString("no-permission"))
+    val illegalArguments get() = parseString(config.getString("illegal-arguments"))
+
+    val consoleOutdatedPluginPortal get() = parseString(config.getString("plugin-portal-outdated-console"))
+    val playerOutdatedPluginPortal get() = parseString(config.getString("plugin-portal-outdated-player"))
+    val playerManuallyRemovedPlugins get () = parseString(config.getString("player-manually-removed-plugins"))
 
     fun init(pluginPortal: PluginPortal) {
         if (Config.language == null) {
@@ -38,8 +45,6 @@ object Message {
     }
 
     private fun parseString(string: String?): Component {
-        return MiniMessage.miniMessage().deserialize(
-            string ?: "<prefix> <red>Language Error, Please report this to our discord @ discord.gg/pluginportal</red>"
-                .replace("<prefix>", prefix))
+        return MiniMessage.miniMessage().deserialize(string ?: "<prefix> <red>Language Error, Please report this to our discord @ discord.gg/pluginportal</red>", Placeholder.component("<prefix>", Component.text(prefix)))
     }
 }

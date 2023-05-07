@@ -1,10 +1,13 @@
 package link.portalbox.pluginportal.listener
 
 import link.portalbox.pluginportal.type.Data
-import link.portalbox.pluginportal.util.color
+import link.portalbox.pluginportal.type.Message
 import link.portalbox.pluginportal.util.getMarketplaceCache
 import link.portalbox.pluginportal.util.getSHA
-import link.portalbox.pplib.manager.MarketplacePluginManager
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.ComponentLike
+import net.kyori.adventure.text.minimessage.MiniMessage
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
@@ -49,7 +52,9 @@ class PluginValidator : Listener {
             else -> removedPlugins.dropLast(1).joinToString(", ") + " and " + removedPlugins.last()
         }
 
-        event.player.sendMessage("&7&l[&b&lPP&7&l] &8&l> &7We noticed you manually removed &c$plugins&7. To prevent issues, we have removed ${if (removedPlugins.size > 1) "them" else "it"} from our data store too.".color())
+        event.player.sendMessage(MiniMessage.miniMessage().deserialize(
+            MiniMessage.miniMessage().serialize(Message.playerManuallyRemovedPlugins),
+            Placeholder.component("{plugins}", Component.text(plugins))))
         notified = true
     }
 }

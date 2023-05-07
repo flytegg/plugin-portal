@@ -1,9 +1,18 @@
 # --------------- Variables --------------- #
 # These variables can be used in messages and will be replaced with the correct value.
 # To use these variables, use the following syntax: ${variableName}
-prefix: '<bold><gray>[<aqua>PP</aqua>]</gray> <dark_gray>></bold> '
+prefix: ""<bold><gray>[<aqua>PP</aqua>]</gray> <dark_gray>></bold> "
 
 
 # --------------- Messages --------------- #
 
-outdated-plugin: '<prefix><gray>This plugin is outdated! Please update to the latest version.'
+no-permission: "<prefix><red>You do not have permission to use this command."
+illegal-arguments: "<prefix><red>Illegal arguments! Please use <aqua>/pp help</aqua> for more information."
+
+console-plugin-portal-outdated: "<prefix><gray>This plugin is outdated! Please update to the latest version."
+player-plugin-portal-outdated: "<prefix><gray>Plugin Portal needs to be updated. Please download the latest version from: <aqua><bold><click:open_url:'https://pluginportal.link'><hover:show_text:'Download PluginPortal from SpigotMC'></hover>[CLICK HERE]</click>"
+player-manually-removed-plugins: "<prefix><gray>We noticed you manually removed <red>%pluginsString%</red>, we have removed them from PluginPortal to prevent issues."
+
+
+
+

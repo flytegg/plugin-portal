@@ -53,7 +53,7 @@ object Data {
         pluginPortal.versionType = getLatestVersion(pluginPortal.description.version)
         if (pluginPortal.versionType != VersionType.LATEST) {
             for (i in 0..2) {
-                Bukkit.getConsoleSender().sendMessage(Message.outdatedPlugin)
+                Bukkit.getConsoleSender().sendMessage(Message.consoleOutdatedPluginPortal)
             }
         }
     }
