@@ -4,6 +4,7 @@ import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Config
 import link.portalbox.pluginportal.type.Data
+import link.portalbox.pluginportal.type.Message
 import link.portalbox.pluginportal.util.*
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
@@ -15,7 +16,7 @@ import org.bukkit.command.CommandSender
 class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
     override fun execute(sender: CommandSender, args: Array<out String>) {
         if (args.size <= 1) {
-            sender.sendMessage("&cPlease specify a plugin to install!".colorOutput())
+            sender.sendMessage(Message.noPluginSpecified)
             return
         }
 
@@ -28,19 +29,19 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         }
 
         if (!getMarketplaceCache().inverse().containsKey(pluginName)) {
-            sender.sendMessage("&cYou specified an invalid plugin.".colorOutput())
+            sender.sendMessage(Message.pluginNotFound)
             return
         }
 
         val id: String = getMarketplaceCache().inverse()[pluginName]?: return
         if (Data.installedPlugins.find { it.id.equals(id) } != null) {
-            sender.sendMessage("&7Plugin is already installed.".colorOutput())
+            sender.sendMessage(Message.pluginAlreadyInstalled)
             return
         }
 
         val plugin: MarketplacePlugin = MarketplacePluginManager.getPlugin(id)
         if (plugin.isPremium) {
-            sender.sendMessage("&cThis plugin is premium so you can't download it through PP. Purchase: https://www.spigotmc.org/resources/${plugin.id}".colorOutput())
+            sender.sendMessage(Message.pluginIsPremium)
             return
         }
 
@@ -56,13 +57,12 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             return
         }
 
-        sender.sendMessage("&a$pluginName &7is being installed...".colorOutput())
+        sender.sendMessage(Message.pluginIsBeingInstalled)
 
         Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
             install(plugin, getURL(plugin.downloadURL)!!)
-            sender.sendMessage(("&a$pluginName &7has been installed." +
-                if (Config.startupOnInstall) " Plugin has automatically started but contain issues. A restart may be needed for plugin to take effect."
-                else " Please restart your server for the install to take effect.").colorOutput())
+            sender.sendMessage(Message.pluginHasBeenInstalled)
+            sender.sendMessage(if (Config.startupOnInstall) Message.pluginAttemptedEnabling else Message.restartServerToEnablePlugin)
         })
     }
 

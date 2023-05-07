@@ -20,13 +20,13 @@ object Message {
 
     val noPermission get() = parseString(config.getString("no-permission"))
     val illegalArguments get() = parseString(config.getString("illegal-arguments"))
+    val noPluginSpecified get() = parseString(config.getString("no-plugin-specified"))
+    val pluginNotFound get() = parseString(config.getString("plugin-not-found"))
 
     val consoleOutdatedPluginPortal get() = parseString(config.getString("plugin-portal-outdated-console"))
     val playerOutdatedPluginPortal get() = parseString(config.getString("plugin-portal-outdated-player"))
     val playerManuallyRemovedPlugins get () = parseString(config.getString("player-manually-removed-plugins"))
 
-    val noPluginSpecified get() = parseString(config.getString("no-plugin-specified"))
-    val pluginNotFound get() = parseString(config.getString("plugin-not-found"))
     val pluginNotInstalled get() = parseString(config.getString("plugin-not-installed"))
     val pluginNotDeleted get() = parseString(config.getString("plugin-not-deleted"))
     val pluginDeleted get() = parseString(config.getString("plugin-deleted"))
@@ -34,6 +34,13 @@ object Message {
     val blankStrikeThroughWithWatermark get() = parseString(config.getString("blank-strike-through-with-watermark"))
     val blankStrikeThrough get() = parseString(config.getString("blank-strike-through"))
     val helpCommandDisplay get() = parseString(config.getString("help-command-display"))
+
+    val pluginAlreadyInstalled get() = parseString(config.getString("plugin-already-installed"))
+    val pluginIsPremium get() = parseString(config.getString("plugin-is-premium"))
+    val pluginIsBeingInstalled get() = parseString(config.getString("plugin-is-being-installed"))
+    val pluginHasBeenInstalled get() = parseString(config.getString("plugin-has-been-installed"))
+    val pluginAttemptedEnabling = parseString(config.getString("plugin-attempted-enabling"))
+    val restartServerToEnablePlugin = parseString(config.getString("restart-server-to-enable-plugin"))
 
     fun init(pluginPortal: PluginPortal) {
         if (Config.language == null) {

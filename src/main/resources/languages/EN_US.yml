@@ -14,25 +14,29 @@ player-manually-removed-plugins: "<prefix><gray>We noticed you manually removed 
 
 no-permission: "<prefix><red>You do not have permission to use this command."
 illegal-arguments: "<prefix><red>Illegal arguments! Please use <aqua>/pp help</aqua> for more information."
+no-plugin-specified: "<prefix><red>No plugin specified!"
+plugin-not-found: "<prefix><red>Plugin not found!"
 
 # ---------------- Delete ---------------- #
 
-no-plugin-specified: "<prefix><red>No plugin specified!"
-plugin-not-found: "<prefix><red>Plugin not found!"
 plugin-not-installed: "<prefix><red>%plugin% not installed!"
 plugin-not-deleted: "<prefix><gray>Could not delete <red>%plugin%</red>! This may be due to the plugin not being enabled. Restart your server and try again."
 plugin-deleted: "<prefix><aqua>%plugin%</aqua><gray> has been deleted!"
 
 # ---------------- Install ---------------- #
 
-
+plugin-already-installed: "<prefix><gray>Plugin already installed!"
+plugin-is-premium: "<prefix><red>PluginPortal may only download plugins which are free to install."
+plugin-is-being-installed: "<prefix><gray>Plugin is being installed, please wait..."
+plugin-has-been-installed: "<prefix><aqua>%plugin%</aqua><gray> has been installed!"
+plugin-attempted-enabling: "<prefix><gray>Plugin has attempted to start automatically, a restart may still be needed."
+restart-server-to-enable: "<prefix><gray>Please restart your server to enable the plugin."
 
 # ----------------- Help ------------------ #
 
 blank-strike-through-with-watermark: "<prefix><dark_gray><st>                        <gray> [<aqua><bold>PP</bold>] </gray><dark_gray>                        "
 blank-strike-through: "<prefix><dark_gray><st>                                                      "
 help-command-display: "<dark_gray> - </dark_gray><bold> <aqua>%command%</aqua></bold><dark_gray>: </dark_gray><gray>%usage%</gray>"
-
 
 
 
