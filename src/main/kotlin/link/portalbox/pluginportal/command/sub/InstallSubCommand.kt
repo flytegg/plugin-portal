@@ -5,9 +5,11 @@ import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Config
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.Message
+import link.portalbox.pluginportal.type.Message.fillInVariables
 import link.portalbox.pluginportal.util.*
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
+import link.portalbox.pplib.type.MarketplaceService
 import link.portalbox.pplib.util.getURL
 import link.portalbox.pplib.util.requestPlugin
 import org.bukkit.Bukkit
@@ -46,14 +48,14 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         }
 
         if (plugin.downloadURL.isEmpty()) {
-            sender.sendMessage("&7We couldn't find a download link for &c$pluginName &7. This happens when they use an external link and we can't always identify the correct file to download. We have automatically sent this to our staff members".colorOutput())
+            sender.sendMessage(Message.downloadNotFound)
             addValueToPieChart(Chart.MOST_INVALID_DOWNLOADS, plugin.id)
             requestPlugin(plugin.toRequestPlugin("External Download URL", sender.name))
             return
         }
 
         if (plugin.service != Config.marketplaceService) {
-            sender.sendMessage("&7This plugin is not available on &c${Config.marketplaceService?.name}, change the supported service in the config.yml or buy premium (Coming Soon)!".colorOutput())
+            sender.sendMessage(Message.serviceNotSupported.fillInVariables(arrayOf(Config.marketplaceService?.name ?: "UNKNOWN")))
             return
         }
 

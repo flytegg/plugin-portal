@@ -22,6 +22,7 @@ object Message {
     val illegalArguments get() = parseString(config.getString("illegal-arguments"))
     val noPluginSpecified get() = parseString(config.getString("no-plugin-specified"))
     val pluginNotFound get() = parseString(config.getString("plugin-not-found"))
+    val downloadNotFound get() = parseString(config.getString("no-download-found"))
 
     val consoleOutdatedPluginPortal get() = parseString(config.getString("plugin-portal-outdated-console"))
     val playerOutdatedPluginPortal get() = parseString(config.getString("plugin-portal-outdated-player"))
@@ -41,6 +42,7 @@ object Message {
     val pluginHasBeenInstalled get() = parseString(config.getString("plugin-has-been-installed"))
     val pluginAttemptedEnabling = parseString(config.getString("plugin-attempted-enabling"))
     val restartServerToEnablePlugin = parseString(config.getString("restart-server-to-enable-plugin"))
+    val serviceNotSupported = parseString(config.getString("service-not-supported"))
 
     val noPluginsInstalled get() = parseString(config.getString("no-plugins-installed"))
     val listingAllPlugins get() = parseString(config.getString("listing-all-plugins"))
@@ -51,6 +53,8 @@ object Message {
 
     val noPluginRequireAnUpdate get() = parseString(config.getString("no-plugin-require-an-update"))
     val updatingPlugins get() = parseString(config.getString("updating-plugins"))
+    val pluginUpdated get() = parseString(config.getString("plugin-updated"))
+    val pluginNotUpdated get() = parseString(config.getString("plugin-not-updated"))
 
     fun init(pluginPortal: PluginPortal) {
         if (Config.language == null) {
@@ -74,4 +78,12 @@ object Message {
     private fun parseString(string: String?): Component {
         return MiniMessage.miniMessage().deserialize(string ?: "<prefix> <red>Language Error, Please report this to our discord @ discord.gg/pluginportal</red>", Placeholder.component("<prefix>", Component.text(prefix)))
     }
-}
+
+    fun Component.fillInVariables(args: Array<String>): Component {
+        val serialized = MiniMessage.miniMessage().serialize(this)
+        for (arg in args.indices) {
+            serialized.replace("**{$arg}**", args[arg])
+        }
+
+        return MiniMessage.miniMessage().deserialize(serialized)
+    }}

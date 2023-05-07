@@ -16,6 +16,7 @@ no-permission: "<prefix><red>You do not have permission to use this command."
 illegal-arguments: "<prefix><red>Illegal arguments! Please use <aqua>/pp help</aqua> for more information."
 no-plugin-specified: "<prefix><red>No plugin specified!"
 plugin-not-found: "<prefix><red>Plugin not found!"
+no-download-found: "<prefix><red>No download URL has been found!"
 
 # ---------------- Delete ---------------- #
 
@@ -31,6 +32,7 @@ plugin-is-being-installed: "<prefix><gray>Plugin is being installed, please wait
 plugin-has-been-installed: "<prefix><aqua>%plugin%</aqua><gray> has been installed!"
 plugin-attempted-enabling: "<prefix><gray>Plugin has attempted to start automatically, a restart may still be needed."
 restart-server-to-enable: "<prefix><gray>Please restart your server to enable the plugin."
+service-not-supported: "<prefix><gray>This plugin is not available on <red>**{0}**</red>. Please change the supported service via the config.yml, or purchase premium (Coming Soon)."
 
 # ----------------- Help ------------------ #
 
@@ -54,3 +56,4 @@ plugin-is-supported: "<prefix><gray>Plugin is supported by PluginPortal"
 no-plugin-requires-an-update: "<prefix><gray>No plugins require an update!"
 updating-plugins: "<prefix><gray>Updating plugins..."
 plugin-updated: "<prefix><aqua>%plugin%</aqua><gray> has been updated!"
+plugin-not-updated: "<prefix><aqua>**{0}**</aqua> has not been updated due to an error. Please make sure the plugin has been enabled."

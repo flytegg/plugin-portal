@@ -5,6 +5,7 @@ import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Config
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.Message
+import link.portalbox.pluginportal.type.Message.fillInVariables
 import link.portalbox.pluginportal.util.*
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
@@ -38,20 +39,20 @@ class UpdateAllSubCommand(private val pluginPortal: PluginPortal) : SubCommand()
             if (plugin.version == localPlugin.version) return
 
             if (plugin.downloadURL.isEmpty()) {
-                sender.sendMessage("&7We couldn't find a download link for &c${plugin.name}&7. This happens when they use an external link and we can't always identify the correct file to download. Please report this to our Discord @ discord.gg/portalbox so we manually support this.".colorOutput())
+                sender.sendMessage(Message.downloadNotFound)
                 return
             }
 
             if (!delete(pluginPortal, localPlugin)) {
-                sender.sendMessage("&c${plugin.name} &7has not been updated due to an error. Tip: the plugin must be enabled before you delete it. Did you restart the server after installing?".colorOutput())
+                sender.sendMessage(Message.pluginNotUpdated.fillInVariables(arrayOf(plugin.name)))
                 return
             }
 
             Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
                 install(plugin, getURL(plugin.downloadURL)!!)
-                sender.sendMessage(("&a${plugin.name} &7has been updated." +
-                        if (Config.startupOnInstall) " Plugin has automatically started but contain issues. A restart may be needed for plugin to take effect."
-                        else " Please restart your server for the install to take effect.").colorOutput())
+
+                sender.sendMessage(Message.pluginUpdated)
+                sender.sendMessage(if (Config.startupOnInstall) Message.pluginAttemptedEnabling else Message.restartServerToEnablePlugin)
             })
         }
     }
