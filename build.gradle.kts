@@ -42,7 +42,8 @@ hangarPublish {
 
         namespace(owner, slug)
         version.set(project.version as String)
-
+        channel.set("release") // placeholder, see code below
+        
         provider {
             channel.set(if(version.get().endsWith("-SNAPSHOT")) "prerelease" else "release")
             val commitLog = getCommitHistory(project.properties["release-start-commit"] as String)
