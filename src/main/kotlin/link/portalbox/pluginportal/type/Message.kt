@@ -42,6 +42,10 @@ object Message {
     val pluginAttemptedEnabling = parseString(config.getString("plugin-attempted-enabling"))
     val restartServerToEnablePlugin = parseString(config.getString("restart-server-to-enable-plugin"))
 
+    val noPluginsInstalled get() = parseString(config.getString("no-plugins-installed"))
+    val listingAllPlugins get() = parseString(config.getString("listing-all-plugins"))
+    val installedPlugin get() = parseString(config.getString("installed-plugin"))
+
     fun init(pluginPortal: PluginPortal) {
         if (Config.language == null) {
             pluginPortal.getLogger().warning("No language set in config.yml. Defaulting to EN_US")

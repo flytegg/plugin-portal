@@ -1,6 +1,6 @@
 # --------------- Variables --------------- #
 # These variables can be used in messages and will be replaced with the correct value.
-# To use these variables, use the following syntax: ${variableName}
+# To use these variables, use the following syntax: <variable-name>
 prefix: "<bold><gray>[<aqua>PP</aqua>]</gray> <dark_gray>></bold> "
 
 
@@ -38,6 +38,9 @@ blank-strike-through-with-watermark: "<prefix><dark_gray><st>                   
 blank-strike-through: "<prefix><dark_gray><st>                                                      "
 help-command-display: "<dark_gray> - </dark_gray><bold> <aqua>%command%</aqua></bold><dark_gray>: </dark_gray><gray>%usage%</gray>"
 
+# ----------------- List ------------------ #
 
-
+no-plugins-installed: "<prefix><gray>You have no plugins installed or recognized by PluginPortal"
+listing-all-plugins: "<prefix><gray>Listing all plugins..."
+installed-plugin: "<green>+</green> <aqua>%name%"
 

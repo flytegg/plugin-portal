@@ -2,23 +2,29 @@ package link.portalbox.pluginportal.command.sub
 
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Data
-import link.portalbox.pluginportal.util.color
-import link.portalbox.pluginportal.util.colorOutput
+import link.portalbox.pluginportal.type.Message
 import link.portalbox.pluginportal.util.getMarketplaceCache
-import link.portalbox.pplib.manager.MarketplacePluginManager
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.command.CommandSender
 
 class ListSubCommand : SubCommand() {
     override fun execute(sender: CommandSender, args: Array<out String>) {
         val installedPlugins = Data.installedPlugins
         if (installedPlugins.isEmpty()) {
-            sender.sendMessage("&7You have no plugins installed or recognised by Plugin Portal.".colorOutput())
+            sender.sendMessage(Message.noPluginsInstalled)
             return
         }
 
-        sender.sendMessage("&7Listing all installed plugins...".colorOutput())
+        sender.sendMessage(Message.listingAllPlugins)
         for (plugin in installedPlugins) {
-            sender.sendMessage("&a+ &b${getMarketplaceCache()[plugin.id]}".color())
+            sender.sendMessage(
+                MiniMessage.miniMessage().deserialize(
+                    MiniMessage.miniMessage().serialize(Message.installedPlugin),
+                    Placeholder.component("%plugin%", Component.text(getMarketplaceCache()[plugin.id] ?: plugin.id))
+                )
+            )
         }
     }
 
