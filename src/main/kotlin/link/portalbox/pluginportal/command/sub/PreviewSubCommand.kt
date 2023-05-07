@@ -4,7 +4,6 @@ import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Message
 import link.portalbox.pluginportal.util.copyPartialMatchesWithService
 import link.portalbox.pluginportal.util.getMarketplaceCache
-import link.portalbox.pluginportal.util.sendPreview
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import org.bukkit.command.CommandSender
 
@@ -28,7 +27,7 @@ class PreviewSubCommand : SubCommand() {
             return
         }
 
-        sendPreview(sender, MarketplacePluginManager.getPlugin(getMarketplaceCache().inverse()[pluginName]!!))
+        //sendPreview(sender, MarketplacePluginManager.getPlugin(getMarketplaceCache().inverse()[pluginName]!!))
     }
 
     override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {

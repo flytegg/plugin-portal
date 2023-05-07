@@ -24,8 +24,8 @@ object Message {
     val pluginNotFound get() = parseString(config.getString("plugin-not-found"))
     val downloadNotFound get() = parseString(config.getString("no-download-found"))
 
-    val consoleOutdatedPluginPortal get() = parseString(config.getString("plugin-portal-outdated-console"))
-    val playerOutdatedPluginPortal get() = parseString(config.getString("plugin-portal-outdated-player"))
+    val consoleOutdatedPluginPortal get() = parseString(config.getString("console-plugin-portal-outdated"))
+    val playerOutdatedPluginPortal get() = parseString(config.getString("player-plugin-portal-outdated"))
     val playerManuallyRemovedPlugins get () = parseString(config.getString("player-manually-removed-plugins"))
 
     val pluginNotInstalled get() = parseString(config.getString("plugin-not-installed"))
@@ -40,9 +40,9 @@ object Message {
     val pluginIsPremium get() = parseString(config.getString("plugin-is-premium"))
     val pluginIsBeingInstalled get() = parseString(config.getString("plugin-is-being-installed"))
     val pluginHasBeenInstalled get() = parseString(config.getString("plugin-has-been-installed"))
-    val pluginAttemptedEnabling = parseString(config.getString("plugin-attempted-enabling"))
-    val restartServerToEnablePlugin = parseString(config.getString("restart-server-to-enable-plugin"))
-    val serviceNotSupported = parseString(config.getString("service-not-supported"))
+    val pluginAttemptedEnabling get() = parseString(config.getString("plugin-attempted-enabling"))
+    val restartServerToEnablePlugin get() = parseString(config.getString("restart-server-to-enable-plugin"))
+    val serviceNotSupported get() = parseString(config.getString("service-not-supported"))
 
     val noPluginsInstalled get() = parseString(config.getString("no-plugins-installed"))
     val listingAllPlugins get() = parseString(config.getString("listing-all-plugins"))
@@ -79,7 +79,7 @@ object Message {
     }
 
     private fun parseString(string: String?): Component {
-        return MiniMessage.miniMessage().deserialize(string ?: "<prefix> <red>Language Error, Please report this to our discord @ discord.gg/pluginportal</red>", Placeholder.component("<prefix>", Component.text(prefix)))
+        return MiniMessage.miniMessage().deserialize(string ?: "prefix <red>Language Error, Please report this to our discord @ discord.gg/pluginportal</red>", Placeholder.component("prefix", MiniMessage.miniMessage().deserialize(prefix)))
     }
 
     fun Component.fillInVariables(args: Array<String>): Component {
