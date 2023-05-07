@@ -48,3 +48,9 @@ installed-plugin: "<green>+</green> <aqua>%name%"
 
 plugin-requested: "<prefix><gray>Plugin has been requested"
 plugin-is-supported: "<prefix><gray>Plugin is supported by PluginPortal"
+
+# ----------------- Update ----------------- #
+
+no-plugin-requires-an-update: "<prefix><gray>No plugins require an update!"
+updating-plugins: "<prefix><gray>Updating plugins..."
+plugin-updated: "<prefix><aqua>%plugin%</aqua><gray> has been updated!"
