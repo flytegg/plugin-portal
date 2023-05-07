@@ -56,6 +56,9 @@ object Message {
     val pluginUpdated get() = parseString(config.getString("plugin-updated"))
     val pluginNotUpdated get() = parseString(config.getString("plugin-not-updated"))
 
+    val pluginIsUpToDate get() = parseString(config.getString("plugin-is-up-to-date"))
+    val listingAllOutdatedPlugins get() = parseString(config.getString("listing-all-outdated-plugins"))
+
     fun init(pluginPortal: PluginPortal) {
         if (Config.language == null) {
             pluginPortal.getLogger().warning("No language set in config.yml. Defaulting to EN_US")

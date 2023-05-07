@@ -3,6 +3,7 @@ package link.portalbox.pluginportal.command.sub
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.Message
+import link.portalbox.pluginportal.type.Message.fillInVariables
 import link.portalbox.pluginportal.util.getMarketplaceCache
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -19,12 +20,7 @@ class ListSubCommand : SubCommand() {
 
         sender.sendMessage(Message.listingAllPlugins)
         for (plugin in installedPlugins) {
-            sender.sendMessage(
-                MiniMessage.miniMessage().deserialize(
-                    MiniMessage.miniMessage().serialize(Message.installedPlugin),
-                    Placeholder.component("%plugin%", Component.text(getMarketplaceCache()[plugin.id] ?: plugin.id))
-                )
-            )
+            sender.sendMessage(Message.installedPlugin.fillInVariables(arrayOf(getMarketplaceCache()[plugin.id] ?: plugin.id)))
         }
     }
 

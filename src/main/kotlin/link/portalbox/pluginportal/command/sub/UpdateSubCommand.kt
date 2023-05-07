@@ -4,6 +4,8 @@ import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Config
 import link.portalbox.pluginportal.type.Data
+import link.portalbox.pluginportal.type.Message
+import link.portalbox.pluginportal.type.Message.fillInVariables
 import link.portalbox.pluginportal.util.*
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
@@ -19,33 +21,32 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             val id = getMarketplaceCache().inverse()[args[1]]
             val localPlugin = Data.installedPlugins.find { it.id == id }
             if (localPlugin == null) {
-                sender.sendMessage("&c${args[1]} &7is not installed or recognised by Plugin Portal. Did you mean to run &b/pp install ${args[1]}&7?".colorOutput())
+                sender.sendMessage(Message.pluginNotFound)
                 return
             }
 
             val plugin: MarketplacePlugin = MarketplacePluginManager.getPlugin(id!!)
             if (plugin.version == localPlugin.version) {
-                sender.sendMessage("&a${args[1]} &7is already up to date.".colorOutput())
+                sender.sendMessage(Message.pluginIsUpToDate.fillInVariables(arrayOf(plugin.name)))
                 return
             }
 
             if (plugin.downloadURL.isEmpty()) {
-                sender.sendMessage("&7We couldn't find a download link for &c${args[1]}&7. This happens when they use an external link and we can't always identify the correct file to download. Please report this to our Discord @ discord.gg/portalbox so we manually support this.".colorOutput())
+                sender.sendMessage(Message.downloadNotFound)
                 return
             }
 
-            sender.sendMessage("&a${args[1]} &7is being updated...".colorOutput())
 
             if (!delete(pluginPortal, localPlugin)) {
-                sender.sendMessage("&c${args[1]} &7has not been updated due to an error. Tip: the plugin must be enabled before you delete it. Did you restart the server after installing?".colorOutput())
+                sender.sendMessage(Message.pluginNotUpdated.fillInVariables(arrayOf(plugin.name)))
                 return
             }
 
             Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
                 install(plugin, getURL(plugin.downloadURL)!!)
-                sender.sendMessage(("&a${args[1]} &7has been updated." +
-                    if (Config.startupOnInstall) " Plugin has automatically started but contain issues. A restart may be needed for plugin to take effect."
-                    else " Please restart your server for the install to take effect.").colorOutput())
+
+                sender.sendMessage(Message.pluginUpdated)
+                sender.sendMessage(if (Config.startupOnInstall) Message.pluginAttemptedEnabling else Message.restartServerToEnablePlugin)
             })
             return
         }
@@ -59,13 +60,13 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         }
 
         if (needUpdating.isEmpty()) {
-            sender.sendMessage("&7No plugins require an update.".colorOutput())
+            sender.sendMessage(Message.noPluginRequireAnUpdate)
             return
         }
 
-        sender.sendMessage("&7Listing all plugins that can be updated:".color())
+        sender.sendMessage(Message.listingAllOutdatedPlugins)
         for (spigetPlugin in needUpdating) {
-            sender.sendMessage("&a+ &b${spigetPlugin.name}".color())
+            sender.sendMessage(Message.installedPlugin.fillInVariables(arrayOf(spigetPlugin.name)))
         }
     }
 
