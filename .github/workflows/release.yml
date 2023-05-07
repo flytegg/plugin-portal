@@ -27,4 +27,4 @@ jobs:
 
       # Run the gradle task
       - name: Run gradle task
-        run: ./gradlew publishReleasePublicationToHangar -Pio.papermc.hangar-publish-plugin.default-api-key=${{ secrets.hangar-api-key }}
+        run: ./gradlew publishReleasePublicationToHangar -Pio.papermc.hangar-publish-plugin.default-api-key=${{ secrets.HANGAR_API_KEY }}
