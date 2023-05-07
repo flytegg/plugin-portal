@@ -31,6 +31,10 @@ object Message {
     val pluginNotDeleted get() = parseString(config.getString("plugin-not-deleted"))
     val pluginDeleted get() = parseString(config.getString("plugin-deleted"))
 
+    val blankStrikeThroughWithWatermark get() = parseString(config.getString("blank-strike-through-with-watermark"))
+    val blankStrikeThrough get() = parseString(config.getString("blank-strike-through"))
+    val helpCommandDisplay get() = parseString(config.getString("help-command-display"))
+
     fun init(pluginPortal: PluginPortal) {
         if (Config.language == null) {
             pluginPortal.getLogger().warning("No language set in config.yml. Defaulting to EN_US")

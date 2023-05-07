@@ -1,7 +1,7 @@
 # --------------- Variables --------------- #
 # These variables can be used in messages and will be replaced with the correct value.
 # To use these variables, use the following syntax: ${variableName}
-prefix: ""<bold><gray>[<aqua>PP</aqua>]</gray> <dark_gray>></bold> "
+prefix: "<bold><gray>[<aqua>PP</aqua>]</gray> <dark_gray>></bold> "
 
 
 # --------------- Messages --------------- #
@@ -22,6 +22,18 @@ plugin-not-found: "<prefix><red>Plugin not found!"
 plugin-not-installed: "<prefix><red>%plugin% not installed!"
 plugin-not-deleted: "<prefix><gray>Could not delete <red>%plugin%</red>! This may be due to the plugin not being enabled. Restart your server and try again."
 plugin-deleted: "<prefix><aqua>%plugin%</aqua><gray> has been deleted!"
+
+# ---------------- Install ---------------- #
+
+
+
+# ----------------- Help ------------------ #
+
+blank-strike-through-with-watermark: "<prefix><dark_gray><st>                        <gray> [<aqua><bold>PP</bold>] </gray><dark_gray>                        "
+blank-strike-through: "<prefix><dark_gray><st>                                                      "
+help-command-display: "<dark_gray> - </dark_gray><bold> <aqua>%command%</aqua></bold><dark_gray>: </dark_gray><gray>%usage%</gray>"
+
+
 
 
 
