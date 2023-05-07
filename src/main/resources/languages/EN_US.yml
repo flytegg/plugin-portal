@@ -44,3 +44,7 @@ no-plugins-installed: "<prefix><gray>You have no plugins installed or recognized
 listing-all-plugins: "<prefix><gray>Listing all plugins..."
 installed-plugin: "<green>+</green> <aqua>%name%"
 
+# ---------------- Request ----------------- #
+
+plugin-requested: "<prefix><gray>Plugin has been requested"
+plugin-is-supported: "<prefix><gray>Plugin is supported by PluginPortal"

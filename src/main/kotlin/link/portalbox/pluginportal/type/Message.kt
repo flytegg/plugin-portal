@@ -46,6 +46,9 @@ object Message {
     val listingAllPlugins get() = parseString(config.getString("listing-all-plugins"))
     val installedPlugin get() = parseString(config.getString("installed-plugin"))
 
+    val pluginRequested get() = parseString(config.getString("plugin-requested"))
+    val pluginIsSupported get() = parseString(config.getString("plugin-is-supported"))
+
     fun init(pluginPortal: PluginPortal) {
         if (Config.language == null) {
             pluginPortal.getLogger().warning("No language set in config.yml. Defaulting to EN_US")
