@@ -18,8 +18,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT")
-    compileOnly("net.kyori:adventure-platform-bukkit:4.13.1") {
+    compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
+    compileOnly("net.kyori:adventure-platform-bukkit:4.1.0") {
         exclude("adventure-bom")
         exclude("adventure-api")
         exclude("adventure-nbt")
@@ -99,7 +99,6 @@ tasks {
         relocate("kotlin", "link.portalbox.kotlin")
         relocate("org.jetbrains.annotations", "link.portalbox.jetbrains.annotations")
         relocate("org.intellij.lang.annotations", "link.portalbox.intellij.lang.annotations")
-        relocate("com.google.gson", "link.portalbox.gson")
     }
 
     runServer {

@@ -3,6 +3,7 @@ package link.portalbox.pluginportal.command
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.sub.*
 import link.portalbox.pluginportal.util.color
+import net.kyori.adventure.text.Component
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -29,6 +30,7 @@ class PPCommand(pluginPortal: PluginPortal) : CommandExecutor, TabCompleter {
             type = SubCommandType.values().find { args[0].equals(it.name, true) || args[0].equals(it.alias, true) }
             if (type == null) {
                 sender.sendMessage("&7&l[&b&lPP&7&l] &8&l> &7Illegal arguments provided. Try &b/pp help&7.".color())
+                sender.sendMessage(Component.text("&7&l[&b&lPP&7&l] &8&l> &7Illegal arguments provided. Try &b/pp help&7."))
                 return false
             }
         }
