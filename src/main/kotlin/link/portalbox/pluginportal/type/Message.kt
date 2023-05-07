@@ -25,6 +25,12 @@ object Message {
     val playerOutdatedPluginPortal get() = parseString(config.getString("plugin-portal-outdated-player"))
     val playerManuallyRemovedPlugins get () = parseString(config.getString("player-manually-removed-plugins"))
 
+    val noPluginSpecified get() = parseString(config.getString("no-plugin-specified"))
+    val pluginNotFound get() = parseString(config.getString("plugin-not-found"))
+    val pluginNotInstalled get() = parseString(config.getString("plugin-not-installed"))
+    val pluginNotDeleted get() = parseString(config.getString("plugin-not-deleted"))
+    val pluginDeleted get() = parseString(config.getString("plugin-deleted"))
+
     fun init(pluginPortal: PluginPortal) {
         if (Config.language == null) {
             pluginPortal.getLogger().warning("No language set in config.yml. Defaulting to EN_US")

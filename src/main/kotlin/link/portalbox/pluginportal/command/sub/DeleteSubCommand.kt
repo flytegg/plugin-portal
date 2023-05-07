@@ -3,37 +3,45 @@ package link.portalbox.pluginportal.command.sub
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Data
-import link.portalbox.pluginportal.util.colorOutput
+import link.portalbox.pluginportal.type.Message
 import link.portalbox.pluginportal.util.delete
 import link.portalbox.pluginportal.util.getMarketplaceCache
-import link.portalbox.pplib.manager.MarketplacePluginManager
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
 
 class DeleteSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
     override fun execute(sender: CommandSender, args: Array<out String>) {
         if (args.size <= 1) {
-            sender.sendMessage("&cPlease specify a plugin to delete!".colorOutput())
+            sender.sendMessage(Message.noPluginSpecified)
             return
         }
 
         if (!getMarketplaceCache().inverse().containsKey(args[1])) {
-            sender.sendMessage("&cYou specified an invalid plugin.".colorOutput())
+            sender.sendMessage(Message.pluginNotFound)
             return
         }
 
         val localPlugin = Data.installedPlugins.find { it.id == getMarketplaceCache().inverse()[args[1]] }
         if (localPlugin == null) {
-            sender.sendMessage("&c${args[1]} &7is not installed.".colorOutput())
+            sender.sendMessage(MiniMessage.miniMessage().deserialize(
+                MiniMessage.miniMessage().serialize(Message.pluginNotInstalled),
+                Placeholder.component("%plugin%", Component.text(args[1]))))
             return
         }
 
         if (!delete(pluginPortal, localPlugin)) {
-            sender.sendMessage("&c${args[1]} &7has not been deleted due to an error. If you just installed this plugin and didn't restart, that is probably the cause. Be sure to restart and run this command again.".colorOutput())
+            sender.sendMessage(MiniMessage.miniMessage().deserialize(
+                MiniMessage.miniMessage().serialize(Message.pluginNotDeleted),
+                Placeholder.component("%plugin%", Component.text(args[1]))))
             return
         }
 
-        sender.sendMessage("&a${args[1]} &7has been deleted.".colorOutput())
+        sender.sendMessage(MiniMessage.miniMessage().deserialize(
+            MiniMessage.miniMessage().serialize(Message.pluginDeleted),
+            Placeholder.component("%plugin%", Component.text(args[1]))))
     }
 
     override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {

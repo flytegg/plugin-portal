@@ -6,13 +6,22 @@ prefix: ""<bold><gray>[<aqua>PP</aqua>]</gray> <dark_gray>></bold> "
 
 # --------------- Messages --------------- #
 
-no-permission: "<prefix><red>You do not have permission to use this command."
-illegal-arguments: "<prefix><red>Illegal arguments! Please use <aqua>/pp help</aqua> for more information."
-
 console-plugin-portal-outdated: "<prefix><gray>This plugin is outdated! Please update to the latest version."
 player-plugin-portal-outdated: "<prefix><gray>Plugin Portal needs to be updated. Please download the latest version from: <aqua><bold><click:open_url:'https://pluginportal.link'><hover:show_text:'Download PluginPortal from SpigotMC'></hover>[CLICK HERE]</click>"
 player-manually-removed-plugins: "<prefix><gray>We noticed you manually removed <red>%pluginsString%</red>, we have removed them from PluginPortal to prevent issues."
 
+# --------------- Commands --------------- #
+
+no-permission: "<prefix><red>You do not have permission to use this command."
+illegal-arguments: "<prefix><red>Illegal arguments! Please use <aqua>/pp help</aqua> for more information."
+
+# ---------------- Delete ---------------- #
+
+no-plugin-specified: "<prefix><red>No plugin specified!"
+plugin-not-found: "<prefix><red>Plugin not found!"
+plugin-not-installed: "<prefix><red>%plugin% not installed!"
+plugin-not-deleted: "<prefix><gray>Could not delete <red>%plugin%</red>! This may be due to the plugin not being enabled. Restart your server and try again."
+plugin-deleted: "<prefix><aqua>%plugin%</aqua><gray> has been deleted!"
 
 
 
