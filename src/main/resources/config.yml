@@ -2,7 +2,7 @@
 # Supported languages: en_US, de_DE (more coming soon)
 # Language Codes: https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/language-codes
 # Want to help translate? Join our Discord: https://discord.gg/pluginportal
-language: en_US # USE "en" or "de", this chooses which language the plugin will use.
+language: en_US # USE "en_US", this chooses which language the plugin will use.
 # --------------- LANGUAGE ---------------
 
 marketplace-service: SPIGOTMC # USE "HANGAR" or "SPIGOTMC", this chooses which plugin marketplace you are able to download from.

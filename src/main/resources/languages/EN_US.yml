@@ -1,0 +1,9 @@
+# --------------- Variables --------------- #
+# These variables can be used in messages and will be replaced with the correct value.
+# To use these variables, use the following syntax: ${variableName}
+prefix: '<bold><gray>[<aqua>PP</aqua>]</gray> <dark_gray>></bold> '
+
+
+# --------------- Messages --------------- #
+
+outdated-plugin: '<prefix><gray>This plugin is outdated! Please update to the latest version.'

@@ -32,8 +32,8 @@ tr_TR	Turkish
 Source: https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/language-codes
  */
 
-enum class Language(supported: Boolean) {
-    EN_US(false), // ENGLISH
+enum class Language(val supported: Boolean) {
+    EN_US(true), // ENGLISH
     AR_AE(false), // Arabic
     ZH_CN(false), // Chinese (Simplified)
     ZH_TW(false), // Chinese (Traditional)
@@ -58,4 +58,5 @@ enum class Language(supported: Boolean) {
     TH_TH(false), // Thai
     TL_PH(false), // Filipino
     TR_TR(false); // Turkish
+
 }

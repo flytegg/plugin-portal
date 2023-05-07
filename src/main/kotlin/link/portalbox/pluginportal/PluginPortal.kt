@@ -6,6 +6,7 @@ import link.portalbox.pluginportal.type.Config
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.listener.PluginValidator
 import link.portalbox.pluginportal.listener.UpdateListener
+import link.portalbox.pluginportal.type.Message
 import link.portalbox.pluginportal.util.*
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.manager.MarketplacePluginManager.loadIndex
@@ -21,6 +22,7 @@ class PluginPortal : JavaPlugin() {
 
     override fun onEnable() {
         Config.init(this)
+        Message.init(this)
         Data.init(this)
 
         MarketplacePluginManager.registerService(MarketplaceService.SPIGOTMC, SpigotMCService())

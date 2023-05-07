@@ -14,11 +14,9 @@ object Config {
     val language get() = config.getString("language")
 
     fun init(pluginPortal: PluginPortal) {
-        val config = pluginPortal.config
+        pluginPortal.saveDefaultConfig()
+        config = pluginPortal.config
         config.options().copyDefaults(true)
         pluginPortal.saveConfig()
     }
 }
-
-
-
