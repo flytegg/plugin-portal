@@ -30,7 +30,17 @@ fun sendPreview(sender: CommandSender, plugin: MarketplacePlugin) {
     text.add(Component.text(" "))
     text.addAll(createButton(plugin, sender))
 
-    val image = fetchImageAsBuffer((plugin.iconURL.substringBeforeLast(".jpg")) + ".jpg")
+    var changeThisInTheNextUpdateImageUrl = plugin.iconURL
+
+    if (changeThisInTheNextUpdateImageUrl.isEmpty() || changeThisInTheNextUpdateImageUrl == "https://i.imgur.com/V9jfjSJ.png") {
+        changeThisInTheNextUpdateImageUrl = "https://cdn.discordapp.com/attachments/1065031876470906880/1105626560087736439/smallpreviewpluginportal.png"
+    }
+
+    var image = fetchImageAsBuffer(changeThisInTheNextUpdateImageUrl)
+    if (image == null) {
+        image = fetchImageAsBuffer("https://cdn.discordapp.com/attachments/1065031876470906880/1105626560087736439/smallpreviewpluginportal.png")
+    }
+
     val imageGrid = image?.let { createImageGrid(it, 11, 13) } ?: emptyArray()
 
     sender.sendMessage(Message.blankStrikeThrough)
