@@ -71,7 +71,12 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         if (args.size != 2) return null
         return if (args[1].length <= 2) {
             mutableListOf("Keep Typing...")
-        } else copyPartialMatchesWithService(args[1], getMarketplaceCache().values, mutableListOf()).toMutableList()
+        } else {
+            val completion = copyPartialMatchesWithService(args[1], getMarketplaceCache().values, mutableListOf()).toMutableList()
+            if (completion.size == 0) { return mutableListOf("Loading Cache...") }
+
+            return completion
+        }
 
     }
 }

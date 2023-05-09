@@ -1,5 +1,5 @@
 name: PluginPortal
-version: 1.4.0
+version: 1.4.2
 main: link.portalbox.pluginportal.PluginPortal
 api-version: 1.13
 authors: [ Portal Box Team ]
