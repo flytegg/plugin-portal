@@ -59,6 +59,9 @@ object Message {
     val openUrlPreviewFormatButton get() = parseString(config.getString("open-url-preview-format-button"))
     val runCommandPreviewFormatButton get() = parseString(config.getString("run-command-preview-format-button"))
 
+    val loadingCache get() = config.getString("loading-cache")
+    val keepTyping get() = config.getString("keep-typing")
+
     fun init(pluginPortal: PluginPortal) {
         if (Config.language == null) {
             pluginPortal.getLogger().warning("No language set in config.yml. Defaulting to EN_US")

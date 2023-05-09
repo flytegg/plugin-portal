@@ -70,10 +70,10 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
     override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {
         if (args.size != 2) return null
         return if (args[1].length <= 2) {
-            mutableListOf("Keep Typing...")
+            mutableListOf(Message.keepTyping ?: "Keep Typing...")
         } else {
             val completion = copyPartialMatchesWithService(args[1], getMarketplaceCache().values, mutableListOf()).toMutableList()
-            if (completion.size == 0) { return mutableListOf("Loading Cache...") }
+            if (completion.size == 0) { return mutableListOf(Message.loadingCache ?: "Loading Cache...") }
 
             return completion
         }
