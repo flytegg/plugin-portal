@@ -1,4 +1,4 @@
-package link.portalbox.pluginportal.type
+package link.portalbox.pluginportal.type.language
 
 import java.net.URL
 

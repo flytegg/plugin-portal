@@ -1,15 +1,14 @@
 package link.portalbox.pluginportal
 
-import com.destroystokyo.paper.event.server.PaperServerListPingEvent
 import link.portalbox.pluginportal.command.PPCommand
+import link.portalbox.pluginportal.listener.ChatListener
 import link.portalbox.pluginportal.type.Config
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.listener.PluginValidator
 import link.portalbox.pluginportal.listener.UpdateListener
-import link.portalbox.pluginportal.type.Message
+import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.util.*
 import link.portalbox.pplib.manager.MarketplacePluginManager
-import link.portalbox.pplib.manager.MarketplacePluginManager.loadIndex
 import link.portalbox.pplib.service.HangarService
 import link.portalbox.pplib.service.SpigotMCService
 import link.portalbox.pplib.type.MarketplaceService
@@ -35,6 +34,7 @@ class PluginPortal : JavaPlugin() {
 
         server.pluginManager.registerEvents(PluginValidator(), this)
         server.pluginManager.registerEvents(UpdateListener(this), this)
+        server.pluginManager.registerEvents(ChatListener(), this)
 
         setupMetrics(Metrics(this, 18005))
     }

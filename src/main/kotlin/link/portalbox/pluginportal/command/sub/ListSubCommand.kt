@@ -2,12 +2,9 @@ package link.portalbox.pluginportal.command.sub
 
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Data
-import link.portalbox.pluginportal.type.Message
-import link.portalbox.pluginportal.type.Message.fillInVariables
+import link.portalbox.pluginportal.type.language.Message
+import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.getMarketplaceCache
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.command.CommandSender
 
 class ListSubCommand : SubCommand() {

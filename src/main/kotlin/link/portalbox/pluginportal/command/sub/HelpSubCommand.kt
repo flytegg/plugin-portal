@@ -2,7 +2,7 @@ package link.portalbox.pluginportal.command.sub
 
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.command.SubCommandType
-import link.portalbox.pluginportal.type.Message
+import link.portalbox.pluginportal.type.language.Message
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.command.CommandSender
 

@@ -1,13 +1,11 @@
 package link.portalbox.pluginportal.command.sub
 
 import link.portalbox.pluginportal.command.SubCommand
-import link.portalbox.pluginportal.type.Data
-import link.portalbox.pluginportal.type.Message
+import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.util.*
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
 import link.portalbox.pplib.util.getPluginJSON
-import link.portalbox.pplib.util.isDirectDownload
 import link.portalbox.pplib.util.isJarFile
 import link.portalbox.pplib.util.requestPlugin
 import org.bukkit.command.CommandSender

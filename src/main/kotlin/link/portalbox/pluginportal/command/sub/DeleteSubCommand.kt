@@ -3,7 +3,7 @@ package link.portalbox.pluginportal.command.sub
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Data
-import link.portalbox.pluginportal.type.Message
+import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.util.delete
 import link.portalbox.pluginportal.util.getMarketplaceCache
 import net.kyori.adventure.text.Component

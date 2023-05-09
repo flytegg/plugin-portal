@@ -1,14 +1,10 @@
-package link.portalbox.pluginportal.type
+package link.portalbox.pluginportal.type.language
 
 import link.portalbox.pluginportal.PluginPortal
+import link.portalbox.pluginportal.type.Config
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.TextComponent
-import net.kyori.adventure.text.TextReplacementConfig
 import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
-import net.kyori.adventure.text.minimessage.tag.standard.StandardTags
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
@@ -59,6 +55,8 @@ object Message {
     val pluginIsUpToDate get() = parseString(config.getString("plugin-is-up-to-date"))
     val listingAllOutdatedPlugins get() = parseString(config.getString("listing-all-outdated-plugins"))
 
+    val previewFormatButton get() = parseString(config.getString("preview-format-button"))
+
     fun init(pluginPortal: PluginPortal) {
         if (Config.language == null) {
             pluginPortal.getLogger().warning("No language set in config.yml. Defaulting to EN_US")
@@ -79,14 +77,21 @@ object Message {
     }
 
     private fun parseString(string: String?): Component {
-        return MiniMessage.miniMessage().deserialize(string ?: "prefix <red>Language Error, Please report this to our discord @ discord.gg/pluginportal</red>", Placeholder.component("prefix", MiniMessage.miniMessage().deserialize(prefix)))
+        return MiniMessage.miniMessage().deserialize(string ?: "prefix <red>Language Error, Please report this to our discord @ discord.gg/pluginportal</red>", Placeholder.component("prefix", MiniMessage.miniMessage().deserialize(
+            prefix
+        )))
     }
 
     fun Component.fillInVariables(args: Array<String>): Component {
-        val serialized = MiniMessage.miniMessage().serialize(this)
-        for (arg in args.indices) {
-            serialized.replace("**{$arg}**", args[arg])
+        var serialized = MiniMessage.miniMessage().serialize(this)
+
+        for ((i, arg) in args.withIndex()) {
+            serialized = serialized.replace("**{$i}**", arg)
+            println("Replacing **{$i}** with $arg")
         }
 
         return MiniMessage.miniMessage().deserialize(serialized)
-    }}
+    }
+
+    fun String.deserialize(): Component = MiniMessage.miniMessage().deserialize(this)
+}

@@ -1,11 +1,10 @@
 package link.portalbox.pluginportal.listener
 
 import link.portalbox.pluginportal.type.Data
-import link.portalbox.pluginportal.type.Message
+import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.util.getMarketplaceCache
 import link.portalbox.pluginportal.util.getSHA
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.event.EventHandler

@@ -4,12 +4,11 @@ import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Config
 import link.portalbox.pluginportal.type.Data
-import link.portalbox.pluginportal.type.Message
-import link.portalbox.pluginportal.type.Message.fillInVariables
+import link.portalbox.pluginportal.type.language.Message
+import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.*
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
-import link.portalbox.pplib.type.MarketplaceService
 import link.portalbox.pplib.util.getURL
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
