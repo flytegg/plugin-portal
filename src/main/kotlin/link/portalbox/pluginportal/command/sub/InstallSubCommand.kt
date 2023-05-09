@@ -62,7 +62,7 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
 
         Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
             install(plugin, getURL(plugin.downloadURL)!!)
-            sender.sendMessage(Message.pluginHasBeenInstalled)
+            sender.sendMessage(Message.pluginHasBeenInstalled.fillInVariables(arrayOf(plugin.name)))
             sender.sendMessage(if (Config.startupOnInstall) Message.pluginAttemptedEnabling else Message.restartServerToEnablePlugin)
         })
     }

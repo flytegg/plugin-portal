@@ -31,7 +31,7 @@ plugin-is-premium: "<prefix><red>PluginPortal may only download plugins which ar
 plugin-is-being-installed: "<prefix><gray>Plugin is being installed, please wait..."
 plugin-has-been-installed: "<prefix><aqua>**{0}**</aqua><gray> has been installed!"
 plugin-attempted-enabling: "<prefix><gray>Plugin has attempted to start automatically, a restart may still be needed."
-restart-server-to-enable: "<prefix><gray>Please restart your server to enable the plugin."
+restart-server-to-enable-plugin: "<prefix><gray>Please restart your server to enable the plugin."
 service-not-supported: "<prefix><gray>This plugin is not available on <red>**{0}**</red>. Please change the supported service via the config.yml, or purchase premium (Coming Soon)."
 
 # ----------------- Help ------------------ #
