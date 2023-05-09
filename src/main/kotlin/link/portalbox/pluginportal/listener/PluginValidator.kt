@@ -2,11 +2,9 @@ package link.portalbox.pluginportal.listener
 
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.language.Message
+import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.getMarketplaceCache
 import link.portalbox.pluginportal.util.getSHA
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
@@ -50,10 +48,8 @@ class PluginValidator : Listener {
             2 -> "${removedPlugins[0]} and ${removedPlugins[1]}"
             else -> removedPlugins.dropLast(1).joinToString(", ") + " and " + removedPlugins.last()
         }
-
-        event.player.sendMessage(MiniMessage.miniMessage().deserialize(
-            MiniMessage.miniMessage().serialize(Message.playerManuallyRemovedPlugins),
-            Placeholder.component("{plugins}", Component.text(plugins))))
+        
+        event.player.sendMessage(Message.playerManuallyRemovedPlugins.fillInVariables(arrayOf(plugins)))
         notified = true
     }
 }

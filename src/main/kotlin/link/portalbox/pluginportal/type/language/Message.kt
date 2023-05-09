@@ -5,6 +5,7 @@ import link.portalbox.pluginportal.type.Config
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
@@ -22,7 +23,7 @@ object Message {
 
     val consoleOutdatedPluginPortal get() = parseString(config.getString("console-plugin-portal-outdated"))
     val playerOutdatedPluginPortal get() = parseString(config.getString("player-plugin-portal-outdated"))
-    val playerManuallyRemovedPlugins get () = parseString(config.getString("player-manually-removed-plugins"))
+    val playerManuallyRemovedPlugins get() = parseString(config.getString("player-manually-removed-plugins"))
 
     val pluginNotInstalled get() = parseString(config.getString("plugin-not-installed"))
     val pluginNotDeleted get() = parseString(config.getString("plugin-not-deleted"))
@@ -78,9 +79,12 @@ object Message {
     }
 
     private fun parseString(string: String?): Component {
-        return MiniMessage.miniMessage().deserialize(string ?: "prefix <red>Language Error, Please report this to our discord @ discord.gg/pluginportal</red>", Placeholder.component("prefix", MiniMessage.miniMessage().deserialize(
-            prefix
-        )))
+        return MiniMessage.miniMessage().deserialize(
+            string ?: "prefix <red>Language Error, Please report this to our discord @ discord.gg/pluginportal",
+            Placeholder.component(
+                "prefix", MiniMessage.miniMessage().deserialize(prefix)
+            )
+        )
     }
 
     fun Component.fillInVariables(args: Array<String>): Component {

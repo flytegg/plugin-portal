@@ -92,13 +92,11 @@ fun createButton(plugin: MarketplacePlugin, sender: CommandSender): List<Compone
 
 fun createDescriptionLines(description: String): Array<Component> {
     val descriptionLines = description.chunked(35)
-
     if (descriptionLines.size > 3) {
         return arrayOf("<gray>$description".deserialize())
     }
 
     return descriptionLines.map { "<gray>│ $it".deserialize() }.toTypedArray()
-
 }
 
 /**
