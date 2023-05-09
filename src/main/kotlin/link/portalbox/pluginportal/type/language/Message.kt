@@ -47,7 +47,7 @@ object Message {
     val pluginRequested get() = parseString(config.getString("plugin-requested"))
     val pluginIsSupported get() = parseString(config.getString("plugin-is-supported"))
 
-    val noPluginRequireAnUpdate get() = parseString(config.getString("no-plugin-require-an-update"))
+    val noPluginRequireAnUpdate get() = parseString(config.getString("no-plugin-requires-an-update"))
     val updatingPlugins get() = parseString(config.getString("updating-plugins"))
     val pluginUpdated get() = parseString(config.getString("plugin-updated"))
     val pluginNotUpdated get() = parseString(config.getString("plugin-not-updated"))
@@ -55,7 +55,8 @@ object Message {
     val pluginIsUpToDate get() = parseString(config.getString("plugin-is-up-to-date"))
     val listingAllOutdatedPlugins get() = parseString(config.getString("listing-all-outdated-plugins"))
 
-    val previewFormatButton get() = parseString(config.getString("preview-format-button"))
+    val openUrlPreviewFormatButton get() = parseString(config.getString("open-url-preview-format-button"))
+    val runCommandPreviewFormatButton get() = parseString(config.getString("run-command-preview-format-button"))
 
     fun init(pluginPortal: PluginPortal) {
         if (Config.language == null) {
@@ -87,7 +88,6 @@ object Message {
 
         for ((i, arg) in args.withIndex()) {
             serialized = serialized.replace("**{$i}**", arg)
-            println("Replacing **{$i}** with $arg")
         }
 
         return MiniMessage.miniMessage().deserialize(serialized)

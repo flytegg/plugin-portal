@@ -1,7 +1,6 @@
 package link.portalbox.pluginportal
 
 import link.portalbox.pluginportal.command.PPCommand
-import link.portalbox.pluginportal.listener.ChatListener
 import link.portalbox.pluginportal.type.Config
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.listener.PluginValidator
@@ -34,7 +33,6 @@ class PluginPortal : JavaPlugin() {
 
         server.pluginManager.registerEvents(PluginValidator(), this)
         server.pluginManager.registerEvents(UpdateListener(this), this)
-        server.pluginManager.registerEvents(ChatListener(), this)
 
         setupMetrics(Metrics(this, 18005))
     }

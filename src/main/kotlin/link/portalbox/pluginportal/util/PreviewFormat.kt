@@ -21,7 +21,8 @@ fun sendPreview(sender: CommandSender, plugin: MarketplacePlugin) {
     val text = mutableListOf(
         displayInformation("<gray>┌ <aqua><bold>${plugin.name}"),
         displayInformation(
-            "<gray>├─ <aqua>${plugin.downloads} <underline><bold>⬇<reset><gray> | <aqua>${plugin.ratingAverage}<gold> ⭐ <gray>| <aqua>${price}"
+            "<gray>├─ <aqua>${plugin.downloads} <u><bold>⬇</bold></u> <gray>| <aqua>${plugin.ratingAverage}<gold> ⭐ <gray>| <aqua>${price}"
+            , 100
         ),
         *descriptionComponents
     )
@@ -59,12 +60,14 @@ fun createButton(plugin: MarketplacePlugin, sender: CommandSender): List<Compone
         }
     }
 
-    val clickString = when (plugin.downloadURL.isEmpty() || plugin.isPremium) {
-        true -> "open_url:'https://www.spigotmc.org/resources/${plugin.id}>'"
-        false -> "run_command:'/pp install ${plugin.service.name}:${plugin.name.replace(" ", "")}'"
+    val downloadable = !(plugin.downloadURL.isEmpty() || plugin.isPremium)
+
+    val clickString = when (downloadable) {
+        false -> "https://www.spigotmc.org/resources/${plugin.id}"
+        true -> "/pp install ${plugin.service.name}:${plugin.name.replace(" ", "")}"
     }
 
-    if (clickString.contains("click:open_url") && !plugin.isPremium) {
+    if (!downloadable && !plugin.isPremium) {
         requestPlugin(plugin.toRequestPlugin("External Download URL", sender.name))
     }
 
@@ -79,7 +82,11 @@ fun createButton(plugin: MarketplacePlugin, sender: CommandSender): List<Compone
     }
 
     return button.map { line ->
-        Message.previewFormatButton.fillInVariables(arrayOf(clickString, hoverText, line))
+        if (downloadable) {
+            Message.runCommandPreviewFormatButton.fillInVariables(arrayOf(clickString, hoverText, line))
+        } else {
+            Message.openUrlPreviewFormatButton.fillInVariables(arrayOf(clickString, hoverText, line))
+        }
     }
 }
 
@@ -91,7 +98,6 @@ fun createDescriptionLines(description: String): Array<Component> {
     }
 
     return descriptionLines.map { "<gray>│ $it".deserialize() }.toTypedArray()
-
 
 }
 
@@ -156,15 +162,15 @@ fun getAverageColor(image: BufferedImage): Color {
 /**
  * Creates a TextComponent with the given string and colors it and truncates it if it is too long with a hover event.
  *
- * @param string The string to create the TextComponent from.
+ * @param text The string to create the TextComponent from.
  * @return The TextComponent
  */
-fun displayInformation(string: String): Component {
-    if (string.length < 45) {
-        return " <gray>$string</gray>".deserialize()
+fun displayInformation(text: String, length: Int = 45): Component {
+    if (text.length < length+5) {
+        return "<gray>$text</gray>".deserialize()
     }
 
-    return "<hover:show_text:<gray>${string}><gray>${string.substring(0, 40)} &8[...]".deserialize()
+    return "<hover:show_text:'${text}'>${text.substring(0, length)} <dark_gray>[...]</hover>".deserialize()
 }
 
 /**
