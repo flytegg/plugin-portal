@@ -33,7 +33,7 @@ Source: https://learn.microsoft.com/en-us/linkedin/shared/references/reference-t
  */
 
 enum class Language(val supported: Boolean) {
-    EN_US(true), // ENGLISH
+    EN_US(true), // English
     AR_AE(false), // Arabic
     ZH_CN(false), // Chinese (Simplified)
     ZH_TW(false), // Chinese (Traditional)
@@ -53,10 +53,11 @@ enum class Language(val supported: Boolean) {
     PT_BR(false), // Portuguese
     RO_RO(false), // Romanian
     RU_RU(false), // Russian
-    ES_ES(false), // Spanish
+    ES_ES(true), // Spanish
     SV_SE(false), // Swedish
     TH_TH(false), // Thai
     TL_PH(false), // Filipino
-    TR_TR(false); // Turkish
+    TR_TR(false), // Turkish
+    VAL_ES(true), // Valencian
 
 }

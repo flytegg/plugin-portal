@@ -1,0 +1,69 @@
+# --------------- Variables --------------- #
+# These variables can be used in messages and will be replaced with the correct value.
+# To use these variables, use the following syntax: <variable-name>
+prefix: "<bold><gray>[<aqua>PP</aqua>]</gray> <dark_gray>></bold> "
+
+
+# --------------- Messages --------------- #
+
+console-plugin-portal-outdated: "<prefix><gray>Este plugin està desactualitzat! Per favor, actualitza-ho a la darrera versió."
+player-plugin-portal-outdated: "<prefix><gray>Plugin Portal ha d'actualitzar-se. Per favor descarrega la darrera versió des de: <aqua><bold><click:open_url:'https://pluginportal.link'><hover:show_text:'<aqua>Download PluginPortal from SpigotMC'>[CLICK HERE]</hover></click>"
+player-manually-removed-plugins: "<prefix><gray>Em notat que has eliminat manualment <red>**{0}**</red>, ho hem eliminat de Plugin Portal per a evitar problemes."
+
+# --------------- Commands --------------- #
+
+no-permission: "<prefix><red>No tens permissos per a utilitzar este comandament."
+illegal-arguments: "<prefix><red>Arguments il-legals! Per favor utilitza <aqua>/pp help</aqua> per més informació."
+no-plugin-specified: "<prefix><red>Sense plugin especificat!"
+plugin-not-found: "<prefix><red>Plugin no trobat!"
+no-download-found: "<prefix><red>No s'ha trobat URL de descàrrega!"
+
+# ---------------- Delete ---------------- #
+
+plugin-not-installed: "<prefix><red>**{0}**no instal-lat!"
+plugin-not-deleted: "<prefix><gray>No es pot esborrar <red>**{0}**</red>! Açò por ser degut a que el plugin no està activat. Reinicia el teu servidor i torna a probar-ho."
+plugin-deleted: "<prefix><aqua>**{0}**</aqua><gray> s'ha esborrat!"
+
+# ---------------- Install ---------------- #
+
+plugin-already-installed: "<prefix><gray>Plugin ja instal-lat!"
+plugin-is-premium: "<prefix><red>PluginPortal només pot descarregar plugins de bades."
+plugin-is-being-installed: "<prefix><gray>Plugin està instal-lante, per favor, espere..."
+plugin-has-been-installed: "<prefix><aqua>**{0}**</aqua><gray> s'ha instal-lat!"
+plugin-attempted-enabling: "<prefix><gray>El plugin ha tractar d'iniciar-se automàticament, pot ser que necessites reiniciar el teu servidor."
+restart-server-to-enable-plugin: "<prefix><gray>Per favor reinicia el teu servidor per a activar el plugin."
+service-not-supported: "<prefix><gray>El plugin no està disponible a <red>**{0}**</red>. Per favor canvia el sistema a config.yml, o compra la versió premium (Molt prompte)."
+
+# ----------------- Help ------------------ #
+
+blank-strike-through-with-watermark: "<dark_gray><st>                         </st><gray>[<aqua><bold>PP</bold></aqua>]</gray><dark_gray><st>                         "
+blank-strike-through: "<dark_gray><st>                                                      "
+help-command-display: "<dark_gray> - </dark_gray><bold> <aqua>**{0}**</aqua></bold><dark_gray>: </dark_gray><gray>**{1}**</gray>"
+
+# ----------------- List ------------------ #
+
+no-plugins-installed: "<prefix><gray>No tens plugins instal-lats o reconeguts per PluginPortal"
+listing-all-plugins: "<prefix><gray>Llistant tots el plugins..."
+installed-plugin: "<green>+</green> <aqua>**{0}**"
+
+# ---------------- Request ----------------- #
+
+plugin-requested: "<prefix><gray>S'ha demanat el plugin"
+plugin-is-supported: "<prefix><gray>El plugin està soportat per PluginPortal"
+
+# ---------------- UpdateAll --------------- #
+
+no-plugin-requires-an-update: "<prefix><gray>No n'hi ha plugins que requerisquen una actualització!"
+updating-plugins: "<prefix><gray>Actualitzant plugins..."
+plugin-updated: "<prefix><aqua>**{0}**</aqua><gray> s'ha actualitzat!"
+plugin-not-updated: "<prefix><aqua>**{0}**</aqua> no s'ha actualitzat per un error. Per favor comproba que el plugin està activat."
+
+# ----------------- Update ----------------- #
+
+plugin-is-up-to-date: "<prefix><aqua>**{0}** <gray>ja està actualitzat."
+listing-all-outdated-plugins: "<prefix><gray>Llistant tots el plugins desactualitzats..."
+
+# ----------------- Preview ----------------- #
+
+open-url-preview-format-button: "<click:open_url:**{0}**><hover:show_text:'**{1}**'>**{2}**</hover></click>"
+run-command-preview-format-button: "<click:run_command:**{0}**><hover:show_text:'**{1}**'>**{2}**</hover></click>"
