@@ -73,10 +73,7 @@ object Message {
         }
 
         val file = File("${pluginPortal.dataFolder}${File.separator}languages", "$language.yml")
-        if (!file.exists()) {
-            println("Creating language file for $language")
-            pluginPortal.saveResource("languages${File.separator}$language.yml", true)
-        }
+        pluginPortal.saveResource("languages${File.separator}$language.yml", true)
 
         config = YamlConfiguration.loadConfiguration(file)
     }
