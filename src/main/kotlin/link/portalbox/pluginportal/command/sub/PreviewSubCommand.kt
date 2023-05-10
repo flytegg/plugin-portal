@@ -1,20 +1,17 @@
 package link.portalbox.pluginportal.command.sub
 
 import link.portalbox.pluginportal.command.SubCommand
-import link.portalbox.pluginportal.util.colorOutput
+import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.util.copyPartialMatchesWithService
 import link.portalbox.pluginportal.util.getMarketplaceCache
 import link.portalbox.pluginportal.util.sendPreview
 import link.portalbox.pplib.manager.MarketplacePluginManager
-import link.portalbox.pplib.type.MarketplaceService
-import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
-import org.bukkit.util.StringUtil
 
 class PreviewSubCommand : SubCommand() {
     override fun execute(sender: CommandSender, args: Array<out String>) {
         if (args.size <= 1) {
-            sender.sendMessage("&cPlease specify a plugin to preview!".colorOutput())
+            sender.sendMessage(Message.noPluginSpecified)
             return
         }
 
@@ -27,7 +24,7 @@ class PreviewSubCommand : SubCommand() {
         }
 
         if (!getMarketplaceCache().inverse().contains(pluginName)) {
-            sender.sendMessage("&cPlugin does not exist.".colorOutput())
+            sender.sendMessage(Message.pluginNotFound)
             return
         }
 

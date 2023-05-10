@@ -5,9 +5,9 @@ import link.portalbox.pluginportal.type.Config
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.listener.PluginValidator
 import link.portalbox.pluginportal.listener.UpdateListener
+import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.util.*
 import link.portalbox.pplib.manager.MarketplacePluginManager
-import link.portalbox.pplib.manager.MarketplacePluginManager.loadIndex
 import link.portalbox.pplib.service.HangarService
 import link.portalbox.pplib.service.SpigotMCService
 import link.portalbox.pplib.type.MarketplaceService
@@ -20,6 +20,7 @@ class PluginPortal : JavaPlugin() {
 
     override fun onEnable() {
         Config.init(this)
+        Message.init(this)
         Data.init(this)
 
         MarketplacePluginManager.registerService(MarketplaceService.SPIGOTMC, SpigotMCService())
@@ -34,7 +35,5 @@ class PluginPortal : JavaPlugin() {
         server.pluginManager.registerEvents(UpdateListener(this), this)
 
         setupMetrics(Metrics(this, 18005))
-
-        Math.abs(-1)
     }
 }

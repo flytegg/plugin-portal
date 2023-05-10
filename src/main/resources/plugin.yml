@@ -1,10 +1,10 @@
 name: PluginPortal
-version: 1.3.3
+version: 1.4.4
 main: link.portalbox.pluginportal.PluginPortal
-api-version: 1.16
+api-version: 1.13
 authors: [ Portal Box Team ]
 description: In-game plugin downloader and updater using the SpigotMC marketplace.
-website: https://portalbox.link
+website: https://pluginportal.link
 libraries:
   - commons-io:commons-io:2.11.0
   - com.google.code.gson:gson:2.10.1

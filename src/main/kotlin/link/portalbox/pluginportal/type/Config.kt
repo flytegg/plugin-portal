@@ -11,6 +11,7 @@ object Config {
     val cacheTime get() = config.getLong("cache-time-in-minutes")
     val marketplaceService get() = config.getString("marketplace-service")
         ?.let { MarketplaceService.valueOf(it.uppercase()) }
+    val language get() = config.getString("language")
 
     fun init(pluginPortal: PluginPortal) {
         pluginPortal.saveDefaultConfig()

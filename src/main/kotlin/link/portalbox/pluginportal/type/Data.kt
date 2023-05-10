@@ -1,8 +1,10 @@
 package link.portalbox.pluginportal.type
 
 import link.portalbox.pluginportal.PluginPortal
+import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pplib.type.VersionType
 import link.portalbox.pplib.util.getLatestVersion
+import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 
@@ -52,7 +54,7 @@ object Data {
         pluginPortal.versionType = getLatestVersion(pluginPortal.description.version)
         if (pluginPortal.versionType != VersionType.LATEST) {
             for (i in 0..2) {
-                pluginPortal.logger.info("Plugin Portal is outdated. Download the new version here: https://www.spigotmc.org/resources/plugin-portal.108700/")
+                Bukkit.getConsoleSender().sendMessage(Message.consoleOutdatedPluginPortal)
             }
         }
     }

@@ -1,10 +1,10 @@
 package link.portalbox.pluginportal.listener
 
 import link.portalbox.pluginportal.type.Data
-import link.portalbox.pluginportal.util.color
+import link.portalbox.pluginportal.type.language.Message
+import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.getMarketplaceCache
 import link.portalbox.pluginportal.util.getSHA
-import link.portalbox.pplib.manager.MarketplacePluginManager
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
@@ -48,8 +48,8 @@ class PluginValidator : Listener {
             2 -> "${removedPlugins[0]} and ${removedPlugins[1]}"
             else -> removedPlugins.dropLast(1).joinToString(", ") + " and " + removedPlugins.last()
         }
-
-        event.player.sendMessage("&7&l[&b&lPP&7&l] &8&l> &7We noticed you manually removed &c$plugins&7. To prevent issues, we have removed ${if (removedPlugins.size > 1) "them" else "it"} from our data store too.".color())
+        
+        event.player.sendMessage(Message.playerManuallyRemovedPlugins.fillInVariables(arrayOf(plugins)))
         notified = true
     }
 }

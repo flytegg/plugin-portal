@@ -9,24 +9,25 @@ plugins {
 }
 
 group = "link.portalbox"
-version = "1.3.3"
+version = "1.4.4"
 
 repositories {
     mavenCentral()
     mavenLocal()
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     maven("https://jitpack.io")
+    maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
-    implementation("org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT") {
-        // Use in-house version of gson
-        exclude(group = "com.google.code.gson", module = "gson")
+    compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
+    compileOnly("net.kyori:adventure-platform-bukkit:4.1.0") {
+        exclude("adventure-bom")
+        exclude("adventure-api")
+        exclude("adventure-nbt")
     }
 
     implementation ("org.bstats:bstats-bukkit:3.0.2")
     implementation("com.github.portal-box:pp-lib:1.3.6")
-    compileOnly("com.google.code.gson:gson:2.10.1")
 }
 
 hangarPublish {
@@ -98,7 +99,6 @@ tasks {
         relocate("kotlin", "link.portalbox.kotlin")
         relocate("org.jetbrains.annotations", "link.portalbox.jetbrains.annotations")
         relocate("org.intellij.lang.annotations", "link.portalbox.intellij.lang.annotations")
-        relocate("com.google.gson", "link.portalbox.gson")
     }
 
     runServer {

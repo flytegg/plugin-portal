@@ -1,12 +1,11 @@
 package link.portalbox.pluginportal.command.sub
 
 import link.portalbox.pluginportal.command.SubCommand
-import link.portalbox.pluginportal.type.Data
+import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.util.*
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
 import link.portalbox.pplib.util.getPluginJSON
-import link.portalbox.pplib.util.isDirectDownload
 import link.portalbox.pplib.util.isJarFile
 import link.portalbox.pplib.util.requestPlugin
 import org.bukkit.command.CommandSender
@@ -15,7 +14,7 @@ import java.net.URL
 class RequestSubCommand : SubCommand() {
     override fun execute(sender: CommandSender, args: Array<out String>) {
         if (args.size <= 1) {
-            sender.sendMessage("&cPlease specify a plugin to preview!".colorOutput())
+            sender.sendMessage(Message.noPluginSpecified)
             return
         }
 
@@ -28,7 +27,7 @@ class RequestSubCommand : SubCommand() {
         }
 
         if (!getMarketplaceCache().inverse().contains(pluginName)) {
-            sender.sendMessage("&cPlugin does not exist.".colorOutput())
+            sender.sendMessage(Message.pluginNotFound)
             return
         }
 
@@ -36,14 +35,14 @@ class RequestSubCommand : SubCommand() {
 
         var isJarFile = false
         runCatching {
-            isJarFile = (isJarFile(URL(plugin.downloadURL)) || isJarFile(URL(getPluginJSON(plugin.id).get("alternateDownload").toString()?: "")))
+            isJarFile = (isJarFile(URL(plugin.downloadURL)) || isJarFile(URL(getPluginJSON(plugin.id).get("alternateDownload").toString())))
         }
 
         if (isJarFile) {
-            sender.sendMessage("&7This plugin is already supported.".colorOutput())
+            sender.sendMessage(Message.pluginIsSupported)
         } else {
             requestPlugin(plugin.toRequestPlugin("External Download, /pp request", sender.name))
-            sender.sendMessage("&7Plugin has been requested.".colorOutput())
+            sender.sendMessage(Message.pluginRequested)
         }
     }
 

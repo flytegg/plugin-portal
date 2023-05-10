@@ -4,6 +4,8 @@ import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Config
 import link.portalbox.pluginportal.type.Data
+import link.portalbox.pluginportal.type.language.Message
+import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.*
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
@@ -15,7 +17,7 @@ import org.bukkit.command.CommandSender
 class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
     override fun execute(sender: CommandSender, args: Array<out String>) {
         if (args.size <= 1) {
-            sender.sendMessage("&cPlease specify a plugin to install!".colorOutput())
+            sender.sendMessage(Message.noPluginSpecified)
             return
         }
 
@@ -28,49 +30,53 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         }
 
         if (!getMarketplaceCache().inverse().containsKey(pluginName)) {
-            sender.sendMessage("&cYou specified an invalid plugin.".colorOutput())
+            sender.sendMessage(Message.pluginNotFound)
             return
         }
 
         val id: String = getMarketplaceCache().inverse()[pluginName]?: return
         if (Data.installedPlugins.find { it.id.equals(id) } != null) {
-            sender.sendMessage("&7Plugin is already installed.".colorOutput())
+            sender.sendMessage(Message.pluginAlreadyInstalled)
             return
         }
 
         val plugin: MarketplacePlugin = MarketplacePluginManager.getPlugin(id)
         if (plugin.isPremium) {
-            sender.sendMessage("&cThis plugin is premium so you can't download it through PP. Purchase: https://www.spigotmc.org/resources/${plugin.id}".colorOutput())
+            sender.sendMessage(Message.pluginIsPremium)
             return
         }
 
         if (plugin.downloadURL.isEmpty()) {
-            sender.sendMessage("&7We couldn't find a download link for &c$pluginName &7. This happens when they use an external link and we can't always identify the correct file to download. We have automatically sent this to our staff members".colorOutput())
+            sender.sendMessage(Message.downloadNotFound)
             addValueToPieChart(Chart.MOST_INVALID_DOWNLOADS, plugin.id)
             requestPlugin(plugin.toRequestPlugin("External Download URL", sender.name))
             return
         }
 
         if (plugin.service != Config.marketplaceService) {
-            sender.sendMessage("&7This plugin is not available on &c${Config.marketplaceService?.name}, change the supported service in the config.yml or buy premium (Coming Soon)!".colorOutput())
+            sender.sendMessage(Message.serviceNotSupported.fillInVariables(arrayOf(Config.marketplaceService?.name ?: "UNKNOWN")))
             return
         }
 
-        sender.sendMessage("&a$pluginName &7is being installed...".colorOutput())
+        sender.sendMessage(Message.pluginIsBeingInstalled)
 
         Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
             install(plugin, getURL(plugin.downloadURL)!!)
-            sender.sendMessage(("&a$pluginName &7has been installed." +
-                if (Config.startupOnInstall) " Plugin has automatically started but contain issues. A restart may be needed for plugin to take effect."
-                else " Please restart your server for the install to take effect.").colorOutput())
+            sender.sendMessage(Message.pluginHasBeenInstalled.fillInVariables(arrayOf(plugin.name)))
+            sender.sendMessage(if (Config.startupOnInstall) Message.pluginAttemptedEnabling else Message.restartServerToEnablePlugin)
         })
     }
 
     override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {
         if (args.size != 2) return null
         return if (args[1].length <= 2) {
-            mutableListOf("Keep Typing...")
-        } else copyPartialMatchesWithService(args[1], getMarketplaceCache().values, mutableListOf()).toMutableList()
+            mutableListOf(Message.keepTyping ?: "Keep Typing...")
+        } else {
+            val completion = copyPartialMatchesWithService(args[1], getMarketplaceCache().values, mutableListOf()).toMutableList()
+            if (completion.size == 0) { return mutableListOf(Message.loadingCache ?: "Loading Cache...") }
+
+            return completion
+        }
 
     }
 }

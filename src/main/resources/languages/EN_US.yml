@@ -1,0 +1,74 @@
+# --------------- Variables --------------- #
+# These variables can be used in messages and will be replaced with the correct value.
+# To use these variables, use the following syntax: <variable-name>
+prefix: "<bold><gray>[<aqua>PP</aqua>]</gray> <dark_gray>></bold> "
+
+
+# --------------- Messages --------------- #
+
+console-plugin-portal-outdated: "<prefix><gray>This plugin is outdated! Please update to the latest version."
+player-plugin-portal-outdated: "<prefix><gray>Plugin Portal needs to be updated. Please download the latest version from: <aqua><bold><click:open_url:'https://pluginportal.link'><hover:show_text:'<aqua>Download PluginPortal from SpigotMC'>[CLICK HERE]</hover></click>"
+player-manually-removed-plugins: "<prefix><gray>We noticed you manually removed <red>**{0}**</red>, we have removed them from PluginPortal to prevent issues."
+
+# --------------- Commands --------------- #
+
+no-permission: "<prefix><red>You do not have permission to use this command."
+illegal-arguments: "<prefix><red>Illegal arguments! Please use <aqua>/pp help</aqua> for more information."
+no-plugin-specified: "<prefix><red>No plugin specified!"
+plugin-not-found: "<prefix><red>Plugin not found!"
+no-download-found: "<prefix><red>No download URL has been found!"
+
+# ---------------- Delete ---------------- #
+
+plugin-not-installed: "<prefix><red>**{0}**not installed!"
+plugin-not-deleted: "<prefix><gray>Could not delete <red>**{0}**</red>! This may be due to the plugin not being enabled. Restart your server and try again."
+plugin-deleted: "<prefix><aqua>**{0}**</aqua><gray> has been deleted!"
+
+# ---------------- Install ---------------- #
+
+plugin-already-installed: "<prefix><gray>Plugin already installed!"
+plugin-is-premium: "<prefix><red>PluginPortal may only download plugins which are free to install."
+plugin-is-being-installed: "<prefix><gray>Plugin is being installed, please wait..."
+plugin-has-been-installed: "<prefix><aqua>**{0}**</aqua><gray> has been installed!"
+plugin-attempted-enabling: "<prefix><gray>Plugin has attempted to start automatically, a restart may still be needed."
+restart-server-to-enable-plugin: "<prefix><gray>Please restart your server to enable the plugin."
+service-not-supported: "<prefix><gray>This plugin is not available on <red>**{0}**</red>. Please change the supported service via the config.yml, or purchase premium (Coming Soon)."
+
+# ----------------- Help ------------------ #
+
+blank-strike-through-with-watermark: "<dark_gray><st>                         </st><gray>[<aqua><bold>PP</bold></aqua>]</gray><dark_gray><st>                         "
+blank-strike-through: "<dark_gray><st>                                                      "
+help-command-display: "<dark_gray> - </dark_gray><bold> <aqua>**{0}**</aqua></bold><dark_gray>: </dark_gray><gray>**{1}**</gray>"
+
+# ----------------- List ------------------ #
+
+no-plugins-installed: "<prefix><gray>You have no plugins installed or recognized by PluginPortal"
+listing-all-plugins: "<prefix><gray>Listing all plugins..."
+installed-plugin: "<green>+</green> <aqua>**{0}**"
+
+# ---------------- Request ----------------- #
+
+plugin-requested: "<prefix><gray>Plugin has been requested"
+plugin-is-supported: "<prefix><gray>Plugin is supported by PluginPortal"
+
+# ---------------- UpdateAll --------------- #
+
+no-plugin-requires-an-update: "<prefix><gray>No plugins require an update!"
+updating-plugins: "<prefix><gray>Updating plugins..."
+plugin-updated: "<prefix><aqua>**{0}**</aqua><gray> has been updated!"
+plugin-not-updated: "<prefix><aqua>**{0}**</aqua> has not been updated due to an error. Please make sure the plugin has been enabled."
+
+# ----------------- Update ----------------- #
+
+plugin-is-up-to-date: "<prefix><aqua>**{0}** <gray>is already up to date."
+listing-all-outdated-plugins: "<prefix><gray>Listing all outdated plugins..."
+
+# ----------------- Preview ----------------- #
+
+open-url-preview-format-button: "<click:open_url:**{0}**><hover:show_text:'**{1}**'>**{2}**</hover></click>"
+run-command-preview-format-button: "<click:run_command:**{0}**><hover:show_text:'**{1}**'>**{2}**</hover></click>"
+
+loading-cache: "Loading cache..."
+keep-typing: "Keep Typing..."
+
+
