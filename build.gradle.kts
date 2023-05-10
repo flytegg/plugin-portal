@@ -31,8 +31,8 @@ dependencies {
 }
 
 hangarPublish {
-    val owner = "nucker"
-    val slug = "plugin-portal-test"
+    val owner = "Flyte"
+    val slug = "PluginPortal"
     val versions: List<String> = listOf("1.8-1.19.4")
 
     // To be run every github release
@@ -45,7 +45,7 @@ hangarPublish {
         version.set(project.version as String)
         channel.set("release") // placeholder, see code below
 
-        channel.set(version.map { if(it.endsWith("-SNAPSHOT")) "Pre-Release" else "Release" })
+        channel.set(version.map { if(it.endsWith("-SNAPSHOT")) "Prerelease" else "Release" })
         changelog.set(provider {
             val commitLog = getCommitHistory(project.properties["release-start-commit"] as String)
 
