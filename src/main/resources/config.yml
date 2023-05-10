@@ -1,11 +1,12 @@
-# --------------- LANGUAGE ---------------
-# Supported languages: en_US (more coming soon)
+# --------------- LANGUAGE ------------- #
+# Supported languages: en_US, es_ES, val_ES
 # Language Codes: https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/language-codes
 # Want to help translate? Join our Discord: https://discord.gg/pluginportal
-language: en_US # USE "en_US", this chooses which language the plugin will use.
-# --------------- LANGUAGE ---------------
-
-marketplace-service: SPIGOTMC # USE "HANGAR" or "SPIGOTMC", this chooses which plugin marketplace you are able to download from.
-
+language: en_US # By default, this is English.
+# --------------- Service -------------- #
+# Supported services: SPIGOTMC, HANGAR
+# This is the Marketplace that PluginPortal will use to download plugins.
+marketplace-service: SPIGOTMC # By default, this is SpigotMC.
+# ----------- For Developers ----------- #
 cache-time-in-minutes: 10 # How long we should keep the cache for all the plugins.
 startup-on-install: false # Allows a plugin to load upon /pp install. This is currently experimental and has the chance to cause issues. Use at your own risk.
