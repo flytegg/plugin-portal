@@ -43,13 +43,13 @@ hangarPublish {
         namespace(owner, slug)
         version.set(project.version as String)
         channel.set("release") // placeholder, see code below
-        
-        provider {
-            channel.set(if(version.get().endsWith("-SNAPSHOT")) "prerelease" else "release")
+
+        channel.set(version.map { if(it.endsWith("-SNAPSHOT")) "Pre-Release" else "Release" })
+        changelog.set(provider {
             val commitLog = getCommitHistory(project.properties["release-start-commit"] as String)
 
-            changelog.set("# Release ${project.version}\n ${commitLog.joinToString(separator = "") { formatCommitLog(it) }} \n")
-        }
+            "# Release ${project.version}\n ${commitLog.joinToString(separator = "") { formatCommitLog(it) }} \n"
+        })
 
         platforms {
             register(Platforms.PAPER) {
@@ -68,7 +68,7 @@ hangarPublish {
 
         val commitLog = getLatestCommit()
         version.set(getCommitHashFromLog(commitLog))
-        channel.set("nightly")
+        channel.set("Nightly")
 
         changelog.set("# Nightly Release " +
                 "[${version.get()}](https://github.com/Nuckerr/plugin-portal/commit/${version.get()})" +
