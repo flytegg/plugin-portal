@@ -2,12 +2,16 @@ package link.portalbox.pluginportal.util
 
 import link.portalbox.pluginportal.type.GameVersion
 import link.portalbox.pplib.type.MarketplacePlugin
+import link.portalbox.pplib.type.MarketplaceService
+import link.portalbox.pplib.type.PostError
 import link.portalbox.pplib.type.RequestPlugin
 import org.apache.commons.lang3.Validate
 import org.bukkit.util.StringUtil.startsWithIgnoreCase
 import java.io.File
 import java.io.FileInputStream
 import java.security.MessageDigest
+
+lateinit var defaultPostError: PostError
 
 fun getSHA(file: File): String {
     if (file.isDirectory) return ""
@@ -43,7 +47,13 @@ inline fun <T> T.applyIf(shouldApply: Boolean, block: T.() -> Unit): T = apply {
 
 // Convert MarketplacePlugin to RequestPlugin, with an input of "reasonForRequest"
 fun MarketplacePlugin.toRequestPlugin(reasonForRequest: String, username: String): RequestPlugin {
-    return RequestPlugin(id, service, username, reasonForRequest)
+    val externalURL = if (service == MarketplaceService.SPIGOTMC) {
+        "https://www.spigotmc.org/resources/$id/"
+    } else {
+        "https://hangar.papermc.io/ (Download will be added soon)"
+    }
+
+    return RequestPlugin(id, service, reasonForRequest, name, externalURL, username)
 }
 
 fun copyPartialMatchesWithService(

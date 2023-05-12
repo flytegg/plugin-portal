@@ -9,8 +9,11 @@ import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.*
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
+import link.portalbox.pplib.type.PostError
 import link.portalbox.pplib.util.getURL
 import link.portalbox.pplib.util.requestPlugin
+import link.portalbox.pplib.util.sendError
+import link.portalbox.pplib.util.startErrorCatcher
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 
@@ -70,10 +73,10 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
     override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {
         if (args.size != 2) return null
         return if (args[1].length <= 2) {
-            mutableListOf(Message.keepTyping ?: "Keep Typing...")
+            mutableListOf(Message.keepTyping)
         } else {
             val completion = copyPartialMatchesWithService(args[1], getMarketplaceCache().values, mutableListOf()).toMutableList()
-            if (completion.size == 0) { return mutableListOf(Message.loadingCache ?: "Loading Cache...") }
+            if (completion.size == 0) { return mutableListOf(Message.loadingCache) }
 
             return completion
         }

@@ -67,9 +67,17 @@ object Message {
             pluginPortal.getLogger().warning("No language set in config.yml. Defaulting to EN_US")
         }
 
-        val language = Language.valueOf(Config.language?.uppercase() ?: "EN_US")
+        var language = Language.EN_US
+
+        try {
+            language = Language.valueOf(Config.language?.uppercase() ?: "EN_US")
+        } catch (e: IllegalArgumentException) {
+            println("Language ${Config.language} is not supported. Defaulting to EN_US")
+        }
+
         if (!language.supported) {
-            pluginPortal.getLogger().warning("Language $language is not supported. Defaulting to EN_US")
+            println("Language ${Config.language} is not supported. Defaulting to EN_US")
+            language = Language.EN_US
         }
 
         val file = File("${pluginPortal.dataFolder}${File.separator}languages", "$language.yml")

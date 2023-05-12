@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "link.portalbox"
-version = "1.4.4"
+version = "1.5.0"
 
 repositories {
     mavenCentral()
@@ -26,7 +26,7 @@ dependencies {
     }
 
     implementation ("org.bstats:bstats-bukkit:3.0.2")
-    implementation("com.github.portal-box:pp-lib:1.3.6")
+    implementation("com.github.portal-box:pp-lib:1.4.0")
 }
 
 /* SET THIS UP SOON

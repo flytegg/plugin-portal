@@ -42,18 +42,23 @@ class PPCommand(pluginPortal: PluginPortal) : CommandExecutor, TabCompleter {
         return false
     }
 
-    override fun onTabComplete(sender: CommandSender, command: Command, label: String, args: Array<out String>): MutableList<String>? {
+    override fun onTabComplete(
+        sender: CommandSender,
+        command: Command,
+        label: String,
+        args: Array<out String>
+    ): MutableList<String>? {
         if (args.size == 1) {
             return StringUtil.copyPartialMatches(
-                    args[0],
-                    Arrays.stream(SubCommandType.values())
-                            .map { subCommandEnum -> subCommandEnum.command.lowercase(Locale.getDefault()) }
-                            .collect(Collectors.toList()),
-                    ArrayList())
+                args[0],
+                Arrays.stream(SubCommandType.values())
+                    .map { subCommandEnum -> subCommandEnum.command.lowercase(Locale.getDefault()) }
+                    .collect(Collectors.toList()),
+                ArrayList())
         }
 
         val type = SubCommandType.values().find { args[0].equals(it.name, true) || args[0].equals(it.alias, true) }
-                ?: return null
+            ?: return null
         if (!sender.hasPermission(type.permission)) {
             return null
         }
