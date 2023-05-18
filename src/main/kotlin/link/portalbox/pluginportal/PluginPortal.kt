@@ -25,7 +25,6 @@ class PluginPortal : JavaPlugin() {
 
         MarketplacePluginManager.registerService(MarketplaceService.SPIGOTMC, SpigotMCService())
         MarketplacePluginManager.registerService(MarketplaceService.HANGAR, HangarService())
-        startCacheTask(this)
 
         val command = PPCommand(this)
         getCommand("pluginportal")!!.setExecutor(command)
