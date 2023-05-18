@@ -6,7 +6,7 @@ import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.delete
-import link.portalbox.pluginportal.util.getMarketplaceCache
+import link.portalbox.pplib.util.getPluginFromName
 
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
@@ -18,12 +18,14 @@ class DeleteSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             return
         }
 
-        if (!getMarketplaceCache().inverse().containsKey(args[1])) {
+        val plugin = getPluginFromName(args[1])
+
+        if (plugin == null) {
             sender.sendMessage(Message.pluginNotFound)
             return
         }
 
-        val localPlugin = Data.installedPlugins.find { it.id == getMarketplaceCache().inverse()[args[1]] }
+        val localPlugin = Data.installedPlugins.find { it.id == plugin.id }
         if (localPlugin == null) {
             sender.sendMessage(Message.pluginNotInstalled.fillInVariables(arrayOf(args[1])))
             return

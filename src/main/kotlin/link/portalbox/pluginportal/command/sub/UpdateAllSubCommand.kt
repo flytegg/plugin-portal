@@ -32,10 +32,9 @@ class UpdateAllSubCommand(private val pluginPortal: PluginPortal) : SubCommand()
 
         sender.sendMessage(Message.updatingPlugins)
         for (outdatedPlugin in needUpdating) {
-            val id = getMarketplaceCache().inverse()[outdatedPlugin.name]
-            val localPlugin = Data.installedPlugins.find { it.id == id } ?: return
+            val localPlugin = Data.installedPlugins.find { it.id == outdatedPlugin.id } ?: return
 
-            val plugin: MarketplacePlugin = MarketplacePluginManager.getPlugin(id!!)
+            val plugin: MarketplacePlugin = MarketplacePluginManager.getPlugin(outdatedPlugin.id)
             if (plugin.version == localPlugin.version) return
 
             if (plugin.downloadURL.isEmpty() || plugin.downloadURL == "null") {
@@ -49,7 +48,7 @@ class UpdateAllSubCommand(private val pluginPortal: PluginPortal) : SubCommand()
             }
 
             Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
-                install(plugin, URL(plugin.downloadURL)!!)
+                install(plugin, URL(plugin.downloadURL))
 
                 sender.sendMessage(Message.pluginUpdated)
                 sender.sendMessage(if (Config.startupOnInstall) Message.pluginAttemptedEnabling else Message.restartServerToEnablePlugin)

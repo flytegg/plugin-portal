@@ -4,6 +4,7 @@ import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.util.sendPreview
 import link.portalbox.pplib.manager.MarketplacePluginManager
+import link.portalbox.pplib.util.getPluginFromName
 import link.portalbox.pplib.util.searchPlugins
 import org.bukkit.command.CommandSender
 
@@ -14,20 +15,13 @@ class PreviewSubCommand : SubCommand() {
             return
         }
 
-        var pluginName = ""
-        if (args[1].contains(":")) {
-            val split: List<String> = args[1].split(":")
-            if (split.size == 2) {
-                pluginName = "${split[0].uppercase()}:${split[1]}"
-            }
-        }
-
-        if (!getMarketplaceCache().inverse().contains(pluginName)) {
+        val plugin = getPluginFromName(args[1])
+        if (plugin == null) {
             sender.sendMessage(Message.pluginNotFound)
             return
         }
 
-        sendPreview(sender, MarketplacePluginManager.getPlugin(getMarketplaceCache().inverse()[pluginName]!!))
+        sendPreview(sender, plugin)
     }
 
     override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {

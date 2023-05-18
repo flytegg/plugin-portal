@@ -7,8 +7,6 @@ import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.*
-import link.portalbox.pplib.manager.MarketplacePluginManager
-import link.portalbox.pplib.type.MarketplacePlugin
 import link.portalbox.pplib.util.getPluginFromName
 import link.portalbox.pplib.util.requestPlugin
 import link.portalbox.pplib.util.searchPlugins
