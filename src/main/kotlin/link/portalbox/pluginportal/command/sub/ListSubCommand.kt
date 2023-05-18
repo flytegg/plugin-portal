@@ -4,7 +4,6 @@ import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
-import link.portalbox.pluginportal.util.getMarketplaceCache
 import org.bukkit.command.CommandSender
 
 class ListSubCommand : SubCommand() {

@@ -2,10 +2,9 @@ package link.portalbox.pluginportal.command.sub
 
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.language.Message
-import link.portalbox.pluginportal.util.copyPartialMatchesWithService
-import link.portalbox.pluginportal.util.getMarketplaceCache
 import link.portalbox.pluginportal.util.sendPreview
 import link.portalbox.pplib.manager.MarketplacePluginManager
+import link.portalbox.pplib.util.searchPlugins
 import org.bukkit.command.CommandSender
 
 class PreviewSubCommand : SubCommand() {
@@ -33,8 +32,16 @@ class PreviewSubCommand : SubCommand() {
 
     override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {
         if (args.size != 2) return null
+
         return if (args[1].length <= 2) {
-            mutableListOf("Keep Typing...")
-        } else copyPartialMatchesWithService(args[1], getMarketplaceCache().values, mutableListOf()).toMutableList()
+            mutableListOf(Message.keepTyping)
+        } else {
+            val completion = searchPlugins(args[1])
+            if (completion.isEmpty()) {
+                mutableListOf(Message.noPluginsFound)
+            } else {
+                completion.toMutableList()
+            }
+        }
     }
 }

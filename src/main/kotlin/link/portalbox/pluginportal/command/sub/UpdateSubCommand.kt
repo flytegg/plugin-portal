@@ -9,10 +9,10 @@ import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.*
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
-import link.portalbox.pplib.util.getURL
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
+import java.net.URL
 
 class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
     override fun execute(sender: CommandSender, args: Array<out String>) {
@@ -30,7 +30,7 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
                 return
             }
 
-            if (plugin.downloadURL.isEmpty()) {
+            if (plugin.downloadURL.isEmpty() || plugin.downloadURL == "null") {
                 sender.sendMessage(Message.downloadNotFound)
                 return
             }
@@ -42,7 +42,7 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             }
 
             Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
-                install(plugin, getURL(plugin.downloadURL)!!)
+                install(plugin, URL(plugin.downloadURL))
 
                 sender.sendMessage(Message.pluginUpdated)
                 sender.sendMessage(if (Config.startupOnInstall) Message.pluginAttemptedEnabling else Message.restartServerToEnablePlugin)

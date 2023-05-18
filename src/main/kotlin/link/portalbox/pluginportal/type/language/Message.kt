@@ -59,7 +59,7 @@ object Message {
     val openUrlPreviewFormatButton get() = parseString(config.getBetterString("open-url-preview-format-button"))
     val runCommandPreviewFormatButton get() = parseString(config.getBetterString("run-command-preview-format-button"))
 
-    val loadingCache get() = config.getBetterString("loading-cache")
+    val noPluginsFound get() = config.getBetterString("no-plugins-found")
     val keepTyping get() = config.getBetterString("keep-typing")
 
     fun init(pluginPortal: PluginPortal) {

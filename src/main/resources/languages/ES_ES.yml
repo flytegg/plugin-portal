@@ -67,3 +67,6 @@ listing-all-outdated-plugins: "<prefix><gray>Listando todos los plugins desactua
 
 open-url-preview-format-button: "<click:open_url:**{0}**><hover:show_text:'**{1}**'>**{2}**</hover></click>"
 run-command-preview-format-button: "<click:run_command:**{0}**><hover:show_text:'**{1}**'>**{2}**</hover></click>"
+
+no-plugins-found: "No se han encontrado plugins"
+keep-typing: "Sigue escribiendo..."

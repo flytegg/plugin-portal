@@ -68,7 +68,7 @@ listing-all-outdated-plugins: "<prefix><gray>Listing all outdated plugins..."
 open-url-preview-format-button: "<click:open_url:**{0}**><hover:show_text:'**{1}**'>**{2}**</hover></click>"
 run-command-preview-format-button: "<click:run_command:**{0}**><hover:show_text:'**{1}**'>**{2}**</hover></click>"
 
-loading-cache: "Loading cache..."
+no-plugins-found: "No Plugins Found"
 keep-typing: "Keep Typing..."
 
 
