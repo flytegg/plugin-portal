@@ -3,8 +3,8 @@ package link.portalbox.pluginportal.util
 import link.portalbox.pluginportal.type.GameVersion
 import link.portalbox.pplib.type.MarketplacePlugin
 import link.portalbox.pplib.type.MarketplaceService
-import link.portalbox.pplib.type.PostError
-import link.portalbox.pplib.type.RequestPlugin
+import link.portalbox.pplib.type.api.PostError
+import link.portalbox.pplib.type.api.RequestPlugin
 import org.apache.commons.lang3.Validate
 import org.bukkit.util.StringUtil.startsWithIgnoreCase
 import java.io.File

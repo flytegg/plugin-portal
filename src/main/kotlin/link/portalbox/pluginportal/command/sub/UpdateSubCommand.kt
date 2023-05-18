@@ -9,6 +9,7 @@ import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.*
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
+import link.portalbox.pplib.util.getPluginFromName
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
@@ -17,14 +18,14 @@ import java.net.URL
 class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
     override fun execute(sender: CommandSender, args: Array<out String>) {
         if (args.size >= 2) {
-            val id = getMarketplaceCache().inverse()[args[1]]
-            val localPlugin = Data.installedPlugins.find { it.id == id }
+            val plugin = getPluginFromName(args[1])
+
+            val localPlugin = Data.installedPlugins.find { it.id == plugin.id }
             if (localPlugin == null) {
                 sender.sendMessage(Message.pluginNotFound)
                 return
             }
 
-            val plugin: MarketplacePlugin = MarketplacePluginManager.getPlugin(id!!)
             if (plugin.version == localPlugin.version) {
                 sender.sendMessage(Message.pluginIsUpToDate.fillInVariables(arrayOf(plugin.name)))
                 return
@@ -73,7 +74,7 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         if (args.size != 2) return null
         return StringUtil.copyPartialMatches(
                 args[1],
-                Data.installedPlugins.map { getMarketplaceCache()[it.id] },
+                Data.installedPlugins.map { it.id },
                 mutableListOf())
     }
 }
