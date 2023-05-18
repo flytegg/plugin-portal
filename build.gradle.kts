@@ -12,21 +12,20 @@ version = "1.5.0"
 
 repositories {
     mavenCentral()
-    mavenLocal()
-    maven("https://jitpack.io")
     maven("https://repo.papermc.io/repository/maven-public/")
+    maven {
+        url = uri("http://localhost:8080/releases")
+        isAllowInsecureProtocol = true
+    }
+
 }
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
-    compileOnly("net.kyori:adventure-platform-bukkit:4.1.0") {
-        exclude("adventure-bom")
-        exclude("adventure-api")
-        exclude("adventure-nbt")
-    }
+    compileOnly("net.kyori:adventure-platform-bukkit:4.1.0")
 
     implementation ("org.bstats:bstats-bukkit:3.0.2")
-    implementation("com.github.portal-box:pp-lib:1.4.0")
+    implementation("gg.flyte:pplib:1.0")
 }
 
 /* SET THIS UP SOON

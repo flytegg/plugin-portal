@@ -9,8 +9,6 @@ import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.*
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
-import link.portalbox.pplib.type.PostError
-import link.portalbox.pplib.util.getURL
 import link.portalbox.pplib.util.requestPlugin
 import link.portalbox.pplib.util.sendError
 import link.portalbox.pplib.util.startErrorCatcher
@@ -51,7 +49,6 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
 
         if (plugin.downloadURL.isEmpty()) {
             sender.sendMessage(Message.downloadNotFound)
-            addValueToPieChart(Chart.MOST_INVALID_DOWNLOADS, plugin.id)
             requestPlugin(plugin.toRequestPlugin("External Download URL", sender.name))
             return
         }
