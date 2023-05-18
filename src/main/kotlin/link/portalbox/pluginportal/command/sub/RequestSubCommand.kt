@@ -5,9 +5,7 @@ import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.util.*
 import link.portalbox.pplib.manager.MarketplacePluginManager
 import link.portalbox.pplib.type.MarketplacePlugin
-import link.portalbox.pplib.util.getPluginJSON
-import link.portalbox.pplib.util.isJarFile
-import link.portalbox.pplib.util.requestPlugin
+import link.portalbox.pplib.util.*
 import org.bukkit.command.CommandSender
 import java.net.URL
 
@@ -26,16 +24,15 @@ class RequestSubCommand : SubCommand() {
             }
         }
 
-        if (!getMarketplaceCache().inverse().contains(pluginName)) {
+        val plugin = getPluginFromName(args[1])
+        if (plugin == null) {
             sender.sendMessage(Message.pluginNotFound)
             return
         }
 
-        val plugin: MarketplacePlugin = MarketplacePluginManager.getPlugin(getMarketplaceCache().inverse()[pluginName]!!)
-
         var isJarFile = false
         runCatching {
-            isJarFile = (isJarFile(URL(plugin.downloadURL)) || isJarFile(URL(getPluginJSON(plugin.id).get("alternateDownload").toString())))
+            isJarFile = (isJarFile(URL(plugin.downloadURL)) || isJarFile(URL(getAPIPlugin(plugin.id).alternateDownload)))
         }
 
         if (isJarFile) {
@@ -48,8 +45,16 @@ class RequestSubCommand : SubCommand() {
 
     override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {
         if (args.size != 2) return null
+
         return if (args[1].length <= 2) {
-            mutableListOf("Keep Typing...")
-        } else copyPartialMatchesWithService(args[1], getMarketplaceCache().values, mutableListOf()).toMutableList()
+            mutableListOf(Message.keepTyping)
+        } else {
+            val completion = searchPlugins(args[1])
+            if (completion.isEmpty()) {
+                mutableListOf(Message.noPluginsFound)
+            } else {
+                completion.toMutableList()
+            }
+        }
     }
 }
