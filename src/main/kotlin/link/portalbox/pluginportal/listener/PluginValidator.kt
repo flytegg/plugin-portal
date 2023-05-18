@@ -3,7 +3,6 @@ package link.portalbox.pluginportal.listener
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
-import link.portalbox.pluginportal.util.getMarketplaceCache
 import link.portalbox.pluginportal.util.getSHA
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -26,7 +25,7 @@ class PluginValidator : Listener {
         for (plugin in Data.installedPlugins) {
             if (!installedShas.contains(plugin.fileSha)) {
                 runCatching {
-                    removedPlugins.add(getMarketplaceCache()[plugin.id]!!)
+                    removedPlugins.add(plugin.id)
                     pluginsToDelete.add(plugin.id)
                 }
             }
