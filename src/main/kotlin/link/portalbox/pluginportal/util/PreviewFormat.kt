@@ -3,9 +3,9 @@ package link.portalbox.pluginportal.util
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.deserialize
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
-import link.portalbox.pplib.type.MarketplacePlugin
-import link.portalbox.pplib.util.isDirectDownload
-import link.portalbox.pplib.util.requestPlugin
+import gg.flyte.pplib.type.MarketplacePlugin
+import gg.flyte.pplib.util.isDirectDownload
+import gg.flyte.pplib.util.requestPlugin
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.command.CommandSender

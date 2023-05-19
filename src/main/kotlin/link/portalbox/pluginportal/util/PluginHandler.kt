@@ -4,9 +4,9 @@ import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.type.Config
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.LocalPlugin
-import link.portalbox.pplib.type.MarketplacePlugin
-import link.portalbox.pplib.type.MarketplaceService
-import link.portalbox.pplib.util.download
+import gg.flyte.pplib.type.MarketplacePlugin
+import gg.flyte.pplib.type.MarketplaceService
+import gg.flyte.pplib.util.download
 import org.bukkit.Bukkit
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.UnknownDependencyException

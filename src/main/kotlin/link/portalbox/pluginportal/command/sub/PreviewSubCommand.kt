@@ -3,9 +3,9 @@ package link.portalbox.pluginportal.command.sub
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.util.sendPreview
-import link.portalbox.pplib.manager.MarketplacePluginManager
-import link.portalbox.pplib.util.getPluginFromName
-import link.portalbox.pplib.util.searchPlugins
+import gg.flyte.pplib.manager.MarketplacePluginManager
+import gg.flyte.pplib.util.getPluginFromName
+import gg.flyte.pplib.util.searchPlugins
 import org.bukkit.command.CommandSender
 
 class PreviewSubCommand : SubCommand() {

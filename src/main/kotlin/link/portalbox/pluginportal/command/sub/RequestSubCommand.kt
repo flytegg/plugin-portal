@@ -3,9 +3,9 @@ package link.portalbox.pluginportal.command.sub
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.util.*
-import link.portalbox.pplib.manager.MarketplacePluginManager
-import link.portalbox.pplib.type.MarketplacePlugin
-import link.portalbox.pplib.util.*
+import gg.flyte.pplib.manager.MarketplacePluginManager
+import gg.flyte.pplib.type.MarketplacePlugin
+import gg.flyte.pplib.util.*
 import org.bukkit.command.CommandSender
 import java.net.URL
 

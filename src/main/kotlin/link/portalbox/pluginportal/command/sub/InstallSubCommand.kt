@@ -7,9 +7,9 @@ import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.*
-import link.portalbox.pplib.util.getPluginFromName
-import link.portalbox.pplib.util.requestPlugin
-import link.portalbox.pplib.util.searchPlugins
+import gg.flyte.pplib.util.getPluginFromName
+import gg.flyte.pplib.util.requestPlugin
+import gg.flyte.pplib.util.searchPlugins
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import java.net.URL

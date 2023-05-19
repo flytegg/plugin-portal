@@ -2,7 +2,7 @@ package link.portalbox.pluginportal.listener
 
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.type.language.Message
-import link.portalbox.pplib.type.VersionType
+import gg.flyte.pplib.type.VersionType
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent

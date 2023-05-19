@@ -1,7 +1,7 @@
 package link.portalbox.pluginportal.type
 
 import link.portalbox.pluginportal.PluginPortal
-import link.portalbox.pplib.type.MarketplaceService
+import gg.flyte.pplib.type.MarketplaceService
 import org.bukkit.configuration.file.FileConfiguration
 
 object Config {

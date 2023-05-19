@@ -6,7 +6,7 @@ import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.delete
-import link.portalbox.pplib.util.getPluginFromName
+import gg.flyte.pplib.util.getPluginFromName
 
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
