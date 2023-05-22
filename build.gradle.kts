@@ -1,3 +1,4 @@
+import io.papermc.hangarpublishplugin.model.Platforms
 import java.io.ByteArrayOutputStream
 
 plugins {
@@ -29,10 +30,9 @@ dependencies {
     implementation("gg.flyte:hangarWrapper:1.1.1")
 }
 
-/* SET THIS UP SOON
 hangarPublish {
-    val owner = "stephen"
-    val slug = "plugin-portal"
+    val owner = "Flyte"
+    val slug = "PluginPortal"
     val versions: List<String> = listOf("1.8-1.19.4")
 
     // To be run every github release
@@ -43,13 +43,14 @@ hangarPublish {
 
         namespace(owner, slug)
         version.set(project.version as String)
+        channel.set("release") // placeholder, see code below
 
-        provider {
-            channel.set(if(version.get().endsWith("-SNAPSHOT")) "prerelease" else "release")
+        channel.set(version.map { if(it.endsWith("-SNAPSHOT")) "Prerelease" else "Release" })
+        changelog.set(provider {
             val commitLog = getCommitHistory(project.properties["release-start-commit"] as String)
 
-            changelog.set("# Release ${project.version}\n ${commitLog.joinToString(separator = "") { formatCommitLog(it) }} \n")
-        }
+            "# Release ${project.version}\n ${commitLog.joinToString(separator = "") { formatCommitLog(it) }} \n"
+        })
 
         platforms {
             register(Platforms.PAPER) {
@@ -68,7 +69,7 @@ hangarPublish {
 
         val commitLog = getLatestCommit()
         version.set(getCommitHashFromLog(commitLog))
-        channel.set("nightly")
+        channel.set("Nightly")
 
         changelog.set("# Nightly Release " +
                 "[${version.get()}](https://github.com/Nuckerr/plugin-portal/commit/${version.get()})" +
@@ -83,7 +84,6 @@ hangarPublish {
         }
     }
 }
- */
 
 tasks {
     compileKotlin {
