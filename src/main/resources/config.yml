@@ -8,5 +8,4 @@ language: en_US # By default, this is English.
 # This is the Marketplace that PluginPortal will use to download plugins.
 marketplace-service: SPIGOTMC # By default, this is SpigotMC.
 # ----------- For Developers ----------- #
-cache-time-in-minutes: 10 # How long we should keep the cache for all the plugins.
 startup-on-install: false # Allows a plugin to load upon /pp install. This is currently experimental and has the chance to cause issues. Use at your own risk.

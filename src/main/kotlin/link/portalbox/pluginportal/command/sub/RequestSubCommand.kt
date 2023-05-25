@@ -2,12 +2,8 @@ package link.portalbox.pluginportal.command.sub
 
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.language.Message
-import link.portalbox.pluginportal.util.*
-import gg.flyte.pplib.manager.MarketplacePluginManager
-import gg.flyte.pplib.type.MarketplacePlugin
 import gg.flyte.pplib.util.*
 import org.bukkit.command.CommandSender
-import java.net.URL
 
 class RequestSubCommand : SubCommand() {
     override fun execute(sender: CommandSender, args: Array<out String>) {
@@ -16,29 +12,14 @@ class RequestSubCommand : SubCommand() {
             return
         }
 
-        var pluginName = ""
-        if (args[1].contains(":")) {
-            val split: List<String> = args[1].split(":")
-            if (split.size == 2) {
-                pluginName = "${split[0].uppercase()}:${split[1]}"
-            }
-        }
-
-        val plugin = getPluginFromName(args[1])
-        if (plugin == null) {
+        val plugin = getPluginFromName(args[1]) ?: run {
             sender.sendMessage(Message.pluginNotFound)
             return
         }
 
-        var isJarFile = false
-        runCatching {
-            isJarFile = (isJarFile(URL(plugin.downloadURL)) || isJarFile(URL(getAPIPlugin(plugin.id).alternateDownload)))
-        }
-
-        if (isJarFile) {
+        if (plugin.isValidDownload()) {
             sender.sendMessage(Message.pluginIsSupported)
         } else {
-            requestPlugin(plugin.toRequestPlugin("External Download, /pp request", sender.name))
             sender.sendMessage(Message.pluginRequested)
         }
     }

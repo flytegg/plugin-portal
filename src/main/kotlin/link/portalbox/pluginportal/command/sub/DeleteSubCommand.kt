@@ -1,12 +1,12 @@
 package link.portalbox.pluginportal.command.sub
 
+import gg.flyte.pplib.util.getPluginFromName
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.delete
-import gg.flyte.pplib.util.getPluginFromName
 
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
@@ -18,9 +18,7 @@ class DeleteSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             return
         }
 
-        val plugin = getPluginFromName(args[1])
-
-        if (plugin == null) {
+        val plugin = getPluginFromName(args[1]) ?: run {
             sender.sendMessage(Message.pluginNotFound)
             return
         }

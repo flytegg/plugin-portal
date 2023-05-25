@@ -1,5 +1,6 @@
 package link.portalbox.pluginportal.command.sub
 
+import gg.flyte.pplib.util.getPluginFromName
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Config
@@ -7,7 +8,6 @@ import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.*
-import gg.flyte.pplib.util.getPluginFromName
 import gg.flyte.pplib.util.requestPlugin
 import gg.flyte.pplib.util.searchPlugins
 import org.bukkit.Bukkit
@@ -21,8 +21,7 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             return
         }
 
-        val plugin = getPluginFromName(args[1])
-        if (plugin == null) {
+        val plugin = getPluginFromName(args[1]) ?: run {
             sender.sendMessage(Message.pluginNotFound)
             return
         }
@@ -37,24 +36,28 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             return
         }
 
-        if (plugin.downloadURL.isEmpty() || plugin.downloadURL == "null") {
+        if (!plugin.isValidDownload()) {
             sender.sendMessage(Message.downloadNotFound)
-            requestPlugin(plugin.toRequestPlugin("External Download URL", sender.name))
             return
         }
 
         if (plugin.service != Config.marketplaceService) {
-            sender.sendMessage(Message.serviceNotSupported.fillInVariables(arrayOf(Config.marketplaceService?.name ?: "UNKNOWN")))
-            return
+            sender.sendMessage(
+                Message.serviceNotSupported.fillInVariables(
+                    arrayOf(
+                        Config.marketplaceService?.name ?: "UNKNOWN"
+                    )
+                )
+            )
+            // return
         }
 
         sender.sendMessage(Message.pluginIsBeingInstalled)
 
-        Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
-            install(plugin, URL(plugin.downloadURL))
+        install(plugin, pluginPortal).run {
             sender.sendMessage(Message.pluginHasBeenInstalled.fillInVariables(arrayOf(plugin.name)))
             sender.sendMessage(if (Config.startupOnInstall) Message.pluginAttemptedEnabling else Message.restartServerToEnablePlugin)
-        })
+        }
     }
 
     override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {

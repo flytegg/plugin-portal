@@ -5,9 +5,10 @@ import link.portalbox.pluginportal.type.Config
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.LocalPlugin
 import gg.flyte.pplib.type.MarketplacePlugin
-import gg.flyte.pplib.type.MarketplaceService
+import gg.flyte.pplib.type.Service
 import gg.flyte.pplib.util.download
 import org.bukkit.Bukkit
+import org.bukkit.command.CommandSender
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.UnknownDependencyException
 import java.io.File
@@ -33,29 +34,26 @@ fun delete(pluginPortal: PluginPortal, localPlugin: LocalPlugin): Boolean {
     return false
 }
 
-fun install(plugin: MarketplacePlugin, downloadURL: URL) {
-    install(plugin, downloadURL, false)
+fun install(plugin: MarketplacePlugin, pluginPortal: PluginPortal) {
+    install(plugin, pluginPortal, false)
 }
 
-fun install(plugin: MarketplacePlugin, downloadURL: URL, enable: Boolean) {
-    val outputFile = File("plugins", "${plugin.name}-${plugin.version} (PP).jar")
-    download(downloadURL, outputFile)
-    // find the plugins name using id
-    // extract author and slug from download url if service == service.HANGAR
-    var id = "${plugin.service}:${plugin.id}"
-    if (plugin.service == MarketplaceService.HANGAR) {
-        val url = plugin.downloadURL
-        val author = url.split("/")[6]
-        val slug = url.split("/")[7]
+fun install(plugin: MarketplacePlugin, pluginPortal: PluginPortal, enable: Boolean) {
+    Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
+        val outputFile = File("plugins", "${plugin.name}-${plugin.version} (PP).jar".replace(":", "~"))
+        download(URL(plugin.downloadURL), outputFile)
 
-        id = "${plugin.service}:${author}:${slug}"
-    }
+        Data.update(LocalPlugin(
+            plugin.id,
+            plugin.service,
+            plugin.version,
+            getSHA(outputFile))
+        )
 
-    Data.update(id, plugin.version, getSHA(outputFile))
-    addValueToPieChart(Chart.MOST_DOWNLOADED, plugin.id)
-    if (enable || Config.startupOnInstall) {
-        enablePlugin(Bukkit.getPluginManager().loadPlugin(outputFile))
-    }
+        if (enable || Config.startupOnInstall) {
+            enablePlugin(Bukkit.getPluginManager().loadPlugin(outputFile))
+        }
+    })
 }
 
 fun enablePlugin(plugin: Plugin?) {

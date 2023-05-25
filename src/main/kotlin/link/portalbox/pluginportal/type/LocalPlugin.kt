@@ -1,6 +1,11 @@
 package link.portalbox.pluginportal.type
 
+import com.fasterxml.jackson.annotation.JsonProperty
+import gg.flyte.pplib.type.Service
+
 data class LocalPlugin(
-        val id: String,
-        var version: String,
-        var fileSha: String)
+        @JsonProperty("id") val id: String,
+        @JsonProperty("service") val service: Service,
+        @JsonProperty("version") var version: String,
+        @JsonProperty("fileSha") var fileSha: String,
+)

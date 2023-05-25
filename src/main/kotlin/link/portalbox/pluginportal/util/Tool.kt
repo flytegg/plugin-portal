@@ -2,7 +2,7 @@ package link.portalbox.pluginportal.util
 
 import link.portalbox.pluginportal.type.GameVersion
 import gg.flyte.pplib.type.MarketplacePlugin
-import gg.flyte.pplib.type.MarketplaceService
+import gg.flyte.pplib.type.Service
 import gg.flyte.pplib.type.api.PostError
 import gg.flyte.pplib.type.api.RequestPlugin
 import org.apache.commons.lang3.Validate
@@ -47,7 +47,7 @@ inline fun <T> T.applyIf(shouldApply: Boolean, block: T.() -> Unit): T = apply {
 
 // Convert MarketplacePlugin to RequestPlugin, with an input of "reasonForRequest"
 fun MarketplacePlugin.toRequestPlugin(reasonForRequest: String, username: String): RequestPlugin {
-    val externalURL = if (service == MarketplaceService.SPIGOTMC) {
+    val externalURL = if (service == Service.SPIGOTMC) {
         "https://www.spigotmc.org/resources/$id/"
     } else {
         "https://hangar.papermc.io/ (Download will be added soon)"

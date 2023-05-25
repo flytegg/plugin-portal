@@ -1,10 +1,9 @@
 package link.portalbox.pluginportal.command.sub
 
+import gg.flyte.pplib.util.getPluginFromName
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.util.sendPreview
-import gg.flyte.pplib.manager.MarketplacePluginManager
-import gg.flyte.pplib.util.getPluginFromName
 import gg.flyte.pplib.util.searchPlugins
 import org.bukkit.command.CommandSender
 
@@ -15,8 +14,7 @@ class PreviewSubCommand : SubCommand() {
             return
         }
 
-        val plugin = getPluginFromName(args[1])
-        if (plugin == null) {
+        val plugin = getPluginFromName(args[1]) ?: run {
             sender.sendMessage(Message.pluginNotFound)
             return
         }

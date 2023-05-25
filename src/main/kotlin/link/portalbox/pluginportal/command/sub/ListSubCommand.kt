@@ -4,7 +4,6 @@ import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
-import gg.flyte.pplib.util.getPluginIdFromName
 import org.bukkit.command.CommandSender
 
 class ListSubCommand : SubCommand() {
@@ -17,7 +16,7 @@ class ListSubCommand : SubCommand() {
 
         sender.sendMessage(Message.listingAllPlugins)
         for (plugin in installedPlugins) {
-            sender.sendMessage(Message.installedPlugin.fillInVariables(arrayOf(getPluginIdFromName(plugin.id))))
+            sender.sendMessage(Message.installedPlugin.fillInVariables(arrayOf(plugin.id)))
         }
     }
 

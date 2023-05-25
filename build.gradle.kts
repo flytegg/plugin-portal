@@ -3,7 +3,7 @@ import java.io.ByteArrayOutputStream
 
 plugins {
     kotlin("jvm") version "1.7.21"
-    id("com.github.johnrengelman.shadow") version "7.1.1"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
     id("io.papermc.hangar-publish-plugin") version "0.0.5"
     id("xyz.jpenilla.run-paper") version "2.0.1"
 }
@@ -26,8 +26,15 @@ dependencies {
     compileOnly("net.kyori:adventure-platform-bukkit:4.1.0")
 
     implementation ("org.bstats:bstats-bukkit:3.0.2")
-    implementation("gg.flyte:pplib:1.1.0")
+
+    // PP LIB
+
+    implementation("com.fasterxml.jackson.core:jackson-core:2.15.1")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.1")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.1")
+
     implementation("gg.flyte:hangarWrapper:1.1.1")
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11")
 }
 
 hangarPublish {

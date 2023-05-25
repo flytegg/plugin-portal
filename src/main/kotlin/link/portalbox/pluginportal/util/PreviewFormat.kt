@@ -30,18 +30,7 @@ fun sendPreview(sender: CommandSender, plugin: MarketplacePlugin) {
     text.add(Component.text(" "))
     text.addAll(createButton(plugin, sender))
 
-    var changeThisInTheNextUpdateImageUrl = plugin.iconURL
-
-    if (changeThisInTheNextUpdateImageUrl.isEmpty() || changeThisInTheNextUpdateImageUrl == "https://i.imgur.com/V9jfjSJ.png") {
-        changeThisInTheNextUpdateImageUrl = "https://cdn.discordapp.com/attachments/1065031876470906880/1105626560087736439/smallpreviewpluginportal.png"
-    }
-
-    var image = fetchImageAsBuffer(changeThisInTheNextUpdateImageUrl)
-    if (image == null) {
-        image = fetchImageAsBuffer("https://cdn.discordapp.com/attachments/1065031876470906880/1105626560087736439/smallpreviewpluginportal.png")
-    }
-
-    val imageGrid = image?.let { createImageGrid(it, 11, 13) } ?: emptyArray()
+    val imageGrid = fetchImageAsBuffer(plugin.iconURL)?.let { createImageGrid(it, 11, 13) } ?: emptyArray()
 
     sender.sendMessage(Message.blankStrikeThrough)
     imageGrid.forEach { row ->
@@ -74,7 +63,7 @@ fun createButton(plugin: MarketplacePlugin, sender: CommandSender): List<Compone
 
     val clickString = when (downloadable) {
         false -> "https://www.spigotmc.org/resources/${plugin.id}"
-        true -> "/pp install ${plugin.service.name}:${plugin.name.replace(" ", "")}"
+        true -> "/pp install ${plugin.name.replace(" ", "")}"
     }
 
     if (!downloadable && !plugin.isPremium) {

@@ -7,8 +7,8 @@ import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.*
-import gg.flyte.pplib.manager.MarketplacePluginManager
 import gg.flyte.pplib.type.MarketplacePlugin
+import gg.flyte.pplib.util.getPluginFromId
 import gg.flyte.pplib.util.getPluginFromName
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
@@ -18,7 +18,10 @@ import java.net.URL
 class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
     override fun execute(sender: CommandSender, args: Array<out String>) {
         if (args.size >= 2) {
-            val plugin = getPluginFromName(args[1])
+            val plugin = getPluginFromName(args[1]) ?: run {
+                sender.sendMessage(Message.pluginNotFound)
+                return
+            }
 
             val localPlugin = Data.installedPlugins.find { it.id == plugin.id }
             if (localPlugin == null) {
@@ -31,29 +34,26 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
                 return
             }
 
-            if (plugin.downloadURL.isEmpty() || plugin.downloadURL == "null") {
+            if (!plugin.isValidDownload()) {
                 sender.sendMessage(Message.downloadNotFound)
                 return
             }
-
 
             if (!delete(pluginPortal, localPlugin)) {
                 sender.sendMessage(Message.pluginNotUpdated.fillInVariables(arrayOf(plugin.name)))
                 return
             }
 
-            Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
-                install(plugin, URL(plugin.downloadURL))
-
+            install(plugin, pluginPortal).run {
                 sender.sendMessage(Message.pluginUpdated)
                 sender.sendMessage(if (Config.startupOnInstall) Message.pluginAttemptedEnabling else Message.restartServerToEnablePlugin)
-            })
-            return
+            }
+
         }
 
         val needUpdating = mutableListOf<MarketplacePlugin>()
         for (plugin in Data.installedPlugins) {
-            val spigetPlugin = MarketplacePluginManager.getPlugin(plugin.id)
+            val spigetPlugin = getPluginFromId(plugin.id) ?: continue
             if (spigetPlugin.version != plugin.version) {
                 needUpdating.add(spigetPlugin)
             }
@@ -73,8 +73,9 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
     override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {
         if (args.size != 2) return null
         return StringUtil.copyPartialMatches(
-                args[1],
-                Data.installedPlugins.map { it.id },
-                mutableListOf())
+            args[1],
+            Data.installedPlugins.map { it.id },
+            mutableListOf()
+        )
     }
 }
