@@ -14,10 +14,7 @@ version = "1.5.1"
 repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
-    maven {
-        url = uri("http://localhost:8080/releases")
-        isAllowInsecureProtocol = true
-    }
+    maven("https://repo.flyte.gg/releases")
 
 }
 
