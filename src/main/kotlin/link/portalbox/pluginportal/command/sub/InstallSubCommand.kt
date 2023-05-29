@@ -8,11 +8,8 @@ import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.*
-import gg.flyte.pplib.util.requestPlugin
 import gg.flyte.pplib.util.searchPlugins
-import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
-import java.net.URL
 
 class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
     override fun execute(sender: CommandSender, args: Array<out String>) {
@@ -26,7 +23,7 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             return
         }
 
-        if (Data.installedPlugins.find { it.id == plugin.id } != null) {
+        if (Data.installedPlugins.find { it.marketplacePlugin.id == plugin.id } != null) {
             sender.sendMessage(Message.pluginAlreadyInstalled)
             return
         }

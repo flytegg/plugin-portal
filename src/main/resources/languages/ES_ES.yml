@@ -44,7 +44,7 @@ help-command-display: "<dark_gray> - </dark_gray><bold> <aqua>**{0}**</aqua></bo
 
 no-plugins-installed: "<prefix><gray>No tienes plugins instalados o reconocidos por PluginPortal"
 listing-all-plugins: "<prefix><gray>Listando todos los plugins..."
-installed-plugin: "<green>+</green> <aqua>**{0}**"
+installed-plugin: "<green>+</green> <gray>**{0}**"
 
 # ---------------- Request ----------------- #
 

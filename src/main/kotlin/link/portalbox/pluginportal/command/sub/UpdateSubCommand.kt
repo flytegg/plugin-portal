@@ -23,13 +23,13 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
                 return
             }
 
-            val localPlugin = Data.installedPlugins.find { it.id == plugin.id }
+            val localPlugin = Data.installedPlugins.find { it.marketplacePlugin.id == plugin.id }
             if (localPlugin == null) {
                 sender.sendMessage(Message.pluginNotFound)
                 return
             }
 
-            if (plugin.version == localPlugin.version) {
+            if (plugin.version == localPlugin.marketplacePlugin.version) {
                 sender.sendMessage(Message.pluginIsUpToDate.fillInVariables(arrayOf(plugin.name)))
                 return
             }
@@ -53,8 +53,8 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
 
         val needUpdating = mutableListOf<MarketplacePlugin>()
         for (plugin in Data.installedPlugins) {
-            val spigetPlugin = getPluginFromId(plugin.id) ?: continue
-            if (spigetPlugin.version != plugin.version) {
+            val spigetPlugin = getPluginFromId(plugin.marketplacePlugin.id) ?: continue
+            if (spigetPlugin.version != plugin.marketplacePlugin.version) {
                 needUpdating.add(spigetPlugin)
             }
         }
@@ -74,7 +74,7 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         if (args.size != 2) return null
         return StringUtil.copyPartialMatches(
             args[1],
-            Data.installedPlugins.map { it.id },
+            Data.installedPlugins.map { it.marketplacePlugin.name },
             mutableListOf()
         )
     }

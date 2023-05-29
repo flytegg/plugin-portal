@@ -63,6 +63,7 @@ fun getPluginFromName(name: String): MarketplacePlugin? {
  * @return an APIPlugin object representing the specified id
  */
 fun getPluginFromId(id: String): MarketplacePlugin? {
+    println("$BASE_DOMAIN/v3/plugins/id/$id")
     return objectMapper.readValue<MarketplacePlugin>(getStringFromURL("$BASE_DOMAIN/v3/plugins/id/$id")) ?: null
 }
 

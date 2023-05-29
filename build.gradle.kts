@@ -14,15 +14,11 @@ version = "1.5.1"
 repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
-    maven {
-        url = uri("http://localhost:8080/releases")
-        isAllowInsecureProtocol = true
-    }
-
+    maven ("https://repo.flyte.gg/releases")
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
     compileOnly("net.kyori:adventure-platform-bukkit:4.1.0")
 
     implementation ("org.bstats:bstats-bukkit:3.0.2")

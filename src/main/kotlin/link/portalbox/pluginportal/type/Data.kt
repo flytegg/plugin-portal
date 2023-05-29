@@ -1,11 +1,10 @@
 package link.portalbox.pluginportal.type
 
+import gg.flyte.pplib.type.Service
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.type.language.Message
 import gg.flyte.pplib.type.VersionType
-import gg.flyte.pplib.util.getLatestVersion
-import gg.flyte.pplib.util.objectMapper
-import gg.flyte.pplib.util.separateServiceAndName
+import gg.flyte.pplib.util.*
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
@@ -43,9 +42,9 @@ object Data {
     }
 
     fun update(localPlugin: LocalPlugin) {
-        val existingLocalPlugin = installedPlugins.find { it.id == localPlugin.id }
+        val existingLocalPlugin = installedPlugins.find { it.marketplacePlugin.id == localPlugin.marketplacePlugin.id }
         if (existingLocalPlugin != null) {
-            existingLocalPlugin.version = localPlugin.version
+            existingLocalPlugin.marketplacePlugin.version = localPlugin.marketplacePlugin.version
             existingLocalPlugin.fileSha = localPlugin.fileSha
         } else {
             installedPlugins.add(localPlugin)
@@ -92,14 +91,31 @@ object Data {
             val pluginSection = updatedConfig.getConfigurationSection(id)
             if (pluginSection != null) {
                 val separated = separateServiceAndName(id)
-                installedPlugins.add(
-                    LocalPlugin(
-                        separated.second,
-                        separated.first,
-                        pluginSection.getString("version")!!,
-                        pluginSection.getString("file")!!
+                println("Adding $id")
+                if (separated.first == Service.SPIGOTMC) {
+                    Bukkit.getScheduler().runTaskAsynchronously(pluginPortal, Runnable {
+                        installedPlugins.add(
+                            LocalPlugin(
+                                separated.second,
+                                getPluginFromId(separated.second)?.name ?: separated.second,
+                                separated.first,
+                                pluginSection.getString("version")!!,
+                                pluginSection.getString("file")!!
+                            )
+                        )
+                    })
+                } else {
+                    installedPlugins.add(
+                        LocalPlugin(
+                            separated.second,
+                            separated.second,
+                            separated.first,
+                            pluginSection.getString("version")!!,
+                            pluginSection.getString("file")!!
+                        )
                     )
-                )
+                }
+
             }
         }
 

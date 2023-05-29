@@ -20,8 +20,8 @@ class UpdateAllSubCommand(private val pluginPortal: PluginPortal) : SubCommand()
         val needUpdating = mutableListOf<MarketplacePlugin>()
         for (plugin in Data.installedPlugins) {
 
-            val marketplacePlugin = getPluginFromId(plugin.id) ?: continue
-            if (marketplacePlugin.version != plugin.version) {
+            val marketplacePlugin = getPluginFromId(plugin.marketplacePlugin.id) ?: continue
+            if (marketplacePlugin.version != plugin.marketplacePlugin.version) {
                 needUpdating.add(marketplacePlugin)
             }
         }
@@ -33,10 +33,10 @@ class UpdateAllSubCommand(private val pluginPortal: PluginPortal) : SubCommand()
 
         sender.sendMessage(Message.updatingPlugins)
         for (outdatedPlugin in needUpdating) {
-            val localPlugin = Data.installedPlugins.find { it.id == outdatedPlugin.id } ?: continue
+            val localPlugin = Data.installedPlugins.find { it.marketplacePlugin.id == outdatedPlugin.id } ?: continue
 
             val plugin: MarketplacePlugin = getPluginFromId(outdatedPlugin.id) ?: continue
-            if (plugin.version == localPlugin.version) return
+            if (plugin.version == localPlugin.marketplacePlugin.version) return
 
             if (!plugin.isValidDownload()) {
                 sender.sendMessage(Message.downloadNotFound)

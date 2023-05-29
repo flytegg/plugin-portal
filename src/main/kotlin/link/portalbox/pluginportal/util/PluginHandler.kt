@@ -25,7 +25,7 @@ fun delete(pluginPortal: PluginPortal, localPlugin: LocalPlugin): Boolean {
                 if (localPlugin.fileSha == getSHA(file)) {
                     pluginPortal.server.pluginManager.disablePlugin(loadedPlugin)
                     file.delete()
-                    Data.delete(localPlugin.id)
+                    Data.delete(localPlugin.marketplacePlugin.id)
                     return true
                 }
             }
@@ -45,6 +45,7 @@ fun install(plugin: MarketplacePlugin, pluginPortal: PluginPortal, enable: Boole
 
         Data.update(LocalPlugin(
             plugin.id,
+            plugin.name,
             plugin.service,
             plugin.version,
             getSHA(outputFile))

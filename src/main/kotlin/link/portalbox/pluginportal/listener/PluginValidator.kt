@@ -25,8 +25,8 @@ class PluginValidator : Listener {
         for (plugin in Data.installedPlugins) {
             if (!installedShas.contains(plugin.fileSha)) {
                 runCatching {
-                    removedPlugins.add(plugin.id)
-                    pluginsToDelete.add(plugin.id)
+                    removedPlugins.add(plugin.marketplacePlugin.id)
+                    pluginsToDelete.add(plugin.marketplacePlugin.id)
                 }
             }
         }

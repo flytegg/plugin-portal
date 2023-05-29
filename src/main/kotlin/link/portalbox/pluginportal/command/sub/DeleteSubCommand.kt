@@ -23,7 +23,7 @@ class DeleteSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             return
         }
 
-        val localPlugin = Data.installedPlugins.find { it.id == plugin.id }
+        val localPlugin = Data.installedPlugins.find { it.marketplacePlugin.id == plugin.id }
         if (localPlugin == null) {
             sender.sendMessage(Message.pluginNotInstalled.fillInVariables(arrayOf(args[1])))
             return
@@ -42,7 +42,7 @@ class DeleteSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         if (args.size != 2) return null
         return StringUtil.copyPartialMatches(
                 args[1],
-                Data.installedPlugins.map { it.id },
+                Data.installedPlugins.map { it.marketplacePlugin.id },
                 mutableListOf()
         )
     }

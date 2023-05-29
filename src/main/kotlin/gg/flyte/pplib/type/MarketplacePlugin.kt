@@ -18,11 +18,13 @@ data class MarketplacePlugin(
     @JsonProperty("iconURL") val iconURL: String,
 
     // Service data
-    @JsonProperty("version") val version: String,
+    @JsonProperty("version") var version: String,
 
     // Download information
     @JsonProperty("downloadURL") val downloadURL: String,
     @JsonProperty("isPremium") val isPremium: Boolean,
+
+    @JsonProperty("extraInfo") val extraInfo: String?,
 ) {
     fun isValidDownload(): Boolean {
         val validDownload = isJarFileDownload(downloadURL)

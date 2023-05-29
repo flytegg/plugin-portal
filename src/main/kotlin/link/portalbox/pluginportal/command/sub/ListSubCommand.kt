@@ -16,7 +16,7 @@ class ListSubCommand : SubCommand() {
 
         sender.sendMessage(Message.listingAllPlugins)
         for (plugin in installedPlugins) {
-            sender.sendMessage(Message.installedPlugin.fillInVariables(arrayOf(plugin.id)))
+            sender.sendMessage(Message.installedPlugin.fillInVariables(arrayOf(plugin.marketplacePlugin.name)))
         }
     }
 
