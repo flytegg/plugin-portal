@@ -1,5 +1,7 @@
 package link.portalbox.pluginportal.command.sub
 
+import gg.flyte.pplib.type.plugin.MarketplacePlugin
+import gg.flyte.pplib.util.getPluginFromID
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Config
@@ -7,13 +9,9 @@ import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.*
-import gg.flyte.pplib.type.MarketplacePlugin
-import gg.flyte.pplib.util.getPluginFromId
 import gg.flyte.pplib.util.getPluginFromName
-import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
-import java.net.URL
 
 class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
     override fun execute(sender: CommandSender, args: Array<out String>) {
@@ -53,7 +51,7 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
 
         val needUpdating = mutableListOf<MarketplacePlugin>()
         for (plugin in Data.installedPlugins) {
-            val spigetPlugin = getPluginFromId(plugin.marketplacePlugin.id) ?: continue
+            val spigetPlugin = getPluginFromID(plugin.marketplacePlugin.id) ?: continue
             if (spigetPlugin.version != plugin.marketplacePlugin.version) {
                 needUpdating.add(spigetPlugin)
             }

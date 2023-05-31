@@ -1,9 +1,9 @@
 package link.portalbox.pluginportal.util
 
+import gg.flyte.pplib.type.plugin.MarketplacePlugin
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.deserialize
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
-import gg.flyte.pplib.type.MarketplacePlugin
 import gg.flyte.pplib.util.isDirectDownload
 import gg.flyte.pplib.util.requestPlugin
 import net.kyori.adventure.text.Component

@@ -9,12 +9,14 @@ plugins {
 }
 
 group = "link.portalbox"
-version = "1.5.1"
+version = "2.0.0"
 
 repositories {
     mavenCentral()
+    maven("https://jcenter.bintray.com/")
     maven("https://repo.papermc.io/repository/maven-public/")
     maven ("https://repo.flyte.gg/releases")
+    maven ("https://repo.flyte.gg/snapshots")
 }
 
 dependencies {
@@ -23,14 +25,15 @@ dependencies {
 
     implementation ("org.bstats:bstats-bukkit:3.0.2")
 
-    // PP LIB
-
     implementation("com.fasterxml.jackson.core:jackson-core:2.15.1")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.1")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.1")
 
     implementation("gg.flyte:hangarWrapper:1.1.1")
+    implementation("gg.flyte:pplib:1.2.2")
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11")
+
+    implementation("com.andreapivetta.kolor:kolor:1.0.0")
 }
 
 hangarPublish {

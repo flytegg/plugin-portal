@@ -1,14 +1,12 @@
 package link.portalbox.pluginportal.util
 
+import gg.flyte.pplib.type.plugin.MarketplacePlugin
+import gg.flyte.pplib.util.download
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.type.Config
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.LocalPlugin
-import gg.flyte.pplib.type.MarketplacePlugin
-import gg.flyte.pplib.type.Service
-import gg.flyte.pplib.util.download
 import org.bukkit.Bukkit
-import org.bukkit.command.CommandSender
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.UnknownDependencyException
 import java.io.File
@@ -44,12 +42,9 @@ fun install(plugin: MarketplacePlugin, pluginPortal: PluginPortal, enable: Boole
         download(URL(plugin.downloadURL), outputFile)
 
         Data.update(LocalPlugin(
-            plugin.id,
-            plugin.name,
-            plugin.service,
-            plugin.version,
-            getSHA(outputFile))
-        )
+            getSHA(outputFile),
+            plugin,
+        ))
 
         if (enable || Config.startupOnInstall) {
             enablePlugin(Bukkit.getPluginManager().loadPlugin(outputFile))

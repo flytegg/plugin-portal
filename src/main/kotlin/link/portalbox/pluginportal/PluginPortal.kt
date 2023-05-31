@@ -7,7 +7,7 @@ import link.portalbox.pluginportal.listener.PluginValidator
 import link.portalbox.pluginportal.listener.UpdateListener
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.util.*
-import gg.flyte.pplib.type.VersionType
+import gg.flyte.pplib.type.version.VersionType
 import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.java.JavaPlugin
 

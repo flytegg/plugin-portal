@@ -42,7 +42,7 @@ class DeleteSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         if (args.size != 2) return null
         return StringUtil.copyPartialMatches(
                 args[1],
-                Data.installedPlugins.map { it.marketplacePlugin.id },
+                Data.installedPlugins.map { it.marketplacePlugin.name },
                 mutableListOf()
         )
     }

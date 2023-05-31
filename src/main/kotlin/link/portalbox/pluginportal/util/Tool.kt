@@ -1,10 +1,10 @@
 package link.portalbox.pluginportal.util
 
+import gg.flyte.pplib.type.error.PostError
+import gg.flyte.pplib.type.plugin.MarketplacePlugin
+import gg.flyte.pplib.type.plugin.RequestPlugin
+import gg.flyte.pplib.type.service.ServiceType
 import link.portalbox.pluginportal.type.GameVersion
-import gg.flyte.pplib.type.MarketplacePlugin
-import gg.flyte.pplib.type.Service
-import gg.flyte.pplib.type.api.PostError
-import gg.flyte.pplib.type.api.RequestPlugin
 import org.apache.commons.lang3.Validate
 import org.bukkit.util.StringUtil.startsWithIgnoreCase
 import java.io.File
@@ -47,7 +47,7 @@ inline fun <T> T.applyIf(shouldApply: Boolean, block: T.() -> Unit): T = apply {
 
 // Convert MarketplacePlugin to RequestPlugin, with an input of "reasonForRequest"
 fun MarketplacePlugin.toRequestPlugin(reasonForRequest: String, username: String): RequestPlugin {
-    val externalURL = if (service == Service.SPIGOTMC) {
+    val externalURL = if (service == ServiceType.SPIGOTMC) {
         "https://www.spigotmc.org/resources/$id/"
     } else {
         "https://hangar.papermc.io/ (Download will be added soon)"
