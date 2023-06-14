@@ -13,34 +13,34 @@ import net.kyori.adventure.audience.Audience
 import org.bukkit.command.CommandSender
 
 class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
-    override fun execute(audience: Audience, args: Array<out String>) {
+    override fun execute(audience: Audience, commandSender: CommandSender, args: Array<out String>) {
         if (args.size <= 1) {
-            sender.sendMessage(Message.noPluginSpecified)
+            audience.sendMessage(Message.noPluginSpecified)
             return
         }
 
         val plugin = getPluginFromName(args[1]) ?: run {
-            sender.sendMessage(Message.pluginNotFound)
+            audience.sendMessage(Message.pluginNotFound)
             return
         }
 
         if (Data.installedPlugins.find { it.marketplacePlugin.id == plugin.id } != null) {
-            sender.sendMessage(Message.pluginAlreadyInstalled)
+            audience.sendMessage(Message.pluginAlreadyInstalled)
             return
         }
 
         if (plugin.isPremium) {
-            sender.sendMessage(Message.pluginIsPremium)
+            audience.sendMessage(Message.pluginIsPremium)
             return
         }
 
         if (!plugin.isValidDownload()) {
-            sender.sendMessage(Message.downloadNotFound)
+            audience.sendMessage(Message.downloadNotFound)
             return
         }
 
         if (plugin.service != Config.marketplaceService) {
-            sender.sendMessage(
+            audience.sendMessage(
                 Message.serviceNotSupported.fillInVariables(
                     arrayOf(
                         Config.marketplaceService?.name ?: "UNKNOWN"
@@ -50,11 +50,11 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             // return
         }
 
-        sender.sendMessage(Message.pluginIsBeingInstalled)
+        audience.sendMessage(Message.pluginIsBeingInstalled)
 
         install(plugin, pluginPortal).run {
-            sender.sendMessage(Message.pluginHasBeenInstalled.fillInVariables(arrayOf(plugin.name)))
-            sender.sendMessage(if (Config.startupOnInstall) Message.pluginAttemptedEnabling else Message.restartServerToEnablePlugin)
+            audience.sendMessage(Message.pluginHasBeenInstalled.fillInVariables(arrayOf(plugin.name)))
+            audience.sendMessage(if (Config.startupOnInstall) Message.pluginAttemptedEnabling else Message.restartServerToEnablePlugin)
         }
     }
 

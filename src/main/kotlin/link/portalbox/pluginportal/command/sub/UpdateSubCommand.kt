@@ -15,37 +15,37 @@ import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
 
 class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
-    override fun execute(audience: Audience, args: Array<out String>) {
+    override fun execute(audience: Audience, commandSender: CommandSender, args: Array<out String>) {
         if (args.size >= 2) {
             val plugin = getPluginFromName(args[1]) ?: run {
-                sender.sendMessage(Message.pluginNotFound)
+                audience.sendMessage(Message.pluginNotFound)
                 return
             }
 
             val localPlugin = Data.installedPlugins.find { it.marketplacePlugin.id == plugin.id }
             if (localPlugin == null) {
-                sender.sendMessage(Message.pluginNotFound)
+                audience.sendMessage(Message.pluginNotFound)
                 return
             }
 
             if (plugin.version == localPlugin.marketplacePlugin.version) {
-                sender.sendMessage(Message.pluginIsUpToDate.fillInVariables(arrayOf(plugin.name)))
+                audience.sendMessage(Message.pluginIsUpToDate.fillInVariables(arrayOf(plugin.name)))
                 return
             }
 
             if (!plugin.isValidDownload()) {
-                sender.sendMessage(Message.downloadNotFound)
+                audience.sendMessage(Message.downloadNotFound)
                 return
             }
 
             if (!delete(pluginPortal, localPlugin)) {
-                sender.sendMessage(Message.pluginNotUpdated.fillInVariables(arrayOf(plugin.name)))
+                audience.sendMessage(Message.pluginNotUpdated.fillInVariables(arrayOf(plugin.name)))
                 return
             }
 
             install(plugin, pluginPortal).run {
-                sender.sendMessage(Message.pluginUpdated)
-                sender.sendMessage(if (Config.startupOnInstall) Message.pluginAttemptedEnabling else Message.restartServerToEnablePlugin)
+                audience.sendMessage(Message.pluginUpdated)
+                audience.sendMessage(if (Config.startupOnInstall) Message.pluginAttemptedEnabling else Message.restartServerToEnablePlugin)
             }
 
         }
@@ -59,13 +59,13 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         }
 
         if (needUpdating.isEmpty()) {
-            sender.sendMessage(Message.noPluginRequireAnUpdate)
+            audience.sendMessage(Message.noPluginRequireAnUpdate)
             return
         }
 
-        sender.sendMessage(Message.listingAllOutdatedPlugins)
+        audience.sendMessage(Message.listingAllOutdatedPlugins)
         for (spigetPlugin in needUpdating) {
-            sender.sendMessage(Message.installedPlugin.fillInVariables(arrayOf(spigetPlugin.name)))
+            audience.sendMessage(Message.installedPlugin.fillInVariables(arrayOf(spigetPlugin.name)))
         }
     }
 

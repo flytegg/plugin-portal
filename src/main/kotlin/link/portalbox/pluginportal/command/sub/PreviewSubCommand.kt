@@ -9,18 +9,18 @@ import net.kyori.adventure.audience.Audience
 import org.bukkit.command.CommandSender
 
 class PreviewSubCommand : SubCommand() {
-    override fun execute(audience: Audience, args: Array<out String>) {
+    override fun execute(audience: Audience, commandSender: CommandSender, args: Array<out String>) {
         if (args.size <= 1) {
-            sender.sendMessage(Message.noPluginSpecified)
+            audience.sendMessage(Message.noPluginSpecified)
             return
         }
 
         val plugin = getPluginFromName(args[1]) ?: run {
-            sender.sendMessage(Message.pluginNotFound)
+            audience.sendMessage(Message.pluginNotFound)
             return
         }
 
-        sendPreview(sender, plugin)
+        sendPreview(plugin, audience, commandSender)
     }
 
     override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {

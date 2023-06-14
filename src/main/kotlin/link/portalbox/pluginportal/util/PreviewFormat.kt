@@ -6,6 +6,7 @@ import link.portalbox.pluginportal.type.language.Message.deserialize
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import gg.flyte.pplib.util.isDirectDownload
 import gg.flyte.pplib.util.requestPlugin
+import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.command.CommandSender
@@ -15,7 +16,7 @@ import java.net.URL
 import javax.imageio.ImageIO
 import kotlin.math.roundToInt
 
-fun sendPreview(sender: CommandSender, plugin: MarketplacePlugin) {
+fun sendPreview(plugin: MarketplacePlugin, audience: Audience, commandSender: CommandSender) {
     val price = if (plugin.isPremium) "$${plugin.price}" else "Free"
     val descriptionComponents = createDescriptionLines(plugin.description)
     val text = mutableListOf(
@@ -28,11 +29,11 @@ fun sendPreview(sender: CommandSender, plugin: MarketplacePlugin) {
     )
 
     text.add(Component.text(" "))
-    text.addAll(createButton(plugin, sender))
+    text.addAll(createButton(plugin, commandSender))
 
     val imageGrid = fetchImageAsBuffer(plugin.iconURL)?.let { createImageGrid(it, 11, 13) } ?: emptyArray()
 
-    sender.sendMessage(Message.blankStrikeThrough)
+    audience.sendMessage(Message.blankStrikeThrough)
     imageGrid.forEach { row ->
         val rowComponent = Component.text()
 
@@ -45,12 +46,12 @@ fun sendPreview(sender: CommandSender, plugin: MarketplacePlugin) {
         }
 
         text.getOrNull(imageGrid.indexOf(row))?.let { rowComponent.append(it) }
-        sender.sendMessage(rowComponent)
+        audience.sendMessage(rowComponent)
     }
-    sender.sendMessage(Message.blankStrikeThrough)
+    audience.sendMessage(Message.blankStrikeThrough)
 }
 
-fun createButton(plugin: MarketplacePlugin, sender: CommandSender): List<Component> {
+fun createButton(plugin: MarketplacePlugin, commandSender: CommandSender): List<Component> {
     val hoverText = when (plugin.isPremium) {
         false -> "<aqua>Click to Download"
         true -> when (isDirectDownload(plugin.downloadURL)) {
@@ -67,7 +68,7 @@ fun createButton(plugin: MarketplacePlugin, sender: CommandSender): List<Compone
     }
 
     if (!downloadable && !plugin.isPremium) {
-        requestPlugin(plugin.toRequestPlugin("External Download URL", sender.name))
+        requestPlugin(plugin.toRequestPlugin("External Download URL", commandSender.name))
     }
 
     val button = when (plugin.isPremium) {

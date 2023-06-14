@@ -39,7 +39,7 @@ class PPCommand(pluginPortal: PluginPortal) : CommandExecutor, TabCompleter {
             return false
         }
 
-        subcommands[type]!!.execute(audiences.sender(sender), args)
+        subcommands[type]!!.execute(audiences.sender(sender), sender, args)
         return false
     }
 
