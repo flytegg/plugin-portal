@@ -5,6 +5,8 @@ import gg.flyte.pplib.type.version.VersionType
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.type.language.Message
 import gg.flyte.pplib.util.*
+import link.portalbox.pluginportal.type.language.Message.serialize
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
@@ -36,10 +38,10 @@ object Data {
 
         objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, installedPlugins)
 
-        pluginPortal.versionType = getLatestVersionType(pluginPortal.pluginMeta.version)
+        pluginPortal.versionType = getLatestVersionType(pluginPortal.description.version)
         if (pluginPortal.versionType != VersionType.LATEST) {
             for (i in 0..2) {
-                Bukkit.getConsoleSender().sendMessage(Message.consoleOutdatedPluginPortal)
+                log(MiniMessage.miniMessage().stripTags(Message.consoleOutdatedPluginPortal.serialize()))
             }
         }
     }
@@ -70,7 +72,7 @@ object Data {
         installedPlugins.addAll(
             objectMapper.readValue<List<LocalPlugin>>(
                 convert(
-                    ymlFile.inputStream().readBytes().toString(Charsets.UTF_8), pluginPortal.pluginMeta.version
+                    ymlFile.inputStream().readBytes().toString(Charsets.UTF_8), pluginPortal.description.version
                 )
             )
         )

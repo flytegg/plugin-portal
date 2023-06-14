@@ -12,7 +12,6 @@ import org.bukkit.plugin.UnknownDependencyException
 import java.io.File
 import java.net.URL
 
-
 fun delete(pluginPortal: PluginPortal, localPlugin: LocalPlugin): Boolean {
     for (loadedPlugin in pluginPortal.server.pluginManager.plugins) {
         val pluginClass = loadedPlugin.javaClass

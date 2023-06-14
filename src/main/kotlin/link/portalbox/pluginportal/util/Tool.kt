@@ -5,7 +5,6 @@ import gg.flyte.pplib.type.plugin.MarketplacePlugin
 import gg.flyte.pplib.type.plugin.RequestPlugin
 import gg.flyte.pplib.type.service.ServiceType
 import link.portalbox.pluginportal.type.GameVersion
-import org.apache.commons.lang3.Validate
 import org.bukkit.util.StringUtil.startsWithIgnoreCase
 import java.io.File
 import java.io.FileInputStream
@@ -61,9 +60,6 @@ fun copyPartialMatchesWithService(
     originals: Iterable<String>,
     matches: MutableCollection<String>
 ): MutableCollection<String> {
-    Validate.notNull(input, "Search token cannot be null")
-    Validate.notNull(matches, "Collection cannot be null")
-    Validate.notNull(originals, "Originals cannot be null")
 
     for (string in originals) {
         if (startsWithIgnoreCase(string.split(":")[1], input)) {

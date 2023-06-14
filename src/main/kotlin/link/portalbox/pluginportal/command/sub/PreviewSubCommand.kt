@@ -5,7 +5,6 @@ import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.util.sendPreview
 import gg.flyte.pplib.util.searchPlugins
-import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 
 class PreviewSubCommand : SubCommand() {
@@ -21,7 +20,6 @@ class PreviewSubCommand : SubCommand() {
         }
 
         sendPreview(sender, plugin)
-        Bukkit.broadcastMessage("test")
     }
 
     override fun tabComplete(sender: CommandSender, args: Array<out String>): MutableList<String>? {

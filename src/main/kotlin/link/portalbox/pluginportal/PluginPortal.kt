@@ -8,6 +8,7 @@ import link.portalbox.pluginportal.listener.UpdateListener
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.util.*
 import gg.flyte.pplib.type.version.VersionType
+import io.papermc.lib.PaperLib
 import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -27,5 +28,6 @@ class PluginPortal : JavaPlugin() {
         server.pluginManager.registerEvents(UpdateListener(this), this)
 
         setupMetrics(Metrics(this, 18005))
+        PaperLib.suggestPaper(this)
     }
 }

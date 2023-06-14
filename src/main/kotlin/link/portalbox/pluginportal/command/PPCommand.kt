@@ -3,6 +3,7 @@ package link.portalbox.pluginportal.command
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.sub.*
 import link.portalbox.pluginportal.type.language.Message
+import link.portalbox.pluginportal.type.language.Message.audiences
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender

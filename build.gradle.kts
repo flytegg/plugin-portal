@@ -20,8 +20,12 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
-    compileOnly("net.kyori:adventure-platform-bukkit:4.1.0")
+    compileOnly("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT")
+    implementation("io.papermc:paperlib:1.0.7")
+
+    implementation("net.kyori:adventure-api:4.14.0")
+    implementation("net.kyori:adventure-platform-bukkit:4.1.0")
+    implementation("net.kyori:adventure-text-minimessage:4.14.0")
 
     implementation ("org.bstats:bstats-bukkit:3.0.2")
 
@@ -34,6 +38,31 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11")
 
     implementation("com.andreapivetta.kolor:kolor:1.0.0")
+}
+
+tasks {
+    compileKotlin {
+        kotlinOptions.jvmTarget = "1.8"
+    }
+
+    compileTestKotlin {
+        kotlinOptions.jvmTarget = "1.8"
+    }
+
+    shadowJar {
+        relocate("org.bstats", "link.portalbox.lib.bstats")
+        relocate("kotlin", "link.portalbox.lib.kotlin")
+        relocate("org.jetbrains.annotations", "link.portalbox.lib.jetbrains.annotations")
+        relocate("org.intellij.lang.annotations", "link.portalbox.lib.intellij.lang.annotations")
+        relocate("net.kyori.adventure", "link.portalbox.lib.kyori")
+        relocate("com.fasterxml.jackson", "link.portalbox.lib.jackson")
+        relocate("okhttp3", "link.portalbox.lib.okhttp3")
+        relocate("io.papermc", "link.portalbox.lib.papermc")
+    }
+
+    runServer {
+        minecraftVersion("1.16.4")
+    }
 }
 
 hangarPublish {
@@ -88,27 +117,6 @@ hangarPublish {
                 platformVersions.set(versions)
             }
         }
-    }
-}
-
-tasks {
-    compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-
-    compileTestKotlin {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-
-    shadowJar {
-        relocate("org.bstats", "link.portalbox.bstats")
-        relocate("kotlin", "link.portalbox.kotlin")
-        relocate("org.jetbrains.annotations", "link.portalbox.jetbrains.annotations")
-        relocate("org.intellij.lang.annotations", "link.portalbox.intellij.lang.annotations")
-    }
-
-    runServer {
-        minecraftVersion("1.19.4")
     }
 }
 
