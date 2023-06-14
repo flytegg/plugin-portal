@@ -7,12 +7,13 @@ import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.delete
+import net.kyori.adventure.audience.Audience
 
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
 
 class DeleteSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
-    override fun execute(sender: CommandSender, args: Array<out String>) {
+    override fun execute(audience: Audience, args: Array<out String>) {
         if (args.size <= 1) {
             sender.sendMessage(Message.noPluginSpecified)
             return

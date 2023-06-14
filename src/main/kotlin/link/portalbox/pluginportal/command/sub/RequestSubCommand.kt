@@ -3,10 +3,11 @@ package link.portalbox.pluginportal.command.sub
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.language.Message
 import gg.flyte.pplib.util.*
+import net.kyori.adventure.audience.Audience
 import org.bukkit.command.CommandSender
 
 class RequestSubCommand : SubCommand() {
-    override fun execute(sender: CommandSender, args: Array<out String>) {
+    override fun execute(audience: Audience, args: Array<out String>) {
         if (args.size <= 1) {
             sender.sendMessage(Message.noPluginSpecified)
             return

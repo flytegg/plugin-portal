@@ -9,10 +9,11 @@ import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.*
 import gg.flyte.pplib.util.searchPlugins
+import net.kyori.adventure.audience.Audience
 import org.bukkit.command.CommandSender
 
 class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
-    override fun execute(sender: CommandSender, args: Array<out String>) {
+    override fun execute(audience: Audience, args: Array<out String>) {
         if (args.size <= 1) {
             sender.sendMessage(Message.noPluginSpecified)
             return
