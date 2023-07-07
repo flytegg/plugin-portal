@@ -57,6 +57,7 @@ no-plugin-requires-an-update: "<prefix><gray>No plugins require an update!"
 updating-plugins: "<prefix><gray>Updating plugins..."
 plugin-updated: "<prefix><aqua>**{0}**</aqua><gray> has been updated!"
 plugin-not-updated: "<prefix><aqua>**{0}**</aqua> has not been updated due to an error. Please make sure the plugin has been enabled."
+not-starred-on-hangar: "<prefix><gray>You have not starred <click:open_url:'https://hangar.papermc.io/Flyte/PluginPortal'><blue><u>PluginPortal</u></blue></click> on Hangar. Please star it to use this command, it may take a few minutes to update. Once you have starred, please change the \"hangar-username\" value in the \"config.yml\" If you are unable to create an account, please join our <click:open_url:'https://discord.gg/pluginportal'><blue><u>Discord</u></blue></click> for support."
 
 # ----------------- Update ----------------- #
 

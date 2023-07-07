@@ -57,6 +57,7 @@ no-plugin-requires-an-update: "¡<prefix><gray>No hay plugins que requieran una 
 updating-plugins: "<prefix><gray>Actualizando plugins..."
 plugin-updated: "¡<prefix><aqua>**{0}**</aqua><gray> se ha actualizado!"
 plugin-not-updated: "<prefix><aqua>**{0}**</aqua> no se ha actualizado por un error. Por favor comprueba que el plugin está activado."
+not-starred-on-hangar: "<prefix><gray>No has destacado <click:open_url:'https://hangar.papermc.io/Flyte/PluginPortal'><blue><u>PluginPortal</u></blue></click> en Hangar. Por favor, destácalo para usar este comando. Puede tardar unos minutos en actualizarse. Una vez que lo hayas destacado, por favor cambia el valor de \"hangar-username\" en el archivo \"config.yml\". Si no puedes crear una cuenta, por favor únete a nuestro <click:open_url:'https://discord.gg/pluginportal'><blue><u>Discord</u></blue></click> para obtener ayuda."</gray></prefix>"
 
 # ----------------- Update ----------------- #
 

@@ -12,16 +12,16 @@ import org.bukkit.util.StringUtil
 import java.util.*
 import java.util.stream.Collectors
 
-class PPCommand(pluginPortal: PluginPortal) : CommandExecutor, TabCompleter {
+class PPCommand(private val pluginPortal: PluginPortal) : CommandExecutor, TabCompleter {
     private val subcommands = HashMap<SubCommandType, SubCommand>().apply {
         put(SubCommandType.HELP, HelpSubCommand())
-        put(SubCommandType.PREVIEW, PreviewSubCommand())
+        put(SubCommandType.PREVIEW, PreviewSubCommand(pluginPortal))
         put(SubCommandType.INSTALL, InstallSubCommand(pluginPortal))
         put(SubCommandType.LIST, ListSubCommand())
         put(SubCommandType.UPDATE, UpdateSubCommand(pluginPortal))
         put(SubCommandType.DELETE, DeleteSubCommand(pluginPortal))
         put(SubCommandType.UPDATEALL, UpdateAllSubCommand(pluginPortal))
-        put(SubCommandType.REQUEST, RequestSubCommand())
+        put(SubCommandType.REQUEST, RequestSubCommand(pluginPortal))
     }
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
@@ -39,7 +39,14 @@ class PPCommand(pluginPortal: PluginPortal) : CommandExecutor, TabCompleter {
             return false
         }
 
-        subcommands[type]!!.execute(audiences.sender(sender), sender, args)
+
+
+        if (type.isAsync) {
+            subcommands[type]!!.executeAsync(pluginPortal, audiences.sender(sender), sender, args)
+        } else {
+            subcommands[type]!!.execute(audiences.sender(sender), sender, args)
+        }
+
         return false
     }
 

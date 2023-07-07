@@ -2,6 +2,7 @@ package link.portalbox.pluginportal.command.sub
 
 import gg.flyte.pplib.type.plugin.MarketplacePlugin
 import gg.flyte.pplib.util.getPluginFromID
+import gg.flyte.pplib.util.hasUserStarredOnHangar
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Config
@@ -15,7 +16,13 @@ import org.bukkit.command.CommandSender
 class UpdateAllSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
     override fun execute(audience: Audience, commandSender: CommandSender, args: Array<out String>) {
 
+        if (!hasUserStarredOnHangar(Config.hangarUsername) || Config.hangarUsername == "Username") {
+            audience.sendMessage(Message.notStarredOnHangar)
+            return
+        }
+
         val needUpdating = mutableListOf<MarketplacePlugin>()
+
         for (plugin in Data.installedPlugins) {
 
             val marketplacePlugin = getPluginFromID(plugin.marketplacePlugin.id) ?: continue

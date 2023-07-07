@@ -10,11 +10,11 @@ import org.bukkit.event.player.PlayerJoinEvent
 class UpdateListener(private val pluginPortal: PluginPortal) : Listener {
 
     @EventHandler
-    fun onJoin(e: PlayerJoinEvent) {
-        if (!e.player.isOp) return;
+    fun onJoin(event: PlayerJoinEvent) {
+        if (!event.player.isOp) return;
         if (pluginPortal.versionType == VersionType.LATEST || pluginPortal.versionType == VersionType.PATCH) return;
 
-        e.player.sendMessage(Message.playerOutdatedPluginPortal)
+        Message.audiences.player(event.player).sendMessage(Message.playerOutdatedPluginPortal)
     }
 
 }

@@ -3,10 +3,11 @@ package link.portalbox.pluginportal.command.sub
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.language.Message
 import gg.flyte.pplib.util.*
+import link.portalbox.pluginportal.PluginPortal
 import net.kyori.adventure.audience.Audience
 import org.bukkit.command.CommandSender
 
-class RequestSubCommand : SubCommand() {
+class RequestSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
     override fun execute(audience: Audience, commandSender: CommandSender, args: Array<out String>) {
         if (args.size <= 1) {
             audience.sendMessage(Message.noPluginSpecified)
@@ -31,7 +32,9 @@ class RequestSubCommand : SubCommand() {
         return if (args[1].length <= 2) {
             mutableListOf(Message.keepTyping)
         } else {
-            val completion = searchPlugins(args[1])
+            pluginPortal.tabManager.searchTerms(args[1])
+            val completion = pluginPortal.tabManager.getTableComplete(args[1])
+
             if (completion.isEmpty()) {
                 mutableListOf(Message.noPluginsFound)
             } else {

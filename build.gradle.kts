@@ -24,7 +24,7 @@ dependencies {
     implementation("io.papermc:paperlib:1.0.7")
 
     implementation("net.kyori:adventure-api:4.14.0")
-    implementation("net.kyori:adventure-platform-bukkit:4.1.0")
+    implementation("net.kyori:adventure-platform-bukkit:4.3.0")
     implementation("net.kyori:adventure-text-minimessage:4.14.0")
 
     implementation ("org.bstats:bstats-bukkit:3.0.2")
@@ -34,7 +34,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.1")
 
     implementation("gg.flyte:hangarWrapper:1.1.1")
-    implementation("gg.flyte:pplib:1.2.2")
+    //implementation("gg.flyte:pplib:1.2.2")
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11")
 
     implementation("com.andreapivetta.kolor:kolor:1.0.0")
@@ -61,14 +61,14 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.16.4")
+        minecraftVersion("1.20.1")
     }
 }
 
 hangarPublish {
     val owner = "Flyte"
     val slug = "PluginPortal"
-    val versions: List<String> = listOf("1.8-1.19.4")
+    val versions: List<String> = listOf("1.8-1.20.1")
 
     // To be run every github release
     publications.register("Release") {

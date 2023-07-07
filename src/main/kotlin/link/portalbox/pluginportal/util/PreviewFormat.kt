@@ -9,9 +9,11 @@ import gg.flyte.pplib.util.requestPlugin
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.command.CommandSender
 import java.awt.Color
 import java.awt.image.BufferedImage
+import java.math.RoundingMode
 import java.net.URL
 import javax.imageio.ImageIO
 import kotlin.math.roundToInt
@@ -22,7 +24,7 @@ fun sendPreview(plugin: MarketplacePlugin, audience: Audience, commandSender: Co
     val text = mutableListOf(
         displayInformation("<gray>┌ <aqua><bold>${plugin.name}"),
         displayInformation(
-            "<gray>├─ <aqua>${plugin.downloads} <u><bold>⬇</bold></u> <gray>| <aqua>${plugin.ratingAverage}<gold> ⭐ <gray>| <aqua>${price}"
+            "<gray>├─ <aqua>${plugin.downloads} <u><bold>⬇</bold></u> <gray>| <aqua>${plugin.ratingAverage.toBigDecimal().setScale(1, RoundingMode.UP).toDouble()}<gold> ⭐ <gray>| <aqua>${price}"
             , 100
         ),
         *descriptionComponents
@@ -41,7 +43,7 @@ fun sendPreview(plugin: MarketplacePlugin, audience: Audience, commandSender: Co
             rowComponent.append(
                 Component.text()
                     .color(TextColor.color(getAverageColor(gridSquare).rgb))
-                    .content("▉")
+                    .content("█")
             )
         }
 
@@ -91,7 +93,7 @@ fun createButton(plugin: MarketplacePlugin, commandSender: CommandSender): List<
 }
 
 fun createDescriptionLines(description: String): Array<Component> {
-    val descriptionLines = description.chunked(35)
+    val descriptionLines = description.chunked(25)
     if (descriptionLines.size > 3) {
         return arrayOf("<gray>$description".deserialize())
     }
@@ -163,7 +165,7 @@ fun getAverageColor(image: BufferedImage): Color {
  * @param text The string to create the TextComponent from.
  * @return The TextComponent
  */
-fun displayInformation(text: String, length: Int = 45): Component {
+fun displayInformation(text: String, length: Int = 25): Component {
     if (text.length < length+5) {
         return "<gray>$text</gray>".deserialize()
     }

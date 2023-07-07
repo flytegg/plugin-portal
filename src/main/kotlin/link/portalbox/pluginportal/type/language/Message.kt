@@ -54,6 +54,7 @@ object Message {
     val updatingPlugins get() = parseString(config.getBetterString("updating-plugins"))
     val pluginUpdated get() = parseString(config.getBetterString("plugin-updated"))
     val pluginNotUpdated get() = parseString(config.getBetterString("plugin-not-updated"))
+    val notStarredOnHangar get() = parseString(config.getBetterString("not-starred-on-hangar"))
 
     val pluginIsUpToDate get() = parseString(config.getBetterString("plugin-is-up-to-date"))
     val listingAllOutdatedPlugins get() = parseString(config.getBetterString("listing-all-outdated-plugins"))

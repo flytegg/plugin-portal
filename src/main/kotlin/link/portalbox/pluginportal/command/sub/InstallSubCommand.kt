@@ -9,6 +9,7 @@ import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.*
 import gg.flyte.pplib.util.searchPlugins
+import link.portalbox.pluginportal.type.language.Message.deserialize
 import net.kyori.adventure.audience.Audience
 import org.bukkit.command.CommandSender
 
@@ -39,11 +40,15 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
             return
         }
 
+        if (!plugin.extraInfo.isNullOrEmpty()) {
+            audience.sendMessage("<gray>Extra Info: ${plugin.extraInfo}</gray>".deserialize())
+        }
+
         if (plugin.service != Config.marketplaceService) {
             audience.sendMessage(
                 Message.serviceNotSupported.fillInVariables(
                     arrayOf(
-                        Config.marketplaceService?.name ?: "UNKNOWN"
+                        Config.marketplaceService ?: "UNKNOWN"
                     )
                 )
             )
@@ -64,7 +69,9 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         return if (args[1].length <= 2) {
             mutableListOf(Message.keepTyping)
         } else {
-            val completion = searchPlugins(args[1])
+            pluginPortal.tabManager.searchTerms(args[1])
+            val completion = copyPartialMatchesWithService(args[1], pluginPortal.tabManager.getTableComplete(args[1]), mutableListOf()).toMutableList()
+
             if (completion.isEmpty()) {
                 mutableListOf(Message.noPluginsFound)
             } else {
