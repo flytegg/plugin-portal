@@ -106,7 +106,7 @@ class SearchPlugins : CliktCommand(
             "Install" -> {
                 val activeServer = getActiveServer()
                 if (activeServer == null) {
-                    echo("No active server found, use the command: pp server select")
+                    echo("No active server found, use the command: ppcli server select")
                     return
                 }
 
