@@ -127,6 +127,7 @@ class SearchPlugins : CliktCommand(
                         downloadUrl,
                         activeServer.getPluginsFolder()
                     )
+                    println("Successfully installed plugin: ${plugin.displayInfo.name}")
                 } else {
                     println("Invalid download URL: $downloadUrl")
                 }
