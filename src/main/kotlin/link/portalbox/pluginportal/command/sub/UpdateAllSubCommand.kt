@@ -1,5 +1,8 @@
 package link.portalbox.pluginportal.command.sub
 
+import gg.flyte.pplib.type.plugin.MarketplacePlugin
+import gg.flyte.pplib.util.getPluginFromID
+import gg.flyte.pplib.util.hasUserStarredOnHangar
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Config
@@ -7,50 +10,52 @@ import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.*
-import gg.flyte.pplib.type.MarketplacePlugin
-import gg.flyte.pplib.util.getPluginFromId
-import gg.flyte.pplib.util.getPluginFromName
-import org.bukkit.Bukkit
+import net.kyori.adventure.audience.Audience
 import org.bukkit.command.CommandSender
-import java.net.URL
 
 class UpdateAllSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
-    override fun execute(sender: CommandSender, args: Array<out String>) {
+    override fun execute(audience: Audience, commandSender: CommandSender, args: Array<out String>) {
+
+        if (!hasUserStarredOnHangar(Config.hangarUsername) || Config.hangarUsername == "Username") {
+            audience.sendMessage(Message.notStarredOnHangar)
+            return
+        }
 
         val needUpdating = mutableListOf<MarketplacePlugin>()
+
         for (plugin in Data.installedPlugins) {
 
-            val marketplacePlugin = getPluginFromId(plugin.id) ?: continue
-            if (marketplacePlugin.version != plugin.version) {
+            val marketplacePlugin = getPluginFromID(plugin.marketplacePlugin.id) ?: continue
+            if (marketplacePlugin.version != plugin.marketplacePlugin.version) {
                 needUpdating.add(marketplacePlugin)
             }
         }
 
         if (needUpdating.isEmpty()) {
-            sender.sendMessage(Message.noPluginRequireAnUpdate)
+            audience.sendMessage(Message.noPluginRequireAnUpdate)
             return
         }
 
-        sender.sendMessage(Message.updatingPlugins)
+        audience.sendMessage(Message.updatingPlugins)
         for (outdatedPlugin in needUpdating) {
-            val localPlugin = Data.installedPlugins.find { it.id == outdatedPlugin.id } ?: continue
+            val localPlugin = Data.installedPlugins.find { it.marketplacePlugin.id == outdatedPlugin.id } ?: continue
 
-            val plugin: MarketplacePlugin = getPluginFromId(outdatedPlugin.id) ?: continue
-            if (plugin.version == localPlugin.version) return
+            val plugin: MarketplacePlugin = getPluginFromID(outdatedPlugin.id) ?: continue
+            if (plugin.version == localPlugin.marketplacePlugin.version) return
 
             if (!plugin.isValidDownload()) {
-                sender.sendMessage(Message.downloadNotFound)
+                audience.sendMessage(Message.downloadNotFound)
                 return
             }
 
             if (!delete(pluginPortal, localPlugin)) {
-                sender.sendMessage(Message.pluginNotUpdated.fillInVariables(arrayOf(plugin.name)))
+                audience.sendMessage(Message.pluginNotUpdated.fillInVariables(arrayOf(plugin.name)))
                 return
             }
 
             install(plugin, pluginPortal).run {
-                sender.sendMessage(Message.pluginUpdated)
-                sender.sendMessage(if (Config.startupOnInstall) Message.pluginAttemptedEnabling else Message.restartServerToEnablePlugin)
+                audience.sendMessage(Message.pluginUpdated)
+                audience.sendMessage(if (Config.startupOnInstall) Message.pluginAttemptedEnabling else Message.restartServerToEnablePlugin)
             }
 
         }

@@ -1,5 +1,7 @@
 package link.portalbox.pluginportal.command.sub
 
+import gg.flyte.pplib.type.plugin.MarketplacePlugin
+import gg.flyte.pplib.util.getPluginFromID
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.SubCommand
 import link.portalbox.pluginportal.type.Config
@@ -7,66 +9,63 @@ import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.*
-import gg.flyte.pplib.type.MarketplacePlugin
-import gg.flyte.pplib.util.getPluginFromId
 import gg.flyte.pplib.util.getPluginFromName
-import org.bukkit.Bukkit
+import net.kyori.adventure.audience.Audience
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
-import java.net.URL
 
 class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
-    override fun execute(sender: CommandSender, args: Array<out String>) {
+    override fun execute(audience: Audience, commandSender: CommandSender, args: Array<out String>) {
         if (args.size >= 2) {
             val plugin = getPluginFromName(args[1]) ?: run {
-                sender.sendMessage(Message.pluginNotFound)
+                audience.sendMessage(Message.pluginNotFound)
                 return
             }
 
-            val localPlugin = Data.installedPlugins.find { it.id == plugin.id }
+            val localPlugin = Data.installedPlugins.find { it.marketplacePlugin.id == plugin.id }
             if (localPlugin == null) {
-                sender.sendMessage(Message.pluginNotFound)
+                audience.sendMessage(Message.pluginNotFound)
                 return
             }
 
-            if (plugin.version == localPlugin.version) {
-                sender.sendMessage(Message.pluginIsUpToDate.fillInVariables(arrayOf(plugin.name)))
+            if (plugin.version == localPlugin.marketplacePlugin.version) {
+                audience.sendMessage(Message.pluginIsUpToDate.fillInVariables(arrayOf(plugin.name)))
                 return
             }
 
             if (!plugin.isValidDownload()) {
-                sender.sendMessage(Message.downloadNotFound)
+                audience.sendMessage(Message.downloadNotFound)
                 return
             }
 
             if (!delete(pluginPortal, localPlugin)) {
-                sender.sendMessage(Message.pluginNotUpdated.fillInVariables(arrayOf(plugin.name)))
+                audience.sendMessage(Message.pluginNotUpdated.fillInVariables(arrayOf(plugin.name)))
                 return
             }
 
             install(plugin, pluginPortal).run {
-                sender.sendMessage(Message.pluginUpdated)
-                sender.sendMessage(if (Config.startupOnInstall) Message.pluginAttemptedEnabling else Message.restartServerToEnablePlugin)
+                audience.sendMessage(Message.pluginUpdated)
+                audience.sendMessage(if (Config.startupOnInstall) Message.pluginAttemptedEnabling else Message.restartServerToEnablePlugin)
             }
 
         }
 
         val needUpdating = mutableListOf<MarketplacePlugin>()
         for (plugin in Data.installedPlugins) {
-            val spigetPlugin = getPluginFromId(plugin.id) ?: continue
-            if (spigetPlugin.version != plugin.version) {
+            val spigetPlugin = getPluginFromID(plugin.marketplacePlugin.id) ?: continue
+            if (spigetPlugin.version != plugin.marketplacePlugin.version) {
                 needUpdating.add(spigetPlugin)
             }
         }
 
         if (needUpdating.isEmpty()) {
-            sender.sendMessage(Message.noPluginRequireAnUpdate)
+            audience.sendMessage(Message.noPluginRequireAnUpdate)
             return
         }
 
-        sender.sendMessage(Message.listingAllOutdatedPlugins)
+        audience.sendMessage(Message.listingAllOutdatedPlugins)
         for (spigetPlugin in needUpdating) {
-            sender.sendMessage(Message.installedPlugin.fillInVariables(arrayOf(spigetPlugin.name)))
+            audience.sendMessage(Message.installedPlugin.fillInVariables(arrayOf(spigetPlugin.name)))
         }
     }
 
@@ -74,7 +73,7 @@ class UpdateSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         if (args.size != 2) return null
         return StringUtil.copyPartialMatches(
             args[1],
-            Data.installedPlugins.map { it.id },
+            Data.installedPlugins.map { it.marketplacePlugin.name },
             mutableListOf()
         )
     }

@@ -1,38 +1,41 @@
 package link.portalbox.pluginportal.util
 
+import gg.flyte.pplib.type.plugin.MarketplacePlugin
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.deserialize
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
-import gg.flyte.pplib.type.MarketplacePlugin
 import gg.flyte.pplib.util.isDirectDownload
 import gg.flyte.pplib.util.requestPlugin
+import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.command.CommandSender
 import java.awt.Color
 import java.awt.image.BufferedImage
+import java.math.RoundingMode
 import java.net.URL
 import javax.imageio.ImageIO
 import kotlin.math.roundToInt
 
-fun sendPreview(sender: CommandSender, plugin: MarketplacePlugin) {
+fun sendPreview(plugin: MarketplacePlugin, audience: Audience, commandSender: CommandSender) {
     val price = if (plugin.isPremium) "$${plugin.price}" else "Free"
     val descriptionComponents = createDescriptionLines(plugin.description)
     val text = mutableListOf(
         displayInformation("<gray>┌ <aqua><bold>${plugin.name}"),
         displayInformation(
-            "<gray>├─ <aqua>${plugin.downloads} <u><bold>⬇</bold></u> <gray>| <aqua>${plugin.ratingAverage}<gold> ⭐ <gray>| <aqua>${price}"
+            "<gray>├─ <aqua>${plugin.downloads} <u><bold>⬇</bold></u> <gray>| <aqua>${plugin.ratingAverage.toBigDecimal().setScale(1, RoundingMode.UP).toDouble()}<gold> ⭐ <gray>| <aqua>${price}"
             , 100
         ),
         *descriptionComponents
     )
 
     text.add(Component.text(" "))
-    text.addAll(createButton(plugin, sender))
+    text.addAll(createButton(plugin, commandSender))
 
     val imageGrid = fetchImageAsBuffer(plugin.iconURL)?.let { createImageGrid(it, 11, 13) } ?: emptyArray()
 
-    sender.sendMessage(Message.blankStrikeThrough)
+    audience.sendMessage(Message.blankStrikeThrough)
     imageGrid.forEach { row ->
         val rowComponent = Component.text()
 
@@ -40,17 +43,17 @@ fun sendPreview(sender: CommandSender, plugin: MarketplacePlugin) {
             rowComponent.append(
                 Component.text()
                     .color(TextColor.color(getAverageColor(gridSquare).rgb))
-                    .content("▉")
+                    .content("█")
             )
         }
 
         text.getOrNull(imageGrid.indexOf(row))?.let { rowComponent.append(it) }
-        sender.sendMessage(rowComponent)
+        audience.sendMessage(rowComponent)
     }
-    sender.sendMessage(Message.blankStrikeThrough)
+    audience.sendMessage(Message.blankStrikeThrough)
 }
 
-fun createButton(plugin: MarketplacePlugin, sender: CommandSender): List<Component> {
+fun createButton(plugin: MarketplacePlugin, commandSender: CommandSender): List<Component> {
     val hoverText = when (plugin.isPremium) {
         false -> "<aqua>Click to Download"
         true -> when (isDirectDownload(plugin.downloadURL)) {
@@ -67,7 +70,7 @@ fun createButton(plugin: MarketplacePlugin, sender: CommandSender): List<Compone
     }
 
     if (!downloadable && !plugin.isPremium) {
-        requestPlugin(plugin.toRequestPlugin("External Download URL", sender.name))
+        requestPlugin(plugin.toRequestPlugin("External Download URL", commandSender.name))
     }
 
     val button = when (plugin.isPremium) {
@@ -90,7 +93,7 @@ fun createButton(plugin: MarketplacePlugin, sender: CommandSender): List<Compone
 }
 
 fun createDescriptionLines(description: String): Array<Component> {
-    val descriptionLines = description.chunked(35)
+    val descriptionLines = description.chunked(25)
     if (descriptionLines.size > 3) {
         return arrayOf("<gray>$description".deserialize())
     }
@@ -162,7 +165,7 @@ fun getAverageColor(image: BufferedImage): Color {
  * @param text The string to create the TextComponent from.
  * @return The TextComponent
  */
-fun displayInformation(text: String, length: Int = 45): Component {
+fun displayInformation(text: String, length: Int = 25): Component {
     if (text.length < length+5) {
         return "<gray>$text</gray>".deserialize()
     }

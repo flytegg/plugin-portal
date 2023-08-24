@@ -3,30 +3,29 @@ package link.portalbox.pluginportal.command
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.command.sub.*
 import link.portalbox.pluginportal.type.language.Message
+import link.portalbox.pluginportal.type.language.Message.audiences
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
 import org.bukkit.util.StringUtil
-import java.util.*
-import java.util.stream.Collectors
 
-class PPCommand(pluginPortal: PluginPortal) : CommandExecutor, TabCompleter {
-    private val subcommands = HashMap<SubCommandType, SubCommand>().apply {
-        put(SubCommandType.HELP, HelpSubCommand())
-        put(SubCommandType.PREVIEW, PreviewSubCommand())
-        put(SubCommandType.INSTALL, InstallSubCommand(pluginPortal))
-        put(SubCommandType.LIST, ListSubCommand())
-        put(SubCommandType.UPDATE, UpdateSubCommand(pluginPortal))
-        put(SubCommandType.DELETE, DeleteSubCommand(pluginPortal))
-        put(SubCommandType.UPDATEALL, UpdateAllSubCommand(pluginPortal))
-        put(SubCommandType.REQUEST, RequestSubCommand())
-    }
+class PPCommand(private val pluginPortal: PluginPortal) : CommandExecutor, TabCompleter {
+    private val subcommands = hashMapOf(
+        SubCommandType.HELP to HelpSubCommand(),
+        SubCommandType.PREVIEW to PreviewSubCommand(pluginPortal),
+        SubCommandType.INSTALL to InstallSubCommand(pluginPortal),
+        SubCommandType.LIST to ListSubCommand(),
+        SubCommandType.UPDATE to UpdateSubCommand(pluginPortal),
+        SubCommandType.DELETE to DeleteSubCommand(pluginPortal),
+        SubCommandType.UPDATEALL to UpdateAllSubCommand(pluginPortal),
+        SubCommandType.REQUEST to RequestSubCommand(pluginPortal)
+    )
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         var type = if (args.isEmpty()) SubCommandType.HELP else null
         if (args.isNotEmpty()) {
-            type = SubCommandType.values().find { args[0].equals(it.name, true) || args[0].equals(it.alias, true) }
+            type = SubCommandType.byName(args[0])
             if (type == null) {
                 sender.sendMessage(Message.illegalArguments)
                 return false
@@ -38,7 +37,14 @@ class PPCommand(pluginPortal: PluginPortal) : CommandExecutor, TabCompleter {
             return false
         }
 
-        subcommands[type]!!.execute(sender, args)
+
+
+        if (type.isAsync) {
+            subcommands[type]!!.executeAsync(pluginPortal, audiences.sender(sender), sender, args)
+        } else {
+            subcommands[type]!!.execute(audiences.sender(sender), sender, args)
+        }
+
         return false
     }
 
@@ -51,14 +57,12 @@ class PPCommand(pluginPortal: PluginPortal) : CommandExecutor, TabCompleter {
         if (args.size == 1) {
             return StringUtil.copyPartialMatches(
                 args[0],
-                Arrays.stream(SubCommandType.values())
-                    .map { subCommandEnum -> subCommandEnum.command.lowercase(Locale.getDefault()) }
-                    .collect(Collectors.toList()),
-                ArrayList())
+                SubCommandType.commandNames,
+                ArrayList()
+            )
         }
 
-        val type = SubCommandType.values().find { args[0].equals(it.name, true) || args[0].equals(it.alias, true) }
-            ?: return null
+        val type = SubCommandType.byName(args[0]) ?: return null
         if (!sender.hasPermission(type.permission)) {
             return null
         }

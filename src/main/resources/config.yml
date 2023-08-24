@@ -1,11 +1,20 @@
+# ---------------- Info ---------------- #
+# This is the config file for PluginPortal.
+# This file is used to configure PluginPortal to your liking.
+# If you have any questions, join our Discord: https://discord.gg/pluginportal
+# When ever we push a new update, the config may look weird. Please delete the file to reset the config with the new design.
 # --------------- LANGUAGE ------------- #
-# Supported languages: en_US, es_ES, val_ES
+# Supported languages: en_US, es_ES, val_ES, it_IT, de_DE
 # Language Codes: https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/language-codes
 # Want to help translate? Join our Discord: https://discord.gg/pluginportal
 language: en_US # By default, this is English.
 # --------------- Service -------------- #
-# Supported services: SPIGOTMC, HANGAR
+# Supported services: SPIGOTMC, HANGAR : WE MAY HAVE OTHER SERVICES WHICH ARE NEW, ASK ABOUT THIS IN OUR DISCORD.
 # This is the Marketplace that PluginPortal will use to download plugins.
 marketplace-service: SPIGOTMC # By default, this is SpigotMC.
+# ---------------- Misc ---------------- #
+# This will allow us to prove that you have starred our project on hangar to use the command "updateall" in-game.
+# If you do not want to sign up, you can leave this blank or join our discord and we will give you a bypass-username. You may leave the discord right after.
+hangar-username: Username # Your Hangar username goes here
 # ----------- For Developers ----------- #
 startup-on-install: false # Allows a plugin to load upon /pp install. This is currently experimental and has the chance to cause issues. Use at your own risk.

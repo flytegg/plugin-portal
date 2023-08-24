@@ -1,17 +1,13 @@
 package gg.flyte.pplib.util
 
+import gg.flyte.pplib.type.logger.LogType
+import gg.flyte.pplib.type.logger.StatusType
 import java.io.File
 import java.io.FileInputStream
 import java.net.URL
 import java.security.MessageDigest
 import javax.net.ssl.HttpsURLConnection
 
-/**
- * Computes the SHA-256 hash of the given file.
- *
- * @param file the file to compute the hash for
- * @return the SHA-256 hash of the file as a hexadecimal string, or null if the computation failed
- */
 fun getSHA256(file: File): String? {
     val messageDigest = runCatching {
         MessageDigest.getInstance("SHA-256")
@@ -37,15 +33,9 @@ fun getSHA256(file: File): String? {
     return digest?.joinToString("") { "%02x".format(it) }
 }
 
-/**
- * Downloads a file from a given URL and saves it to a specified location on the file system.
- *
- * @param downloadURL The URL of the file to be downloaded.
- * @param output The file to which the downloaded content will be saved.
- * @return The downloaded file, or null if the download failed.
- */
 fun download(downloadURL: URL, output: File): File? {
     return runCatching {
+        log(downloadURL.toString(), StatusType.LOADING, LogType.DOWNLOAD)
         (downloadURL.openConnection() as? HttpsURLConnection)?.apply {
             requestMethod = "GET"
             setRequestProperty("User-Agent", "Mozilla/5.0")
@@ -56,6 +46,7 @@ fun download(downloadURL: URL, output: File): File? {
                 }
             }
         }
+        log(downloadURL.toString(), StatusType.OK, LogType.DOWNLOAD)
         output
     }.onFailure {
         it.printStackTrace()

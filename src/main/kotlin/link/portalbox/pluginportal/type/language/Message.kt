@@ -2,6 +2,7 @@ package link.portalbox.pluginportal.type.language
 
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.type.Config
+import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -12,6 +13,7 @@ import java.io.File
 
 object Message {
     private lateinit var config: FileConfiguration
+    lateinit var audiences: BukkitAudiences
 
     private val prefix get() = config.getBetterString("prefix")
 
@@ -52,6 +54,7 @@ object Message {
     val updatingPlugins get() = parseString(config.getBetterString("updating-plugins"))
     val pluginUpdated get() = parseString(config.getBetterString("plugin-updated"))
     val pluginNotUpdated get() = parseString(config.getBetterString("plugin-not-updated"))
+    val notStarredOnHangar get() = parseString(config.getBetterString("not-starred-on-hangar"))
 
     val pluginIsUpToDate get() = parseString(config.getBetterString("plugin-is-up-to-date"))
     val listingAllOutdatedPlugins get() = parseString(config.getBetterString("listing-all-outdated-plugins"))
@@ -83,6 +86,8 @@ object Message {
         val file = File("${pluginPortal.dataFolder}${File.separator}languages", "$language.yml")
         pluginPortal.saveResource("languages${File.separator}$language.yml", true)
         config = YamlConfiguration.loadConfiguration(file)
+
+        audiences = BukkitAudiences.create(pluginPortal)
     }
 
     private fun parseString(string: String): Component {
@@ -105,6 +110,8 @@ object Message {
     }
 
     fun String.deserialize(): Component = MiniMessage.miniMessage().deserialize(this)
+
+    fun Component.serialize(): String = MiniMessage.miniMessage().serialize(this)
 
     private fun FileConfiguration.getBetterString(path: String): String {
         val configString = this.getString(path)

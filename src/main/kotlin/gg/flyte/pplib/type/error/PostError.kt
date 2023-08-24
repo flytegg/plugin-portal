@@ -1,7 +1,7 @@
-package gg.flyte.pplib.type.api
+package gg.flyte.pplib.type.error
 
 data class PostError(
     val pluginVersion: String,
-    val mcVersion: String,
+    val minecraftVersion: String,
     val stackTrace: String,
 )

@@ -1,17 +1,12 @@
 package link.portalbox.pluginportal.util
 
+import gg.flyte.pplib.type.plugin.MarketplacePlugin
+import gg.flyte.pplib.type.plugin.RequestPlugin
 import link.portalbox.pluginportal.type.GameVersion
-import gg.flyte.pplib.type.MarketplacePlugin
-import gg.flyte.pplib.type.Service
-import gg.flyte.pplib.type.api.PostError
-import gg.flyte.pplib.type.api.RequestPlugin
-import org.apache.commons.lang3.Validate
-import org.bukkit.util.StringUtil.startsWithIgnoreCase
+import org.bukkit.util.StringUtil
 import java.io.File
 import java.io.FileInputStream
 import java.security.MessageDigest
-
-lateinit var defaultPostError: PostError
 
 fun getSHA(file: File): String {
     if (file.isDirectory) return ""
@@ -47,13 +42,7 @@ inline fun <T> T.applyIf(shouldApply: Boolean, block: T.() -> Unit): T = apply {
 
 // Convert MarketplacePlugin to RequestPlugin, with an input of "reasonForRequest"
 fun MarketplacePlugin.toRequestPlugin(reasonForRequest: String, username: String): RequestPlugin {
-    val externalURL = if (service == Service.SPIGOTMC) {
-        "https://www.spigotmc.org/resources/$id/"
-    } else {
-        "https://hangar.papermc.io/ (Download will be added soon)"
-    }
-
-    return RequestPlugin(id, service, reasonForRequest, name, externalURL, username)
+    return RequestPlugin(id, service, reasonForRequest, name, "externalURL", username)
 }
 
 fun copyPartialMatchesWithService(
@@ -61,12 +50,9 @@ fun copyPartialMatchesWithService(
     originals: Iterable<String>,
     matches: MutableCollection<String>
 ): MutableCollection<String> {
-    Validate.notNull(input, "Search token cannot be null")
-    Validate.notNull(matches, "Collection cannot be null")
-    Validate.notNull(originals, "Originals cannot be null")
 
     for (string in originals) {
-        if (startsWithIgnoreCase(string.split(":")[1], input)) {
+        if (StringUtil.startsWithIgnoreCase(string.split(":")[1], input)) {
             matches.add("${string.split(":")[0].lowercase()}:${string.split(":")[1]}")
         }
     }

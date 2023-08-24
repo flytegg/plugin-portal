@@ -1,19 +1,16 @@
 package link.portalbox.pluginportal.util
 
+import gg.flyte.pplib.type.plugin.MarketplacePlugin
+import gg.flyte.pplib.util.download
 import link.portalbox.pluginportal.PluginPortal
 import link.portalbox.pluginportal.type.Config
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.LocalPlugin
-import gg.flyte.pplib.type.MarketplacePlugin
-import gg.flyte.pplib.type.Service
-import gg.flyte.pplib.util.download
 import org.bukkit.Bukkit
-import org.bukkit.command.CommandSender
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.UnknownDependencyException
 import java.io.File
 import java.net.URL
-
 
 fun delete(pluginPortal: PluginPortal, localPlugin: LocalPlugin): Boolean {
     for (loadedPlugin in pluginPortal.server.pluginManager.plugins) {
@@ -25,7 +22,7 @@ fun delete(pluginPortal: PluginPortal, localPlugin: LocalPlugin): Boolean {
                 if (localPlugin.fileSha == getSHA(file)) {
                     pluginPortal.server.pluginManager.disablePlugin(loadedPlugin)
                     file.delete()
-                    Data.delete(localPlugin.id)
+                    Data.delete(localPlugin.marketplacePlugin.id)
                     return true
                 }
             }
@@ -44,11 +41,9 @@ fun install(plugin: MarketplacePlugin, pluginPortal: PluginPortal, enable: Boole
         download(URL(plugin.downloadURL), outputFile)
 
         Data.update(LocalPlugin(
-            plugin.id,
-            plugin.service,
-            plugin.version,
-            getSHA(outputFile))
-        )
+            getSHA(outputFile),
+            plugin,
+        ))
 
         if (enable || Config.startupOnInstall) {
             enablePlugin(Bukkit.getPluginManager().loadPlugin(outputFile))

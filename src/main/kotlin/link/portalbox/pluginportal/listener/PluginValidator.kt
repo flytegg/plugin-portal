@@ -2,6 +2,7 @@ package link.portalbox.pluginportal.listener
 
 import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.language.Message
+import link.portalbox.pluginportal.type.language.Message.audiences
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.getSHA
 import org.bukkit.event.EventHandler
@@ -25,8 +26,8 @@ class PluginValidator : Listener {
         for (plugin in Data.installedPlugins) {
             if (!installedShas.contains(plugin.fileSha)) {
                 runCatching {
-                    removedPlugins.add(plugin.id)
-                    pluginsToDelete.add(plugin.id)
+                    removedPlugins.add(plugin.marketplacePlugin.id)
+                    pluginsToDelete.add(plugin.marketplacePlugin.id)
                 }
             }
         }
@@ -48,7 +49,7 @@ class PluginValidator : Listener {
             else -> removedPlugins.dropLast(1).joinToString(", ") + " and " + removedPlugins.last()
         }
         
-        event.player.sendMessage(Message.playerManuallyRemovedPlugins.fillInVariables(arrayOf(plugins)))
+        audiences.player(event.player).sendMessage(Message.playerManuallyRemovedPlugins.fillInVariables(arrayOf(plugins)))
         notified = true
     }
 }

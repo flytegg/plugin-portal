@@ -7,34 +7,35 @@ import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.delete
+import net.kyori.adventure.audience.Audience
 
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
 
 class DeleteSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
-    override fun execute(sender: CommandSender, args: Array<out String>) {
+    override fun execute(audience: Audience, commandSender: CommandSender, args: Array<out String>) {
         if (args.size <= 1) {
-            sender.sendMessage(Message.noPluginSpecified)
+            audience.sendMessage(Message.noPluginSpecified)
             return
         }
 
         val plugin = getPluginFromName(args[1]) ?: run {
-            sender.sendMessage(Message.pluginNotFound)
+            audience.sendMessage(Message.pluginNotFound)
             return
         }
 
-        val localPlugin = Data.installedPlugins.find { it.id == plugin.id }
+        val localPlugin = Data.installedPlugins.find { it.marketplacePlugin.id == plugin.id }
         if (localPlugin == null) {
-            sender.sendMessage(Message.pluginNotInstalled.fillInVariables(arrayOf(args[1])))
+            audience.sendMessage(Message.pluginNotInstalled.fillInVariables(arrayOf(args[1])))
             return
         }
 
         if (!delete(pluginPortal, localPlugin)) {
-            sender.sendMessage(Message.pluginNotDeleted.fillInVariables(arrayOf(args[1])))
+            audience.sendMessage(Message.pluginNotDeleted.fillInVariables(arrayOf(args[1])))
             return
         }
 
-        sender.sendMessage(Message.pluginDeleted.fillInVariables(arrayOf(args[1])))
+        audience.sendMessage(Message.pluginDeleted.fillInVariables(arrayOf(args[1])))
         return
     }
 
@@ -42,7 +43,7 @@ class DeleteSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         if (args.size != 2) return null
         return StringUtil.copyPartialMatches(
                 args[1],
-                Data.installedPlugins.map { it.id },
+                Data.installedPlugins.map { it.marketplacePlugin.name },
                 mutableListOf()
         )
     }

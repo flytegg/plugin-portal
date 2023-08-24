@@ -1,10 +1,8 @@
-package gg.flyte.pplib.type.api
-
-import gg.flyte.pplib.type.Service
+package gg.flyte.pplib.type.plugin
 
 data class RequestPlugin(
     val id: String,
-    val service: Service,
+    val service: String,
     val requestReasoning: String,
     val pluginName: String,
     val externalUrl: String,

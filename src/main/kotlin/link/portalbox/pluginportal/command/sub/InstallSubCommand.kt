@@ -8,55 +8,58 @@ import link.portalbox.pluginportal.type.Data
 import link.portalbox.pluginportal.type.language.Message
 import link.portalbox.pluginportal.type.language.Message.fillInVariables
 import link.portalbox.pluginportal.util.*
-import gg.flyte.pplib.util.requestPlugin
 import gg.flyte.pplib.util.searchPlugins
-import org.bukkit.Bukkit
+import link.portalbox.pluginportal.type.language.Message.deserialize
+import net.kyori.adventure.audience.Audience
 import org.bukkit.command.CommandSender
-import java.net.URL
 
 class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
-    override fun execute(sender: CommandSender, args: Array<out String>) {
+    override fun execute(audience: Audience, commandSender: CommandSender, args: Array<out String>) {
         if (args.size <= 1) {
-            sender.sendMessage(Message.noPluginSpecified)
+            audience.sendMessage(Message.noPluginSpecified)
             return
         }
 
         val plugin = getPluginFromName(args[1]) ?: run {
-            sender.sendMessage(Message.pluginNotFound)
+            audience.sendMessage(Message.pluginNotFound)
             return
         }
 
-        if (Data.installedPlugins.find { it.id == plugin.id } != null) {
-            sender.sendMessage(Message.pluginAlreadyInstalled)
+        if (Data.installedPlugins.find { it.marketplacePlugin.id == plugin.id } != null) {
+            audience.sendMessage(Message.pluginAlreadyInstalled)
             return
         }
 
         if (plugin.isPremium) {
-            sender.sendMessage(Message.pluginIsPremium)
+            audience.sendMessage(Message.pluginIsPremium)
             return
         }
 
         if (!plugin.isValidDownload()) {
-            sender.sendMessage(Message.downloadNotFound)
+            audience.sendMessage(Message.downloadNotFound)
             return
         }
 
+        if (!plugin.extraInfo.isNullOrEmpty()) {
+            audience.sendMessage("<gray>Extra Info: ${plugin.extraInfo}</gray>".deserialize())
+        }
+
         if (plugin.service != Config.marketplaceService) {
-            sender.sendMessage(
+            audience.sendMessage(
                 Message.serviceNotSupported.fillInVariables(
                     arrayOf(
-                        Config.marketplaceService?.name ?: "UNKNOWN"
+                        Config.marketplaceService ?: "UNKNOWN"
                     )
                 )
             )
             // return
         }
 
-        sender.sendMessage(Message.pluginIsBeingInstalled)
+        audience.sendMessage(Message.pluginIsBeingInstalled)
 
         install(plugin, pluginPortal).run {
-            sender.sendMessage(Message.pluginHasBeenInstalled.fillInVariables(arrayOf(plugin.name)))
-            sender.sendMessage(if (Config.startupOnInstall) Message.pluginAttemptedEnabling else Message.restartServerToEnablePlugin)
+            audience.sendMessage(Message.pluginHasBeenInstalled.fillInVariables(arrayOf(plugin.name)))
+            audience.sendMessage(if (Config.startupOnInstall) Message.pluginAttemptedEnabling else Message.restartServerToEnablePlugin)
         }
     }
 
@@ -66,7 +69,9 @@ class InstallSubCommand(private val pluginPortal: PluginPortal) : SubCommand() {
         return if (args[1].length <= 2) {
             mutableListOf(Message.keepTyping)
         } else {
-            val completion = searchPlugins(args[1])
+            pluginPortal.tabManager.searchTerms(args[1])
+            val completion = copyPartialMatchesWithService(args[1], pluginPortal.tabManager.getTableComplete(args[1]), mutableListOf()).toMutableList()
+
             if (completion.isEmpty()) {
                 mutableListOf(Message.noPluginsFound)
             } else {
