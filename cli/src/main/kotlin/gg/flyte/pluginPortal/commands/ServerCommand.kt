@@ -104,7 +104,7 @@ class SelectServer : CliktCommand(
             return
         }
 
-        ServerManager.activeServerFile = serverFile
+        ServerManager.activeServerFile = File(serverFile, "config.ppm")
     }
 }
 

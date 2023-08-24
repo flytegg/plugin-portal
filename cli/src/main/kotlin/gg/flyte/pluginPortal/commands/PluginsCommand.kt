@@ -103,7 +103,7 @@ class SearchPlugins : CliktCommand(
         val action = KInquirer.promptList("What would you like to do?", listOf("Install", "Preview", "Exit"))
 
         when (action) {
-            "install" -> {
+            "Install" -> {
                 val activeServer = getActiveServer()
                 if (activeServer == null) {
                     echo("No active server found, use the command: pp server select")
@@ -129,11 +129,11 @@ class SearchPlugins : CliktCommand(
                 }
             }
 
-            "preview" -> {
+            "Preview" -> {
 
             }
 
-            "exit" -> return
+            "Exit" -> return
         }
     }
 }

@@ -16,7 +16,7 @@ object ServerManager {
         println(getHomeFolderDirectory().absolutePath)
 
         val serverFolder = File(getServerFolderDirectory(), server.name).apply { mkdir() }
-        File(serverFolder, "PluginPortal_Server.json").let {
+        File(serverFolder, "config.ppm").let {
             it.createNewFile()
             it.writeText(GSON.toJson(server))
             println(serverFolder.absolutePath)
