@@ -8,10 +8,7 @@ import com.github.kinquirer.KInquirer
 import com.github.kinquirer.components.promptList
 import gg.flyte.common.api.API
 import gg.flyte.common.type.service.PlatformType
-import gg.flyte.common.util.downloadFileAsync
-import gg.flyte.common.util.downloadFileSync
-import gg.flyte.common.util.isDirectDownload
-import gg.flyte.common.util.isJARFileDownload
+import gg.flyte.common.util.*
 import gg.flyte.pluginPortal.manager.ServerManager.getActiveServer
 import java.awt.Desktop
 import java.net.URI
@@ -99,8 +96,9 @@ class SearchPlugins : CliktCommand(
 
         if (pluginName.isEmpty() || pluginName == "Exit") return
 
-        val plugin = plugins.body()?.result?.find { "${it.displayInfo.name} - ${it.displayInfo.description}" == pluginName }
-            ?: return
+        val plugin =
+            plugins.body()?.result?.find { "${it.displayInfo.name} - ${it.displayInfo.description}" == pluginName }
+                ?: return
 
         val action = KInquirer.promptList("What would you like to do?", listOf("Install", "Preview", "Exit"))
 
@@ -113,7 +111,8 @@ class SearchPlugins : CliktCommand(
                     return
                 }
 
-                val downloadUrl = plugin.versions[activeServer.softwareType.primarySupportedPlatformType]?.get(plugin.versionData.latestVersion)?.downloadUrl
+                val downloadUrl =
+                    plugin.versions[activeServer.softwareType.primarySupportedPlatformType]?.get(plugin.versionData.latestVersion)?.downloadUrl
 
                 if (downloadUrl.isNullOrEmpty()) {
                     echo("No download URL found for plugin: ${plugin.displayInfo.name} for platform: ${activeServer.softwareType.primarySupportedPlatformType}")
@@ -123,7 +122,11 @@ class SearchPlugins : CliktCommand(
 
                 if (isJARFileDownload(downloadUrl)) {
                     println("Downloading plugin: ${plugin.displayInfo.name} from: $downloadUrl")
-                    downloadFileAsync(downloadUrl, activeServer.getPluginsFolder()) {}
+                    installPlugin(
+                        plugin,
+                        downloadUrl,
+                        activeServer.getPluginsFolder()
+                    )
                 } else {
                     println("Invalid download URL: $downloadUrl")
                 }

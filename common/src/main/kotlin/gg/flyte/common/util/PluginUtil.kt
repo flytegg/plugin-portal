@@ -1,0 +1,18 @@
+package gg.flyte.common.util
+
+import gg.flyte.common.api.dataClasses.MarketplacePlugin
+import gg.flyte.common.type.service.PlatformType
+import java.io.File
+
+fun installPlugin(
+    plugin: MarketplacePlugin,
+    url: String,
+    pluginFolder: File,
+    async: Boolean = false
+) {
+    val outputFile = File(pluginFolder, "${plugin.displayInfo.name} (PP).jar".replace(":", "~"))
+
+    if (async) downloadFileAsync(url, outputFile) {}
+    else downloadFileSync(url, outputFile)
+
+}
