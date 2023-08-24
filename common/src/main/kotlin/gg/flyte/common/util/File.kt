@@ -45,6 +45,39 @@ fun getSha256(input: String): String {
 //    }.getOrNull()
 //}
 
+fun downloadFileSync(url: String, destinationFile: File): Boolean {
+    val call: Call<ResponseBody> = apiInterface.downloadFile(url) // Assuming you have a method for file download in your ApiInterface
+
+    return try {
+        val response = call.execute()
+
+        if (response.isSuccessful) {
+            val responseBody = response.body()
+            responseBody?.let {
+                val inputStream = it.byteStream()
+                val outputStream = FileOutputStream(destinationFile)
+                val buffer = ByteArray(4096)
+                var bytesRead: Int
+
+                while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                    outputStream.write(buffer, 0, bytesRead)
+                }
+
+                outputStream.flush()
+                outputStream.close()
+                inputStream.close()
+
+                true // File download success
+            } ?: false // Response body is null
+        } else {
+            false // Response not successful
+        }
+    } catch (e: IOException) {
+        false // Error during file write or network failure
+    }
+}
+
+
 fun downloadFileAsync(url: String, destinationFile: File, onComplete: (Boolean) -> Unit) {
     val call: Call<ResponseBody> = apiInterface.downloadFile(url) // Assuming you have a method for file download in your ApiInterface
 

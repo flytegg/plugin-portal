@@ -9,7 +9,9 @@ import com.github.kinquirer.components.promptList
 import gg.flyte.common.api.API
 import gg.flyte.common.type.service.PlatformType
 import gg.flyte.common.util.downloadFileAsync
+import gg.flyte.common.util.downloadFileSync
 import gg.flyte.common.util.isDirectDownload
+import gg.flyte.common.util.isJARFileDownload
 import gg.flyte.pluginPortal.manager.ServerManager.getActiveServer
 import java.awt.Desktop
 import java.net.URI
@@ -105,6 +107,7 @@ class SearchPlugins : CliktCommand(
         when (action) {
             "Install" -> {
                 val activeServer = getActiveServer()
+
                 if (activeServer == null) {
                     echo("No active server found, use the command: ppcli server select")
                     return
@@ -113,19 +116,16 @@ class SearchPlugins : CliktCommand(
                 val downloadUrl = plugin.versions[activeServer.softwareType.primarySupportedPlatformType]?.get(plugin.versionData.latestVersion)?.downloadUrl
 
                 if (downloadUrl.isNullOrEmpty()) {
-                    echo("No download URL found for plugin: ${plugin.displayInfo.name}")
+                    echo("No download URL found for plugin: ${plugin.displayInfo.name} for platform: ${activeServer.softwareType.primarySupportedPlatformType}")
                     API.requestPluginById(plugin.id, activeServer.softwareType.primarySupportedPlatformType ?: return)
                     return
                 }
 
-                if (isDirectDownload(downloadUrl)) {
-                    downloadFileAsync(downloadUrl, activeServer.getPluginsFolder()) {
-                        if (it) {
-                            echo("Successfully downloaded plugin: ${plugin.displayInfo.name}")
-                        } else {
-                            echo("Failed to download plugin: ${plugin.displayInfo.name}")
-                        }
-                    }
+                if (isJARFileDownload(downloadUrl)) {
+                    println("Downloading plugin: ${plugin.displayInfo.name} from: $downloadUrl")
+                    downloadFileAsync(downloadUrl, activeServer.getPluginsFolder()) {}
+                } else {
+                    println("Invalid download URL: $downloadUrl")
                 }
             }
 

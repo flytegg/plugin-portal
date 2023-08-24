@@ -2,6 +2,7 @@ package gg.flyte.pluginPortal.manager
 
 import gg.flyte.common.type.service.SoftwareType
 import gg.flyte.common.util.GSON
+import gg.flyte.pluginPortal.`object`.Config
 import gg.flyte.pluginPortal.`object`.serializer.SerializedServer
 import java.awt.Desktop
 import java.io.BufferedReader
@@ -10,8 +11,6 @@ import java.io.InputStreamReader
 
 object ServerManager {
 
-    var activeServerFile: File? = null
-
     fun createServer(server: SerializedServer) {
         println(getHomeFolderDirectory().absolutePath)
 
@@ -19,12 +18,23 @@ object ServerManager {
         File(serverFolder, "config.ppm").let {
             it.createNewFile()
             it.writeText(GSON.toJson(server))
-            println(serverFolder.absolutePath)
         }
     }
 
-    fun getActiveServer(): SerializedServer? = if (activeServerFile?.exists() == true)
-        GSON.fromJson(activeServerFile!!.readText(), SerializedServer::class.java) else null
+    fun getActiveServer(): SerializedServer? {
+        if (Config.serializedConfig.activeServerName.isNullOrEmpty()) return null
+
+        val folder = Config.serializedConfig.activeServerName?.let { File(getServerFolderDirectory(), it) }
+        val file = folder?.let { File(it, "config.ppm") }
+
+        return if (!file?.exists()!!) null
+        else GSON.fromJson(file.readText(), SerializedServer::class.java)
+    }
+
+    fun setActiveServer(serverName: String) {
+        Config.serializedConfig.activeServerName = serverName
+        Config.saveConfig()
+    }
 
     fun startServer() {
         val server = getActiveServer()

@@ -11,6 +11,7 @@ import gg.flyte.pluginPortal.manager.ServerManager
 import gg.flyte.pluginPortal.manager.ServerManager.createServer
 import gg.flyte.pluginPortal.manager.ServerManager.getActiveServer
 import gg.flyte.pluginPortal.manager.ServerManager.getServerFolderDirectory
+import gg.flyte.pluginPortal.manager.ServerManager.setActiveServer
 import gg.flyte.pluginPortal.`object`.Config
 import gg.flyte.pluginPortal.`object`.serializer.SerializedConfig
 import gg.flyte.pluginPortal.`object`.serializer.SerializedServer
@@ -48,14 +49,23 @@ class CreateServer : CliktCommand(
     help = "Create a new server"
 ) {
     override fun run() {
-        var server = getActiveServer()
+        fun getServerName(): String {
+            val serverName = KInquirer.promptInput("Server Name: ")
+            if (serverName.isEmpty()) {
+                echo("Server name cannot be empty!")
+                return getServerName()
+            }
 
-        if (server != null) {
-            echo("A server already exists!")
-            return
+            val serverFolder = File(getServerFolderDirectory(), serverName)
+            if (serverFolder.exists()) {
+                echo("Server already exists!")
+                return getServerName()
+            }
+
+            return serverName
         }
 
-        val serverName = KInquirer.promptInput("Server Name: ")
+        val serverName = getServerName()
 
         val serverVersion = KInquirer.promptList(
             "Server Version:",
@@ -74,14 +84,17 @@ class CreateServer : CliktCommand(
 
 
 
-        server = SerializedServer(
+        SerializedServer(
             serverName,
             softwareType,
             serverVersion,
             Config.serializedConfig.autoUpdatePlugins,
-        )
+        ).apply {
+            createServer(this)
+            getPluginsFolder()
 
-        createServer(server)
+            if (Config.serializedConfig.selectServerUponCreation) setActiveServer(serverName)
+        }
     }
 }
 
@@ -95,16 +108,14 @@ class SelectServer : CliktCommand(
             getServerFolderDirectory().listFiles()?.map { it.name } ?: listOf("Exit")
         )
 
-        println(getServerFolderDirectory().listFiles())
-        println(getServerFolderDirectory().absolutePath)
-
         val serverFile = File(getServerFolderDirectory(), server)
         if (!serverFile.exists()) {
             echo("Server does not exist!")
             return
         }
 
-        ServerManager.activeServerFile = File(serverFile, "config.ppm")
+        setActiveServer(server)
+
     }
 }
 

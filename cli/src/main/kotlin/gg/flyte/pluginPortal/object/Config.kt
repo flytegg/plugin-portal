@@ -11,7 +11,8 @@ object Config {
     private val homeDirectory = ServerManager.getHomeFolderDirectory()
 
     fun loadConfigs() {
-        val file = File(homeDirectory, "config.json")
+        val file = File(homeDirectory, "settings.json")
+        println(file.absolutePath)
         if (!file.exists()) {
             file.createNewFile()
             file.writeText(GSON.toJson(SerializedConfig()))
@@ -20,7 +21,7 @@ object Config {
         this.serializedConfig = GSON.fromJson(
             File(
                 ServerManager.getHomeFolderDirectory(),
-                "config.json"
+                "settings.json"
             ).readText(), SerializedConfig::class.java
         )
 
@@ -30,7 +31,7 @@ object Config {
     }
 
     fun saveConfig() {
-        File(homeDirectory, "config.json").writeText(GSON.toJson(this.serializedConfig))
+        File(homeDirectory, "settings.json").writeText(GSON.toJson(this.serializedConfig))
     }
 
 }

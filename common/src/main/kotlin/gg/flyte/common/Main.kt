@@ -4,7 +4,7 @@ import gg.flyte.common.api.API
 import gg.flyte.common.type.service.PlatformType
 import gg.flyte.common.util.GSON
 
-fun main() {
+fun main(arrayOf: Array<String>) {
     //println(API.requestPluginById("EssentialsX:Essentials", PlatformType.PAPER).body())
     println(
         GSON.toJson(

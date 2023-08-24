@@ -7,5 +7,8 @@ data class SerializedConfig(
     var autoAcceptEula: Boolean = true,
     val selectServerUponCreation: Boolean = true,
     val debug: Boolean = false,
-    val defaultOperators: ArrayList<String> = arrayListOf()
+    var activeServerName: String? = null,
+    var lastLaunchedVersion: String? = "2.0.0",
+    val defaultOperators: ArrayList<String> = arrayListOf(),
+    val installedPlugins: HashSet<String> = hashSetOf() // Plugin id's
 )

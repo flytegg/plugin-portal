@@ -22,7 +22,7 @@ data class SerializedServer(
 ) {
     fun getPluginsFolder(): File {
         return File(getDirectory(), "plugins").apply {
-            createNewFile()
+            mkdirs()
         }
     }
 
