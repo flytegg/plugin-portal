@@ -1,0 +1,4 @@
+name: PluginPortal
+main: gg.flyte.pluginPortal.PluginPortal
+version: ${version}
+api-version: 1.13
