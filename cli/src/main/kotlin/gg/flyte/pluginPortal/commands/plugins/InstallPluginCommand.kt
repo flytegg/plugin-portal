@@ -5,6 +5,7 @@ import gg.flyte.common.type.service.PlatformType
 import gg.flyte.common.type.service.findPlatformTypesFromGroup
 import gg.flyte.common.util.installPlugin
 import gg.flyte.pluginPortal.commands.abstractClasses.PluginAPICommand
+import gg.flyte.pluginPortal.type.server.ServerManager
 
 class InstallPluginCommand : PluginAPICommand(
     name = "install",
@@ -22,9 +23,26 @@ class InstallPluginCommand : PluginAPICommand(
             return
         }
 
-        if (validDownloadPlatforms.size == 1) {
-            installPlugin(plugin, validDownloadPlatforms[0])
+        val activeServer = ServerManager.getActiveServer()
+
+        if (activeServer == null) {
+            println("No active server found, use the command: ppcli server select")
             return
+        }
+
+        if (validDownloadPlatforms.size == 1) {
+            if (plugin.versions[validDownloadPlatforms.first()]?.isEmpty() == true) {
+                println("No valid download platforms found for this plugin.")
+                return
+            }
+
+            installPlugin(
+                plugin,
+                plugin.versions[validDownloadPlatforms.first()]?.values?.first()!!.downloadUrl,
+                activeServer.getPluginsFolder()
+            )
+
+
         }
 
 
