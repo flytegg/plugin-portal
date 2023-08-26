@@ -1,4 +1,4 @@
-package gg.flyte.pluginPortal.`object`.server
+package gg.flyte.pluginPortal.type.server
 
 enum class ServerVersion {
     V1_8_8,

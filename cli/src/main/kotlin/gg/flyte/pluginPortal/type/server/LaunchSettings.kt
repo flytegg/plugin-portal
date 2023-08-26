@@ -1,4 +1,4 @@
-package gg.flyte.pluginPortal.`object`.server
+package gg.flyte.pluginPortal.type.server
 
 data class LaunchSettings(
     val flagType: FlagType,

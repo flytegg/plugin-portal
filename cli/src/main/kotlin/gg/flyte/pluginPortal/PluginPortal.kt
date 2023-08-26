@@ -4,16 +4,19 @@ import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.mordant.rendering.AnsiLevel
 import com.github.ajalt.mordant.terminal.Terminal
-import gg.flyte.common.type.logger.Logger
 import gg.flyte.pluginPortal.commands.*
-import gg.flyte.pluginPortal.`object`.Config
+import gg.flyte.pluginPortal.commands.plugins.RequestPluginCommand
+import gg.flyte.pluginPortal.commands.plugins.SearchPluginsCommand
+import gg.flyte.pluginPortal.commands.server.DeleteServerCommand
+import gg.flyte.pluginPortal.commands.server.SelectServerCommand
+import gg.flyte.pluginPortal.type.config.Config
+
 
 class PluginPortal {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
             Config.loadConfigs()
-            Logger.enabled = Config.serializedConfig.debug
 
             PPCommand()
                 .context { terminal = Terminal(ansiLevel = AnsiLevel.TRUECOLOR, interactive = true) }
@@ -22,9 +25,9 @@ class PluginPortal {
                         .subcommands(
                             StartServer(),
                             CreateServer(),
-                            DeleteServer(),
+                            DeleteServerCommand(),
                             ListServers(),
-                            SelectServer(),
+                            SelectServerCommand(),
                             PresetCommand()
                                 .subcommands(
                                     ListPreset(),
@@ -39,8 +42,8 @@ class PluginPortal {
                             UpdatePlugin(),
                             ListPlugins(),
                             DeletePlugin(),
-                            RequestPlugins(),
-                            SearchPlugins(),
+                            RequestPluginCommand(),
+                            SearchPluginsCommand(),
                         ),
                     SettingsCommand()
                 )

@@ -69,6 +69,7 @@ subprojects {
         withType<KotlinCompile> {
             kotlinOptions {
                 jvmTarget = "1.8"
+
             }
         }
     }
@@ -106,3 +107,4 @@ tasks.named("build") {
     dependsOn("shadowJar")
     dependsOn("copyJars")
 }
+

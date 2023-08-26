@@ -1,5 +1,6 @@
 package gg.flyte.common.api.dataClasses
 
+import gg.flyte.common.type.service.PlatformGroup
 import gg.flyte.common.type.service.PlatformType
 import gg.flyte.common.type.service.ServiceType
 import java.util.TreeSet
@@ -8,9 +9,14 @@ data class MarketplacePlugin(
     val id: String,
     val displayInfo: DisplayInfo,
     val stats: Stats,
-    val service: ServiceType,
+    val serviceData: ServiceData,
     val versionData: VersionData,
     val versions: HashMap<PlatformType, HashMap<String, VersionInfo>>,
+)
+
+data class ServiceData(
+    val primaryServiceType: ServiceType,
+    val platformGroup: PlatformGroup
 )
 
 data class VersionData(

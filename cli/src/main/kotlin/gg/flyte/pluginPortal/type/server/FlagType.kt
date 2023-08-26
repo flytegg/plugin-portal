@@ -1,4 +1,4 @@
-package gg.flyte.pluginPortal.`object`.server
+package gg.flyte.pluginPortal.type.server
 
 enum class FlagType {
     NONE,

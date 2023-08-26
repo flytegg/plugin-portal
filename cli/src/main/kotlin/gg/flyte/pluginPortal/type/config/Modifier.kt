@@ -1,4 +1,4 @@
-package gg.flyte.pluginPortal.`object`
+package gg.flyte.pluginPortal.type.config
 
 enum class Modifier(b: Boolean) {
     ADD(true),

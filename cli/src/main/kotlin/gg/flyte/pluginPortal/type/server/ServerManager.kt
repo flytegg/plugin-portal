@@ -1,19 +1,15 @@
-package gg.flyte.pluginPortal.manager
+package gg.flyte.pluginPortal.type.server
 
 import gg.flyte.common.type.service.SoftwareType
 import gg.flyte.common.util.GSON
-import gg.flyte.pluginPortal.`object`.Config
-import gg.flyte.pluginPortal.`object`.serializer.SerializedServer
-import java.awt.Desktop
+import gg.flyte.pluginPortal.type.config.Config
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
 
 object ServerManager {
 
-    fun createServer(server: SerializedServer) {
-        println(getHomeFolderDirectory().absolutePath)
-
+    fun createServer(server: ServerConfig) {
         val serverFolder = File(getServerFolderDirectory(), server.name).apply { mkdir() }
         File(serverFolder, "config.ppm").let {
             it.createNewFile()
@@ -21,18 +17,18 @@ object ServerManager {
         }
     }
 
-    fun getActiveServer(): SerializedServer? {
-        if (Config.serializedConfig.activeServerName.isNullOrEmpty()) return null
+    fun getActiveServer(): ServerConfig? {
+        if (Config.userConfig.activeServerName.isNullOrEmpty()) return null
 
-        val folder = Config.serializedConfig.activeServerName?.let { File(getServerFolderDirectory(), it) }
+        val folder = Config.userConfig.activeServerName?.let { File(getServerFolderDirectory(), it) }
         val file = folder?.let { File(it, "config.ppm") }
 
         return if (!file?.exists()!!) null
-        else GSON.fromJson(file.readText(), SerializedServer::class.java)
+        else GSON.fromJson(file.readText(), ServerConfig::class.java)
     }
 
-    fun setActiveServer(serverName: String) {
-        Config.serializedConfig.activeServerName = serverName
+    fun setActiveServer(server: ServerConfig) {
+        Config.userConfig.activeServerName = server.name
         Config.saveConfig()
     }
 
@@ -94,6 +90,13 @@ object ServerManager {
                 println("Unsupported server type!")
             }
         }
+    }
+
+    fun getServerFromName(serverName: String): ServerConfig {
+        val folder = File(getServerFolderDirectory(), serverName)
+        val file = File(folder, "config.ppm")
+
+        return GSON.fromJson(file.readText(), ServerConfig::class.java)
     }
 
     fun getHomeFolderDirectory() = File(System.getProperty("java.class.path")).parentFile.parentFile

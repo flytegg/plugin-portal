@@ -4,18 +4,18 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.kinquirer.KInquirer
 import com.github.kinquirer.components.promptConfirm
 import com.github.kinquirer.components.promptInput
-import com.github.kinquirer.components.promptList
 import gg.flyte.common.util.GSON
-import gg.flyte.pluginPortal.`object`.Config
-import gg.flyte.pluginPortal.`object`.Modifier
-import gg.flyte.pluginPortal.`object`.UserSetting
+import gg.flyte.pluginPortal.type.config.Config
+import gg.flyte.pluginPortal.type.config.Modifier
+import gg.flyte.pluginPortal.type.config.UserSetting
+import gg.flyte.pluginPortal.util.promptBetterList
 
 class SettingsCommand : CliktCommand(
     name = "settings",
     help = "Change PluginPortal settings"
 ) {
     override fun run() {
-        val settingDisplayName: String = KInquirer.promptList(
+        val settingDisplayName: String = KInquirer.promptBetterList(
             message = "Select a setting to change",
             choices = UserSetting.entries.map { "${it.displayName} > ${it.description}" }
         )
@@ -29,37 +29,37 @@ class SettingsCommand : CliktCommand(
                     default = true // current value from config
                 )
 
-                Config.serializedConfig = GSON.toJsonTree(Config.serializedConfig).asJsonObject.apply {
+                Config.userConfig = GSON.toJsonTree(Config.userConfig).asJsonObject.apply {
                     addProperty(setting.variableName, value)
                 }.let {
-                    GSON.fromJson(it, Config.serializedConfig::class.java)
+                    GSON.fromJson(it, Config.userConfig::class.java)
                 }
             }
 
             List::class.java -> {
-                val value: Modifier = KInquirer.promptList(
+                val value: Modifier = KInquirer.promptBetterList(
                     message = setting.displayName,
                     choices = Modifier.entries.map { it.name }
                 ).let { Modifier.valueOf(it) }
 
                 when (value) {
                     Modifier.ADD -> {
-                        Config.serializedConfig.defaultOperators.add(
+                        Config.userConfig.defaultOperators.add(
                             KInquirer.promptInput(
                                 message = "Enter a player name to add to the default operators list:"
                             )
                         )
                     }
                     Modifier.REMOVE -> {
-                        if (Config.serializedConfig.defaultOperators.isEmpty()) {
+                        if (Config.userConfig.defaultOperators.isEmpty()) {
                             echo("There are no players in the default operators list")
                             return
                         }
 
-                        Config.serializedConfig.defaultOperators.remove(
-                            KInquirer.promptList(
+                        Config.userConfig.defaultOperators.remove(
+                            KInquirer.promptBetterList(
                                 message = "Select a player name to remove from the default operators list:",
-                                choices = Config.serializedConfig.defaultOperators
+                                choices = Config.userConfig.defaultOperators
                             )
                         )
                     }

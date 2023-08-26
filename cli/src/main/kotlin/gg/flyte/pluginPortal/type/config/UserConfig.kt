@@ -1,6 +1,6 @@
-package gg.flyte.pluginPortal.`object`.serializer
+package gg.flyte.pluginPortal.type.config
 
-data class SerializedConfig(
+data class UserConfig(
     var browserPreview: Boolean = true,
     var autoUpdatePlugins: Boolean = false,
     var autoRestart: Boolean = false,
@@ -10,5 +10,4 @@ data class SerializedConfig(
     var activeServerName: String? = null,
     var lastLaunchedVersion: String? = "2.0.0",
     val defaultOperators: ArrayList<String> = arrayListOf(),
-    val installedPlugins: HashSet<String> = hashSetOf() // Plugin id's
 )

@@ -1,15 +1,10 @@
-package gg.flyte.pluginPortal.`object`.serializer
+package gg.flyte.pluginPortal.type.server
 
-import gg.flyte.common.type.service.PlatformType
 import gg.flyte.common.type.service.SoftwareType
-import gg.flyte.common.util.GSON
-import gg.flyte.pluginPortal.manager.ServerManager.getServerFolderDirectory
-import gg.flyte.pluginPortal.`object`.server.FlagType
-import gg.flyte.pluginPortal.`object`.server.LaunchSettings
-import gg.flyte.pluginPortal.`object`.server.ServerVersion
+import gg.flyte.pluginPortal.type.server.ServerManager.getServerFolderDirectory
 import java.io.File
 
-data class SerializedServer(
+data class ServerConfig(
     val name: String,
     val softwareType: SoftwareType,
     val version: ServerVersion = ServerVersion.entries.last(),
@@ -19,6 +14,7 @@ data class SerializedServer(
         true,
         false
     ),
+    val installedPlugins: HashSet<String> = hashSetOf() // Plugin id's
 ) {
     fun getPluginsFolder(): File {
         return File(getDirectory(), "plugins").apply {

@@ -4,20 +4,15 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.kinquirer.KInquirer
 import com.github.kinquirer.components.promptInput
 import com.github.kinquirer.components.promptList
-import gg.flyte.common.type.service.PlatformType
 import gg.flyte.common.type.service.ServerType
 import gg.flyte.common.type.service.SoftwareType
-import gg.flyte.pluginPortal.manager.ServerManager
-import gg.flyte.pluginPortal.manager.ServerManager.createServer
-import gg.flyte.pluginPortal.manager.ServerManager.getActiveServer
-import gg.flyte.pluginPortal.manager.ServerManager.getServerFolderDirectory
-import gg.flyte.pluginPortal.manager.ServerManager.setActiveServer
-import gg.flyte.pluginPortal.`object`.Config
-import gg.flyte.pluginPortal.`object`.serializer.SerializedConfig
-import gg.flyte.pluginPortal.`object`.serializer.SerializedServer
-import gg.flyte.pluginPortal.`object`.server.*
+import gg.flyte.pluginPortal.type.server.ServerManager.createServer
+import gg.flyte.pluginPortal.type.server.ServerManager.getServerFolderDirectory
+import gg.flyte.pluginPortal.type.server.ServerManager.setActiveServer
+import gg.flyte.pluginPortal.type.config.Config
+import gg.flyte.pluginPortal.type.server.ServerConfig
+import gg.flyte.pluginPortal.type.server.*
 import java.io.File
-import java.net.http.HttpClient
 
 class ServerCommand : CliktCommand(
     name = "server",
@@ -84,49 +79,23 @@ class CreateServer : CliktCommand(
 
 
 
-        SerializedServer(
+        ServerConfig(
             serverName,
             softwareType,
             serverVersion,
-            Config.serializedConfig.autoUpdatePlugins,
+            Config.userConfig.autoUpdatePlugins,
         ).apply {
             createServer(this)
             getPluginsFolder()
 
-            if (Config.serializedConfig.selectServerUponCreation) setActiveServer(serverName)
+            if (Config.userConfig.selectServerUponCreation) setActiveServer(this)
         }
     }
 }
 
-class SelectServer : CliktCommand(
-    name = "select",
-    help = "Select a server"
-) {
-    override fun run() {
-        val server = KInquirer.promptList(
-            "Select a server to manage:",
-            getServerFolderDirectory().listFiles()?.map { it.name } ?: listOf("Exit")
-        )
 
-        val serverFile = File(getServerFolderDirectory(), server)
-        if (!serverFile.exists()) {
-            echo("Server does not exist!")
-            return
-        }
 
-        setActiveServer(server)
 
-    }
-}
-
-class DeleteServer : CliktCommand(
-    name = "delete",
-    help = "Delete a server"
-) {
-    override fun run() {
-        echo("deleting server")
-    }
-}
 
 class ListServers : CliktCommand(
     name = "list",
