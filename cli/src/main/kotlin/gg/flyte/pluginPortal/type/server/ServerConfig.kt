@@ -7,7 +7,7 @@ import java.io.File
 data class ServerConfig(
     val name: String,
     val softwareType: SoftwareType,
-    val version: ServerVersion = ServerVersion.entries.last(),
+    val version: String,
     var autoUpdatePlugins: Boolean = false,
     val launchSettings: LaunchSettings = LaunchSettings(
         FlagType.NONE,

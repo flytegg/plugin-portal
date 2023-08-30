@@ -7,6 +7,8 @@ enum class PlatformGroup {
     FORGE,
     FABRIC,
     BUNGEECORD,
+    WATERFALL,
+    TRAVERTINE,
     VELOCITY,
     DATAPACK,
 }

@@ -8,7 +8,7 @@ fun KInquirer.promptBetterList(
     message: String,
     choices: List<String> = emptyList(),
     hint: String = "",
-    pageSize: Int = Int.MAX_VALUE,
+    pageSize: Int = 7,
     viewOptions: ListViewOptions = ListViewOptions(
         questionMarkPrefix = "✅",
         cursor = " ❯ ",

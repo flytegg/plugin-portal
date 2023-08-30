@@ -46,7 +46,7 @@ fun getSha256(input: String): String {
 //}
 
 fun downloadFileSync(url: String, destinationFile: File): Boolean {
-    val call: Call<ResponseBody> = apiInterface.downloadFile(url) // Assuming you have a method for file download in your ApiInterface
+    val call: Call<ResponseBody> = pluginApiInterface.downloadFile(url) // Assuming you have a method for file download in your ApiInterface
 
     return try {
         val response = call.execute()
@@ -79,7 +79,7 @@ fun downloadFileSync(url: String, destinationFile: File): Boolean {
 
 
 fun downloadFileAsync(url: String, destinationFile: File, onComplete: (Boolean) -> Unit) {
-    val call: Call<ResponseBody> = apiInterface.downloadFile(url) // Assuming you have a method for file download in your ApiInterface
+    val call: Call<ResponseBody> = pluginApiInterface.downloadFile(url) // Assuming you have a method for file download in your ApiInterface
 
     call.enqueue(object : Callback<ResponseBody> {
         override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {

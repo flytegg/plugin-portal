@@ -2,7 +2,8 @@ package gg.flyte.common.util
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import gg.flyte.common.api.ApiInterface
+import gg.flyte.common.api.interfaces.PaperMCApiInterface
+import gg.flyte.common.api.interfaces.PluginApiInterface
 import gg.flyte.common.api.RequestInterceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -21,10 +22,18 @@ val okHttpClient = OkHttpClient()
     .addInterceptor(RequestInterceptor())
     .build()
 
-val retrofit = Retrofit.Builder()
+private val pluginApiRetrofit = Retrofit.Builder()
     .client(okHttpClient)
     .baseUrl(BASE_DOMAIN)
     .addConverterFactory(GsonConverterFactory.create())
     .build()
 
-val apiInterface = retrofit.create<ApiInterface>()
+private val paperMCApiRetrofit = Retrofit.Builder()
+    .client(okHttpClient)
+    .baseUrl("https://api.papermc.io/v2/")
+    .addConverterFactory(GsonConverterFactory.create())
+    .build()
+
+val pluginApiInterface = pluginApiRetrofit.create<PluginApiInterface>()
+
+val paperMCApiInterface = paperMCApiRetrofit.create<PaperMCApiInterface>()

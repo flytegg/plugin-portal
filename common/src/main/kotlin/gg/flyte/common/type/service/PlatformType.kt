@@ -12,6 +12,7 @@ enum class PlatformType(vararg val platformGroup: PlatformGroup) {
     QUILT(PlatformGroup.FABRIC),
     DATAPACK(PlatformGroup.DATAPACK),
     BUNGEECORD(PlatformGroup.BUNGEECORD),
-    WATERFALL(PlatformGroup.FABRIC),
+    WATERFALL(PlatformGroup.BUNGEECORD),
+    TRAVERTINE(PlatformGroup.BUNGEECORD),
     VELOCITY(PlatformGroup.VELOCITY),
 }

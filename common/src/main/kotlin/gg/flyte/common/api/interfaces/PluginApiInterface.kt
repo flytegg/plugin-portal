@@ -1,4 +1,4 @@
-package gg.flyte.common.api
+package gg.flyte.common.api.interfaces
 
 import gg.flyte.common.api.dataClasses.endpoints.PaginatedResultMarketplacePlugin
 import gg.flyte.common.type.service.PlatformType
@@ -6,7 +6,7 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.*
 
-interface ApiInterface {
+interface PluginApiInterface {
 
     @GET("plugins")
     fun searchForPlugins(
