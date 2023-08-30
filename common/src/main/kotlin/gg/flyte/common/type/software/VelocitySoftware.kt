@@ -1,11 +1,6 @@
 package gg.flyte.common.type.software
 
-class VelocitySoftware : SoftwareInterface {
-    override fun getVersions(): List<String> {
-        TODO("Not yet implemented")
-    }
+import gg.flyte.common.type.software.`interface`.PaperMCSoftwareInterface
+import gg.flyte.common.type.software.`interface`.SoftwareInterface
 
-    override fun getDownloadUrl(version: String): String {
-        TODO("Not yet implemented")
-    }
-}
+class VelocitySoftware : PaperMCSoftwareInterface { override fun getPlatformName(): String = "velocity" }
