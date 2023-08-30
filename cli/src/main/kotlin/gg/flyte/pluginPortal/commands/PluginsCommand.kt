@@ -11,22 +11,7 @@ class Plugins : CliktCommand(
     override fun run() = Unit
 }
 
-class PreviewPlugin : CliktCommand(
-    name = "preview",
-    help = "Show plugin information for correct installation."
-) {
-    override fun run() {
 
-        if (true) {
-            echo("Opening Plugin Page in browser...")
-            Desktop.getDesktop().browse(URI("https://www.spigotmc.org/resources/9089"))
-            echo("To disable this feature, please visit the config.")
-        } else {
-            echo("Plugin info: ")
-        }
-
-    }
-}
 
 
 

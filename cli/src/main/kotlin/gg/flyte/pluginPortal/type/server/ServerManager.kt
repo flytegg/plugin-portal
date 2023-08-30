@@ -2,6 +2,7 @@ package gg.flyte.pluginPortal.type.server
 
 import gg.flyte.common.type.service.SoftwareType
 import gg.flyte.common.util.GSON
+import gg.flyte.common.util.downloadFileSync
 import gg.flyte.pluginPortal.type.config.Config
 import java.io.BufferedReader
 import java.io.File
@@ -30,6 +31,8 @@ object ServerManager {
     fun setActiveServer(server: ServerConfig) {
         Config.userConfig.activeServerName = server.name
         Config.saveConfig()
+
+        downloadServer()
     }
 
     fun startServer() {
@@ -52,7 +55,8 @@ object ServerManager {
     fun downloadServer() {
         when (getActiveServer()?.softwareType) {
             SoftwareType.VANILLA -> {
-                // https://cdn.mcutils.com/jars/vanilla-1.20.1.jar
+                //
+                downloadFileSync("https://cdn.mcutils.com/jars/vanilla-1.20.1.jar", File(getActiveServer()?.getDirectory(), "server.jar"))
 
 
             }
@@ -64,6 +68,7 @@ object ServerManager {
 
             SoftwareType.PAPER -> {
                 // https://cdn.mcutils.com/jars/paper-1.20.1.jar
+                downloadFileSync("https://cdn.mcutils.com/jars/paper-1.20.1.jar", File(getActiveServer()?.getDirectory(), "server.jar"))
 
             }
 

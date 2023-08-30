@@ -1,11 +1,13 @@
 package gg.flyte.pluginPortal.commands.plugins
 
+import com.github.kinquirer.KInquirer
 import gg.flyte.common.api.dataClasses.MarketplacePlugin
 import gg.flyte.common.type.service.PlatformType
 import gg.flyte.common.type.service.findPlatformTypesFromGroup
 import gg.flyte.common.util.installPlugin
 import gg.flyte.pluginPortal.commands.abstractClasses.PluginAPICommand
 import gg.flyte.pluginPortal.type.server.ServerManager
+import gg.flyte.pluginPortal.util.promptBetterList
 
 class InstallPluginCommand : PluginAPICommand(
     name = "install",
@@ -42,7 +44,27 @@ class InstallPluginCommand : PluginAPICommand(
                 activeServer.getPluginsFolder()
             )
 
+        }
 
+        if (validDownloadPlatforms.size > 1) {
+            val platformType = KInquirer.promptBetterList(
+                "Select a platform to download the plugin for.",
+                validDownloadPlatforms.map { it.name },
+                pageSize = 7
+            )
+
+            if (platformType.isEmpty()) return
+
+            if (plugin.versions[PlatformType.valueOf(platformType)]?.isEmpty() == true) {
+                println("No valid download platforms found for this plugin.")
+                return
+            }
+
+            installPlugin(
+                plugin,
+                plugin.versions[PlatformType.valueOf(platformType)]?.values?.first()!!.downloadUrl,
+                activeServer.getPluginsFolder()
+            )
         }
 
 

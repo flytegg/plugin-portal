@@ -65,7 +65,7 @@ class SearchPluginsCommand : PluginAPICommand(
                     body {
                         row(
                             """   
-    Current Service: ${plugin.service.name}                                                     
+    Current Service: ${plugin.serviceData.primaryServiceType.name}                                                     
     Downloads: ${plugin.stats.downloads}
     Rating: ${plugin.stats.ratingAverage}/${plugin.stats.ratingCount}
     Price: ${if (plugin.stats.isPremium) "Premium: $${plugin.stats.price}" else "Free"}

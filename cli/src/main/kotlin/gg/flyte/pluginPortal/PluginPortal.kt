@@ -5,8 +5,8 @@ import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.mordant.rendering.AnsiLevel
 import com.github.ajalt.mordant.terminal.Terminal
 import gg.flyte.pluginPortal.commands.*
-import gg.flyte.pluginPortal.commands.plugins.RequestPluginCommand
-import gg.flyte.pluginPortal.commands.plugins.SearchPluginsCommand
+import gg.flyte.pluginPortal.commands.plugins.*
+import gg.flyte.pluginPortal.commands.server.CreateServerCommand
 import gg.flyte.pluginPortal.commands.server.DeleteServerCommand
 import gg.flyte.pluginPortal.commands.server.SelectServerCommand
 import gg.flyte.pluginPortal.type.config.Config
@@ -24,7 +24,7 @@ class PluginPortal {
                     ServerCommand()
                         .subcommands(
                             StartServer(),
-                            CreateServer(),
+                            CreateServerCommand(),
                             DeleteServerCommand(),
                             ListServers(),
                             SelectServerCommand(),
@@ -37,10 +37,10 @@ class PluginPortal {
                         ),
                     Plugins()
                         .subcommands(
-                            InstallPlugin(),
-                            PreviewPlugin(),
+                            InstallPluginCommand(),
+                            PreviewPluginCommand(),
                             UpdatePlugin(),
-                            ListPlugins(),
+                            ListPluginsCommand(),
                             DeletePlugin(),
                             RequestPluginCommand(),
                             SearchPluginsCommand(),
