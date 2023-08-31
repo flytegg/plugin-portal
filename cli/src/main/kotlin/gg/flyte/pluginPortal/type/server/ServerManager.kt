@@ -8,7 +8,6 @@ import gg.flyte.common.util.installPlugin
 import gg.flyte.pluginPortal.type.config.Config
 import gg.flyte.pluginPortal.type.plugin.InstalledPlugin
 import gg.flyte.pluginPortal.util.isWindows
-import okhttp3.internal.notify
 import java.io.File
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
@@ -54,8 +53,8 @@ object ServerManager {
         val executorService = Executors.newFixedThreadPool(2)
 
         ProcessBuilder("start.bat").apply {
-            if (isWindows) command("cmd.exe", "/c", "start.bat");
-            else command("sh", "-c", "start.bat");
+            if (isWindows) command("cmd.exe", "/c", "start.bat")
+            else command("sh", "-c", "start.bat")
 
             redirectInput(ProcessBuilder.Redirect.INHERIT)
             redirectOutput(ProcessBuilder.Redirect.INHERIT)
