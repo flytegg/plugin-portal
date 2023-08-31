@@ -10,7 +10,7 @@ fun installPlugin(
     pluginFolder: File,
     async: Boolean = false
 ): String { // Return SHA256 Hash
-    val outputFile = File(pluginFolder, "${plugin.displayInfo.name} (PP).jar".replace(":", "~"))
+    val outputFile = File(pluginFolder, "${plugin.displayInfo.name} (PP-${plugin.id}).jar".replace(":", "~"))
 
     if (async) downloadFileAsync(url, outputFile) {}
     else downloadFileSync(url, outputFile)
