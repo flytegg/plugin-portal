@@ -8,6 +8,7 @@ import gg.flyte.common.util.installPlugin
 import gg.flyte.pluginPortal.type.config.Config
 import gg.flyte.pluginPortal.type.plugin.InstalledPlugin
 import gg.flyte.pluginPortal.util.isWindows
+import okhttp3.internal.notify
 import java.io.File
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
@@ -120,21 +121,23 @@ object ServerManager {
         version: String,
         platformType: PlatformType
     ) {
-        installPlugin(
-            plugin,
-            url,
-            pluginFolder,
-            false
-        )
+
 
         getActiveServer()!!.let { server ->
             println("adding plugin to server: ${plugin.displayInfo.name}")
             server.installedPlugins.add(
                 InstalledPlugin(
                     plugin.id,
+                    plugin.displayInfo.name,
                     version,
                     platformType,
-                    plugin.primaryServiceType
+                    plugin.primaryServiceType,
+                    installPlugin(
+                        plugin,
+                        url,
+                        pluginFolder,
+                        false
+                    ),
                 )
             )
 

@@ -7,13 +7,14 @@ import retrofit2.Response
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 
-fun getSha256(input: String): String {
+fun File.get256Hash(): String {
     val HEX_CHARS = "0123456789ABCDEF"
     val bytes = MessageDigest
         .getInstance("SHA-256")
-        .digest(input.toByteArray())
+        .digest(this.readBytes())
     val result = StringBuilder(bytes.size * 2)
 
     bytes.forEach {
