@@ -22,8 +22,6 @@ class ServerCommand : CliktCommand(
     override fun run() = Unit
 }
 
-
-
 class ServerSettings : CliktCommand(
     name = "settings",
     help = "Modify the server settings"
@@ -33,23 +31,9 @@ class ServerSettings : CliktCommand(
     }
 }
 
-
-
-
-
-
 class PresetCommand : CliktCommand(
     name = "preset",
     help = "Manage the server presets"
 ) {
     override fun run() = Unit
-}
-
-class DeletePreset : CliktCommand(
-    name = "delete",
-    help = "Delete a preset"
-) {
-    override fun run() {
-        echo("deleting preset")
-    }
 }
