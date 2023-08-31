@@ -45,16 +45,7 @@ class PresetCommand : CliktCommand(
     override fun run() = Unit
 }
 
-class ListPreset : CliktCommand(
-    name = "list",
-    help = "List all the server presets"
-) {
-    override fun run() {
-        File("presets").walk().forEach {
-            echo(it.name.removeSuffix(".json"))
-        }
-    }
-}
+
 
 
 

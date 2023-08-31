@@ -43,12 +43,6 @@ object ServerManager {
         Config.saveConfig()
     }
 
-    fun getServerList(): List<String> {
-        return getServerFolderDirectory().listFiles()!!
-            .filter { it.isDirectory }
-            .map { it.name }
-    }
-
     fun startServer(server: ServerConfig) {
         val executorService = Executors.newFixedThreadPool(2)
 
@@ -149,7 +143,18 @@ object ServerManager {
         }
     }
 
+    fun getServerList() = getServerFolderDirectory()
+        .listFiles()!!
+        .filter { it.isDirectory }
+        .map { it.name }
+
+    fun getPresetList() = getPresetsFolderDirectory()
+        .listFiles()!!
+        .filter { it.isFile }
+        .map { GSON.fromJson(it.readText(), ServerConfig::class.java) }
+
     fun getHomeFolderDirectory() = File(System.getProperty("java.class.path")).parentFile.parentFile
     fun getServerFolderDirectory() = File(getHomeFolderDirectory(), "servers")
     fun getPresetsFolderDirectory() = File(getHomeFolderDirectory(), "presets")
+
 }
