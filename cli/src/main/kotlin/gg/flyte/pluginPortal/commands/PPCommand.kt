@@ -29,6 +29,7 @@ class ServerCommand : NoOpCliktCommand(
         "l" to listOf("list"),
         "sl" to listOf("select"),
         "pr" to listOf("preset"),
+        "i" to listOf("info"),
     )
 }
 

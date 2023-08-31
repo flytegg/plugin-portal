@@ -27,6 +27,7 @@ class PluginPortal {
                             DeleteServerCommand(),
                             ListServersCommand(),
                             SelectServerCommand(),
+                            InfoServerCommand(),
                             PresetCommand()
                                 .subcommands(
                                     ListPresetsCommand(),
