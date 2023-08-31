@@ -6,6 +6,8 @@ import com.github.ajalt.mordant.table.row
 import com.github.ajalt.mordant.table.table
 import gg.flyte.pluginPortal.type.config.Config
 import gg.flyte.pluginPortal.type.server.ServerManager
+import jdk.internal.org.jline.utils.AttributedStringBuilder
+import jdk.internal.org.jline.utils.AttributedStringBuilder.append
 
 class ListPluginsCommand : CliktCommand(
     name = "list",
@@ -13,12 +15,8 @@ class ListPluginsCommand : CliktCommand(
 ) {
 
     override fun run() {
-        val activeServer = ServerManager.getActiveServer()
-
-        if (activeServer == null) {
-            echo("No active server found, use the command: ppcli server select")
-            return
-        }
+        if (ServerManager.noServerFoundCheck()) return
+        val activeServer = ServerManager.getActiveServer()!!
 
         Config.terminal.println(table {
             header { row("Name (ID) | Platform | Version") }
@@ -29,6 +27,7 @@ class ListPluginsCommand : CliktCommand(
                             .map { plugin -> " - ${plugin.name} (${plugin.id}) | ${plugin.primaryPlatformType.name} | ${plugin.version} \n" }
                             .forEach { append(it) }
 
+                        if (activeServer.installedPlugins.isEmpty()) AttributedStringBuilder.append("No plugins found! Install one with /ppcli plugins")
                     }
                 )
             }

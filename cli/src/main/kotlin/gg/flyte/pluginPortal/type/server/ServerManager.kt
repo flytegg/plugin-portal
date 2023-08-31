@@ -1,5 +1,6 @@
 package gg.flyte.pluginPortal.type.server
 
+import com.github.ajalt.mordant.table.table
 import gg.flyte.common.api.dataClasses.MarketplacePlugin
 import gg.flyte.common.type.service.PlatformType
 import gg.flyte.common.util.GSON
@@ -141,6 +142,16 @@ object ServerManager {
 
             server.save()
         }
+    }
+
+    fun noServerFoundCheck(): Boolean {
+        if (getActiveServer() == null) {
+            Config.terminal.println(table {
+                header { row("No active server found! Use /ppcli server select") }
+            })
+            return true
+        }
+        return false
     }
 
     fun getServerList() = getServerFolderDirectory()
