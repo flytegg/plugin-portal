@@ -13,13 +13,16 @@ class ListServersCommand : CliktCommand(
 
         ServerManager.getServerList().let { servers ->
             Config.terminal.println(table {
-                header { row("Server Name") }
+                header {
+                    if (servers.isNotEmpty()) row("Name | Version | Software | Plugin Count")
+                }
                 body {
                     row(
                         StringBuilder().apply {
-                            servers.forEach { server -> append(" - $server \n") }
-
-                            if (servers.isEmpty()) append("No servers found! Create one with /ppcli server create")
+                            servers.forEach { server ->
+                                append(" - ${server.name} | ${server.version} | ${server.softwareType.name} | ${server.installedPlugins.size} \n")
+                            }
+                            if (servers.isEmpty()) append("No servers found!\nCreate one with /ppcli server create")
                         }
                     )
                 }

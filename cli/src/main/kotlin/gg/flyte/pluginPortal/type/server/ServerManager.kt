@@ -147,7 +147,8 @@ object ServerManager {
     fun noServerFoundCheck(): Boolean {
         if (getActiveServer() == null) {
             Config.terminal.println(table {
-                header { row("No active server found! Use /ppcli server select") }
+                header { row("No active server found! Please use /ppcli server select") }
+                body { row("Total Server Count: ${getServerList().size}") }
             })
             return true
         }
@@ -155,6 +156,11 @@ object ServerManager {
     }
 
     fun getServerList() = getServerFolderDirectory()
+        .listFiles()!!
+        .filter { it.isDirectory }
+        .map { GSON.fromJson(it.readText(), ServerConfig::class.java) }
+
+    fun getServerNameList() = getServerFolderDirectory()
         .listFiles()!!
         .filter { it.isDirectory }
         .map { it.name }
