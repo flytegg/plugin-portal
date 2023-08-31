@@ -16,7 +16,6 @@ class PreviewPluginCommand : PluginAPICommand(
                 preview("https://www.spigotmc.org/resources/${plugin.id}")
             }
 
-
             else -> {
                 echo("No preview available for this service type.")
             }

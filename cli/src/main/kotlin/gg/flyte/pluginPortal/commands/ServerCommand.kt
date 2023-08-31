@@ -22,20 +22,7 @@ class ServerCommand : CliktCommand(
     override fun run() = Unit
 }
 
-class StartServer : CliktCommand(
-    name = "start",
-    help = "Start the Server"
-) {
-    override fun run() {
-        ServerManager.getActiveServer().let { server ->
-            if (server == null) {
-                echo("No active server found!")
-                return
-            }
-            startServer(server)
-        }
-    }
-}
+
 
 class ServerSettings : CliktCommand(
     name = "settings",

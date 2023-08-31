@@ -122,7 +122,6 @@ object ServerManager {
         platformType: PlatformType
     ) {
 
-
         getActiveServer()!!.let { server ->
             println("adding plugin to server: ${plugin.displayInfo.name}")
             server.installedPlugins.add(

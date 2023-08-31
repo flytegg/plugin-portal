@@ -20,7 +20,10 @@ class DeleteServerCommand : ServerAPICommand(
         )
 
         if (shouldContinue) {
-            File(ServerManager.getServerFolderDirectory(), server.name).deleteRecursively()
+            File(ServerManager.getServerFolderDirectory(), server.name).apply {
+                deleteRecursively()
+                delete()
+            }
         } else {
             echo("Server deletion has been cancelled.")
         }

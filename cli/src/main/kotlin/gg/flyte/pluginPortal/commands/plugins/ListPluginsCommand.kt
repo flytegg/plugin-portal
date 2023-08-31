@@ -21,21 +21,19 @@ class ListPluginsCommand : CliktCommand(
         }
 
         Config.terminal.println(table {
-            header {
-                row("Installed Plugins for server: ${activeServer.name}")
-            }
-
+            header { row("Name (ID) | Platform | Version") }
             body {
-                row {
+                row(
                     StringBuilder().apply {
-                        activeServer.installedPlugins.forEach { plugin ->
-                            append("${plugin.name} (${plugin.id}) | ${plugin.platformType.name} | ${plugin.version}")
-                            append("\n")
-                        }
+                        activeServer.installedPlugins
+                            .map { plugin -> " - ${plugin.name} (${plugin.id}) | ${plugin.primaryPlatformType.name} | ${plugin.version} \n" }
+                            .forEach { append(it) }
+
                     }
-                }
+                )
             }
 
+            footer { row("Total Plugins: ${activeServer.installedPlugins.size} | Server Name: ${activeServer.name}") }
         })
 
     }

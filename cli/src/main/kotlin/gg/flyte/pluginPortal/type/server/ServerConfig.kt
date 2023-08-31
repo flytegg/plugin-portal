@@ -29,11 +29,8 @@ data class ServerConfig(
     }
 
     fun save() {
-        File(getDirectory(), "config.ppm").apply {
-            println(absolutePath)
-            installedPlugins.forEach { println(it) }
-        }.writeText(GSON.toJson(this))
-
+        File(getDirectory(), "config.ppm")
+            .writeText(GSON.toJson(this))
     }
 }
 
