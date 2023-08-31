@@ -56,14 +56,7 @@ class ListPreset : CliktCommand(
     }
 }
 
-class SavePreset : CliktCommand(
-    name = "save",
-    help = "Save the current server settings as a preset"
-) {
-    override fun run() {
 
-    }
-}
 
 class LoadPreset : CliktCommand(
     name = "load",

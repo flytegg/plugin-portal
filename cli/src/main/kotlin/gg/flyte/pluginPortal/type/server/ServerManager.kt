@@ -6,7 +6,7 @@ import gg.flyte.common.util.GSON
 import gg.flyte.common.util.downloadFileSync
 import gg.flyte.common.util.installPlugin
 import gg.flyte.pluginPortal.type.config.Config
-import gg.flyte.pluginPortal.type.plugin.InstalledPlugin
+import gg.flyte.common.type.plugin.InstalledPlugin
 import gg.flyte.pluginPortal.util.isWindows
 import java.io.File
 import java.util.concurrent.Executors
@@ -151,4 +151,5 @@ object ServerManager {
 
     fun getHomeFolderDirectory() = File(System.getProperty("java.class.path")).parentFile.parentFile
     fun getServerFolderDirectory() = File(getHomeFolderDirectory(), "servers")
+    fun getPresetsFolderDirectory() = File(getHomeFolderDirectory(), "presets")
 }

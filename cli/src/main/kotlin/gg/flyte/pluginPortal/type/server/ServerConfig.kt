@@ -2,7 +2,7 @@ package gg.flyte.pluginPortal.type.server
 
 import gg.flyte.common.type.service.SoftwareType
 import gg.flyte.common.util.GSON
-import gg.flyte.pluginPortal.type.plugin.InstalledPlugin
+import gg.flyte.common.type.plugin.InstalledPlugin
 import gg.flyte.pluginPortal.type.server.ServerManager.getServerFolderDirectory
 import java.io.File
 

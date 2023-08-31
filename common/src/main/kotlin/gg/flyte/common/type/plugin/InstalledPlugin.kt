@@ -1,4 +1,4 @@
-package gg.flyte.pluginPortal.type.plugin
+package gg.flyte.common.type.plugin
 
 import gg.flyte.common.type.service.PlatformType
 import gg.flyte.common.type.service.ServiceType
