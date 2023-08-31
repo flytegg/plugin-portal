@@ -8,5 +8,6 @@ data class InstalledPlugin(
     val name: String,
     val version: String,
     val platformType: PlatformType,
-    val serviceType: ServiceType
+    val serviceType: ServiceType,
+    val sha256Hash: String,
 )
