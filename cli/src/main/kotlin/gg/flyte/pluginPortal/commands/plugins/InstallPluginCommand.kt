@@ -30,12 +30,8 @@ class InstallPluginCommand : PluginAPICommand(
             return
         }
 
-        val activeServer = ServerManager.getActiveServer()
-
-        if (activeServer == null) {
-            println("No active server found, use the command: ppcli server select")
-            return
-        }
+        val activeServer = if (ServerManager.noServerFoundCheck()) return
+        else ServerManager.getActiveServer()!!
 
         if (validDownloadPlatforms.size == 1) {
             if (plugin.versions[validDownloadPlatforms.first()]?.isEmpty() == true) {

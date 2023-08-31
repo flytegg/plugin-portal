@@ -10,7 +10,8 @@ class StreamGobbler(
     val consumer: Consumer<String>
 ) : Runnable {
     override fun run() {
-        BufferedReader(InputStreamReader(inputStream)).lines()
+        BufferedReader(InputStreamReader(inputStream))
+            .lines()
             .forEach(consumer)
     }
 }

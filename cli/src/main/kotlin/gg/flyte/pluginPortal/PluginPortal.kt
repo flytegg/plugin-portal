@@ -41,7 +41,7 @@ class PluginPortal {
                             PreviewPluginCommand(),
                             UpdatePlugin(),
                             ListPluginsCommand(),
-                            DeletePlugin(),
+                            DeletePluginCommand(),
                             RequestPluginCommand(),
                             SearchPluginsCommand(),
                         ),

@@ -14,12 +14,4 @@ class UpdatePlugin : CliktCommand(
     override fun run() = echo("managing update plugins")
 }
 
-class DeletePlugin : CliktCommand(
-    name = "delete",
-    help = "Remove a plugin from the server."
-) {
-    override fun run() = echo("managing delete plugins")
-}
-
-
 
