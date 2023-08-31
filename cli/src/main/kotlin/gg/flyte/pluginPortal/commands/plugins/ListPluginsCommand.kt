@@ -15,7 +15,9 @@ class ListPluginsCommand : CliktCommand(
         else ServerManager.getActiveServer()!!
 
         Config.terminal.println(table {
-            header { row("Name (ID) | Platform | Version") }
+            header {
+                if (activeServer.installedPlugins.isNotEmpty()) row("Name (ID) | Platform | Version")
+            }
             body {
                 row(
                     StringBuilder().apply {
