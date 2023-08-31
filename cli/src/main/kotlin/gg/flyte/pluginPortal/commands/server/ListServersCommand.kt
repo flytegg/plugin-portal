@@ -22,12 +22,14 @@ class ListServersCommand : CliktCommand(
                             servers.forEach { server ->
                                 append(" - ${server.name} | ${server.version} | ${server.softwareType.name} | ${server.installedPlugins.size} \n")
                             }
-                            if (servers.isEmpty()) append("No servers found!\nCreate one with /ppcli server create")
+                            if (servers.isEmpty()) append("No servers found!")
                         }
                     )
                 }
                 footer {
-                    if (servers.isNotEmpty()) row("Total Server Count: ${servers.size}") }
+                    if (servers.isNotEmpty()) row("Total Server Count: ${servers.size}")
+                    else row("Create one with /ppcli server create")
+                }
             })
         }
     }
