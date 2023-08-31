@@ -6,7 +6,7 @@ import gg.flyte.common.util.GSON
 import gg.flyte.common.util.downloadFileSync
 import gg.flyte.common.util.installPlugin
 import gg.flyte.pluginPortal.type.config.Config
-import gg.flyte.pluginPortal.type.plugin.PluginInstaller
+import gg.flyte.pluginPortal.type.plugin.InstalledPlugin
 import gg.flyte.pluginPortal.util.isWindows
 import java.io.File
 import java.util.concurrent.Executors
@@ -117,7 +117,7 @@ object ServerManager {
         plugin: MarketplacePlugin,
         url: String,
         pluginFolder: File,
-        version: String
+        version: String,
         platformType: PlatformType
     ) {
         installPlugin(
@@ -127,20 +127,19 @@ object ServerManager {
             false
         )
 
-        getActiveServer()!!.pluginInstallers.add(
-            PluginInstaller(
-                plugin.id,
-                version,
-                platformType
+        getActiveServer()!!.let { server ->
+            println("adding plugin to server: ${plugin.displayInfo.name}")
+            server.installedPlugins.add(
+                InstalledPlugin(
+                    plugin.id,
+                    version,
+                    platformType,
+                    plugin.primaryServiceType
+                )
             )
-        )
 
-
-        println("adding")
-        getActiveServer()!!.pluginInstallers.add(id)
-        println(getActiveServer()!!.pluginInstallers)
-        println("added")
-        getActiveServer()?.save()
+            server.save()
+        }
     }
 
     fun getHomeFolderDirectory() = File(System.getProperty("java.class.path")).parentFile.parentFile

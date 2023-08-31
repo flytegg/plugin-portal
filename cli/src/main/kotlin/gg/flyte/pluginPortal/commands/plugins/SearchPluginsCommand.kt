@@ -4,12 +4,14 @@ import com.github.ajalt.mordant.table.table
 import com.github.kinquirer.KInquirer
 import gg.flyte.common.api.API
 import gg.flyte.common.api.dataClasses.MarketplacePlugin
+import gg.flyte.common.type.service.PlatformType
 import gg.flyte.common.util.getVersionRange
 import gg.flyte.common.util.installPlugin
 import gg.flyte.common.util.isJARFileDownload
 import gg.flyte.pluginPortal.commands.abstractClasses.PluginAPICommand
 import gg.flyte.pluginPortal.type.server.ServerManager
 import gg.flyte.pluginPortal.type.config.Config
+import gg.flyte.pluginPortal.type.plugin.InstalledPlugin
 import gg.flyte.pluginPortal.util.promptBetterList
 
 class SearchPluginsCommand : PluginAPICommand(
@@ -45,8 +47,13 @@ class SearchPluginsCommand : PluginAPICommand(
                         activeServer.getPluginsFolder()
                     )
 
-                    ServerManager.addInstalledPluginId(plugin.id)
-                    println("Successfully installed plugin: ${plugin.displayInfo.name}")
+                    ServerManager.installPluginToServer(
+                        plugin,
+                        downloadUrl,
+                        activeServer.getPluginsFolder(),
+                        plugin.versionData.latestVersion,
+                        activeServer.softwareType.primarySupportedPlatformType!!
+                    )
                 } else {
                     println("Invalid download URL: $downloadUrl")
                 }

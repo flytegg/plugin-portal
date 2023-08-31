@@ -1,15 +1,11 @@
 package gg.flyte.pluginPortal.type.plugin
 
 import gg.flyte.common.type.service.PlatformType
-import gg.flyte.common.util.downloadFileSync
-import gg.flyte.common.util.installPlugin
+import gg.flyte.common.type.service.ServiceType
 
-data class PluginInstaller(
+data class InstalledPlugin(
     val id: String,
     val version: String,
     val platformType: PlatformType,
-) {
-    fun install() {
-        downloadFileSync()
-    }
-}
+    val serviceType: ServiceType
+)
