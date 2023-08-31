@@ -26,7 +26,8 @@ class ListServersCommand : CliktCommand(
                         }
                     )
                 }
-                footer { row("Total Server Count: ${servers.size}") }
+                footer {
+                    if (servers.isNotEmpty()) row("Total Server Count: ${servers.size}") }
             })
         }
     }
