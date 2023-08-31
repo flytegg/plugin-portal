@@ -143,6 +143,15 @@ object ServerManager {
             return
         }
 
+        if (getActiveServer()!!.installedPlugins.any { it.id == plugin.id }) {
+            Config.terminal.println(table {
+                header { row("Plugin already installed!") }
+                body { row("Update it with /ppcli plugins update") }
+            })
+            return
+        }
+
+
         getActiveServer()!!.let { server ->
             server.installedPlugins.add(
                 InstalledPlugin(
