@@ -6,9 +6,7 @@ import com.github.ajalt.mordant.rendering.AnsiLevel
 import com.github.ajalt.mordant.terminal.Terminal
 import gg.flyte.pluginPortal.commands.*
 import gg.flyte.pluginPortal.commands.plugins.*
-import gg.flyte.pluginPortal.commands.server.CreateServerCommand
-import gg.flyte.pluginPortal.commands.server.DeleteServerCommand
-import gg.flyte.pluginPortal.commands.server.SelectServerCommand
+import gg.flyte.pluginPortal.commands.server.*
 import gg.flyte.pluginPortal.type.config.Config
 
 
@@ -23,10 +21,10 @@ class PluginPortal {
                 .subcommands(
                     ServerCommand()
                         .subcommands(
-                            StartServer(),
+                            StartServerCommand(),
                             CreateServerCommand(),
                             DeleteServerCommand(),
-                            ListServers(),
+                            ListServersCommand(),
                             SelectServerCommand(),
                             PresetCommand()
                                 .subcommands(
