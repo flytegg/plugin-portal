@@ -45,19 +45,6 @@ class PresetCommand : CliktCommand(
     override fun run() = Unit
 }
 
-
-
-
-
-class LoadPreset : CliktCommand(
-    name = "load",
-    help = "Load a preset"
-) {
-    override fun run() {
-        echo("loading preset")
-    }
-}
-
 class DeletePreset : CliktCommand(
     name = "delete",
     help = "Delete a preset"

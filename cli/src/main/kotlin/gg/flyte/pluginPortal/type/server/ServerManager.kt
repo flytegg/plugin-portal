@@ -114,6 +114,18 @@ object ServerManager {
         }
     }
 
+    fun loadPreset(preset: ServerConfig) {
+        if (getServerNameList().contains(preset.name)) {
+            Config.terminal.println(table {
+                header { row("Server already exists!") }
+                body { row("Delete it with /ppcli server delete ${preset.name}") }
+            })
+            return
+        }
+
+        createServer(preset)
+    }
+
     fun installPluginToServer(
         plugin: MarketplacePlugin,
         url: String,
