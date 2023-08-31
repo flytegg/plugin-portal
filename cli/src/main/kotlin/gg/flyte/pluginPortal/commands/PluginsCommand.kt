@@ -4,14 +4,6 @@ import com.github.ajalt.clikt.core.CliktCommand
 import java.awt.Desktop
 import java.net.URI
 
-class Plugins : CliktCommand(
-    name = "plugins",
-    help = "Manage Server's Plugins"
-) {
-    override fun run() = Unit
-}
-
-
 
 
 

@@ -11,8 +11,8 @@ class ListPluginsCommand : CliktCommand(
 ) {
 
     override fun run() {
-        if (ServerManager.noServerFoundCheck()) return
-        val activeServer = ServerManager.getActiveServer()!!
+        val activeServer = if (ServerManager.noServerFoundCheck()) return
+        else ServerManager.getActiveServer()!!
 
         Config.terminal.println(table {
             header { row("Name (ID) | Platform | Version") }

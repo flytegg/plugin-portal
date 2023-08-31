@@ -7,10 +7,7 @@ import com.github.ajalt.mordant.terminal.Terminal
 import gg.flyte.pluginPortal.commands.*
 import gg.flyte.pluginPortal.commands.plugins.*
 import gg.flyte.pluginPortal.commands.server.*
-import gg.flyte.pluginPortal.commands.server.preset.DeletePresetCommand
-import gg.flyte.pluginPortal.commands.server.preset.ListPresetsCommand
-import gg.flyte.pluginPortal.commands.server.preset.LoadPresetCommand
-import gg.flyte.pluginPortal.commands.server.preset.SavePresetCommand
+import gg.flyte.pluginPortal.commands.server.preset.*
 import gg.flyte.pluginPortal.type.config.Config
 
 
@@ -37,7 +34,6 @@ class PluginPortal {
                                     LoadPresetCommand(),
                                     DeletePresetCommand(),
                                 ),
-                            ServerSettings()
                         ),
                     Plugins()
                         .subcommands(

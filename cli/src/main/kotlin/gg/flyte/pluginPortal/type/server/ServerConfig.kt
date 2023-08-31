@@ -7,15 +7,12 @@ import gg.flyte.pluginPortal.type.server.ServerManager.getServerFolderDirectory
 import java.io.File
 
 data class ServerConfig(
-    val name: String,
+    var name: String,
     val softwareType: SoftwareType,
     val version: String,
     var autoUpdatePlugins: Boolean = false,
-    val launchSettings: LaunchSettings = LaunchSettings(
-        FlagType.NONE,
-        true,
-        false
-    ),
+    var noGui: Boolean = false,
+    var autoRestart: Boolean = false,
     val installedPlugins: ArrayList<InstalledPlugin> = arrayListOf()
 ) {
     fun getPluginsFolder(): File {
