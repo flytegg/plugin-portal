@@ -16,9 +16,15 @@ abstract class ServerAPICommand(
     help = help
 ) {
     override fun run() {
+
+        if (ServerManager.getServerList().isEmpty()) {
+            echo("No servers exist! Create one with /ppcli server create")
+            return
+        }
+
         val server = KInquirer.promptBetterList(
             "Select a server to manage:",
-            ServerManager.getServerFolderDirectory().listFiles()?.map { it.name } ?: listOf("Exit")
+            ServerManager.getServerList()
         )
 
         val serverFile = File(ServerManager.getServerFolderDirectory(), server)

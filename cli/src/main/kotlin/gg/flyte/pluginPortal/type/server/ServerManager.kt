@@ -44,6 +44,12 @@ object ServerManager {
         Config.saveConfig()
     }
 
+    fun getServerList(): List<String> {
+        return getServerFolderDirectory().listFiles()!!
+            .filter { it.isDirectory }
+            .map { it.name }
+    }
+
     fun startServer(server: ServerConfig) {
         val executorService = Executors.newFixedThreadPool(2)
 
