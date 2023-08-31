@@ -38,7 +38,6 @@ class SearchPluginsCommand : PluginAPICommand(
                 }
 
                 if (isJARFileDownload(downloadUrl)) {
-                    println("Downloading plugin: ${plugin.displayInfo.name}")
                     installPlugin(
                         plugin,
                         downloadUrl,

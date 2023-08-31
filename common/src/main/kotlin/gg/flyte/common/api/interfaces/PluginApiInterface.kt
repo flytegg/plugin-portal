@@ -1,5 +1,6 @@
 package gg.flyte.common.api.interfaces
 
+import gg.flyte.common.api.dataClasses.MarketplacePlugin
 import gg.flyte.common.api.dataClasses.endpoints.PaginatedResultMarketplacePlugin
 import gg.flyte.common.type.service.PlatformType
 import okhttp3.ResponseBody
@@ -17,7 +18,7 @@ interface PluginApiInterface {
     ): Call<PaginatedResultMarketplacePlugin>
 
     @GET("plugins/{id}")
-    fun getPluginById(@Path("id") id: String): Call<PaginatedResultMarketplacePlugin>
+    fun getPluginById(@Path("id") id: String): Call<MarketplacePlugin>
 
     @GET
     @Streaming // Use streaming for large files

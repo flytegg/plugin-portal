@@ -8,6 +8,7 @@ import gg.flyte.common.util.downloadFileSync
 import gg.flyte.common.util.installPlugin
 import gg.flyte.pluginPortal.type.config.Config
 import gg.flyte.common.type.plugin.InstalledPlugin
+import gg.flyte.common.util.isJARFileDownload
 import gg.flyte.pluginPortal.util.isWindows
 import java.io.File
 import java.util.concurrent.Executors
@@ -134,8 +135,15 @@ object ServerManager {
         platformType: PlatformType
     ) {
 
+        if (!isJARFileDownload(url)) {
+            Config.terminal.println(table {
+                header { row("${plugin.displayInfo.name} is not a valid download!") }
+                body { row("Plugin has been requested to be updated.") }
+            })
+            return
+        }
+
         getActiveServer()!!.let { server ->
-            println("adding plugin to server: ${plugin.displayInfo.name}")
             server.installedPlugins.add(
                 InstalledPlugin(
                     plugin.id,
@@ -151,6 +159,11 @@ object ServerManager {
                     ),
                 )
             )
+
+            Config.terminal.println(table {
+                header { row("Installed plugin: ${plugin.displayInfo.name}") }
+                footer { row("Total Plugins: ${getActiveServer()!!.installedPlugins.size} | Server Name: ${getActiveServer()!!.name}") }
+            })
 
             server.save()
         }

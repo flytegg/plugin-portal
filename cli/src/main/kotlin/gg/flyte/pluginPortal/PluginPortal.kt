@@ -39,7 +39,7 @@ class PluginPortal {
                         .subcommands(
                             InstallPluginCommand(),
                             PreviewPluginCommand(),
-                            UpdatePlugin(),
+                            UpdatePluginCommand(),
                             ListPluginsCommand(),
                             DeletePluginCommand(),
                             RequestPluginCommand(),
