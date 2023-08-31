@@ -12,6 +12,8 @@ class SavePresetCommand : CliktCommand(
     help = "Save the current server settings as a preset"
 ) {
     override fun run() {
+        if (ServerManager.noServerFoundCheck()) return
+
         File(
             ServerManager.getPresetsFolderDirectory(),
             "${ServerManager.getActiveServer()?.name}.json"
