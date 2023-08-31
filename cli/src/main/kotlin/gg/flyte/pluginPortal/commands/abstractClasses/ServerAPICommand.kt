@@ -20,14 +20,6 @@ abstract class ServerAPICommand(
 ) {
     override fun run() {
 
-        if (ServerManager.getServerList().isEmpty()) {
-            Config.terminal.println(table {
-                header { row("No Servers found") }
-                body { row("Create one with /ppcli server create") }
-            })
-            return
-        }
-
         if (checkForServer && ServerManager.noServerFoundCheck()) return
 
         val server = KInquirer.promptBetterList(
