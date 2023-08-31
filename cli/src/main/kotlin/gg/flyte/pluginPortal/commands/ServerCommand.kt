@@ -38,17 +38,6 @@ class ServerSettings : CliktCommand(
 
 
 
-class ListServers : CliktCommand(
-    name = "list",
-    help = "List all the servers"
-) {
-    override fun run() {
-        File("servers").walk().forEach {
-            echo(it.name.removeSuffix(".json"))
-        }
-    }
-}
-
 class PresetCommand : CliktCommand(
     name = "preset",
     help = "Manage the server presets"
