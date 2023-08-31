@@ -15,9 +15,7 @@ class PreviewPluginCommand : PluginAPICommand(
             ServiceType.SPIGOTMC -> {
                 preview("https://www.spigotmc.org/resources/${plugin.id}")
             }
-            ServiceType.HANGAR -> {
-                preview("https://hangar.papermc.io/${plugin.id.replace(":", "/")}")
-            }
+
 
             else -> {
                 echo("No preview available for this service type.")
