@@ -1,6 +1,7 @@
 package gg.flyte.pluginPortal.type.server
 
 import gg.flyte.common.type.service.SoftwareType
+import gg.flyte.common.util.GSON
 import gg.flyte.pluginPortal.type.server.ServerManager.getServerFolderDirectory
 import java.io.File
 
@@ -24,6 +25,14 @@ data class ServerConfig(
 
     fun getDirectory(): File {
         return File(getServerFolderDirectory(), name)
+    }
+
+    fun save() {
+        File(getDirectory(), "config.ppm").apply {
+            println(absolutePath)
+            installedPlugins.forEach { println(it) }
+        }.writeText(GSON.toJson(this))
+
     }
 }
 

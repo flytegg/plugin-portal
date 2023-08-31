@@ -49,6 +49,8 @@ class InstallPluginCommand : PluginAPICommand(
                 activeServer.getPluginsFolder()
             )
 
+            ServerManager.addInstalledPluginId(plugin.id)
+
         }
 
         if (validDownloadPlatforms.size > 1) {
@@ -70,6 +72,8 @@ class InstallPluginCommand : PluginAPICommand(
                 plugin.versions[PlatformType.valueOf(platformType)]?.values?.first()!!.downloadUrl,
                 activeServer.getPluginsFolder()
             )
+
+            ServerManager.addInstalledPluginId(plugin.id)
         }
 
 

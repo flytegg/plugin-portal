@@ -39,13 +39,13 @@ class CreateServerCommand : CliktCommand(
         val serverName = getServerName()
 
         val softwareType = KInquirer.promptBetterList("Select Server Type:",
-            ServerType.entries
+            ServerType.values()
                 .filter { serverType -> serverType.containsSupportedSoftware() }
                 .map { serverType -> serverType.getDisplayName() })
             .let { serverType ->
                 KInquirer.promptBetterList(
                     "Select Server Software Type:",
-                    SoftwareType.entries
+                    SoftwareType.values()
                         .filter { it.softwareInterface != null }
                         .filter { it.serverType == ServerType.valueOf(serverType.substringBefore(" >")) }
                         .map { it.getDisplayName() }).let { SoftwareType.valueOf(it.substringBefore(" >")) }

@@ -109,6 +109,15 @@ object ServerManager {
         }
     }
 
+    fun addInstalledPluginId(id: String) {
+        println("adding")
+        println(id)
+        getActiveServer()!!.installedPlugins.add(id)
+        println(getActiveServer()!!.installedPlugins)
+        println("added")
+        getActiveServer()?.save()
+    }
+
     fun getHomeFolderDirectory() = File(System.getProperty("java.class.path")).parentFile.parentFile
     fun getServerFolderDirectory() = File(getHomeFolderDirectory(), "servers")
 }

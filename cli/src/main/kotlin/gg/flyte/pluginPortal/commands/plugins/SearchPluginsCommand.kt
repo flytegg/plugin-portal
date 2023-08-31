@@ -38,12 +38,14 @@ class SearchPluginsCommand : PluginAPICommand(
                 }
 
                 if (isJARFileDownload(downloadUrl)) {
-                    println("Downloading plugin: ${plugin.displayInfo.name} from: $downloadUrl")
+                    println("Downloading plugin: ${plugin.displayInfo.name}")
                     installPlugin(
                         plugin,
                         downloadUrl,
                         activeServer.getPluginsFolder()
                     )
+
+                    ServerManager.addInstalledPluginId(plugin.id)
                     println("Successfully installed plugin: ${plugin.displayInfo.name}")
                 } else {
                     println("Invalid download URL: $downloadUrl")
