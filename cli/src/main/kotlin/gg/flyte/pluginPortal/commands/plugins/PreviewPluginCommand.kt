@@ -11,7 +11,7 @@ class PreviewPluginCommand : PluginAPICommand(
     help = "Show plugin information for correct installation."
 ) {
     override fun finishCommand(plugin: MarketplacePlugin) {
-        when (plugin.serviceData.primaryServiceType) {
+        when (plugin.primaryServiceType) {
             ServiceType.SPIGOTMC -> {
                 preview("https://www.spigotmc.org/resources/${plugin.id}")
             }

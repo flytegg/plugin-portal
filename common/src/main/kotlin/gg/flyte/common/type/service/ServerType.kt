@@ -2,7 +2,7 @@ package gg.flyte.common.type.service
 
 enum class ServerType(val description: String) {
     VANILLA("Strictly Vanilla"),
-    BUKKIT("Supports Plugins, This Is The Most Common"),
+    PLUGINS("Supports Plugins, This Is The Most Common"),
     MODDED("Supports Mods"),
     PROXY("Supports Multiple Servers At Once"),
     SPONGE("Supports Sponge plugins and sometimes Forge mods"),
@@ -10,4 +10,10 @@ enum class ServerType(val description: String) {
 
 
     fun getDisplayName() = "${this.name} > ${this.description}"
+
+    fun containsSupportedSoftware(): Boolean {
+        return SoftwareType.values()
+            .filter { software -> software.serverType == this }
+            .any { softwareType -> softwareType.softwareInterface != null }
+    }
 }

@@ -1,12 +1,14 @@
 package gg.flyte.pluginPortal.type.server
 
-import gg.flyte.common.type.service.SoftwareType
 import gg.flyte.common.util.GSON
 import gg.flyte.common.util.downloadFileSync
 import gg.flyte.pluginPortal.type.config.Config
-import java.io.BufferedReader
+import gg.flyte.pluginPortal.util.isWindows
 import java.io.File
-import java.io.InputStreamReader
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
+
 
 object ServerManager {
 
@@ -16,6 +18,10 @@ object ServerManager {
             it.createNewFile()
             it.writeText(GSON.toJson(server))
         }
+
+        downloadServer(server)
+        generateEula(server)
+        generateFlags(server)
     }
 
     fun getActiveServer(): ServerConfig? {
@@ -31,70 +37,46 @@ object ServerManager {
     fun setActiveServer(server: ServerConfig) {
         Config.userConfig.activeServerName = server.name
         Config.saveConfig()
-
-        downloadServer()
     }
 
-    fun startServer() {
-        val server = getActiveServer()
-        if (server == null) {
-            println("No server found!")
-            return
-        }
+    fun startServer(server: ServerConfig) {
+        val executorService = Executors.newFixedThreadPool(2)
 
-        val process = ProcessBuilder("java -jar server.jar").start()
-        val reader = BufferedReader(InputStreamReader(process.inputStream))
-        val writer = process.outputStream.bufferedWriter()
+        ProcessBuilder("start.bat").apply {
+            if (isWindows) command("cmd.exe", "/c", "start.bat");
+            else command("sh", "-c", "start.bat");
 
-        while (true) {
-            val line = reader.readLine() ?: break
-            println(line)
-        }
+            redirectInput(ProcessBuilder.Redirect.INHERIT)
+            redirectOutput(ProcessBuilder.Redirect.INHERIT)
+            directory(server.getDirectory())
+        }.start()
+            .let { process ->
+                val streamGobbler = StreamGobbler(process.inputStream, System.out::println)
+
+                val future: Future<*> = executorService.submit(streamGobbler)
+
+                val exitCode = process.waitFor()
+
+                try {
+                    future.get(10, TimeUnit.SECONDS)
+                } catch (e: Exception) {
+                    println("Exception occurred while waiting for the future: ${e.message}")
+                }
+
+                if (exitCode == 0) {
+                    println("Process completed successfully.")
+                } else {
+                    println("Process exited with a non-zero code: $exitCode")
+                }
+
+                executorService.shutdown()
+
+            }
     }
 
-    fun downloadServer() {
-        when (getActiveServer()?.softwareType) {
-            SoftwareType.VANILLA -> {
-                //
-                downloadFileSync("https://cdn.mcutils.com/jars/vanilla-1.20.1.jar", File(getActiveServer()?.getDirectory(), "server.jar"))
-
-
-            }
-
-            SoftwareType.SPIGOT -> {
-                // https://cdn.mcutils.com/jars/bukkit-1.20.1.jar
-
-            }
-
-            SoftwareType.PAPER -> {
-                // https://cdn.mcutils.com/jars/paper-1.20.1.jar
-                downloadFileSync("https://cdn.mcutils.com/jars/paper-1.20.1.jar", File(getActiveServer()?.getDirectory(), "server.jar"))
-
-            }
-
-            SoftwareType.PURPUR -> {
-                // https://cdn.mcutils.com/jars/bungeecord-1.20.1.jar
-
-            }
-
-            SoftwareType.FOLIA -> {
-
-            }
-
-            SoftwareType.WATERFALL -> {
-                // https://cdn.mcutils.com/jars/waterfall-1.20.1.jar
-
-            }
-
-            SoftwareType.VELOCITY -> {
-                // https://cdn.mcutils.com/jars/velocity-1.20.1.jar
-
-            }
-
-            else -> {
-                println("Unsupported server type!")
-            }
-        }
+    private fun downloadServer(server: ServerConfig) {
+        server.softwareType.softwareInterface?.getDownloadUrl(server.version)
+            ?.let { downloadUrl -> downloadFileSync(downloadUrl, File(server.getDirectory(), "server.jar")) }
     }
 
     fun getServerFromName(serverName: String): ServerConfig {
@@ -102,6 +84,29 @@ object ServerManager {
         val file = File(folder, "config.ppm")
 
         return GSON.fromJson(file.readText(), ServerConfig::class.java)
+    }
+
+    private fun generateEula(server: ServerConfig) {
+        server.getDirectory().let { serverDirectory ->
+            File(serverDirectory, "eula.txt").let { eulaFile ->
+                if (!eulaFile.exists()) {
+                    eulaFile.createNewFile()
+                    if (Config.userConfig.autoAcceptEula) eulaFile.writeText("eula=true")
+                    else eulaFile.writeText("eula=false")
+                }
+            }
+        }
+    }
+
+    private fun generateFlags(server: ServerConfig) {
+        server.getDirectory().let { serverDirectory ->
+            File(serverDirectory, "start.bat").let { startFile ->
+                if (!startFile.exists()) {
+                    startFile.createNewFile()
+                    startFile.writeText("java -Xmx2G --add-modules=jdk.incubator.vector -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcutils.com -Daikars.new.flags=true -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -jar server.jar --nogui")
+                }
+            }
+        }
     }
 
     fun getHomeFolderDirectory() = File(System.getProperty("java.class.path")).parentFile.parentFile

@@ -11,6 +11,7 @@ import gg.flyte.pluginPortal.type.config.Config
 import gg.flyte.pluginPortal.type.server.ServerConfig
 import gg.flyte.pluginPortal.type.server.ServerManager
 import gg.flyte.pluginPortal.type.server.ServerVersion
+import gg.flyte.pluginPortal.util.promptBetterInput
 import gg.flyte.pluginPortal.util.promptBetterList
 import java.io.File
 
@@ -20,7 +21,7 @@ class CreateServerCommand : CliktCommand(
 ) {
     override fun run() {
         fun getServerName(): String {
-            val serverName = KInquirer.promptInput("Server Name: ")
+            val serverName = KInquirer.promptBetterInput("Enter Server Name:")
             if (serverName.isEmpty()) {
                 echo("Server name cannot be empty!")
                 return getServerName()
@@ -37,33 +38,22 @@ class CreateServerCommand : CliktCommand(
 
         val serverName = getServerName()
 
-        val softwareType = KInquirer.promptList("Select Server Type:",
-            ServerType.entries.map { it.getDisplayName() }).let { serverType ->
-            KInquirer.promptList(
-                "Select Server Software Type:",
-                SoftwareType.entries
-                    .filter { it.serverType == ServerType.valueOf(serverType.substringBefore(" >")) }
-                    .map { it.getDisplayName() }).let { SoftwareType.valueOf(it.substringBefore(" >")) }
-        }
+        val softwareType = KInquirer.promptBetterList("Select Server Type:",
+            ServerType.entries
+                .filter { serverType -> serverType.containsSupportedSoftware() }
+                .map { serverType -> serverType.getDisplayName() })
+            .let { serverType ->
+                KInquirer.promptBetterList(
+                    "Select Server Software Type:",
+                    SoftwareType.entries
+                        .filter { it.softwareInterface != null }
+                        .filter { it.serverType == ServerType.valueOf(serverType.substringBefore(" >")) }
+                        .map { it.getDisplayName() }).let { SoftwareType.valueOf(it.substringBefore(" >")) }
+            }
 
-        if (listOf(
-                SoftwareType.PAPER,
-                SoftwareType.TRAVERTINE,
-                SoftwareType.WATERFALL,
-                SoftwareType.VELOCITY,
-                SoftwareType.FOLIA
-            ).contains(softwareType)
-        ) {
-            val serverVersion = KInquirer.promptBetterList(
-                "Server Version:",
-                PaperMCAPI.getProject(softwareType.name.lowercase()).body()?.versions!!.map { it!! }.reversed()
-            )
-        }
-
-
-        val serverVersion = KInquirer.promptList(
+        val serverVersion = KInquirer.promptBetterList(
             "Server Version:",
-            ServerVersion.entries.map { it.name.replace("V", "").replace("_", ".") }.reversed()
+            SoftwareType.valueOf(softwareType.name).softwareInterface!!.getVersions().reversed()
         )
 
         ServerConfig(

@@ -15,5 +15,6 @@ enum class PlatformGroup {
 
 
 fun findPlatformTypesFromGroup(platformGroup: PlatformGroup): List<PlatformType> {
-    return PlatformType.entries.filter { platformGroup in it.platformGroup }
+    return PlatformType.values()
+        .filter { platformGroup in it.platformGroup }
 }

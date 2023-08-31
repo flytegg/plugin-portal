@@ -16,7 +16,9 @@ abstract class PluginAPICommand(
     name = name,
     help = help
 ) {
-    val name: String by option().prompt("Plugin Name").help("The name of the plugin to search for.")
+    val name: String by option()
+        .prompt("Enter Plugin Name")
+        .help("The name of the plugin to search for.")
 
     lateinit var plugin: MarketplacePlugin
 

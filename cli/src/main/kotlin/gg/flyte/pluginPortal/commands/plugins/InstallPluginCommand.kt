@@ -14,11 +14,16 @@ class InstallPluginCommand : PluginAPICommand(
     help = "Install a Plugin."
 ) {
     override fun finishCommand(plugin: MarketplacePlugin) {
-        val validDownloadPlatforms: ArrayList<PlatformType> = arrayListOf()
+        val validDownloadPlatforms: HashSet<PlatformType> = hashSetOf()
 
-        findPlatformTypesFromGroup(plugin.serviceData.platformGroup)
-            .filter { plugin.versions.containsKey(it) }
-            .forEach { validDownloadPlatforms.add(it) }
+        plugin.versions.keys.forEach { platformType ->
+            platformType.platformGroup.forEach { platformGroup ->
+                findPlatformTypesFromGroup(platformGroup)
+                    .filter { plugin.versions.containsKey(it) }
+                    .forEach { validDownloadPlatforms.add(it) }
+            }
+        }
+
 
         if (validDownloadPlatforms.isEmpty()) {
             println("No valid download platforms found for this plugin.")

@@ -9,15 +9,10 @@ data class MarketplacePlugin(
     val id: String,
     val displayInfo: DisplayInfo,
     val stats: Stats,
-    val serviceData: ServiceData,
+    val primaryServiceType: ServiceType,
     val versionData: VersionData,
     val versions: HashMap<PlatformType, HashMap<String, VersionInfo>>,
     val alternatePluginIds: HashSet<String>? // HashSet<Id>, this is where plugins are hosted on multiple services
-)
-
-data class ServiceData(
-    val primaryServiceType: ServiceType,
-    val platformGroup: PlatformGroup
 )
 
 data class VersionData(

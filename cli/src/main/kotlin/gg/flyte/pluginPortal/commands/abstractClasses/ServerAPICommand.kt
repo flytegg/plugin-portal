@@ -5,6 +5,7 @@ import com.github.kinquirer.KInquirer
 import com.github.kinquirer.components.promptList
 import gg.flyte.pluginPortal.type.server.ServerManager
 import gg.flyte.pluginPortal.type.server.ServerConfig
+import gg.flyte.pluginPortal.util.promptBetterList
 import java.io.File
 
 abstract class ServerAPICommand(
@@ -15,7 +16,7 @@ abstract class ServerAPICommand(
     help = help
 ) {
     override fun run() {
-        val server = KInquirer.promptList(
+        val server = KInquirer.promptBetterList(
             "Select a server to manage:",
             ServerManager.getServerFolderDirectory().listFiles()?.map { it.name } ?: listOf("Exit")
         )

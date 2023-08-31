@@ -12,6 +12,7 @@ import gg.flyte.pluginPortal.type.server.ServerManager.setActiveServer
 import gg.flyte.pluginPortal.type.config.Config
 import gg.flyte.pluginPortal.type.server.ServerConfig
 import gg.flyte.pluginPortal.type.server.*
+import gg.flyte.pluginPortal.type.server.ServerManager.startServer
 import java.io.File
 
 class ServerCommand : CliktCommand(
@@ -26,7 +27,13 @@ class StartServer : CliktCommand(
     help = "Start the Server"
 ) {
     override fun run() {
-        echo("starting server")
+        ServerManager.getActiveServer().let { server ->
+            if (server == null) {
+                echo("No active server found!")
+                return
+            }
+            startServer(server)
+        }
     }
 }
 
