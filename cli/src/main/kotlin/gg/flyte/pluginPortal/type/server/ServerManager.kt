@@ -1,8 +1,12 @@
 package gg.flyte.pluginPortal.type.server
 
+import gg.flyte.common.api.dataClasses.MarketplacePlugin
+import gg.flyte.common.type.service.PlatformType
 import gg.flyte.common.util.GSON
 import gg.flyte.common.util.downloadFileSync
+import gg.flyte.common.util.installPlugin
 import gg.flyte.pluginPortal.type.config.Config
+import gg.flyte.pluginPortal.type.plugin.PluginInstaller
 import gg.flyte.pluginPortal.util.isWindows
 import java.io.File
 import java.util.concurrent.Executors
@@ -109,11 +113,32 @@ object ServerManager {
         }
     }
 
-    fun addInstalledPluginId(id: String) {
+    fun installPluginToServer(
+        plugin: MarketplacePlugin,
+        url: String,
+        pluginFolder: File,
+        version: String
+        platformType: PlatformType
+    ) {
+        installPlugin(
+            plugin,
+            url,
+            pluginFolder,
+            false
+        )
+
+        getActiveServer()!!.pluginInstallers.add(
+            PluginInstaller(
+                plugin.id,
+                version,
+                platformType
+            )
+        )
+
+
         println("adding")
-        println(id)
-        getActiveServer()!!.installedPlugins.add(id)
-        println(getActiveServer()!!.installedPlugins)
+        getActiveServer()!!.pluginInstallers.add(id)
+        println(getActiveServer()!!.pluginInstallers)
         println("added")
         getActiveServer()?.save()
     }

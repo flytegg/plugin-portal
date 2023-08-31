@@ -2,8 +2,6 @@ package gg.flyte.pluginPortal.commands.server
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.kinquirer.KInquirer
-import com.github.kinquirer.components.promptInput
-import com.github.kinquirer.components.promptList
 import gg.flyte.common.api.PaperMCAPI
 import gg.flyte.common.type.service.ServerType
 import gg.flyte.common.type.service.SoftwareType

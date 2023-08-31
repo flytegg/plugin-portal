@@ -2,6 +2,7 @@ package gg.flyte.pluginPortal.type.server
 
 import gg.flyte.common.type.service.SoftwareType
 import gg.flyte.common.util.GSON
+import gg.flyte.pluginPortal.type.plugin.PluginInstaller
 import gg.flyte.pluginPortal.type.server.ServerManager.getServerFolderDirectory
 import java.io.File
 
@@ -15,7 +16,7 @@ data class ServerConfig(
         true,
         false
     ),
-    val installedPlugins: HashSet<String> = hashSetOf() // Plugin id's
+    val pluginInstallers: ArrayList<PluginInstaller> = arrayListOf()
 ) {
     fun getPluginsFolder(): File {
         return File(getDirectory(), "plugins").apply {
@@ -30,7 +31,7 @@ data class ServerConfig(
     fun save() {
         File(getDirectory(), "config.ppm").apply {
             println(absolutePath)
-            installedPlugins.forEach { println(it) }
+            pluginInstallers.forEach { println(it) }
         }.writeText(GSON.toJson(this))
 
     }

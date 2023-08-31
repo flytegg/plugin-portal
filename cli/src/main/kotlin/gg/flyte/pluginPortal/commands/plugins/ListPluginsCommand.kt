@@ -16,7 +16,7 @@ class ListPluginsCommand : CliktCommand(
             return
         }
 
-        for (plugin in activeServer.installedPlugins) {
+        for (plugin in activeServer.pluginInstallers) {
             echo(plugin)
         }
 
