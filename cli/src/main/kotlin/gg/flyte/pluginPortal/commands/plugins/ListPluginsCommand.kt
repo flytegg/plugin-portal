@@ -29,10 +29,7 @@ class ListPluginsCommand : CliktCommand(
                 row {
                     StringBuilder().apply {
                         activeServer.installedPlugins.forEach { plugin ->
-                            append("${plugin.name} (${plugin.id}) | $pl")
-                            append(version)
-                            append(" ")
-                            append(it.platformType.name)
+                            append("${plugin.name} (${plugin.id}) | ${plugin.platformType.name} | ${plugin.version}")
                             append("\n")
                         }
                     }
@@ -40,11 +37,6 @@ class ListPluginsCommand : CliktCommand(
             }
 
         })
-
-        for (plugin in activeServer.installedPlugins) {
-            echo(plugin)
-        }
-
 
     }
 
