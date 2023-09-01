@@ -8,32 +8,33 @@ import revxrsal.commands.annotation.Default
 import revxrsal.commands.annotation.DefaultFor
 import revxrsal.commands.annotation.Subcommand
 import revxrsal.commands.bukkit.annotation.CommandPermission
-import revxrsal.commands.command.CommandActor
 import revxrsal.commands.help.CommandHelp
 
 
-@Command("pp", "pluginportal", "ppm")
+@Command("pp", "pluginportal", "ppm", "pportal")
 class PPCommand  {
 
-    @DefaultFor("pp", "pluginportal", "ppm")
-    fun onPPCommand(sender: Audience, helpEntries: CommandHelp<String?>, @Default("1") page: Int) {
-        for (entry in helpEntries.paginate(page, 7))  // 7 entries per page
+    @DefaultFor("pp", "pluginportal", "ppm", "pportal")
+    fun onPPCommand(sender: Audience, helpEntries: CommandHelp<String>, page: Int = 1) {
+        for (entry in helpEntries.paginate(page, 7)) {
             sender.sendMessage(entry!!.toComponent())
+        }
+
     }
 
-    @Subcommand("help", "h")
+    @Subcommand("help")
     fun onHelpCommand(sender: Audience, helpEntries: CommandHelp<String?>, @Default("1") page: Int) {
         for (entry in helpEntries.paginate(page, 7))  // 7 entries per page
             sender.sendMessage(entry!!.toComponent())
     }
 
-    @Subcommand("install", "in")
+    @Subcommand("install", "i")
     @CommandPermission("pluginportal.install")
     fun onInstallCommand(int: Int) {
         Bukkit.broadcast(int.toString().toComponent())
     }
 
-    @Subcommand("uninstall", "un")
+    @Subcommand("uninstall")
     @CommandPermission("pluginportal.uninstall")
     fun onUninstallCommand(int: Int) {
         Bukkit.broadcast(int.toString().toComponent())
@@ -51,7 +52,7 @@ class PPCommand  {
         Bukkit.broadcast(int.toString().toComponent())
     }
 
-    @Subcommand("disable", "dis")
+    @Subcommand("disable")
     @CommandPermission("pluginportal.disable")
     fun onDisableCommand(int: Int) {
         Bukkit.broadcast(int.toString().toComponent())
@@ -81,7 +82,7 @@ class PPCommand  {
         Bukkit.broadcast(int.toString().toComponent())
     }
 
-    @Subcommand("request", "r")
+    @Subcommand("request")
     @CommandPermission("pluginportal.request")
     fun onRequestCommand(int: Int) {
         Bukkit.broadcast(int.toString().toComponent())
