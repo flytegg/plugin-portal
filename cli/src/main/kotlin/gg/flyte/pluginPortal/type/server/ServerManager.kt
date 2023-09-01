@@ -3,12 +3,9 @@ package gg.flyte.pluginPortal.type.server
 import com.github.ajalt.mordant.table.table
 import gg.flyte.common.api.dataClasses.MarketplacePlugin
 import gg.flyte.common.type.service.PlatformType
-import gg.flyte.common.util.GSON
-import gg.flyte.common.util.downloadFileSync
-import gg.flyte.common.util.installPlugin
 import gg.flyte.pluginPortal.type.config.Config
 import gg.flyte.common.type.plugin.InstalledPlugin
-import gg.flyte.common.util.isJARFileDownload
+import gg.flyte.common.util.*
 import gg.flyte.pluginPortal.util.isWindows
 import java.io.File
 import java.util.concurrent.Executors
@@ -28,6 +25,7 @@ object ServerManager {
         downloadServer(server)
         generateEula(server)
         generateFlags(server)
+        generateOpsFile(server)
     }
 
     fun getActiveServer(): ServerConfig? {
@@ -110,6 +108,17 @@ object ServerManager {
                 if (!startFile.exists()) {
                     startFile.createNewFile()
                     startFile.writeText("java -Xmx2G --add-modules=jdk.incubator.vector -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcutils.com -Daikars.new.flags=true -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -jar server.jar --nogui")
+                }
+            }
+        }
+    }
+
+    private fun generateOpsFile(server: ServerConfig) {
+        server.getDirectory().let { serverDirectory ->
+            File(serverDirectory, "ops.json").let { opsFile ->
+                if (!opsFile.exists()) {
+                    opsFile.createNewFile()
+                    opsFile.writeText(Config.userConfig.defaultOperators.toJson())
                 }
             }
         }

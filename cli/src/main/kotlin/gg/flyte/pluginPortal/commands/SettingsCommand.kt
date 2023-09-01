@@ -1,14 +1,20 @@
 package gg.flyte.pluginPortal.commands
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.mordant.table.table
 import com.github.kinquirer.KInquirer
 import com.github.kinquirer.components.promptConfirm
-import com.github.kinquirer.components.promptInput
 import gg.flyte.common.util.GSON
+import gg.flyte.common.util.addDashesToStringUUID
+import gg.flyte.common.util.getStringFromURL
+import gg.flyte.common.util.toJson
 import gg.flyte.pluginPortal.type.config.Config
 import gg.flyte.pluginPortal.type.config.Modifier
 import gg.flyte.pluginPortal.type.config.UserSetting
+import gg.flyte.pluginPortal.type.server.ServerOperator
+import gg.flyte.pluginPortal.util.promptBetterInput
 import gg.flyte.pluginPortal.util.promptBetterList
+import java.util.*
 
 class SettingsCommand : CliktCommand(
     name = "settings",
@@ -45,11 +51,26 @@ class SettingsCommand : CliktCommand(
                 when (value) {
                     Modifier.ADD -> {
                         Config.userConfig.defaultOperators.add(
-                            KInquirer.promptInput(
+                            KInquirer.promptBetterInput(
                                 message = "Enter a player name to add to the default operators list:"
-                            )
+                            ).let { name ->
+                                ServerOperator(
+                                    getStringFromURL("https://api.mojang.com/users/profiles/minecraft/$name").let { uuid ->
+                                        if (uuid.contains("Couldn't find any profile with name", true)) {
+                                            Config.terminal.println(table {
+                                                body { row("$name Not Found") }
+                                            })
+                                            return
+                                        } else {
+                                            uuid.substring(12, 44).addDashesToStringUUID()
+                                        }
+                                    },
+                                    name
+                                )
+                            }
                         )
                     }
+
                     Modifier.REMOVE -> {
                         if (Config.userConfig.defaultOperators.isEmpty()) {
                             echo("There are no players in the default operators list")
@@ -57,10 +78,12 @@ class SettingsCommand : CliktCommand(
                         }
 
                         Config.userConfig.defaultOperators.remove(
-                            KInquirer.promptBetterList(
-                                message = "Select a player name to remove from the default operators list:",
-                                choices = Config.userConfig.defaultOperators
-                            )
+                            Config.userConfig.defaultOperators.find {
+                                it.name == KInquirer.promptBetterList(
+                                    message = "Select a player name to remove from the default operators list:",
+                                    choices = Config.userConfig.defaultOperators.map { op -> op.name }
+                                )
+                            }
                         )
                     }
                 }

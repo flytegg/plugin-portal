@@ -1,5 +1,7 @@
 package gg.flyte.pluginPortal.type.config
 
+import gg.flyte.pluginPortal.type.server.ServerOperator
+
 data class UserConfig(
     var browserPreview: Boolean = true,
     var autoUpdatePlugins: Boolean = false,
@@ -9,5 +11,5 @@ data class UserConfig(
     val debug: Boolean = false,
     var activeServerName: String? = null,
     var lastLaunchedVersion: String? = "2.0.0",
-    val defaultOperators: ArrayList<String> = arrayListOf(),
+    val defaultOperators: ArrayList<ServerOperator> = arrayListOf(),
 )
