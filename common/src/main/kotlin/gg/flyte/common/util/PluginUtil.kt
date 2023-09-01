@@ -1,7 +1,7 @@
 package gg.flyte.common.util
 
 import gg.flyte.common.api.dataClasses.MarketplacePlugin
-import gg.flyte.common.type.service.PlatformType
+import gg.flyte.common.type.api.service.PlatformType
 import java.io.File
 
 fun installPlugin(

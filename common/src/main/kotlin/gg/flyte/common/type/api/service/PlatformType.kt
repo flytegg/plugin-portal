@@ -1,4 +1,4 @@
-package gg.flyte.common.type.service
+package gg.flyte.common.type.api.service
 
 enum class PlatformType(vararg val platformGroup: PlatformGroup) {
     BUKKIT(PlatformGroup.CRAFT_BUKKIT),

@@ -12,8 +12,8 @@ import retrofit2.create
 
 const val USER_AGENT = "flytegg/pp-lib/2.0.0 (hello@flyte.gg)"
 
-//const val BASE_DOMAIN = "https://api.portalbox.link/v1/"
-const val BASE_DOMAIN = "http://localhost:5005/v1/"
+const val BASE_DOMAIN = "https://api.pluginportal.link/v1/"
+//const val BASE_DOMAIN = "http://localhost:5006/v1/"
 
 val GSON: Gson = GsonBuilder().setPrettyPrinting().create()
 

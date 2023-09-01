@@ -1,6 +1,6 @@
 package gg.flyte.common.api.dataClasses
 
-import gg.flyte.common.type.service.PlatformType
+import gg.flyte.common.type.api.service.PlatformType
 
 data class Dependency(
     val name: String,

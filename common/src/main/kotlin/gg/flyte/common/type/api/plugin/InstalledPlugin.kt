@@ -1,7 +1,7 @@
-package gg.flyte.common.type.plugin
+package gg.flyte.common.type.api.plugin
 
-import gg.flyte.common.type.service.PlatformType
-import gg.flyte.common.type.service.ServiceType
+import gg.flyte.common.type.api.service.PlatformType
+import gg.flyte.common.type.api.service.ServiceType
 
 data class InstalledPlugin(
     val id: String,
@@ -10,4 +10,5 @@ data class InstalledPlugin(
     val primaryPlatformType: PlatformType,
     val serviceType: ServiceType,
     val sha256Hash: String,
+    val downloadUrl: String,
 )

@@ -1,4 +1,4 @@
-package gg.flyte.common.type.service
+package gg.flyte.common.type.api.service
 
 enum class ServerType(val description: String) {
     VANILLA("Strictly Vanilla"),

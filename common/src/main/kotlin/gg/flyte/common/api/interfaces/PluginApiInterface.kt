@@ -2,8 +2,10 @@ package gg.flyte.common.api.interfaces
 
 import gg.flyte.common.api.dataClasses.MarketplacePlugin
 import gg.flyte.common.api.dataClasses.endpoints.PaginatedResultMarketplacePlugin
-import gg.flyte.common.type.service.PlatformGroup
-import gg.flyte.common.type.service.PlatformType
+import gg.flyte.common.type.api.service.PlatformGroup
+import gg.flyte.common.type.api.service.PlatformType
+import gg.flyte.common.type.api.user.PPPlatform
+import gg.flyte.common.type.api.user.Profile
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.*
@@ -32,7 +34,7 @@ interface PluginApiInterface {
     fun recognizePluginByHashes(@Query("hashes") hashes: String, @Query("platformGroup") platformGroup: PlatformGroup): Call<HashMap<String, MarketplacePlugin>> // SHA256, Plugin
 
     @GET("versions")
-    fun getVersions(): Call<HashMap<String, String>> // SHA256, Version
+    fun getVersions(@Query("profileString") profileString: String): Call<HashMap<PPPlatform, LinkedHashMap<String, String>>>
 
 
 }

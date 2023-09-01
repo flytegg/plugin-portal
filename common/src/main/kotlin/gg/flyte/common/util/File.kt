@@ -23,7 +23,7 @@ fun File.get256Hash(): String {
         result.append(HEX_CHARS[i and 0x0f])
     }
 
-    return result.toString()
+    return result.toString().lowercase()
 }
 
 //fun download(downloadURL: URL, output: File): File? {

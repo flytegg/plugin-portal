@@ -1,4 +1,4 @@
-package gg.flyte.common.type.error
+package gg.flyte.common.type.api.error
 
 data class PostError(
     val pluginVersion: String,

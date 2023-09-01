@@ -1,4 +1,4 @@
-package gg.flyte.common.type.service
+package gg.flyte.common.type.api.service
 
 enum class PlatformGroup {
     CRAFT_BUKKIT,

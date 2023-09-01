@@ -2,9 +2,13 @@ package gg.flyte.common.api
 
 import gg.flyte.common.api.dataClasses.MarketplacePlugin
 import gg.flyte.common.api.dataClasses.endpoints.PaginatedResultMarketplacePlugin
-import gg.flyte.common.type.service.PlatformGroup
-import gg.flyte.common.type.service.PlatformType
+import gg.flyte.common.type.api.service.PlatformGroup
+import gg.flyte.common.type.api.service.PlatformType
+import gg.flyte.common.type.api.user.PPPlatform
+import gg.flyte.common.type.api.user.Profile
+import gg.flyte.common.util.GSON
 import gg.flyte.common.util.pluginApiInterface
+import gg.flyte.common.util.toJson
 import retrofit2.Response
 
 object API {
@@ -30,8 +34,8 @@ object API {
         return pluginApiInterface.recognizePluginByHashes(hashes, platformGroup).execute()
     }
 
-    fun getVersions(): Response<HashMap<String, String>> {
-        return pluginApiInterface.getVersions().execute()
+    fun getVersions(profile: Profile): Response<HashMap<PPPlatform, LinkedHashMap<String, String>>> {
+        return pluginApiInterface.getVersions(profile.toJson()).execute()
     }
 }
 

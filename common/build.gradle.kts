@@ -9,6 +9,7 @@ repositories {
 
 dependencies {
     implementation("com.github.ajalt.mordant:mordant:2.1.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
@@ -25,7 +26,7 @@ application {
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+//        kotlinOptions.jvmTarget = "1.8"
     }
     build {
         dependsOn(shadowJar)

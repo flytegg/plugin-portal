@@ -1,8 +1,8 @@
 package gg.flyte.common.api.dataClasses
 
-import gg.flyte.common.type.service.PlatformGroup
-import gg.flyte.common.type.service.PlatformType
-import gg.flyte.common.type.service.ServiceType
+import gg.flyte.common.type.api.service.PlatformGroup
+import gg.flyte.common.type.api.service.PlatformType
+import gg.flyte.common.type.api.service.ServiceType
 import java.util.TreeSet
 
 data class MarketplacePlugin(

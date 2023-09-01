@@ -56,7 +56,7 @@ class SettingsCommand : CliktCommand(
                             ).let { name ->
                                 ServerOperator(
                                     getStringFromURL("https://api.mojang.com/users/profiles/minecraft/$name").let { uuid ->
-                                        if (uuid.contains("Couldn't find any profile with name", true)) {
+                                        if (uuid.contains("Couldn't find any profile with name",  true)) {
                                             Config.terminal.println(table {
                                                 body { row("$name Not Found") }
                                             })

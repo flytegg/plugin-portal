@@ -71,5 +71,10 @@
       <option name="name" value="maven3" />
       <option name="url" value="https://jcenter.bintray.com/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven6" />
+      <option name="name" value="maven6" />
+      <option name="url" value="https://oss.sonatype.org/content/repositories/central" />
+    </remote-repository>
   </component>
 </project>

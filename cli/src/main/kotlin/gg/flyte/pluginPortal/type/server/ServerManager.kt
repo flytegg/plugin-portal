@@ -2,9 +2,9 @@ package gg.flyte.pluginPortal.type.server
 
 import com.github.ajalt.mordant.table.table
 import gg.flyte.common.api.dataClasses.MarketplacePlugin
-import gg.flyte.common.type.service.PlatformType
+import gg.flyte.common.type.api.service.PlatformType
 import gg.flyte.pluginPortal.type.config.Config
-import gg.flyte.common.type.plugin.InstalledPlugin
+import gg.flyte.common.type.api.plugin.InstalledPlugin
 import gg.flyte.common.util.*
 import gg.flyte.pluginPortal.util.isWindows
 import java.io.File
@@ -175,6 +175,7 @@ object ServerManager {
                         pluginFolder,
                         false
                     ),
+                    url
                 )
             )
 

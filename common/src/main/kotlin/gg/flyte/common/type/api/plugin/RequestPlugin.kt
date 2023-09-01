@@ -1,6 +1,6 @@
-package gg.flyte.common.type.plugin
+package gg.flyte.common.type.api.plugin
 
-import gg.flyte.common.type.service.ServiceType
+import gg.flyte.common.type.api.service.ServiceType
 
 data class RequestPlugin(
     val id: String,

@@ -3,8 +3,8 @@ package gg.flyte.pluginPortal.commands.server
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.kinquirer.KInquirer
 import gg.flyte.common.api.PaperMCAPI
-import gg.flyte.common.type.service.ServerType
-import gg.flyte.common.type.service.SoftwareType
+import gg.flyte.common.type.api.service.ServerType
+import gg.flyte.common.type.api.service.SoftwareType
 import gg.flyte.pluginPortal.type.config.Config
 import gg.flyte.pluginPortal.type.server.ServerConfig
 import gg.flyte.pluginPortal.type.server.ServerManager

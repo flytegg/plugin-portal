@@ -1,4 +1,4 @@
-package gg.flyte.common.type.software.`interface`
+package gg.flyte.common.type.api.software.`interface`
 
 import gg.flyte.common.api.PaperMCAPI
 

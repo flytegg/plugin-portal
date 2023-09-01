@@ -1,3 +1,4 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -50,6 +51,7 @@ subprojects {
         compileOnly("net.kyori:adventure-api:4.14.0")
         compileOnly("net.kyori:adventure-text-minimessage:4.14.0")
         implementation("com.github.Revxrsal.Lamp:common:3.1.5")
+        implementation("com.github.Revxrsal.Lamp:brigadier:3.1.5")
         implementation("com.google.code.gson:gson:2.10.1")
     }
 
@@ -60,27 +62,28 @@ subprojects {
         }
     }
 
-    java {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    tasks {
-        withType<KotlinCompile> {
-            kotlinOptions {
-                jvmTarget = "1.8"
-
-            }
-        }
-    }
+//    java {
+//        sourceCompatibility = JavaVersion.VERSION_1_8
+//        targetCompatibility = JavaVersion.VERSION_1_8
+//    }
+//
+//    tasks {
+//        withType<KotlinCompile> {
+//            kotlinOptions {
+//                jvmTarget = "1.8"
+//
+//            }
+//        }
+//    }
 }
 
-tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+tasks.named<ShadowJar>("shadowJar") {
     relocate("net.kyori.adventure", "gg.flyte.lib.adventure")
     relocate("kotlin", "gg.flyte.lib.kotlin")
     relocate("com.google.gson", "gg.flyte.lib.gson")
     relocate("com.github.Revxrsal.Lamp", "gg.flyte.lib.lamp")
-
+    relocate("com.github.Revxrsal.Lamp", "gg.flyte.lib.lamp")
+    relocate("org.bstats", "gg.flyte.lib.bstats")
 }
 
 task<Copy>("copyJars") {

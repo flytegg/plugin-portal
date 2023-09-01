@@ -1,0 +1,7 @@
+name: PluginPortal
+version: 2.0.0
+main: gg.flyte.pluginPortal.PluginPortal
+description: A Minecraft Modification Package Manager
+author: Flyte
+website: https://flyte.gg
+api-version: '1.13'
