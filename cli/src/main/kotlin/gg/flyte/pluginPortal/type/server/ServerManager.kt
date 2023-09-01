@@ -179,7 +179,7 @@ object ServerManager {
             )
 
             Config.terminal.println(table {
-                header { row("Installed plugin: ${plugin.displayInfo.name}") }
+                header { row("Updated plugin: ${plugin.displayInfo.name}") }
                 footer { row("Total Plugins: ${getActiveServer()!!.installedPlugins.size} | Server Name: ${getActiveServer()!!.name}") }
             })
 

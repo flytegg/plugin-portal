@@ -2,6 +2,7 @@ package gg.flyte.common.api
 
 import gg.flyte.common.api.dataClasses.MarketplacePlugin
 import gg.flyte.common.api.dataClasses.endpoints.PaginatedResultMarketplacePlugin
+import gg.flyte.common.type.service.PlatformGroup
 import gg.flyte.common.type.service.PlatformType
 import gg.flyte.common.util.pluginApiInterface
 import retrofit2.Response
@@ -23,6 +24,14 @@ object API {
 
     fun requestPluginById(id: String, platformType: PlatformType): Response<Boolean> {
         return pluginApiInterface.requestPluginById(id, platformType).execute()
+    }
+
+    fun recognizePluginByHashes(hashes: String, platformGroup: PlatformGroup): Response<HashMap<String, MarketplacePlugin>> {
+        return pluginApiInterface.recognizePluginByHashes(hashes, platformGroup).execute()
+    }
+
+    fun getVersions(): Response<HashMap<String, String>> {
+        return pluginApiInterface.getVersions().execute()
     }
 }
 
