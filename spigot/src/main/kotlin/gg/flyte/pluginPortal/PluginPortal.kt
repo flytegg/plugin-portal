@@ -4,6 +4,7 @@ import gg.flyte.pluginPortal.command.PPCommand
 import gg.flyte.pluginPortal.type.Config
 import io.papermc.lib.PaperLib
 import me.superpenguin.superglue.foundations.customevents.CustomEventListener
+import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
@@ -15,7 +16,11 @@ class PluginPortal : JavaPlugin() {
     override fun onEnable() {
         Config.init(this)
 
+        val audiences = BukkitAudiences.create(this)
+
         BukkitCommandHandler.create(this).apply {
+            enableAdventure(audiences)
+
             register(PPCommand())
             fastRegister(
 
