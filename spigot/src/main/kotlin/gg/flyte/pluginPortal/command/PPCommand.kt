@@ -14,33 +14,9 @@ import revxrsal.commands.help.CommandHelp
 @Command("pp", "pluginportal", "ppm", "pportal")
 class PPCommand  {
 
-
-
-
-
-
-
     @Subcommand("preview", "p")
     @CommandPermission("pluginportal.preview")
     fun onPreviewCommand(int: Int) {
-        Bukkit.broadcast(int.toString().toComponent())
-    }
-
-    @Subcommand("enable", "en")
-    @CommandPermission("pluginportal.enable")
-    fun onEnableCommand(int: Int) {
-        Bukkit.broadcast(int.toString().toComponent())
-    }
-
-    @Subcommand("disable")
-    @CommandPermission("pluginportal.disable")
-    fun onDisableCommand(int: Int) {
-        Bukkit.broadcast(int.toString().toComponent())
-    }
-
-    @Subcommand("update", "up")
-    @CommandPermission("pluginportal.update")
-    fun onUpdateCommand(int: Int) {
         Bukkit.broadcast(int.toString().toComponent())
     }
 
