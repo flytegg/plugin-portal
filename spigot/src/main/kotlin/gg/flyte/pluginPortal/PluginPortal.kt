@@ -21,8 +21,6 @@ import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import revxrsal.commands.bukkit.BukkitCommandHandler
-import java.io.File
-
 
 class PluginPortal : JavaPlugin() {
 
@@ -31,8 +29,8 @@ class PluginPortal : JavaPlugin() {
         twilight(this) {}
         PPPluginCache.loadInstalledPlugins(
             dataFolder.apply { mkdir() }.parentFile,
-            SpigotInstalledPluginLoader().apply {
-                loadInstalledPlugins(File(dataFolder, "plugins.json"))
+            SpigotInstalledPluginLoader(this).apply {
+                loadInstalledPlugins()
             }
         )
 
@@ -110,6 +108,7 @@ class PluginPortal : JavaPlugin() {
     }
 
     override fun onDisable() {
+        PPPluginCache.saveInstalledPlugins()
         logger.info("PluginPortal has been disabled!")
     }
 

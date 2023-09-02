@@ -5,7 +5,12 @@ import java.io.File
 
 interface InstalledPluginLoader {
 
-    abstract val installedPlugins: ArrayList<InstalledPlugin>
-    abstract fun loadInstalledPlugins(configFIle: File)
+    abstract val configFile: File
+    abstract val installedPlugins: MutableSet<InstalledPlugin>
+
+    abstract fun addInstalledPlugin(plugin: InstalledPlugin)
+    abstract fun loadInstalledPlugins()
+    abstract fun saveInstalledPlugins()
 
 }
+

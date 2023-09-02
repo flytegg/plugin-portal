@@ -10,6 +10,7 @@ import gg.flyte.common.type.api.plugin.InstalledPlugin
 import gg.flyte.common.type.api.service.PlatformGroup
 import gg.flyte.common.type.api.service.PlatformType
 import gg.flyte.common.util.get256Hash
+import gg.flyte.common.util.toJson
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -24,6 +25,8 @@ object PPPluginCache {
         .build()
 
     private val installedPlugins = arrayListOf<InstalledPlugin>()
+
+    private lateinit var loader: InstalledPluginLoader
 
     fun getPluginsByName(name: String) = arrayListOf<MarketplacePlugin>().apply {
         pluginCache.asMap().keys.forEach {
@@ -67,16 +70,14 @@ object PPPluginCache {
     }
 
     fun loadInstalledPlugins(pluginsFolder: File, loader: InstalledPluginLoader) {
+        this.loader = loader
         val loadedPlugins = loader.installedPlugins
         val requestHashes = arrayListOf<String>()
 
         println(pluginsFolder.absolutePath)
         for (file in pluginsFolder.listFiles()!!) {
             if (file.isDirectory || !file.name.endsWith(".jar")) continue
-            println("this")
             if (loadedPlugins.any { it.sha256Hash == file.get256Hash() }) continue
-            println("thisssssss")
-
 
             println("Found Jar: ${file.name}")
             requestHashes.add(file.get256Hash())
@@ -100,18 +101,26 @@ object PPPluginCache {
 
                 println("Auto Recognized Plugin: ${plugin.displayInfo.name} | Version: $pluginVersion | Platform: $pluginPlatform")
 
-                loadedPlugins.add(
-                    InstalledPlugin(
-                        plugin.id,
-                        plugin.displayInfo.name,
-                        pluginVersion,
-                        pluginPlatform!!,
-                        plugin.primaryServiceType,
-                        hash,
-                        pluginVersionData!!.downloadUrl,
-                    )
+                val installedPlugin = InstalledPlugin(
+                    plugin.id,
+                    plugin.displayInfo.name,
+                    pluginVersion,
+                    pluginPlatform!!,
+                    plugin.primaryServiceType,
+                    hash,
+                    pluginVersionData!!.downloadUrl,
                 )
+
+                println(installedPlugin.toJson())
+
+                loader.addInstalledPlugin(installedPlugin)
             }
         }
+
+        saveInstalledPlugins()
+    }
+
+    fun saveInstalledPlugins() {
+        loader.saveInstalledPlugins()
     }
 }
