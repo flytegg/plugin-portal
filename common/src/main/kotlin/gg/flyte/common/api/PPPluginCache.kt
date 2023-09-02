@@ -70,10 +70,15 @@ object PPPluginCache {
         val loadedPlugins = loader.installedPlugins
         val requestHashes = arrayListOf<String>()
 
+        println(pluginsFolder.absolutePath)
         for (file in pluginsFolder.listFiles()!!) {
-            if (file.isDirectory || !file.endsWith(".jar")) return
-            if (loadedPlugins.any { it.sha256Hash == file.get256Hash() }) return
+            if (file.isDirectory || !file.name.endsWith(".jar")) continue
+            println("this")
+            if (loadedPlugins.any { it.sha256Hash == file.get256Hash() }) continue
+            println("thisssssss")
 
+
+            println("Found Jar: ${file.name}")
             requestHashes.add(file.get256Hash())
         }
 
