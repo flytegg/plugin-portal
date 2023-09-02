@@ -12,7 +12,7 @@ class InstallSubCommand {
 
     @Subcommand("install", "i")
     @CommandPermission("pluginportal.install")
-    @AutoComplete("@ppPlugin")
+    @AutoComplete("@marketplacePlugin")
     fun installSubCommand(sender: Audience, @PPPlugin pluginName: String) {
 
     }

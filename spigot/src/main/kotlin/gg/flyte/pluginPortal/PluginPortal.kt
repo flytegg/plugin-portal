@@ -1,7 +1,7 @@
 package gg.flyte.pluginPortal
 
-import gg.flyte.common.api.API
 import gg.flyte.common.api.PPPluginCache
+import gg.flyte.common.api.interfaces.InstalledPluginLoader
 import gg.flyte.common.type.api.service.PlatformType
 import gg.flyte.pluginPortal.command.PPCommand
 import gg.flyte.pluginPortal.command.downloadable.DeleteSubCommand
@@ -12,6 +12,7 @@ import gg.flyte.pluginPortal.command.javaPlugin.DisableSubCommand
 import gg.flyte.pluginPortal.command.javaPlugin.EnableSubCommand
 import gg.flyte.pluginPortal.command.javaPlugin.ReloadSubCommand
 import gg.flyte.pluginPortal.type.manager.Config
+import gg.flyte.pluginPortal.type.manager.SpigotInstalledPluginLoader
 import gg.flyte.twilight.scheduler.async
 import gg.flyte.twilight.twilight
 import io.papermc.lib.PaperLib
@@ -20,6 +21,7 @@ import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import revxrsal.commands.bukkit.BukkitCommandHandler
+import java.io.File
 
 
 class PluginPortal : JavaPlugin() {
@@ -27,6 +29,12 @@ class PluginPortal : JavaPlugin() {
     override fun onEnable() {
         Config.init(this)
         twilight(this) {}
+        PPPluginCache.loadInstalledPlugins(
+            dataFolder.apply { mkdir() }.parentFile,
+            SpigotInstalledPluginLoader().apply {
+                loadInstalledPlugins(File(dataFolder, "plugins.json"))
+            }
+        )
 
         val audiences = BukkitAudiences.create(this)
 
@@ -42,7 +50,7 @@ class PluginPortal : JavaPlugin() {
                     Bukkit.getPluginManager().plugins
                         .filter { !it.isEnabled }
                         .map { it.name }
-                }.registerSuggestion("ppPlugin") { args, sender, command ->
+                }.registerSuggestion("marketplacePlugin") { args, sender, command ->
                     val searchName = args[2]
 
                     if (searchName.length == 2) {

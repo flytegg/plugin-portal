@@ -30,8 +30,8 @@ object API {
         return pluginApiInterface.requestPluginById(id, platformType).execute()
     }
 
-    fun recognizePluginByHashes(hashes: String, platformGroup: PlatformGroup): Response<HashMap<String, MarketplacePlugin>> {
-        return pluginApiInterface.recognizePluginByHashes(hashes, platformGroup).execute()
+    fun recognizePluginByHashes(hashes: List<String>, platformGroup: PlatformGroup): Response<HashMap<String, MarketplacePlugin>> {
+        return pluginApiInterface.recognizePluginByHashes(hashes.joinToString(","), platformGroup).execute()
     }
 
     fun getVersions(profile: Profile): Response<HashMap<PPPlatform, LinkedHashMap<String, String>>> {
