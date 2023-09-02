@@ -46,12 +46,24 @@ class PluginPortal : JavaPlugin() {
                 }.registerSuggestion("ppPlugin") { args, sender, command ->
                     val searchName = args[2]
 
-                    if (searchName.length <= 2) return@registerSuggestion listOf("$searchName${if (searchName.isEmpty()) "" else " ~ "}Keep Typing")
-                    else {
+                    if (searchName.length == 2) {
                         PPPluginCache.searchForPluginsByName(
                             searchName,
                             PlatformType.PAPER,
                         ).map { it.displayInfo.name }
+                    }
+
+                    if (searchName.length <= 2) {
+                        return@registerSuggestion listOf("$searchName${if (searchName.isEmpty()) "" else " ~ "}Keep Typing")
+                    } else {
+                        PPPluginCache.searchForPluginsByName(
+                            searchName,
+                            PlatformType.PAPER,
+                        ).map { it.displayInfo.name }.apply {
+                            if (isEmpty()) {
+                                return@registerSuggestion listOf("$searchName ~ No Results Found")
+                            }
+                        }
                     }
                 }
 
