@@ -1,6 +1,8 @@
 package gg.flyte.pluginPortal
 
 import gg.flyte.common.api.API
+import gg.flyte.common.api.PPPluginCache
+import gg.flyte.common.type.api.service.PlatformType
 import gg.flyte.pluginPortal.command.PPCommand
 import gg.flyte.pluginPortal.command.downloadable.DeleteSubCommand
 import gg.flyte.pluginPortal.command.downloadable.InstallSubCommand
@@ -9,8 +11,7 @@ import gg.flyte.pluginPortal.command.info.HelpSubCommand
 import gg.flyte.pluginPortal.command.javaPlugin.DisableSubCommand
 import gg.flyte.pluginPortal.command.javaPlugin.EnableSubCommand
 import gg.flyte.pluginPortal.command.javaPlugin.ReloadSubCommand
-import gg.flyte.pluginPortal.type.Config
-import gg.flyte.pluginPortal.type.annotation.PPPlugin
+import gg.flyte.pluginPortal.type.manager.Config
 import io.papermc.lib.PaperLib
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bstats.bukkit.Metrics
@@ -47,10 +48,10 @@ class PluginPortal : JavaPlugin() {
 
                     if (searchName.length <= 2) return@registerSuggestion listOf("$searchName${if (searchName.isEmpty()) "" else " ~ "}Keep Typing")
                     else {
-                        API.searchForPluginsByName(
+                        PPPluginCache.searchForPluginsByName(
                             searchName,
-                            "PAPER",
-                        ).body()?.result!!.map { it.displayInfo.name }
+                            PlatformType.PAPER,
+                        ).map { it.displayInfo.name }
                     }
                 }
 

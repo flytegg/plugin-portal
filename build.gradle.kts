@@ -57,6 +57,8 @@ subprojects {
         implementation("com.squareup.okhttp3:okhttp:4.10.0")
         implementation("com.squareup.retrofit2:retrofit:2.9.0")
         implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+        implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
     }
 
     sourceSets {

@@ -1,15 +1,9 @@
 package gg.flyte.pluginPortal.command.info
 
 import gg.flyte.pluginPortal.type.data.HelpMessage
-import gg.flyte.pluginPortal.type.language.Message.toComponent
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.Command
-import revxrsal.commands.annotation.Default
-import revxrsal.commands.annotation.DefaultFor
-import revxrsal.commands.annotation.Optional
-import revxrsal.commands.annotation.SecretCommand
 import revxrsal.commands.annotation.Subcommand
-import revxrsal.commands.help.CommandHelp
 
 @Command("pp", "pluginportal", "ppm", "pportal")
 class HelpSubCommand {

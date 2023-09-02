@@ -1,6 +1,6 @@
 package gg.flyte.pluginPortal.command.downloadable
 
-import gg.flyte.pluginPortal.type.language.Message.toComponent
+import gg.flyte.pluginPortal.type.manager.language.Message.toComponent
 import org.bukkit.Bukkit
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Subcommand

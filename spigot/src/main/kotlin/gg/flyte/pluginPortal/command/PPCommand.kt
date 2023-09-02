@@ -1,14 +1,10 @@
 package gg.flyte.pluginPortal.command
 
-import gg.flyte.pluginPortal.type.language.Message.toComponent
-import net.kyori.adventure.audience.Audience
+import gg.flyte.pluginPortal.type.manager.language.Message.toComponent
 import org.bukkit.Bukkit
 import revxrsal.commands.annotation.Command
-import revxrsal.commands.annotation.Default
-import revxrsal.commands.annotation.DefaultFor
 import revxrsal.commands.annotation.Subcommand
 import revxrsal.commands.bukkit.annotation.CommandPermission
-import revxrsal.commands.help.CommandHelp
 
 
 @Command("pp", "pluginportal", "ppm", "pportal")
