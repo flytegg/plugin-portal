@@ -13,7 +13,6 @@ import revxrsal.commands.help.CommandHelp
 @Command("pp", "pluginportal", "ppm", "pportal")
 class HelpSubCommand {
 
-    @DefaultFor("pp help", "pp", "pluginportal", "ppm", "pportal")
     @Subcommand("help")
     fun onHelpCommand(sender: Audience, helpEntries: CommandHelp<String?>, @Optional page: Int?) {
         for (entry in helpEntries.paginate(page ?: 1, 7))
