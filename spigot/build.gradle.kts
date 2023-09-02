@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly(project(":common"))
+    implementation(project(":common"))
 
     paperweight.paperDevBundle("1.20.1-R0.1-SNAPSHOT")
     implementation("io.papermc:paperlib:1.0.7")
@@ -25,6 +25,7 @@ dependencies {
 
     implementation("org.bstats:bstats-bukkit:3.0.2")
     implementation("com.github.Revxrsal.Lamp:bukkit:3.1.5")
+    implementation("com.github.Revxrsal.Lamp:brigadier:3.1.5")
 }
 
 tasks {

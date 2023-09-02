@@ -11,12 +11,6 @@ dependencies {
     implementation("com.github.ajalt.mordant:mordant:2.1.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
-    implementation("com.squareup.okhttp3:okhttp:4.10.0")
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-
-    implementation("com.google.code.gson:gson:2.10.1")
-
     implementation(files("libs/hangarWrapper-1.1.7-all.jar"))
 }
 
