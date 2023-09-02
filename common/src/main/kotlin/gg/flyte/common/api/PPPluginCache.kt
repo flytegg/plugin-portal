@@ -42,7 +42,7 @@ object PPPluginCache {
         val cachedMatches = mutableListOf<MarketplacePlugin>().apply {
             addAll(getPluginsByName(name))
 
-            if (size >= 25 || pluginCache.asMap().containsKey(name)) return this
+            if (size >= 25 || pluginCache.asMap().keys.any { name.startsWith(it, true) } ) return this
             else {
                 API.searchForPluginsByName(name, platformType.name).body()?.result?.let { list ->
                     pluginCache.put(name, list)
