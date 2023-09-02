@@ -21,7 +21,9 @@ dependencies {
     paperweight.paperDevBundle("1.20.1-R0.1-SNAPSHOT")
     implementation("io.papermc:paperlib:1.0.7")
     implementation("net.kyori:adventure-platform-bukkit:4.3.0")
+
     implementation("com.github.SuperGlueLib:SuperFoundations:1.2.0")
+    implementation("gg.flyte:twilight:1.0.3")
 
     implementation("org.bstats:bstats-bukkit:3.0.2")
     implementation("com.github.Revxrsal.Lamp:bukkit:3.1.5")

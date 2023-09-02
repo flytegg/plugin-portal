@@ -12,6 +12,8 @@ import gg.flyte.pluginPortal.command.javaPlugin.DisableSubCommand
 import gg.flyte.pluginPortal.command.javaPlugin.EnableSubCommand
 import gg.flyte.pluginPortal.command.javaPlugin.ReloadSubCommand
 import gg.flyte.pluginPortal.type.manager.Config
+import gg.flyte.twilight.scheduler.async
+import gg.flyte.twilight.twilight
 import io.papermc.lib.PaperLib
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bstats.bukkit.Metrics
@@ -22,14 +24,11 @@ import revxrsal.commands.bukkit.BukkitCommandHandler
 
 class PluginPortal : JavaPlugin() {
 
-    private lateinit var customHelpEntries: List<String>
-
     override fun onEnable() {
         Config.init(this)
+        twilight(this) {}
 
         val audiences = BukkitAudiences.create(this)
-
-        val plugins = mutableSetOf(Bukkit.getPluginManager().plugins.map { it.name })
 
         BukkitCommandHandler.create(this).apply {
             enableAdventure(audiences)
@@ -47,10 +46,12 @@ class PluginPortal : JavaPlugin() {
                     val searchName = args[2]
 
                     if (searchName.length == 2) {
-                        PPPluginCache.searchForPluginsByName(
-                            searchName,
-                            PlatformType.PAPER,
-                        ).map { it.displayInfo.name }
+                        async {
+                            PPPluginCache.searchForPluginsByName(
+                                searchName,
+                                PlatformType.PAPER,
+                            ).map { it.displayInfo.name }
+                        }
                     }
 
                     if (searchName.length <= 2) {
