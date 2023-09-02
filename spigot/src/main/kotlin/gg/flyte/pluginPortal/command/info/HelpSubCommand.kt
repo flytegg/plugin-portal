@@ -14,9 +14,27 @@ import revxrsal.commands.help.CommandHelp
 class HelpSubCommand {
 
     @Subcommand("help")
-    fun onHelpCommand(sender: Audience, helpEntries: CommandHelp<String?>, @Optional page: Int?) {
-        for (entry in helpEntries.paginate(page ?: 1, 7))
-            sender.sendMessage(entry!!.toComponent())
+    fun onHelpCommand(sender: Audience) {
+        arrayListOf(
+            HelpMessage(
+                "Install",
+                "pluginportal.install",
+                listOf("i"),
+                "Install a plugin from the marketplace",
+                "/pp install <plugin>"
+            ),
+            HelpMessage(
+                "Uninstall",
+                "pluginportal.uninstall",
+                listOf("u"),
+                "Uninstall a plugin from the marketplace",
+                "/pp uninstall <plugin>"
+            ),
+        )
     }
 
+}
+
+data class HelpMessage(val message: String, val permission: String, val aliases: List<String>, val description: String, val usage: String) {
+    fun toComponent() = message.toComponent()
 }
