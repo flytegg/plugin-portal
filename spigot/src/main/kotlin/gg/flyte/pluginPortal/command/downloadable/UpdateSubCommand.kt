@@ -7,11 +7,11 @@ import revxrsal.commands.annotation.Subcommand
 import revxrsal.commands.bukkit.annotation.CommandPermission
 
 @Command("pp", "pluginportal", "ppm", "pportal")
-class InstallSubCommand {
+class UpdateSubCommand {
 
-    @Subcommand("install", "i")
-    @CommandPermission("pluginportal.install")
-    fun installSubCommand(int: Int) {
+    @Subcommand("update")
+    @CommandPermission("pluginportal.update")
+    fun updateSubCommand(int: Int) {
         Bukkit.broadcast(int.toString().toComponent())
     }
 

@@ -1,4 +1,4 @@
-package gg.flyte.pluginPortal.command.downloadable
+package gg.flyte.pluginPortal.command.toggle
 
 import gg.flyte.pluginPortal.type.language.Message.toComponent
 import org.bukkit.Bukkit
@@ -7,12 +7,11 @@ import revxrsal.commands.annotation.Subcommand
 import revxrsal.commands.bukkit.annotation.CommandPermission
 
 @Command("pp", "pluginportal", "ppm", "pportal")
-class InstallSubCommand {
+class DisableSubCommand {
 
-    @Subcommand("install", "i")
-    @CommandPermission("pluginportal.install")
-    fun installSubCommand(int: Int) {
+    @Subcommand("disable")
+    @CommandPermission("pluginportal.disable")
+    fun disableSubCommand(int: Int) {
         Bukkit.broadcast(int.toString().toComponent())
     }
-
 }

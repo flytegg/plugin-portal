@@ -1,6 +1,12 @@
 package gg.flyte.pluginPortal
 
 import gg.flyte.pluginPortal.command.PPCommand
+import gg.flyte.pluginPortal.command.downloadable.DeleteSubCommand
+import gg.flyte.pluginPortal.command.downloadable.InstallSubCommand
+import gg.flyte.pluginPortal.command.downloadable.UpdateSubCommand
+import gg.flyte.pluginPortal.command.info.HelpSubCommand
+import gg.flyte.pluginPortal.command.toggle.DisableSubCommand
+import gg.flyte.pluginPortal.command.toggle.EnableSubCommand
 import gg.flyte.pluginPortal.type.Config
 import io.papermc.lib.PaperLib
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
@@ -23,7 +29,15 @@ class PluginPortal : JavaPlugin() {
         BukkitCommandHandler.create(this).apply {
             enableAdventure(audiences)
 
-            register(PPCommand())
+            register(
+                InstallSubCommand(),
+                DeleteSubCommand(),
+                UpdateSubCommand(),
+                HelpSubCommand(),
+                DisableSubCommand(),
+                EnableSubCommand(),
+                PPCommand(),
+            )
 
             setHelpWriter { command, actor ->
                 if (command.path.toRealString().length > 5) {
