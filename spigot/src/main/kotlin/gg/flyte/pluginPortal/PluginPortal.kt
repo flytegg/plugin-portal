@@ -5,8 +5,9 @@ import gg.flyte.pluginPortal.command.downloadable.DeleteSubCommand
 import gg.flyte.pluginPortal.command.downloadable.InstallSubCommand
 import gg.flyte.pluginPortal.command.downloadable.UpdateSubCommand
 import gg.flyte.pluginPortal.command.info.HelpSubCommand
-import gg.flyte.pluginPortal.command.toggle.DisableSubCommand
-import gg.flyte.pluginPortal.command.toggle.EnableSubCommand
+import gg.flyte.pluginPortal.command.javaPlugin.DisableSubCommand
+import gg.flyte.pluginPortal.command.javaPlugin.EnableSubCommand
+import gg.flyte.pluginPortal.command.javaPlugin.ReloadSubCommand
 import gg.flyte.pluginPortal.type.Config
 import io.papermc.lib.PaperLib
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
@@ -14,7 +15,6 @@ import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import revxrsal.commands.bukkit.BukkitCommandHandler
-import java.util.stream.Collectors
 
 
 class PluginPortal : JavaPlugin() {
@@ -51,6 +51,7 @@ class PluginPortal : JavaPlugin() {
                 HelpSubCommand(),
                 DisableSubCommand(),
                 EnableSubCommand(),
+                ReloadSubCommand(),
                 PPCommand(),
             )
 
