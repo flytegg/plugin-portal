@@ -14,8 +14,8 @@ import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import revxrsal.commands.bukkit.BukkitCommandHandler
-import revxrsal.commands.orphan.OrphanCommand
-import revxrsal.commands.orphan.Orphans
+import java.util.stream.Collectors
+
 
 class PluginPortal : JavaPlugin() {
 
@@ -26,8 +26,23 @@ class PluginPortal : JavaPlugin() {
 
         val audiences = BukkitAudiences.create(this)
 
+        val plugins = mutableSetOf(Bukkit.getPluginManager().plugins.map { it.name })
+
         BukkitCommandHandler.create(this).apply {
             enableAdventure(audiences)
+
+            autoCompleter
+                .registerSuggestion("enabledJavaPlugins") { _, _, _ ->
+                    Bukkit.getPluginManager().plugins
+                        .filter { it.isEnabled }
+                        .map { it.name }
+                }.registerSuggestion("disabledJavaPlugins") { _, _, _ ->
+                    Bukkit.getPluginManager().plugins
+                        .filter { !it.isEnabled }
+                        .map { it.name }
+                }
+
+
 
             register(
                 InstallSubCommand(),
@@ -52,7 +67,8 @@ class PluginPortal : JavaPlugin() {
                 }
             }
 
-        }.registerBrigadier()
+            registerBrigadier()
+        }
 
         Metrics(this, 18005)
         PaperLib.suggestPaper(this)
@@ -60,10 +76,6 @@ class PluginPortal : JavaPlugin() {
 
     override fun onDisable() {
         logger.info("PluginPortal has been disabled!")
-    }
-
-    fun BukkitCommandHandler.fastRegister(vararg commands: OrphanCommand) {
-        commands.forEach { register(Orphans.path().handler(it)) }
     }
 
 }
