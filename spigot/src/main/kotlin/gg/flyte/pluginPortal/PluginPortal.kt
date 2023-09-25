@@ -1,13 +1,19 @@
 package gg.flyte.pluginPortal
 
+import com.google.gson.internal.LinkedTreeMap
+import com.google.gson.reflect.TypeToken
 import gg.flyte.common.api.PPPluginCache
 import gg.flyte.common.api.interfaces.InstalledPluginLoader
+import gg.flyte.common.type.api.plugin.InstalledPlugin
 import gg.flyte.common.type.api.service.PlatformType
+import gg.flyte.common.type.api.service.ServiceType
+import gg.flyte.common.util.GSON
 import gg.flyte.pluginPortal.command.PPCommand
 import gg.flyte.pluginPortal.command.downloadable.DeleteSubCommand
 import gg.flyte.pluginPortal.command.downloadable.InstallSubCommand
 import gg.flyte.pluginPortal.command.downloadable.UpdateSubCommand
 import gg.flyte.pluginPortal.command.info.HelpSubCommand
+import gg.flyte.pluginPortal.command.info.ListSubCommand
 import gg.flyte.pluginPortal.command.javaPlugin.DisableSubCommand
 import gg.flyte.pluginPortal.command.javaPlugin.EnableSubCommand
 import gg.flyte.pluginPortal.command.javaPlugin.ReloadSubCommand
@@ -24,12 +30,18 @@ import revxrsal.commands.bukkit.BukkitCommandHandler
 
 class PluginPortal : JavaPlugin() {
 
+    companion object {
+        lateinit var instance: PluginPortal
+    }
+
     override fun onEnable() {
+        instance = this
         Config.init(this)
         twilight(this) {}
+
         PPPluginCache.loadInstalledPlugins(
             dataFolder.apply { mkdir() }.parentFile,
-            SpigotInstalledPluginLoader(this).apply {
+            SpigotInstalledPluginLoader.apply {
                 loadInstalledPlugins()
             }
         )
@@ -81,6 +93,7 @@ class PluginPortal : JavaPlugin() {
                 DeleteSubCommand(),
                 UpdateSubCommand(),
                 HelpSubCommand(),
+                ListSubCommand(),
                 DisableSubCommand(),
                 EnableSubCommand(),
                 ReloadSubCommand(),

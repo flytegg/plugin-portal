@@ -13,7 +13,6 @@ class UpdateSubCommand {
 
     @Subcommand("update")
     @CommandPermission("pluginportal.update")
-
     fun updateSubCommand(sender: Audience) {
 
     }

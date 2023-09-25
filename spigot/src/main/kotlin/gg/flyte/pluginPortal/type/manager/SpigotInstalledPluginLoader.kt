@@ -1,5 +1,6 @@
 package gg.flyte.pluginPortal.type.manager
 
+import gg.flyte.common.api.PPPluginCache
 import gg.flyte.common.api.interfaces.InstalledPluginLoader
 import gg.flyte.common.type.api.plugin.InstalledPlugin
 import gg.flyte.common.util.GSON
@@ -9,25 +10,22 @@ import org.apache.commons.lang.mutable.Mutable
 import org.bukkit.event.player.PlayerInteractEvent
 import java.io.File
 
-class SpigotInstalledPluginLoader(val pluginPortal: PluginPortal) : InstalledPluginLoader {
-    override val configFile: File = File(pluginPortal.dataFolder, "plugins.json")
-
-    override val installedPlugins: MutableSet<InstalledPlugin> = mutableSetOf()
+object SpigotInstalledPluginLoader : InstalledPluginLoader {
+    override val configFile: File = File(PluginPortal.instance.dataFolder, "plugins.json")
 
     override fun addInstalledPlugin(plugin: InstalledPlugin) {
         println(plugin.toJson())
-        installedPlugins.add(plugin)
-        installedPlugins.forEach { println(it) }
+        PPPluginCache.addInstalledPlugins(plugin)
     }
 
     override fun loadInstalledPlugins() {
-        installedPlugins.addAll(GSON.fromJson(
+        GSON.fromJson(
             configFile.readText(),
-            HashSet<InstalledPlugin>()::class.java
-        ))
+            Array<InstalledPlugin>::class.java
+        ).forEach { PPPluginCache.addInstalledPlugins(it) }
     }
 
     override fun saveInstalledPlugins() {
-        configFile.writeText(GSON.toJson(installedPlugins))
+        configFile.writeText(GSON.toJson(PPPluginCache.getInstalledPlugins()))
     }
 }

@@ -1,7 +1,7 @@
 package gg.flyte.pluginPortal.commands.plugins
 
 import com.github.kinquirer.KInquirer
-import gg.flyte.common.api.dataClasses.MarketplacePlugin
+import gg.flyte.common.type.api.plugin.MarketplacePlugin
 import gg.flyte.common.type.api.service.PlatformType
 import gg.flyte.common.type.api.service.findPlatformTypesFromGroup
 import gg.flyte.common.util.installPlugin

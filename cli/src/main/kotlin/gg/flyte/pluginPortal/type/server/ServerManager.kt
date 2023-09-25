@@ -1,7 +1,7 @@
 package gg.flyte.pluginPortal.type.server
 
 import com.github.ajalt.mordant.table.table
-import gg.flyte.common.api.dataClasses.MarketplacePlugin
+import gg.flyte.common.type.api.plugin.MarketplacePlugin
 import gg.flyte.common.type.api.service.PlatformType
 import gg.flyte.pluginPortal.type.config.Config
 import gg.flyte.common.type.api.plugin.InstalledPlugin

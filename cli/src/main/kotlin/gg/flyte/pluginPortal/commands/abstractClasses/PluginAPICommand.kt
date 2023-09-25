@@ -1,13 +1,10 @@
 package gg.flyte.pluginPortal.commands.abstractClasses
 
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.parameters.options.help
-import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.mordant.table.table
 import com.github.kinquirer.KInquirer
 import gg.flyte.common.api.API
-import gg.flyte.common.api.dataClasses.MarketplacePlugin
+import gg.flyte.common.type.api.plugin.MarketplacePlugin
 import gg.flyte.pluginPortal.type.config.Config
 import gg.flyte.pluginPortal.type.server.ServerManager
 import gg.flyte.pluginPortal.util.promptBetterInput

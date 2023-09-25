@@ -6,7 +6,6 @@ import java.io.File
 interface InstalledPluginLoader {
 
     abstract val configFile: File
-    abstract val installedPlugins: MutableSet<InstalledPlugin>
 
     abstract fun addInstalledPlugin(plugin: InstalledPlugin)
     abstract fun loadInstalledPlugins()

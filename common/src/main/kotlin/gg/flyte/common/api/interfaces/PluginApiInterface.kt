@@ -1,11 +1,10 @@
 package gg.flyte.common.api.interfaces
 
-import gg.flyte.common.api.dataClasses.MarketplacePlugin
+import gg.flyte.common.type.api.plugin.MarketplacePlugin
 import gg.flyte.common.api.dataClasses.endpoints.PaginatedResultMarketplacePlugin
 import gg.flyte.common.type.api.service.PlatformGroup
 import gg.flyte.common.type.api.service.PlatformType
 import gg.flyte.common.type.api.user.PPPlatform
-import gg.flyte.common.type.api.user.Profile
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.*

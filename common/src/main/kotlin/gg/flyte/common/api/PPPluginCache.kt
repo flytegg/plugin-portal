@@ -2,9 +2,8 @@ package gg.flyte.common.api
 
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
-import gg.flyte.common.api.dataClasses.MarketplacePlugin
-import gg.flyte.common.api.dataClasses.VersionData
-import gg.flyte.common.api.dataClasses.VersionInfo
+import gg.flyte.common.type.api.plugin.MarketplacePlugin
+import gg.flyte.common.type.api.plugin.VersionInfo
 import gg.flyte.common.api.interfaces.InstalledPluginLoader
 import gg.flyte.common.type.api.plugin.InstalledPlugin
 import gg.flyte.common.type.api.service.PlatformGroup
@@ -16,17 +15,23 @@ import java.util.concurrent.TimeUnit
 
 object PPPluginCache {
 
+    private lateinit var loader: InstalledPluginLoader
+
     /**
      * Key: Search Term
      * Value: List<MarketplacePlugin>
      */
     private val pluginCache: Cache<String, List<MarketplacePlugin>> = Caffeine.newBuilder()
-        .expireAfterWrite(5, TimeUnit.MINUTES)
+        .expireAfterWrite(10, TimeUnit.MINUTES)
         .build()
 
-    private val installedPlugins = arrayListOf<InstalledPlugin>()
+    private val installedPlugins = HashSet<InstalledPlugin>()
 
-    private lateinit var loader: InstalledPluginLoader
+    fun getInstalledPlugins() = installedPlugins
+    fun removeInstalledPlugins(vararg plugin: InstalledPlugin) = installedPlugins.removeAll(plugin.toSet())
+
+    fun addInstalledPlugins(vararg plugin: InstalledPlugin) = installedPlugins.addAll(plugin)
+    fun addInstalledPlugins(plugin: ArrayList<InstalledPlugin>) = installedPlugins.addAll(plugin)
 
     fun getPluginsByName(name: String) = arrayListOf<MarketplacePlugin>().apply {
         pluginCache.asMap().keys.forEach {
@@ -71,13 +76,11 @@ object PPPluginCache {
 
     fun loadInstalledPlugins(pluginsFolder: File, loader: InstalledPluginLoader) {
         this.loader = loader
-        val loadedPlugins = loader.installedPlugins
         val requestHashes = arrayListOf<String>()
 
-        println(pluginsFolder.absolutePath)
         for (file in pluginsFolder.listFiles()!!) {
             if (file.isDirectory || !file.name.endsWith(".jar")) continue
-            if (loadedPlugins.any { it.sha256Hash == file.get256Hash() }) continue
+            if (installedPlugins.any { it.sha256Hash == file.get256Hash() }) continue
 
             println("Found Jar: ${file.name}")
             requestHashes.add(file.get256Hash())

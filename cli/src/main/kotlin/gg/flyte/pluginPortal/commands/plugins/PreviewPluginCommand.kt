@@ -1,6 +1,6 @@
 package gg.flyte.pluginPortal.commands.plugins
 
-import gg.flyte.common.api.dataClasses.MarketplacePlugin
+import gg.flyte.common.type.api.plugin.MarketplacePlugin
 import gg.flyte.common.type.api.service.ServiceType
 import gg.flyte.pluginPortal.commands.abstractClasses.PluginAPICommand
 import java.awt.Desktop

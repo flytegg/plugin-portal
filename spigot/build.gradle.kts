@@ -3,7 +3,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 plugins {
     `java-library`
     id("io.papermc.paperweight.userdev") version "1.5.5"
-    id("xyz.jpenilla.run-paper") version "2.1.0"
+    id("xyz.jpenilla.run-paper") version "2.2.0"
 }
 
 repositories {
@@ -18,7 +18,7 @@ repositories {
 dependencies {
     implementation(project(":common"))
 
-    paperweight.paperDevBundle("1.20.1-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.20.2-R0.1-SNAPSHOT")
     implementation("io.papermc:paperlib:1.0.7")
     implementation("net.kyori:adventure-platform-bukkit:4.3.0")
 
@@ -77,7 +77,7 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.20.1")
+        minecraftVersion("1.20.2")
     }
 }
 //

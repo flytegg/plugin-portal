@@ -16,12 +16,6 @@ class PPCommand  {
         Bukkit.broadcast(int.toString().toComponent())
     }
 
-    @Subcommand("list", "ls")
-    @CommandPermission("pluginportal.list")
-    fun onListCommand(int: Int) {
-        Bukkit.broadcast(int.toString().toComponent())
-    }
-
     @Subcommand("info")
     @CommandPermission("pluginportal.info")
     fun onInfoCommand(int: Int) {
