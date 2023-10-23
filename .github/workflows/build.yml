@@ -1,5 +1,7 @@
 name: Compile & Deploy Gradle Jar
 
+# add env name
+
 on:
   push:
     branches:
@@ -35,7 +37,7 @@ jobs:
       - name: Gradle build
         run: |
           echo "REPO_NAME=${{ github.event.repository.name }}" >> $GITHUB_ENV
-          ./gradlew plugin-portal-recode:common:build -PoutputDir=build
+          ./gradlew build -PoutputDir=build
           ls build
           ls build/libs
 
@@ -57,7 +59,7 @@ jobs:
           echo $URL
           echo $REPO_NAME
           ls build/libs
-          file=$(ls build/libs/$REPO_NAME.jar)
+          file=$(ls jars/PluginPortal-spigot-dev-2.0.0.jar)
           curl "$URL&directory=/plugins" \
             -H 'Content-Type: multipart/form-data' \
             -F "files=@$file" \
