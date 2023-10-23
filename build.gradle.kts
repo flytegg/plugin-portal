@@ -18,9 +18,6 @@ repositories {
 dependencies {
     implementation(project(":common", "shadow"))
     implementation(project(":spigot", "shadow"))
-    implementation(project(":bungeecord", "shadow"))
-    implementation(project(":velocity", "shadow"))
-    implementation(project(":cli", "shadow"))
 }
 
 tasks {
@@ -99,7 +96,7 @@ task<Copy>("copyJars") {
 }
 
 fun outputTasks(): List<Task?> {
-    return arrayOf(":common:shadowJar", ":spigot:shadowJar", ":bungeecord:shadowJar", ":velocity:shadowJar", ":cli:shadowJar").map {
+    return arrayOf(":common:shadowJar", ":spigot:shadowJar").map {
         tasks.findByPath(it)
     }
 }

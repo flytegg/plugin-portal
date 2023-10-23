@@ -35,7 +35,7 @@ jobs:
       - name: Gradle build
         run: |
           echo "REPO_NAME=${{ github.event.repository.name }}" >> $GITHUB_ENV
-          ./gradlew build -PoutputDir=build
+          ./gradlew plugin-portal-recode:common:build -PoutputDir=build
           ls build
           ls build/libs
 
