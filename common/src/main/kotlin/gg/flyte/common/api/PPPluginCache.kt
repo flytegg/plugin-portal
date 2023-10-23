@@ -8,7 +8,10 @@ import gg.flyte.common.api.interfaces.InstalledPluginLoader
 import gg.flyte.common.type.api.plugin.InstalledPlugin
 import gg.flyte.common.type.api.service.PlatformGroup
 import gg.flyte.common.type.api.service.PlatformType
-import gg.flyte.common.util.get256Hash
+import gg.flyte.common.type.misc.HashType
+import gg.flyte.common.util.getHashes
+import gg.flyte.common.util.getSha1Hash
+import gg.flyte.common.util.getSha256Hash
 import gg.flyte.common.util.toJson
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -76,51 +79,61 @@ object PPPluginCache {
 
     fun loadInstalledPlugins(pluginsFolder: File, loader: InstalledPluginLoader) {
         this.loader = loader
-        val requestHashes = arrayListOf<String>()
+        val requestHashes = HashMap<HashType, String>()
 
         for (file in pluginsFolder.listFiles()!!) {
             if (file.isDirectory || !file.name.endsWith(".jar")) continue
-            if (installedPlugins.any { it.sha256Hash == file.get256Hash() }) continue
+
+            if (installedPlugins.any { it.hashes.any { hash -> file.getHashes().containsValue(hash.value) } }) continue
+
 
             println("Found Jar: ${file.name}")
-            requestHashes.add(file.get256Hash())
+
+
+            requestHashes.putAll(file.getHashes())
+
+            API.recognizePluginByHashes(
+                file.getHashes(),
+                PlatformGroup.CRAFT_BUKKIT
+            )
         }
-
-        API.recognizePluginByHashes(requestHashes, PlatformGroup.CRAFT_BUKKIT).body()?.let { map ->
-            map.forEach { (hash, plugin) ->
-                var pluginVersionData: VersionInfo? = null
-                var pluginVersion = ""
-                var pluginPlatform: PlatformType? = null
-
-                plugin.versions.forEach { entry ->
-                    entry.value.forEach { versions ->
-                        if (versions.value.shaHash == hash) {
-                            pluginVersionData = versions.value
-                            pluginVersion = versions.key
-                            pluginPlatform = entry.key
-                        }
-                    }
-                }
-
-                println("Auto Recognized Plugin: ${plugin.displayInfo.name} | Version: $pluginVersion | Platform: $pluginPlatform")
-
-                val installedPlugin = InstalledPlugin(
-                    plugin.id,
-                    plugin.displayInfo.name,
-                    pluginVersion,
-                    pluginPlatform!!,
-                    plugin.primaryServiceType,
-                    hash,
-                    pluginVersionData!!.downloadUrl,
-                )
-
-                println(installedPlugin.toJson())
-
-                loader.addInstalledPlugin(installedPlugin)
-            }
-        }
-
-        saveInstalledPlugins()
+//
+//        API.recognizePluginByHashes(requestHashes, PlatformGroup.CRAFT_BUKKIT).body()?.let { map ->
+//
+//            map.forEach { (hash, plugin) ->
+//                var pluginVersionData: VersionInfo? = null
+//                var pluginVersion = ""
+//                var pluginPlatform: PlatformType? = null
+//
+//                plugin.versions.forEach { entry ->
+//                    entry.value.forEach { versions ->
+//                        if (versions.value.shaHash == hash) {
+//                            pluginVersionData = versions.value
+//                            pluginVersion = versions.key
+//                            pluginPlatform = entry.key
+//                        }
+//                    }
+//                }
+//
+//                println("Auto Recognized Plugin: ${plugin.displayInfo.name} | Version: $pluginVersion | Platform: $pluginPlatform")
+//
+//                val installedPlugin = InstalledPlugin(
+//                    plugin.id,
+//                    plugin.displayInfo.name,
+//                    pluginVersion,
+//                    pluginPlatform!!,
+//                    plugin.primaryServiceType,
+//                    hash,
+//                    pluginVersionData!!.downloadUrl,
+//                )
+//
+//                println(installedPlugin.toJson())
+//
+//                loader.addInstalledPlugin(installedPlugin)
+//            }
+//        }
+//
+//        saveInstalledPlugins()
     }
 
     fun saveInstalledPlugins() {

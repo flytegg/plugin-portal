@@ -12,6 +12,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
     implementation(files("libs/hangarWrapper-1.1.7-all.jar"))
+    implementation("com.google.guava:guava:32.1.2-jre")
 }
 
 application {

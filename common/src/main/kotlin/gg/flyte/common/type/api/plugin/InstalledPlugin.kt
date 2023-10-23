@@ -2,6 +2,7 @@ package gg.flyte.common.type.api.plugin
 
 import gg.flyte.common.type.api.service.PlatformType
 import gg.flyte.common.type.api.service.ServiceType
+import gg.flyte.common.type.misc.HashType
 
 data class InstalledPlugin(
     val id: String,
@@ -9,6 +10,6 @@ data class InstalledPlugin(
     val version: String,
     val primaryPlatformType: PlatformType,
     val serviceType: ServiceType,
-    val sha256Hash: String,
+    val hashes: HashMap<HashType, String>,
     val downloadUrl: String,
 )

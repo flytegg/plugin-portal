@@ -6,6 +6,8 @@ import gg.flyte.common.type.logger.Logger.log
 import gg.flyte.common.type.logger.getStatusType
 import okhttp3.Request
 import java.net.URL
+import java.net.URLDecoder
+import java.net.URLEncoder
 import javax.net.ssl.HttpsURLConnection
 
 fun getStringFromURL(url: String): String {
@@ -101,3 +103,6 @@ private fun getFinalRedirect(url: String): String {
 //        }
 //    }
 //}
+
+fun Any.encodeURL() = URLEncoder.encode(this.toJson(), "UTF-8")
+fun String.decodeURL() = URLDecoder.decode(this.toJson(), "UTF-8")

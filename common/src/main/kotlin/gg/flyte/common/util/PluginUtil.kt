@@ -14,5 +14,5 @@ fun installPlugin(
     if (async) downloadFileAsync(url, outputFile) {}
     else downloadFileSync(url, outputFile)
 
-    return outputFile.get256Hash()
+    return outputFile.getSha256Hash()
 }

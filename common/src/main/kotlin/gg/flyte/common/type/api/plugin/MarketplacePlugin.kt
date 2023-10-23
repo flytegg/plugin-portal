@@ -11,7 +11,7 @@ data class MarketplacePlugin(
     val stats: Stats,
     val primaryServiceType: ServiceType,
     val versionData: VersionData,
-    val versions: HashMap<PlatformType, HashMap<String, VersionInfo>>,
+    var versions: HashMap<PlatformType, HashMap<String, VersionInfo>>, // HashMap<PlatformType, Hashmap<VersionID, VersionInfo>>
     val alternatePluginIds: HashSet<String>? // HashSet<Id>, this is where plugins are hosted on multiple services
 )
 
@@ -27,14 +27,17 @@ data class Stats(
     val ratingCount: Int,
     val isPremium: Boolean,
     val price: Double?,
+
 )
 
 data class VersionInfo(
-    val downloadUrl: String,
-    val shaHash: String?,
+    val name: String,
+    val downloadUrl: String?,
+    val hashes: HashMap<String, String>,
     val releaseDate: String,
-    val supportedVersions: TreeSet<String> = TreeSet(),
+    val supportedVersions: HashSet<String> = hashSetOf(),
     val dependencies: HashSet<Dependency> = hashSetOf(),
+    val malwareInfo: MalwareInfo?,
 )
 
 data class DisplayInfo(
@@ -42,4 +45,12 @@ data class DisplayInfo(
     val description: String,
     val iconURL: String,
     val extraInfo: String?,
+)
+
+data class MalwareInfo(
+    val reason: String?,
+    val scannerUsed: String,
+    val scanDate: Long,
+    val scanResult: HashMap<String, Double>, // MalwareType, ConfidenceRate
+    val conclusion: Boolean,
 )

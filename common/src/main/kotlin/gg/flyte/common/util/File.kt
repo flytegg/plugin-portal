@@ -1,5 +1,8 @@
 package gg.flyte.common.util
 
+import com.google.common.hash.Hashing
+import com.google.common.io.Files
+import gg.flyte.common.type.misc.HashType
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -10,20 +13,19 @@ import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 
-fun File.get256Hash(): String {
-    val HEX_CHARS = "0123456789ABCDEF"
-    val bytes = MessageDigest
-        .getInstance("SHA-256")
-        .digest(this.readBytes())
-    val result = StringBuilder(bytes.size * 2)
+fun File.getSha1Hash() = Files.asByteSource(this).hash(Hashing.sha1()).toString()
+fun File.getMd5Hash() = Files.asByteSource(this).hash(Hashing.md5()).toString()
 
-    bytes.forEach {
-        val i = it.toInt()
-        result.append(HEX_CHARS[i shr 4 and 0x0f])
-        result.append(HEX_CHARS[i and 0x0f])
+fun File.getSha256Hash() = Files.asByteSource(this).hash(Hashing.sha256()).toString()
+fun File.getSha512Hash() = Files.asByteSource(this).hash(Hashing.sha512()).toString()
+
+fun File.getHashes(): HashMap<HashType, String> {
+    return HashMap<HashType, String>().apply {
+        put(HashType.SHA1, getSha1Hash())
+        put(HashType.SHA256, getSha256Hash())
+        put(HashType.SHA512, getSha512Hash())
+        put(HashType.MD5, getMd5Hash())
     }
-
-    return result.toString().lowercase()
 }
 
 //fun download(downloadURL: URL, output: File): File? {

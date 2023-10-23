@@ -1,14 +1,19 @@
 package gg.flyte.common.api
 
+import gg.flyte.common.api.API.recognizePluginByHashes
 import gg.flyte.common.type.api.plugin.MarketplacePlugin
 import gg.flyte.common.api.dataClasses.endpoints.PaginatedResultMarketplacePlugin
+import gg.flyte.common.api.dataClasses.endpoints.RecognizePluginByHashesResult
 import gg.flyte.common.type.api.service.PlatformGroup
 import gg.flyte.common.type.api.service.PlatformType
 import gg.flyte.common.type.api.user.PPPlatform
 import gg.flyte.common.type.api.user.Profile
+import gg.flyte.common.type.misc.HashType
+import gg.flyte.common.util.encodeURL
 import gg.flyte.common.util.pluginApiInterface
 import gg.flyte.common.util.toJson
 import retrofit2.Response
+import java.net.URLEncoder
 
 object API {
 
@@ -29,8 +34,8 @@ object API {
         return pluginApiInterface.requestPluginById(id, platformType).execute()
     }
 
-    fun recognizePluginByHashes(hashes: List<String>, platformGroup: PlatformGroup): Response<HashMap<String, MarketplacePlugin>> {
-        return pluginApiInterface.recognizePluginByHashes(hashes.joinToString(","), platformGroup).execute()
+    fun recognizePluginByHashes(hashes: HashMap<HashType, String>, platformGroup: PlatformGroup): Response<RecognizePluginByHashesResult> {
+        return pluginApiInterface.recognizePluginByHashes(hashes.encodeURL(), platformGroup).execute()
     }
 
     fun getVersions(profile: Profile): Response<HashMap<PPPlatform, LinkedHashMap<String, String>>> {

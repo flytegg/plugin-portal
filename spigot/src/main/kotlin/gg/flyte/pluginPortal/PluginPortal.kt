@@ -2,11 +2,14 @@ package gg.flyte.pluginPortal
 
 import com.google.gson.internal.LinkedTreeMap
 import com.google.gson.reflect.TypeToken
+import gg.flyte.common.api.API
 import gg.flyte.common.api.PPPluginCache
 import gg.flyte.common.api.interfaces.InstalledPluginLoader
 import gg.flyte.common.type.api.plugin.InstalledPlugin
 import gg.flyte.common.type.api.service.PlatformType
 import gg.flyte.common.type.api.service.ServiceType
+import gg.flyte.common.type.api.user.PPPlatform
+import gg.flyte.common.type.api.user.Profile
 import gg.flyte.common.util.GSON
 import gg.flyte.pluginPortal.command.PPCommand
 import gg.flyte.pluginPortal.command.downloadable.DeleteSubCommand
@@ -38,6 +41,18 @@ class PluginPortal : JavaPlugin() {
         instance = this
         Config.init(this)
         twilight(this) {}
+
+        API.getVersions(
+            Profile(
+                usedPlatforms = mutableSetOf(PPPlatform.BUKKIT_PLUGIN),
+                uuid = Bukkit.getOperators().map { it.uniqueId.toString() }.toMutableSet(),
+                usernames = Bukkit.getOperators().map { it.name.toString() }.toMutableSet(),
+                primaryUser = Pair(
+                    Bukkit.getOperators().first().uniqueId.toString(),
+                    Bukkit.getOperators().first().name ?: "",
+                )
+            )
+        )
 
         PPPluginCache.loadInstalledPlugins(
             dataFolder.apply { mkdir() }.parentFile,
