@@ -42,25 +42,6 @@ class PluginPortal : JavaPlugin() {
         Config.init(this)
         twilight(this) {}
 
-        API.getVersions(
-            Profile(
-                usedPlatforms = mutableSetOf(PPPlatform.BUKKIT_PLUGIN),
-                uuid = Bukkit.getOperators().map { it.uniqueId.toString() }.toMutableSet(),
-                usernames = Bukkit.getOperators().map { it.name.toString() }.toMutableSet(),
-                primaryUser = Pair(
-                    Bukkit.getOperators().first().uniqueId.toString(),
-                    Bukkit.getOperators().first().name ?: "",
-                )
-            )
-        )
-
-        PPPluginCache.loadInstalledPlugins(
-            dataFolder.apply { mkdir() }.parentFile,
-            SpigotInstalledPluginLoader.apply {
-                loadInstalledPlugins()
-            }
-        )
-
         val audiences = BukkitAudiences.create(this)
 
         BukkitCommandHandler.create(this).apply {
