@@ -5,7 +5,6 @@ import gg.flyte.pluginPortal.command.CommandManager
 import gg.flyte.pluginPortal.type.manager.Config
 import gg.flyte.twilight.twilight
 import io.papermc.lib.PaperLib
-import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -21,7 +20,7 @@ class PluginPortal : JavaPlugin() {
         Config.init(this)
         twilight(this) {}
 
-        CommandManager.registerCommands()
+        CommandManager.init()
 
         Metrics(this, 18005)
         PaperLib.suggestPaper(this)
