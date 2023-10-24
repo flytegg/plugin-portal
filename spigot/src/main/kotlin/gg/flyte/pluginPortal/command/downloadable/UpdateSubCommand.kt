@@ -13,6 +13,7 @@ class UpdateSubCommand {
 
     @Subcommand("update")
     @CommandPermission("pluginportal.update")
+    @AutoComplete("@installedPlugin")
     fun updateSubCommand(sender: Audience) {
 
     }

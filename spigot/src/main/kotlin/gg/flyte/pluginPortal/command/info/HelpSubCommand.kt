@@ -9,8 +9,7 @@ import revxrsal.commands.annotation.Subcommand
 @Command("pp", "pluginportal", "ppm", "pportal")
 class HelpSubCommand {
 
-    @Subcommand("help")
-    @DefaultFor("pp", "pp help", "pluginportal", "pluginportal help", "ppm", "ppm help", "pportal", "pportal help")
+    @DefaultFor("~", "~ help")
     fun onHelpCommand(sender: Audience) {
         arrayListOf(
             HelpMessage(
@@ -21,11 +20,11 @@ class HelpSubCommand {
                 "/pp install <plugin>"
             ),
             HelpMessage(
-                "Uninstall",
-                "pluginportal.uninstall",
-                listOf("u"),
-                "Uninstall a plugin from the marketplace",
-                "/pp uninstall <plugin>"
+                "Delete",
+                "pluginportal.delete",
+                listOf("d"),
+                "Delete a plugin from the server",
+                "/pp delete <plugin>"
             ),
         ).let { messages ->
             messages.forEach {

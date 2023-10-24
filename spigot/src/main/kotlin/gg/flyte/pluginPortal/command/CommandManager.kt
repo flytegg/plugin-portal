@@ -10,6 +10,7 @@ import gg.flyte.pluginPortal.command.info.ListSubCommand
 import gg.flyte.pluginPortal.command.javaPlugin.DisableSubCommand
 import gg.flyte.pluginPortal.command.javaPlugin.EnableSubCommand
 import gg.flyte.pluginPortal.command.javaPlugin.ReloadSubCommand
+import gg.flyte.pluginPortal.type.manager.SpigotInstalledPluginLoader
 import gg.flyte.twilight.scheduler.async
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bukkit.Bukkit
@@ -89,6 +90,14 @@ object CommandManager {
                             return@registerSuggestion listOf("$searchName ~ No Results Found")
                         }
                     }
+                }
+            }.registerSuggestion("installedPlugin") { args, sender, command ->
+                PPPluginCache.getInstalledPlugins().map { it.name }.let { list ->
+                    if (list.isEmpty()) {
+                        return@registerSuggestion listOf("No Plugins Installed")
+                    }
+
+                    return@registerSuggestion list
                 }
             }
     }
