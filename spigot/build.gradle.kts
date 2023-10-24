@@ -26,8 +26,8 @@ dependencies {
     implementation("gg.flyte:twilight:1.0.15")
 
     implementation("org.bstats:bstats-bukkit:3.0.2")
-    implementation("com.github.Revxrsal.Lamp:bukkit:3.1.5")
-    implementation("com.github.Revxrsal.Lamp:brigadier:3.1.5")
+    implementation("com.github.Revxrsal.Lamp:bukkit:3.1.7")
+    implementation("com.github.Revxrsal.Lamp:brigadier:3.1.7")
 }
 
 tasks {

@@ -48,7 +48,7 @@ subprojects {
         compileOnly("net.kyori:adventure-api:4.14.0")
         compileOnly("net.kyori:adventure-text-minimessage:4.14.0")
 
-        implementation("com.github.Revxrsal.Lamp:common:3.1.5")
+        implementation("com.github.Revxrsal.Lamp:common:3.1.7")
         implementation("com.google.code.gson:gson:2.10.1")
 
         implementation("com.squareup.okhttp3:okhttp:4.10.0")
