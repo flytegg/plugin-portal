@@ -1,7 +1,6 @@
 package gg.flyte.pluginPortal.command
 
 import gg.flyte.common.api.PPPluginCache
-import gg.flyte.common.type.api.service.PlatformType
 import gg.flyte.pluginPortal.PluginPortal
 import gg.flyte.pluginPortal.command.downloadable.DeleteSubCommand
 import gg.flyte.pluginPortal.command.downloadable.InstallSubCommand

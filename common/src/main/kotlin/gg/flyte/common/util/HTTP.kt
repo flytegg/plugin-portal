@@ -1,9 +1,5 @@
 package gg.flyte.common.util
 
-
-import gg.flyte.common.type.logger.LogType
-import gg.flyte.common.type.logger.Logger.log
-import gg.flyte.common.type.logger.getStatusType
 import okhttp3.Request
 import java.net.URL
 import java.net.URLDecoder
@@ -17,7 +13,6 @@ fun getStringFromURL(url: String): String {
             .header("User-Agent", USER_AGENT)
             .build()
     ).execute().run {
-        log(url, code.getStatusType(), LogType.GET)
         this.body?.string().run {
             close()
             this ?: ""
@@ -39,7 +34,6 @@ fun isDirectDownload(urlString: String): Boolean {
         val contentLength = connection.contentLength
 
         connection.disconnect()
-        log(urlString, connection.responseCode.getStatusType(), LogType.GET)
 
         contentType == "application/octet-stream" && contentLength != -1
     }.getOrDefault(false)
@@ -52,7 +46,6 @@ fun isJARFileDownload(url: String): Boolean {
         .url(getFinalRedirect(url))
         .build()
     val response = okHttpClient.newCall(request).execute().run {
-        log(url, code.getStatusType(), LogType.GET)
         this
     }
 
@@ -69,7 +62,6 @@ fun isJARFileDownload(url: String): Boolean {
 private fun getFinalRedirect(url: String): String {
     var request = Request.Builder().url(url).head().build()
     var response = okHttpClient.newCall(request).execute().run {
-        log(url, code.getStatusType(), LogType.GET)
         this
     }
 

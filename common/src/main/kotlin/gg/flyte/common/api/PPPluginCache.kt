@@ -3,16 +3,10 @@ package gg.flyte.common.api
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import gg.flyte.common.type.api.plugin.MarketplacePlugin
-import gg.flyte.common.type.api.plugin.VersionInfo
 import gg.flyte.common.api.interfaces.InstalledPluginLoader
 import gg.flyte.common.type.api.plugin.InstalledPlugin
-import gg.flyte.common.type.api.service.PlatformGroup
-import gg.flyte.common.type.api.service.PlatformType
 import gg.flyte.common.type.misc.HashType
 import gg.flyte.common.util.getHashes
-import gg.flyte.common.util.getSha1Hash
-import gg.flyte.common.util.getSha256Hash
-import gg.flyte.common.util.toJson
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -56,7 +50,7 @@ object PPPluginCache {
         return null
     }
 
-    fun searchForPluginsByName(name: String, platformType: PlatformType): List<MarketplacePlugin> {
+    fun searchForPluginsByName(name: String): List<MarketplacePlugin> {
 
         val cachedMatches = mutableListOf<MarketplacePlugin>().apply {
             addAll(getPluginsByName(name))
@@ -64,7 +58,7 @@ object PPPluginCache {
             if (size >= 25 || pluginCache.asMap().keys.any { name.startsWith(it, true) })
                 return this.filter { it.displayInfo.name.startsWith(name, true) }
             else {
-                API.searchForPluginsByName(name, platformType.name).body()?.result?.let { list ->
+                API.searchForPluginsByName(name).body()?.result?.let { list ->
                     pluginCache.put(name, list)
 
                     return list.filter {
@@ -94,7 +88,6 @@ object PPPluginCache {
 
             API.recognizePluginByHashes(
                 file.getHashes(),
-                PlatformGroup.CRAFT_BUKKIT
             )
         }
 //
