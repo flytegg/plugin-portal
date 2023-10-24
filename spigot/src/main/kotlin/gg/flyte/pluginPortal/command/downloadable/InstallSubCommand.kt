@@ -23,7 +23,7 @@ class InstallSubCommand {
 
         if (plugins.size > 1) {
             plugins.forEach {
-                sender.sendInfo(" - ${it.displayInfo.name} (${it.id}) | ${it.primaryServiceType.name} | ${it.versionData.latestVersion}")
+                sender.sendInfo(" - ${it.displayInfo.name} (${it.id}) | ${it.primaryServiceType} | ${it.versionData.latestVersion}")
             }
         } else {
             sender.sendInfo("install preview format")

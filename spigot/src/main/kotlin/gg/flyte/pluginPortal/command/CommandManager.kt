@@ -41,7 +41,6 @@ object CommandManager {
                         async {
                             PPPluginCache.searchForPluginsByName(
                                 searchName,
-                                PlatformType.PAPER,
                             ).map { it.displayInfo.name }
                         }
                     }
@@ -51,7 +50,6 @@ object CommandManager {
                     } else {
                         PPPluginCache.searchForPluginsByName(
                             searchName,
-                            PlatformType.PAPER,
                         ).map { it.displayInfo.name }.apply {
                             if (isEmpty()) {
                                 return@registerSuggestion listOf("$searchName ~ No Results Found")
