@@ -6,11 +6,9 @@ import gg.flyte.pluginPortal.command.downloadable.DeleteSubCommand
 import gg.flyte.pluginPortal.command.downloadable.InstallSubCommand
 import gg.flyte.pluginPortal.command.downloadable.UpdateSubCommand
 import gg.flyte.pluginPortal.command.info.HelpSubCommand
+import gg.flyte.pluginPortal.command.info.InfoSubCommand
 import gg.flyte.pluginPortal.command.info.ListSubCommand
-import gg.flyte.pluginPortal.command.javaPlugin.DisableSubCommand
-import gg.flyte.pluginPortal.command.javaPlugin.EnableSubCommand
-import gg.flyte.pluginPortal.command.javaPlugin.ReloadSubCommand
-import gg.flyte.pluginPortal.type.manager.SpigotInstalledPluginLoader
+import gg.flyte.pluginPortal.command.info.SearchSubCommand
 import gg.flyte.twilight.scheduler.async
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bukkit.Bukkit
@@ -30,21 +28,19 @@ object CommandManager {
         }
     }
 
-    fun BukkitCommandHandler.registerCommands() {
+    private fun BukkitCommandHandler.registerCommands() {
         register(
             InstallSubCommand(),
             DeleteSubCommand(),
             UpdateSubCommand(),
             HelpSubCommand(),
+            InfoSubCommand(),
             ListSubCommand(),
-            DisableSubCommand(),
-            EnableSubCommand(),
-            ReloadSubCommand(),
-            PPCommand(),
+            SearchSubCommand(),
         )
     }
 
-    fun BukkitCommandHandler.registerHelpWriter() {
+    private fun BukkitCommandHandler.registerHelpWriter() {
         setHelpWriter { command, actor ->
             if (command.path.toRealString().length > 5) {
                 String.format(
@@ -59,7 +55,7 @@ object CommandManager {
         }
     }
 
-    fun BukkitCommandHandler.registerAutoComplete() {
+    private fun BukkitCommandHandler.registerAutoComplete() {
         autoCompleter
             .registerSuggestion("enabledJavaPlugins") { _, _, _ ->
                 Bukkit.getPluginManager().plugins

@@ -33,7 +33,7 @@ data class VersionInfo(
     val downloadUrl: String?,
     val hashes: HashMap<String, String>,
     val releaseDate: String,
-    val supportedVersions: HashSet<String> = hashSetOf(),
+    val supportedVersionsRange: String?,
     val dependencies: HashSet<Dependency> = hashSetOf(),
     val malwareInfo: MalwareInfo?,
 )
