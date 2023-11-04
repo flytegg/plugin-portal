@@ -23,7 +23,12 @@ class PluginPortal : JavaPlugin() {
 
         CommandManager.init()
 
-        SpigotInstalledPluginLoader.loadInstalledPlugins()
+        PPPluginCache.loadInstalledPlugins(
+            dataFolder.apply { mkdir() }.parentFile,
+            SpigotInstalledPluginLoader.apply {
+                loadInstalledPlugins()
+            }
+        )
 
         Metrics(this, 18005)
         PaperLib.suggestPaper(this)

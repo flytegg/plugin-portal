@@ -19,18 +19,12 @@ interface PluginApiInterface {
     @GET("plugins/{id}")
     fun getPluginById(@Path("id") id: String): Call<MarketplacePlugin>
 
+    @GET("recognize")
+    fun recognizePluginByHashes(@Query("hashes") hashes: String): Call<HashSet<MarketplacePlugin>> // SHA256, Plugin
+
     @GET
     @Streaming // Use streaming for large files
     fun downloadFile(@Url url: String): Call<ResponseBody>
-
-    @POST("plugins/{id}/request")
-    fun requestPluginById(@Path("id") id: String): Call<Boolean>
-
-    @GET("plugins/recognize")
-    fun recognizePluginByHashes(@Query("hashes") hashes: String): Call<RecognizePluginByHashesResult> // SHA256, Plugin
-
-    @GET("versions")
-    fun getVersions(@Query("profileString") profileString: String): Call<LinkedHashMap<String, String>>
 
 
 }

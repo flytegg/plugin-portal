@@ -1,8 +1,6 @@
 package gg.flyte.common.type.api.plugin
 
 import gg.flyte.common.api.dataClasses.Dependency
-import java.util.TreeSet
-
 data class MarketplacePlugin(
     val id: String,
     val displayInfo: DisplayInfo,
@@ -34,7 +32,7 @@ data class VersionInfo(
     val hashes: HashMap<String, String>,
     val releaseDate: String,
     val supportedVersionsRange: String?,
-    val dependencies: HashSet<Dependency> = hashSetOf(),
+    val dependencies: HashSet<Dependency>?,
     val malwareInfo: MalwareInfo?,
 )
 

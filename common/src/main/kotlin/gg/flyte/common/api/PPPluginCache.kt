@@ -73,7 +73,7 @@ object PPPluginCache {
 
     fun loadInstalledPlugins(pluginsFolder: File, loader: InstalledPluginLoader) {
         this.loader = loader
-        val requestHashes = HashMap<HashType, String>()
+        val requestHashes = HashSet<HashMap<HashType, String>>()
 
         for (file in pluginsFolder.listFiles()!!) {
             if (file.isDirectory || !file.name.endsWith(".jar")) continue
@@ -83,14 +83,14 @@ object PPPluginCache {
 
             println("Found Jar: ${file.name}")
 
+            requestHashes.add(file.getHashes())
 
-            requestHashes.putAll(file.getHashes())
-
-            API.recognizePluginByHashes(
-                file.getHashes(),
-            )
         }
-//
+
+        API.recognizePluginByHashes(requestHashes).body()?.forEach {
+            println("Recognized: ${it.displayInfo.name}")
+        }
+
 //        API.recognizePluginByHashes(requestHashes, PlatformGroup.CRAFT_BUKKIT).body()?.let { map ->
 //
 //            map.forEach { (hash, plugin) ->

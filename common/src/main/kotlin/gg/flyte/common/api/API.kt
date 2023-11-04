@@ -1,12 +1,15 @@
 package gg.flyte.common.api
 
+import com.google.gson.Gson
 import gg.flyte.common.type.api.plugin.MarketplacePlugin
 import gg.flyte.common.api.dataClasses.endpoints.PaginatedResultMarketplacePlugin
 import gg.flyte.common.api.dataClasses.endpoints.RecognizePluginByHashesResult
 import gg.flyte.common.type.misc.HashType
-import gg.flyte.common.util.encodeURL
 import gg.flyte.common.util.pluginApiInterface
+import gg.flyte.common.util.toJson
 import retrofit2.Response
+import java.net.URLDecoder
+import java.net.URLEncoder
 
 object API {
 
@@ -22,17 +25,14 @@ object API {
         return pluginApiInterface.getPluginById(id).execute()
     }
 
-    fun requestPluginById(id: String): Response<Boolean> {
-        return pluginApiInterface.requestPluginById(id).execute()
+    fun recognizePluginByHashes(hashes: HashSet<HashMap<HashType, String>>): Response<HashSet<MarketplacePlugin>> {
+        return pluginApiInterface.recognizePluginByHashes(hashes.encode()).execute()
     }
-
-    fun recognizePluginByHashes(hashes: HashMap<HashType, String>): Response<RecognizePluginByHashesResult> {
-        return pluginApiInterface.recognizePluginByHashes(hashes.encodeURL()).execute()
-    }
-
-    // TODO: Create a /v1/versions/SPIGOT endpoint
-//    fun getVersions(profile): Response<HashMap<PPPlatform, LinkedHashMap<String, String>>> {
-//        return pluginApiInterface.getVersions(profile.toJson()).execute()
-//    }
 }
 
+private inline fun <reified T> String.decode() = Gson().fromJson(URLDecoder.decode(this, Charsets.UTF_8), T::class.java)
+//private inline fun <reified T> T.encode() = URLEncoder.encode(this?.toJson(), Charsets.UTF_8)
+private inline fun <reified T> T.encode(): String {
+    println(this?.toJson())
+    return URLEncoder.encode(this?.toJson(), Charsets.UTF_8)
+}

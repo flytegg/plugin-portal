@@ -13,18 +13,13 @@ import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 
-fun File.getSha1Hash() = Files.asByteSource(this).hash(Hashing.sha1()).toString()
-fun File.getMd5Hash() = Files.asByteSource(this).hash(Hashing.md5()).toString()
-
 fun File.getSha256Hash() = Files.asByteSource(this).hash(Hashing.sha256()).toString()
 fun File.getSha512Hash() = Files.asByteSource(this).hash(Hashing.sha512()).toString()
 
 fun File.getHashes(): HashMap<HashType, String> {
     return HashMap<HashType, String>().apply {
-        put(HashType.SHA1, getSha1Hash())
         put(HashType.SHA256, getSha256Hash())
         put(HashType.SHA512, getSha512Hash())
-        put(HashType.MD5, getMd5Hash())
     }
 }
 
