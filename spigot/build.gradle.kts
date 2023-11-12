@@ -15,6 +15,8 @@ repositories {
 
 }
 
+// WHEN FIXING GRADLE, ADD RELOCATION
+
 dependencies {
     implementation(project(":common"))
 
@@ -23,7 +25,7 @@ dependencies {
     implementation("net.kyori:adventure-platform-bukkit:4.3.0")
 
     implementation("com.github.SuperGlueLib:SuperFoundations:1.2.0")
-    implementation("gg.flyte:twilight:1.0.15")
+    implementation("gg.flyte:twilight:1.0.30")
 
     implementation("org.bstats:bstats-bukkit:3.0.2")
     implementation("com.github.Revxrsal.Lamp:bukkit:3.1.7")

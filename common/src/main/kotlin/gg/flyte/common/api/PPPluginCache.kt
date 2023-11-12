@@ -2,9 +2,10 @@ package gg.flyte.common.api
 
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
-import gg.flyte.common.type.api.plugin.MarketplacePlugin
 import gg.flyte.common.api.interfaces.InstalledPluginLoader
 import gg.flyte.common.type.api.plugin.InstalledPlugin
+import gg.flyte.common.type.api.plugin.schemas.MarketplacePlugin
+import gg.flyte.common.type.api.plugin.toInstalledPlugin
 import gg.flyte.common.type.misc.HashType
 import gg.flyte.common.util.getHashes
 import java.io.File
@@ -18,7 +19,7 @@ object PPPluginCache {
      * Key: Search Term
      * Value: List<MarketplacePlugin>
      */
-    private val pluginCache: Cache<String, List<MarketplacePlugin>> = Caffeine.newBuilder()
+    private val pluginCache: Cache<String, HashSet<MarketplacePlugin>> = Caffeine.newBuilder()
         .expireAfterWrite(10, TimeUnit.MINUTES)
         .build()
 
@@ -58,7 +59,7 @@ object PPPluginCache {
             if (size >= 25 || pluginCache.asMap().keys.any { name.startsWith(it, true) })
                 return this.filter { it.displayInfo.name.startsWith(name, true) }
             else {
-                API.searchForPluginsByName(name).body()?.result?.let { list ->
+                API.searchForPluginsByName(name).body()?.let { list ->
                     pluginCache.put(name, list)
 
                     return list.filter {
@@ -78,7 +79,7 @@ object PPPluginCache {
         for (file in pluginsFolder.listFiles()!!) {
             if (file.isDirectory || !file.name.endsWith(".jar")) continue
 
-            if (installedPlugins.any { it.hashes.any { hash -> file.getHashes().containsValue(hash.value) } }) continue
+            if (installedPlugins.any { it.hashes!!.any { hash -> file.getHashes().containsValue(hash.value) } }) continue
 
 
             println("Found Jar: ${file.name}")
@@ -89,44 +90,8 @@ object PPPluginCache {
 
         API.recognizePluginByHashes(requestHashes).body()?.forEach {
             println("Recognized: ${it.displayInfo.name}")
+            installedPlugins.add(it.toInstalledPlugin())
         }
-
-//        API.recognizePluginByHashes(requestHashes, PlatformGroup.CRAFT_BUKKIT).body()?.let { map ->
-//
-//            map.forEach { (hash, plugin) ->
-//                var pluginVersionData: VersionInfo? = null
-//                var pluginVersion = ""
-//                var pluginPlatform: PlatformType? = null
-//
-//                plugin.versions.forEach { entry ->
-//                    entry.value.forEach { versions ->
-//                        if (versions.value.shaHash == hash) {
-//                            pluginVersionData = versions.value
-//                            pluginVersion = versions.key
-//                            pluginPlatform = entry.key
-//                        }
-//                    }
-//                }
-//
-//                println("Auto Recognized Plugin: ${plugin.displayInfo.name} | Version: $pluginVersion | Platform: $pluginPlatform")
-//
-//                val installedPlugin = InstalledPlugin(
-//                    plugin.id,
-//                    plugin.displayInfo.name,
-//                    pluginVersion,
-//                    pluginPlatform!!,
-//                    plugin.primaryServiceType,
-//                    hash,
-//                    pluginVersionData!!.downloadUrl,
-//                )
-//
-//                println(installedPlugin.toJson())
-//
-//                loader.addInstalledPlugin(installedPlugin)
-//            }
-//        }
-//
-//        saveInstalledPlugins()
     }
 
     fun saveInstalledPlugins() {

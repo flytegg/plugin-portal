@@ -1,9 +1,8 @@
 package gg.flyte.common.api
 
 import com.google.gson.Gson
-import gg.flyte.common.type.api.plugin.MarketplacePlugin
-import gg.flyte.common.api.dataClasses.endpoints.PaginatedResultMarketplacePlugin
-import gg.flyte.common.api.dataClasses.endpoints.RecognizePluginByHashesResult
+
+import gg.flyte.common.type.api.plugin.schemas.MarketplacePlugin
 import gg.flyte.common.type.misc.HashType
 import gg.flyte.common.util.pluginApiInterface
 import gg.flyte.common.util.toJson
@@ -17,7 +16,7 @@ object API {
         name: String,
         limit: Int = 25,
         offset: Int = 0
-    ): Response<PaginatedResultMarketplacePlugin> {
+    ): Response<HashSet<MarketplacePlugin>> {
         return pluginApiInterface.searchForPlugins(name, limit, offset).execute()
     }
 
@@ -31,8 +30,4 @@ object API {
 }
 
 private inline fun <reified T> String.decode() = Gson().fromJson(URLDecoder.decode(this, Charsets.UTF_8), T::class.java)
-//private inline fun <reified T> T.encode() = URLEncoder.encode(this?.toJson(), Charsets.UTF_8)
-private inline fun <reified T> T.encode(): String {
-    println(this?.toJson())
-    return URLEncoder.encode(this?.toJson(), Charsets.UTF_8)
-}
+private inline fun <reified T> T.encode() = URLEncoder.encode(this?.toJson(), Charsets.UTF_8)

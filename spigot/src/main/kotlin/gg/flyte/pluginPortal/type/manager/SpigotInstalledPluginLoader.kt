@@ -12,6 +12,8 @@ import java.io.File
 
 object SpigotInstalledPluginLoader : InstalledPluginLoader {
     override val configFile: File = File(PluginPortal.instance.dataFolder, "plugins.json")
+    val pluginFolder: File = PluginPortal.instance.dataFolder.parentFile
+    val updateFolder: File = File(pluginFolder, "update").apply { if (!exists()) mkdirs() }
 
     override fun addInstalledPlugin(plugin: InstalledPlugin) {
         println(plugin.toJson())
