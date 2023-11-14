@@ -2,11 +2,10 @@ package gg.flyte.common.api
 
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
-import gg.flyte.common.api.interfaces.InstalledPluginLoader
-import gg.flyte.common.type.api.plugin.InstalledPlugin
-import gg.flyte.common.type.api.plugin.schemas.MarketplacePlugin
-import gg.flyte.common.type.api.plugin.toInstalledPlugin
-import gg.flyte.common.type.misc.HashType
+import gg.flyte.common.api.plugins.schemas.InstalledPlugin
+import gg.flyte.common.api.plugins.schemas.MarketplacePlugin
+import gg.flyte.common.api.plugins.schemas.toInstalledPlugin
+import gg.flyte.common.api.plugins.schemas.HashType
 import gg.flyte.common.util.getHashes
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -17,7 +16,7 @@ object PPPluginCache {
 
     /**
      * Key: Search Term
-     * Value: List<MarketplacePlugin>
+     * Value: HashSet<MarketplacePlugin>
      */
     private val pluginCache: Cache<String, HashSet<MarketplacePlugin>> = Caffeine.newBuilder()
         .expireAfterWrite(10, TimeUnit.MINUTES)
@@ -39,16 +38,6 @@ object PPPluginCache {
         }
 
         filter { it.displayInfo.name.startsWith(name, true) }
-    }
-
-    fun getPluginById(id: String): MarketplacePlugin? {
-        pluginCache.asMap().values.forEach {
-            it.forEach { plugin ->
-                if (plugin.id == id) return plugin
-            }
-        }
-
-        return null
     }
 
     fun searchForPluginsByName(name: String): List<MarketplacePlugin> {

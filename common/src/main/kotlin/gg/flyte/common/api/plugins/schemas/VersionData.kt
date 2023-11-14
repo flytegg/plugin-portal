@@ -1,4 +1,4 @@
-package gg.flyte.common.type.api.plugin.schemas
+package gg.flyte.common.api.plugins.schemas
 
 data class VersionData(
     val releaseDate: String,

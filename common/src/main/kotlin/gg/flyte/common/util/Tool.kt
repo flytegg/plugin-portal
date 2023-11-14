@@ -1,7 +1,5 @@
 package gg.flyte.common.util
 
-import java.util.UUID
-
 fun String.alphaNumericOnly(): String {
     val regex = Regex("[^A-Za-z0-9 :]")
     return regex.replace(this, "")
@@ -17,6 +15,6 @@ fun String.addDashesToStringUUID(): String {
     }
 }
 
-
 fun Any.toJson() = GSON.toJson(this)
+
 

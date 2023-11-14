@@ -1,4 +1,4 @@
-package gg.flyte.common.api.dataClasses
+package gg.flyte.common.api.plugins.schemas
 
 data class Dependency(
     val name: String,

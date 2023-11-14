@@ -98,4 +98,7 @@ object CommandManager {
             }
     }
 
+    @Target(AnnotationTarget.VALUE_PARAMETER)
+    annotation class PPPlugin
+
 }

@@ -12,7 +12,7 @@ class InfoSubCommand {
     @Subcommand("info")
     @CommandPermission("pluginportal.info")
     fun onInfoCommand(int: Int) {
-        Bukkit.broadcast(int.toString().toComponent())
+
     }
 
 }

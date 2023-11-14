@@ -6,8 +6,8 @@ import org.bukkit.entity.Player
 
 var prefix = "<bold><gray>[<aqua>PP</aqua>]</gray> <dark_gray>></bold> "
 
-private fun Audience.sendMessage(message: String, color: String, prefix: Boolean = true) =
-    sendMessage("${if (prefix) prefix else ""}<$color>$message".toComponent())
+private fun Audience.sendMessage(message: String, color: String, showPrefix: Boolean = true) =
+    sendMessage("${if (showPrefix) prefix else ""}<$color>$message".toComponent())
 
 fun Audience.sendSuccess(message: String) = sendMessage("$prefix<green>$message".toComponent())
 fun Audience.sendError(message: String) = sendMessage("$prefix<red>$message".toComponent())

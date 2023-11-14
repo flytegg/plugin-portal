@@ -1,10 +1,9 @@
 package gg.flyte.pluginPortal.command.info
 
-import gg.flyte.pluginPortal.type.data.HelpMessage
+import gg.flyte.pluginPortal.type.manager.language.Message.toComponent
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.DefaultFor
-import revxrsal.commands.annotation.Subcommand
 
 @Command("pp", "pluginportal", "ppm", "pportal")
 class HelpSubCommand {
@@ -31,6 +30,10 @@ class HelpSubCommand {
                 sender.sendMessage(it.toComponent())
             }
         }
+    }
+
+    private data class HelpMessage(val message: String, val permission: String, val aliases: List<String>, val description: String, val usage: String) {
+        fun toComponent() = message.toComponent()
     }
 }
 

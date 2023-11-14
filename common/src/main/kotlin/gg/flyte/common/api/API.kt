@@ -2,8 +2,8 @@ package gg.flyte.common.api
 
 import com.google.gson.Gson
 
-import gg.flyte.common.type.api.plugin.schemas.MarketplacePlugin
-import gg.flyte.common.type.misc.HashType
+import gg.flyte.common.api.plugins.schemas.MarketplacePlugin
+import gg.flyte.common.api.plugins.schemas.HashType
 import gg.flyte.common.util.pluginApiInterface
 import gg.flyte.common.util.toJson
 import retrofit2.Response

@@ -1,33 +1,44 @@
 package gg.flyte.pluginPortal.type.manager
 
 import gg.flyte.common.api.PPPluginCache
-import gg.flyte.common.api.interfaces.InstalledPluginLoader
-import gg.flyte.common.type.api.plugin.InstalledPlugin
+import gg.flyte.common.api.plugins.schemas.InstalledPlugin
+import gg.flyte.common.api.plugins.schemas.MarketplacePlugin
+import gg.flyte.common.api.plugins.schemas.toInstalledPlugin
 import gg.flyte.common.util.GSON
-import gg.flyte.common.util.toJson
+import gg.flyte.common.util.getHashes
 import gg.flyte.pluginPortal.PluginPortal
-import org.apache.commons.lang.mutable.Mutable
-import org.bukkit.event.player.PlayerInteractEvent
 import java.io.File
 
-object SpigotInstalledPluginLoader : InstalledPluginLoader {
-    override val configFile: File = File(PluginPortal.instance.dataFolder, "plugins.json")
+object SpigotInstalledPluginLoader {
+    private val configFile: File = File(PluginPortal.instance.dataFolder, "plugins.json")
     val pluginFolder: File = PluginPortal.instance.dataFolder.parentFile
     val updateFolder: File = File(pluginFolder, "update").apply { if (!exists()) mkdirs() }
 
-    override fun addInstalledPlugin(plugin: InstalledPlugin) {
-        println(plugin.toJson())
-        PPPluginCache.addInstalledPlugins(plugin)
+    fun addInstalledPlugin(
+        plugin: MarketplacePlugin,
+        version: String,
+        file: File,
+    ) {
+        PPPluginCache.addInstalledPlugins(
+            with(plugin) {
+                InstalledPlugin(
+                    id,
+                    displayInfo.name,
+                    version,
+                    file.getHashes(),
+                )
+            }
+        )
     }
 
-    override fun loadInstalledPlugins() {
+    fun loadInstalledPlugins() {
         GSON.fromJson(
             configFile.readText(),
             Array<InstalledPlugin>::class.java
         ).forEach { PPPluginCache.addInstalledPlugins(it) }
     }
 
-    override fun saveInstalledPlugins() {
+    fun saveInstalledPlugins() {
         configFile.writeText(GSON.toJson(PPPluginCache.getInstalledPlugins()))
     }
 }

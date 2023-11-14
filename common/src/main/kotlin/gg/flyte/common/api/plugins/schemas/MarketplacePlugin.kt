@@ -1,4 +1,6 @@
-package gg.flyte.common.type.api.plugin.schemas
+package gg.flyte.common.api.plugins.schemas
+
+import gg.flyte.common.api.PPPluginCache
 
 data class MarketplacePlugin(
     val id: String,
@@ -9,5 +11,8 @@ data class MarketplacePlugin(
     var versions: HashMap<String, VersionInfo>, // HashMap<PlatformType, Hashmap<VersionID, VersionInfo>>
     val alternatePluginIds: HashSet<String>? // HashSet<Id>, this is where plugins are hosted on multiple services
 ) {
+    fun getUniqueName() = "${displayInfo.name} (${id})"
     fun getDownloadCount() = stats.downloads
+    fun getDownloadURL() = versions[versionData.latestVersion]?.downloadUrl
+    fun isInstalled() = PPPluginCache.getInstalledPlugins().any { it.id == id }
 }

@@ -1,6 +1,6 @@
-package gg.flyte.common.api.interfaces
+package gg.flyte.common.api.plugins.interfaces
 
-import gg.flyte.common.type.api.plugin.schemas.MarketplacePlugin
+import gg.flyte.common.api.plugins.schemas.MarketplacePlugin
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.*

@@ -1,4 +1,4 @@
-package gg.flyte.common.type.misc
+package gg.flyte.common.api.plugins.schemas
 
 enum class HashType {
     SHA256,
