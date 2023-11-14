@@ -1,4 +1,4 @@
-package gg.flyte.common.api.plugins.interfaces
+package gg.flyte.common.api.plugins
 
 import gg.flyte.common.api.plugins.schemas.MarketplacePlugin
 import okhttp3.ResponseBody

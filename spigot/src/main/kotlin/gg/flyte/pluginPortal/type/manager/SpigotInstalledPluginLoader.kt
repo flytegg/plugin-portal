@@ -1,6 +1,5 @@
 package gg.flyte.pluginPortal.type.manager
 
-import gg.flyte.common.api.PPPluginCache
 import gg.flyte.common.api.plugins.schemas.InstalledPlugin
 import gg.flyte.common.api.plugins.schemas.MarketplacePlugin
 import gg.flyte.common.api.plugins.schemas.toInstalledPlugin
@@ -14,24 +13,9 @@ object SpigotInstalledPluginLoader {
     val pluginFolder: File = PluginPortal.instance.dataFolder.parentFile
     val updateFolder: File = File(pluginFolder, "update").apply { if (!exists()) mkdirs() }
 
-    fun addInstalledPlugin(
-        plugin: MarketplacePlugin,
-        version: String,
-        file: File,
-    ) {
-        PPPluginCache.addInstalledPlugins(
-            with(plugin) {
-                InstalledPlugin(
-                    id,
-                    displayInfo.name,
-                    version,
-                    file.getHashes(),
-                )
-            }
-        )
-    }
-
     fun loadInstalledPlugins() {
+        if (configFile.readText().isEmpty()) { configFile.writeText("[]") }
+
         GSON.fromJson(
             configFile.readText(),
             Array<InstalledPlugin>::class.java

@@ -2,7 +2,7 @@ package gg.flyte.common.util
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import gg.flyte.common.api.plugins.interfaces.PluginApiInterface
+import gg.flyte.common.api.plugins.PluginApiInterface
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit

@@ -1,18 +1,20 @@
-package gg.flyte.common.api
+package gg.flyte.pluginPortal.type.manager
 
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
+import gg.flyte.common.api.API
 import gg.flyte.common.api.plugins.schemas.InstalledPlugin
 import gg.flyte.common.api.plugins.schemas.MarketplacePlugin
 import gg.flyte.common.api.plugins.schemas.toInstalledPlugin
 import gg.flyte.common.api.plugins.schemas.HashType
+import gg.flyte.common.util.GSON
 import gg.flyte.common.util.getHashes
+import gg.flyte.pluginPortal.PluginPortal
+import gg.flyte.twilight.scheduler.async
 import java.io.File
 import java.util.concurrent.TimeUnit
 
 object PPPluginCache {
-
-    private lateinit var loader: InstalledPluginLoader
 
     /**
      * Key: Search Term
@@ -23,6 +25,10 @@ object PPPluginCache {
         .build()
 
     private val installedPlugins = HashSet<InstalledPlugin>()
+
+    private val installedPluginsConfig get(): File = File(PluginPortal.instance.dataFolder, "plugins.json")
+    val pluginFolder get(): File = PluginPortal.instance.dataFolder.parentFile
+    val updateFolder get(): File = File(pluginFolder, "update").apply { if (!exists()) mkdirs() }
 
     fun getInstalledPlugins() = installedPlugins
     fun removeInstalledPlugins(vararg plugin: InstalledPlugin) = installedPlugins.removeAll(plugin.toSet())
@@ -41,7 +47,6 @@ object PPPluginCache {
     }
 
     fun searchForPluginsByName(name: String): List<MarketplacePlugin> {
-
         val cachedMatches = mutableListOf<MarketplacePlugin>().apply {
             addAll(getPluginsByName(name))
 
@@ -61,29 +66,41 @@ object PPPluginCache {
         return cachedMatches
     }
 
-    fun loadInstalledPlugins(pluginsFolder: File, loader: InstalledPluginLoader) {
-        this.loader = loader
-        val requestHashes = HashSet<HashMap<HashType, String>>()
+    fun loadInstalledPlugins() {
+        async {
+            if (installedPluginsConfig.readText().isEmpty()) {
+                installedPluginsConfig.writeText("[]")
+            }
 
-        for (file in pluginsFolder.listFiles()!!) {
-            if (file.isDirectory || !file.name.endsWith(".jar")) continue
+            GSON.fromJson(
+                installedPluginsConfig.readText(),
+                Array<InstalledPlugin>::class.java
+            ).forEach { addInstalledPlugins(it) }
 
-            if (installedPlugins.any { it.hashes!!.any { hash -> file.getHashes().containsValue(hash.value) } }) continue
+            val requestHashes = HashSet<HashMap<HashType, String>>().apply {
+                pluginFolder.listFiles()
+                    ?.filter { it.name.endsWith(".jar") }
+                    ?.filter { file ->
+                        !installedPlugins.any {
+                            it.hashes?.firstNotNullOfOrNull { hash ->
+                                file.getHashes().containsValue(hash.value)
+                            } ?: false
+                        }
+                    }
+                    ?.forEach { add(it.getHashes()) }
+            }
 
+            API.recognizePluginByHashes(requestHashes).body()?.forEach {
+                addInstalledPlugins(it.toInstalledPlugin())
+            }
 
-            println("Found Jar: ${file.name}")
-
-            requestHashes.add(file.getHashes())
-
-        }
-
-        API.recognizePluginByHashes(requestHashes).body()?.forEach {
-            println("Recognized: ${it.displayInfo.name}")
-            installedPlugins.add(it.toInstalledPlugin())
+            saveInstalledPlugins()
         }
     }
 
     fun saveInstalledPlugins() {
-        loader.saveInstalledPlugins()
+        installedPluginsConfig.writeText(GSON.toJson(getInstalledPlugins()))
     }
+
+    fun MarketplacePlugin.isInstalled() = getInstalledPlugins().any { it.id == id }
 }

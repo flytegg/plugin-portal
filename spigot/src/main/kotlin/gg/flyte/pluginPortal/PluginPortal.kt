@@ -1,9 +1,8 @@
 package gg.flyte.pluginPortal
 
-import gg.flyte.common.api.PPPluginCache
 import gg.flyte.pluginPortal.command.CommandManager
 import gg.flyte.pluginPortal.type.manager.Config
-import gg.flyte.pluginPortal.type.manager.SpigotInstalledPluginLoader
+import gg.flyte.pluginPortal.type.manager.PPPluginCache
 import gg.flyte.twilight.twilight
 import io.papermc.lib.PaperLib
 import org.bstats.bukkit.Metrics
@@ -24,10 +23,10 @@ class PluginPortal : JavaPlugin() {
         CommandManager.init()
 
         PPPluginCache.loadInstalledPlugins(
-            dataFolder.apply { mkdir() }.parentFile,
-            SpigotInstalledPluginLoader.apply {
-                loadInstalledPlugins()
-            }
+//            dataFolder.apply { mkdir() }.parentFile,
+//            SpigotInstalledPluginLoader.apply {
+//                loadInstalledPlugins()
+//            }
         )
 
         Metrics(this, 18005)

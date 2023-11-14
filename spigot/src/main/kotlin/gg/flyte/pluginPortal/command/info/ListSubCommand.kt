@@ -1,8 +1,6 @@
 package gg.flyte.pluginPortal.command.info
 
-import gg.flyte.common.api.PPPluginCache
-import gg.flyte.pluginPortal.PluginPortal
-import gg.flyte.pluginPortal.type.manager.SpigotInstalledPluginLoader
+import gg.flyte.pluginPortal.type.manager.PPPluginCache
 import gg.flyte.pluginPortal.type.manager.language.Message.toComponent
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.Command

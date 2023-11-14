@@ -1,14 +1,13 @@
 package gg.flyte.pluginPortal.command
 
-import gg.flyte.common.api.PPPluginCache
 import gg.flyte.pluginPortal.PluginPortal
-import gg.flyte.pluginPortal.command.downloadable.DeleteSubCommand
 import gg.flyte.pluginPortal.command.downloadable.InstallSubCommand
 import gg.flyte.pluginPortal.command.downloadable.UpdateSubCommand
 import gg.flyte.pluginPortal.command.info.HelpSubCommand
 import gg.flyte.pluginPortal.command.info.InfoSubCommand
 import gg.flyte.pluginPortal.command.info.ListSubCommand
 import gg.flyte.pluginPortal.command.info.SearchSubCommand
+import gg.flyte.pluginPortal.type.manager.PPPluginCache
 import gg.flyte.twilight.scheduler.async
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bukkit.Bukkit
@@ -31,7 +30,6 @@ object CommandManager {
     private fun BukkitCommandHandler.registerCommands() {
         register(
             InstallSubCommand(),
-            DeleteSubCommand(),
             UpdateSubCommand(),
             HelpSubCommand(),
             InfoSubCommand(),

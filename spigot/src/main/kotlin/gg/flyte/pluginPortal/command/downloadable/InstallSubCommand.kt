@@ -1,12 +1,12 @@
 package gg.flyte.pluginPortal.command.downloadable
 
 import gg.flyte.common.api.API
-import gg.flyte.common.api.PPPluginCache
 import gg.flyte.common.api.plugins.schemas.MarketplacePlugin
 import gg.flyte.pluginPortal.command.CommandManager
 import gg.flyte.pluginPortal.type.extension.sendError
 import gg.flyte.pluginPortal.type.extension.sendInfo
 import gg.flyte.pluginPortal.type.extension.sendSuccess
+import gg.flyte.pluginPortal.type.manager.PPPluginCache
 import gg.flyte.pluginPortal.type.manager.PluginManager
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.AutoComplete
@@ -19,6 +19,16 @@ import revxrsal.commands.bukkit.annotation.CommandPermission
 
 @Command("pp", "pluginportal", "ppm", "pportal")
 class InstallSubCommand {
+
+    companion object {
+        fun getPlugins(pluginName: String, isId: Boolean) = if (isId) {
+            HashSet<MarketplacePlugin>().apply { API.getPluginById(pluginName).body()?.let { add(it) } }
+        } else {
+            PPPluginCache.getPluginsByName(pluginName)
+                .filter { it.displayInfo.name.equals(pluginName, true) }
+                .toHashSet()
+        }
+    }
 
     @Subcommand("install", "i")
     @CommandPermission("pluginportal.install")
@@ -44,8 +54,8 @@ class InstallSubCommand {
 
             sender.sendInfo("Downloading ${plugin.getUniqueName()}")
 
-            PluginManager.installPlugin(plugin) { isSuccessful ->
-                if (isSuccessful) sender.sendSuccess("Successfully installed ${plugin.getUniqueName()}")
+            PluginManager.installPlugin(plugin) { success ->
+                if (success) sender.sendSuccess("Successfully installed ${plugin.getUniqueName()}")
                 else sender.sendError("Failed to install ${plugin.getUniqueName()}")
             }
 
@@ -53,13 +63,4 @@ class InstallSubCommand {
 
 
     }
-
-    private fun getPlugins(pluginName: String, isId: Boolean) = if (isId) {
-        HashSet<MarketplacePlugin>().apply { API.getPluginById(pluginName).body()?.let { add(it) } }
-    } else {
-        PPPluginCache.getPluginsByName(pluginName)
-            .filter { it.displayInfo.name.equals(pluginName, true) }
-            .toHashSet()
-    }
-
 }
