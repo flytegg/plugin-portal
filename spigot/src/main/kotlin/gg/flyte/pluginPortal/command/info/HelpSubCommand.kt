@@ -1,12 +1,9 @@
 package gg.flyte.pluginPortal.command.info
 
-import gg.flyte.pluginPortal.type.extension.sendInfo
-import gg.flyte.pluginPortal.type.manager.language.Message.toComponent
+import gg.flyte.twilight.extension.solidLine
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextDecoration
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.DefaultFor
 
@@ -14,43 +11,58 @@ import revxrsal.commands.annotation.DefaultFor
 class HelpSubCommand {
 
     @DefaultFor("~", "~ help")
-    fun onHelpCommand(sender: Audience) {
-        arrayListOf(
+    fun onHelpCommand(
+        sender: Audience
+    ) {
+        val messages = hashSetOf(
             HelpMessage(
                 "Install",
                 "pluginportal.install",
                 listOf("i"),
-                "Install a plugin from the marketplace",
+                "Install a plugin",
                 "/pp install <plugin>"
             ),
             HelpMessage(
-                "Delete",
-                "pluginportal.delete",
-                listOf("d"),
-                "Delete a plugin from the server",
-                "/pp delete <plugin>"
+                "Update",
+                "pluginportal.update",
+                listOf("u"),
+                "Update an installed plugin",
+                "/pp update <plugin>"
             ),
-        ).let { messages ->
-            with(sender) {
-                val strike = Component.text("")
-                    .color(NamedTextColor.GRAY)
-                    .solidLine()
+        )
 
-                sendMessage(strike)
-                messages.forEach { sendMessage(it.toComponent()) }
-                sendMessage(strike)
-            }
+        val strike = Component.text("")
+            .solidLine()
+            .color(NamedTextColor.DARK_GRAY)
 
-        }
+        sender.sendMessage(
+            Component.text().append(
+                strike,
+                Component.newline(),
+                Component.text().append(
+                    messages.map { message ->
+                        Component.text().append(
+                            Component.text(" - ", NamedTextColor.GRAY),
+                            Component.text(message.usage, NamedTextColor.AQUA),
+                            Component.text(" ( ${message.aliases.joinToString(" ")} ) ", NamedTextColor.DARK_GRAY),
+                            Component.text(" | ", NamedTextColor.GRAY),
+                            Component.text(message.description, NamedTextColor.GRAY),
+                            Component.newline(),
+                        ).build()
+                    },
+                ).build(),
+                strike
+            )
+        )
+
     }
 
-    private data class HelpMessage(val message: String, val permission: String, val aliases: List<String>, val description: String, val usage: String) {
-        fun toComponent() = message.toComponent()
-    }
-
-    fun Component.solidLine(): TextComponent {
-        return Component.text("                                                                               ").decorate(
-            TextDecoration.STRIKETHROUGH)
-    }
+    private data class HelpMessage(
+        val message: String,
+        val permission: String,
+        val aliases: List<String>,
+        val description: String,
+        val usage: String
+    )
 }
 

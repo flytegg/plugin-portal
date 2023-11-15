@@ -17,48 +17,44 @@ object InfoDisplay {
 
     class DefaultDisplay : InfoInterface {
         override fun getDisplayInfo(plugin: MarketplacePlugin): Component {
+            return Component.text().append(
+                Component.empty()
+                    .solidLine()
+                    .color(NamedTextColor.DARK_GRAY),
 
-            return Component.empty()
-                .append(
-                    Component.empty()
-                        .solidLine()
-                        .color(NamedTextColor.DARK_GRAY)
-                )
-                .appendNewline()
-                .append(Component.text("┌ ", NamedTextColor.GRAY))
-                .append(Component.text("Name: ", NamedTextColor.AQUA, TextDecoration.BOLD))
-                .append(displayInformation(plugin.getUniqueName()))
-                .appendNewline()
-                .append(Component.text("├─ ", NamedTextColor.GRAY))
-                .append(Component.text(plugin.stats.downloads, NamedTextColor.AQUA))
-                .appendSpace()
-                .append(Component.text("⬇", NamedTextColor.AQUA, TextDecoration.UNDERLINED, TextDecoration.BOLD))
-                .append(Component.text(" | ", NamedTextColor.GRAY))
-                .append(
-                    Component.text(
-                        plugin.stats.ratingAverage.toBigDecimal().setScale(
-                            1,
-                            RoundingMode.UP
-                        ).toDouble(),
-                        NamedTextColor.AQUA
-                    )
-                )
-                .append(Component.text(" ⭐", NamedTextColor.GOLD, TextDecoration.BOLD))
-                .append(Component.text(" | ", NamedTextColor.GRAY))
-                .append(
-                    Component.text(
-                        if ((plugin.stats.price ?: 0) > 0) "\$${plugin.stats.price}" else "FREE",
-                        NamedTextColor.AQUA
-                    )
-                )
-                .appendNewline()
-                .append(createDescriptionLines(plugin.displayInfo.description))
-                .appendNewline()
-                .append(
-                    Component.empty()
-                        .solidLine()
-                        .color(NamedTextColor.DARK_GRAY)
-                )
+                Component.newline(),
+                Component.text("┌ ", NamedTextColor.GRAY),
+                Component.text("Name: ", NamedTextColor.AQUA, TextDecoration.BOLD),
+                displayInformation(plugin.getUniqueName()),
+                Component.newline(),
+                Component.text("├─ ", NamedTextColor.GRAY),
+                Component.text(plugin.stats.downloads, NamedTextColor.AQUA),
+                Component.space(),
+                Component.text("⬇", NamedTextColor.AQUA, TextDecoration.UNDERLINED, TextDecoration.BOLD),
+                Component.text(" | ", NamedTextColor.GRAY),
+                Component.text(
+                    plugin.stats.ratingAverage.toBigDecimal().setScale(
+                        1,
+                        RoundingMode.UP
+                    ).toDouble(),
+                    NamedTextColor.AQUA
+                ),
+
+                Component.text(" ⭐", NamedTextColor.GOLD, TextDecoration.BOLD),
+                Component.text(" | ", NamedTextColor.GRAY),
+                Component.text(
+                    if ((plugin.stats.price ?: 0) > 0) "\$${plugin.stats.price}" else "FREE",
+                    NamedTextColor.AQUA
+                ),
+
+                Component.newline(),
+                createDescriptionLines(plugin.displayInfo.description),
+                Component.newline(),
+                Component.empty()
+                    .solidLine()
+                    .color(NamedTextColor.DARK_GRAY)
+
+            ).build()
         }
     }
 

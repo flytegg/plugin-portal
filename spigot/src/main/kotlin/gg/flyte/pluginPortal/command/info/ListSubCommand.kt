@@ -6,6 +6,7 @@ import gg.flyte.pluginPortal.type.manager.language.Message.toComponent
 import gg.flyte.twilight.extension.solidLine
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Subcommand
 import revxrsal.commands.bukkit.annotation.CommandPermission
@@ -16,16 +17,34 @@ class ListSubCommand {
     @Subcommand("list", "ls")
     @CommandPermission("pluginportal.list")
     fun listSubCommand(sender: Audience) {
-        val strike = Component.text("").solidLine()
-        with(sender) {
-            sendMessage(strike)
-            if (PPPluginCache.getInstalledPlugins().isEmpty()) { sendInfo("No plugins installed.") }
+        val strike = Component.text("")
+            .solidLine()
+            .color(NamedTextColor.DARK_GRAY)
 
-            PPPluginCache.getInstalledPlugins().forEach {
-                sendMessage(" - ${it.getUniqueName()} | ${it.version ?: "Unknown Version"}".toComponent())
-            }
-            sendMessage(strike)
-        }
+        sender.sendMessage(
+            Component.text().append(
+                strike,
+                Component.newline(),
+                if (PPPluginCache.getInstalledPlugins().isEmpty()) {
+                    Component.text("No plugins installed.", NamedTextColor.RED)
+                    Component.newline()
+                } else {
+                    Component.text().append(
+                        PPPluginCache.getInstalledPlugins().map { plugin ->
+                            Component.text().append(
+                                Component.text(" - ", NamedTextColor.GRAY),
+                                Component.text(plugin.getUniqueName(), NamedTextColor.AQUA),
+                                Component.text(" | ", NamedTextColor.GRAY),
+                                Component.text(plugin.version ?: "Unknown Version", NamedTextColor.AQUA),
+                                Component.newline()
+                            ).build()
+                        }
+                    ).build()
+                },
+                strike
+            )
+        )
+
     }
 
 }
