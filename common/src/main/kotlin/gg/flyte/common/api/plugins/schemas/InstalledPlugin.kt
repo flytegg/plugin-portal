@@ -5,11 +5,6 @@ data class InstalledPlugin(
     val name: String,
     val version: String?,
     val hashes: HashMap<HashType, String>?,
-)
-
-fun MarketplacePlugin.toInstalledPlugin() = InstalledPlugin(
-    this.id,
-    this.displayInfo.name,
-    null,
-    null,
-)
+) {
+    fun getUniqueName() = "$name ($id)"
+}

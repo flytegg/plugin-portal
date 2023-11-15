@@ -5,8 +5,8 @@ import gg.flyte.common.api.plugins.schemas.MarketplacePlugin
 import gg.flyte.common.util.getHashes
 import gg.flyte.common.util.pluginApiInterface
 import gg.flyte.pluginPortal.type.manager.PPPluginCache.isInstalled
-import gg.flyte.pluginPortal.type.manager.SpigotInstalledPluginLoader.pluginFolder
-import gg.flyte.pluginPortal.type.manager.SpigotInstalledPluginLoader.updateFolder
+import gg.flyte.pluginPortal.type.manager.PPPluginCache.pluginFolder
+import gg.flyte.pluginPortal.type.manager.PPPluginCache.updateFolder
 import gg.flyte.twilight.scheduler.async
 import java.io.File
 
@@ -45,23 +45,26 @@ object PluginManager {
         version: String,
         file: File,
     ) {
-        PPPluginCache.removeInstalledPlugins(
-            PPPluginCache.getInstalledPlugins()
-                .firstOrNull { it.id == plugin.id } ?: return
-        )
+        with(PPPluginCache) {
 
-        PPPluginCache.addInstalledPlugins(
-            with(plugin) {
-                InstalledPlugin(
-                    id,
-                    displayInfo.name,
-                    version,
-                    file.getHashes(),
-                )
-            }
-        )
+            getInstalledPlugins()
+                .firstOrNull { it.id == plugin.id }?.let {
+                    removeInstalledPlugins(it)
+                }
 
-        PPPluginCache.saveInstalledPlugins()
+            addInstalledPlugins(
+                with(plugin) {
+                    InstalledPlugin(
+                        id,
+                        displayInfo.name,
+                        version,
+                        file.getHashes(),
+                    )
+                }
+            )
+
+            saveInstalledPlugins()
+        }
     }
 
     private fun MarketplacePlugin.getInstallDirectory() = if (isInstalled()) updateFolder else pluginFolder

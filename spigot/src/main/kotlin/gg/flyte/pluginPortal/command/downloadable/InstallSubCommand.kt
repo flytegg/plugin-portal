@@ -7,6 +7,7 @@ import gg.flyte.pluginPortal.type.extension.sendError
 import gg.flyte.pluginPortal.type.extension.sendInfo
 import gg.flyte.pluginPortal.type.extension.sendSuccess
 import gg.flyte.pluginPortal.type.manager.PPPluginCache
+import gg.flyte.pluginPortal.type.manager.PPPluginCache.isInstalled
 import gg.flyte.pluginPortal.type.manager.PluginManager
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.AutoComplete
@@ -19,16 +20,6 @@ import revxrsal.commands.bukkit.annotation.CommandPermission
 
 @Command("pp", "pluginportal", "ppm", "pportal")
 class InstallSubCommand {
-
-    companion object {
-        fun getPlugins(pluginName: String, isId: Boolean) = if (isId) {
-            HashSet<MarketplacePlugin>().apply { API.getPluginById(pluginName).body()?.let { add(it) } }
-        } else {
-            PPPluginCache.getPluginsByName(pluginName)
-                .filter { it.displayInfo.name.equals(pluginName, true) }
-                .toHashSet()
-        }
-    }
 
     @Subcommand("install", "i")
     @CommandPermission("pluginportal.install")
@@ -49,7 +40,9 @@ class InstallSubCommand {
         } else {
             val plugin = plugins.first()
 
-            if (plugin.versions[plugin.versionData.latestVersion]?.downloadUrl == null)
+            if (plugin.isInstalled()) return sender.sendError("Plugin ${plugin.getUniqueName()} is already installed. Please use the update command.")
+
+            if (plugin.getDownloadURL() == null)
                 return sender.sendError("No download URL found for ${plugin.displayInfo.name}")
 
             sender.sendInfo("Downloading ${plugin.getUniqueName()}")
@@ -63,4 +56,13 @@ class InstallSubCommand {
 
 
     }
+
+    private fun getPlugins(pluginName: String, isId: Boolean) = if (isId) {
+        HashSet<MarketplacePlugin>().apply { API.getPluginById(pluginName).body()?.let { add(it) } }
+    } else {
+        PPPluginCache.getPluginsByName(pluginName)
+            .filter { it.displayInfo.name.equals(pluginName, true) }
+            .toHashSet()
+    }
+
 }

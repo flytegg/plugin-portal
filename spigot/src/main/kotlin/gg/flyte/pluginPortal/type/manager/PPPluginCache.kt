@@ -5,7 +5,6 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import gg.flyte.common.api.API
 import gg.flyte.common.api.plugins.schemas.InstalledPlugin
 import gg.flyte.common.api.plugins.schemas.MarketplacePlugin
-import gg.flyte.common.api.plugins.schemas.toInstalledPlugin
 import gg.flyte.common.api.plugins.schemas.HashType
 import gg.flyte.common.util.GSON
 import gg.flyte.common.util.getHashes
@@ -33,7 +32,12 @@ object PPPluginCache {
     fun getInstalledPlugins() = installedPlugins
     fun removeInstalledPlugins(vararg plugin: InstalledPlugin) = installedPlugins.removeAll(plugin.toSet())
 
-    fun addInstalledPlugins(vararg plugin: InstalledPlugin) = installedPlugins.addAll(plugin)
+    fun addInstalledPlugins(vararg plugin: InstalledPlugin, shouldSave: Boolean = true) = installedPlugins.addAll(plugin)
+        .also {
+            if (shouldSave) saveInstalledPlugins()
+        }
+
+
     fun addInstalledPlugins(plugin: ArrayList<InstalledPlugin>) = installedPlugins.addAll(plugin)
 
     fun getPluginsByName(name: String) = arrayListOf<MarketplacePlugin>().apply {

@@ -12,4 +12,11 @@ data class MarketplacePlugin(
     fun getUniqueName() = "${displayInfo.name} (${id})"
     fun getDownloadCount() = stats.downloads
     fun getDownloadURL() = versions[versionData.latestVersion]?.downloadUrl
+
+    fun toInstalledPlugin() = InstalledPlugin(
+        this.id,
+        this.displayInfo.name,
+        null,
+        null,
+    )
 }
