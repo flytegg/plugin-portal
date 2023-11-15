@@ -1,5 +1,7 @@
 package gg.flyte.pluginPortal.command
 
+import gg.flyte.common.api.API
+import gg.flyte.common.api.plugins.schemas.MarketplacePlugin
 import gg.flyte.pluginPortal.PluginPortal
 import gg.flyte.pluginPortal.command.downloadable.InstallSubCommand
 import gg.flyte.pluginPortal.command.downloadable.UpdateSubCommand
@@ -94,6 +96,14 @@ object CommandManager {
                     return@registerSuggestion list
                 }
             }
+    }
+
+    fun getPlugins(pluginName: String, isId: Boolean) = if (isId) {
+        HashSet<MarketplacePlugin>().apply { API.getPluginById(pluginName).body()?.let { add(it) } }
+    } else {
+        PPPluginCache.getPluginsByName(pluginName)
+            .filter { it.displayInfo.name.equals(pluginName, true) }
+            .toHashSet()
     }
 
     @Target(AnnotationTarget.VALUE_PARAMETER)

@@ -112,7 +112,7 @@ object Message {
     }
 
     fun String.toComponent(): Component = MiniMessage.miniMessage().deserialize(this)
-    fun Component.toString(): String = MiniMessage.miniMessage().serialize(this)
+    fun Component.serialize() = MiniMessage.miniMessage().serialize(this)
 
     private fun FileConfiguration.getBetterString(path: String): String {
         val configString = this.getString(path)

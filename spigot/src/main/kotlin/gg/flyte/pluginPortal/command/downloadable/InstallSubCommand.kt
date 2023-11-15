@@ -29,7 +29,7 @@ class InstallSubCommand {
         @CommandManager.PPPlugin pluginName: String,
         @Flag @Optional @Default("false") isId: Boolean,
     ) {
-        val plugins = getPlugins(pluginName, isId).also {
+        val plugins = CommandManager.getPlugins(pluginName, isId).also {
             if (it.isEmpty()) return sender.sendError("No plugins found with the name '$pluginName'")
         }
 
@@ -53,16 +53,6 @@ class InstallSubCommand {
             }
 
         }
-
-
-    }
-
-    private fun getPlugins(pluginName: String, isId: Boolean) = if (isId) {
-        HashSet<MarketplacePlugin>().apply { API.getPluginById(pluginName).body()?.let { add(it) } }
-    } else {
-        PPPluginCache.getPluginsByName(pluginName)
-            .filter { it.displayInfo.name.equals(pluginName, true) }
-            .toHashSet()
     }
 
 }

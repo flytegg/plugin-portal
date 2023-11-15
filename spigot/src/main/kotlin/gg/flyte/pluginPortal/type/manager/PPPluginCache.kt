@@ -94,8 +94,10 @@ object PPPluginCache {
                     ?.forEach { add(it.getHashes()) }
             }
 
-            API.recognizePluginByHashes(requestHashes).body()?.forEach {
-                addInstalledPlugins(it.toInstalledPlugin())
+            if (requestHashes.isNotEmpty()) {
+                API.recognizePluginByHashes(requestHashes).body()?.forEach {
+                    addInstalledPlugins(it.toInstalledPlugin())
+                }
             }
 
             saveInstalledPlugins()
