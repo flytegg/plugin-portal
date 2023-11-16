@@ -2,10 +2,9 @@ package gg.flyte.pluginPortal.command.info
 
 import gg.flyte.pluginPortal.command.CommandManager
 import gg.flyte.pluginPortal.command.info.display.InfoDisplay
-import gg.flyte.pluginPortal.type.extension.sendError
-import gg.flyte.pluginPortal.type.extension.sendInfo
+import gg.flyte.pluginPortal.manager.language.sendError
+import gg.flyte.pluginPortal.manager.language.sendInfo
 import net.kyori.adventure.audience.Audience
-import org.bukkit.Bukkit
 import revxrsal.commands.annotation.*
 import revxrsal.commands.bukkit.annotation.CommandPermission
 

@@ -1,7 +1,7 @@
-package gg.flyte.pluginPortal.type.manager.language
+package gg.flyte.pluginPortal.manager.language
 
 import gg.flyte.pluginPortal.PluginPortal
-import gg.flyte.pluginPortal.type.manager.Config
+import gg.flyte.pluginPortal.manager.Config
 import link.portalbox.pluginportal.type.language.Language
 import link.portalbox.pluginportal.type.language.LanguageLoadingException
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
@@ -123,3 +123,4 @@ object Message {
         return configString
     }
 }
+

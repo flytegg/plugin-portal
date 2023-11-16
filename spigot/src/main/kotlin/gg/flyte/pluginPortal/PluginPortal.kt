@@ -1,8 +1,8 @@
 package gg.flyte.pluginPortal
 
 import gg.flyte.pluginPortal.command.CommandManager
-import gg.flyte.pluginPortal.type.manager.Config
-import gg.flyte.pluginPortal.type.manager.PPPluginCache
+import gg.flyte.pluginPortal.manager.Config
+import gg.flyte.pluginPortal.manager.PPPluginCache
 import gg.flyte.twilight.twilight
 import io.papermc.lib.PaperLib
 import org.bstats.bukkit.Metrics
@@ -17,25 +17,17 @@ class PluginPortal : JavaPlugin() {
     override fun onEnable() {
         instance = this
 
-        Config.init(this)
         twilight(this) {}
+        Config.init(this)
 
         CommandManager.init()
 
-        PPPluginCache.loadInstalledPlugins(
-//            dataFolder.apply { mkdir() }.parentFile,
-//            SpigotInstalledPluginLoader.apply {
-//                loadInstalledPlugins()
-//            }
-        )
+        PPPluginCache.loadInstalledPlugins()
 
         Metrics(this, 18005)
         PaperLib.suggestPaper(this)
     }
 
-    override fun onDisable() {
-        PPPluginCache.saveInstalledPlugins()
-        logger.info("PluginPortal has been disabled!")
-    }
+    override fun onDisable() { PPPluginCache.saveInstalledPlugins() }
 
 }

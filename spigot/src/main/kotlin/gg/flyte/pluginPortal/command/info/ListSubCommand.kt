@@ -1,8 +1,6 @@
 package gg.flyte.pluginPortal.command.info
 
-import gg.flyte.pluginPortal.type.extension.sendInfo
-import gg.flyte.pluginPortal.type.manager.PPPluginCache
-import gg.flyte.pluginPortal.type.manager.language.Message.toComponent
+import gg.flyte.pluginPortal.manager.PPPluginCache
 import gg.flyte.twilight.extension.solidLine
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component

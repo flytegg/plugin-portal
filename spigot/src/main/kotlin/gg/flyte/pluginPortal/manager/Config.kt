@@ -1,4 +1,4 @@
-package gg.flyte.pluginPortal.type.manager
+package gg.flyte.pluginPortal.manager
 
 import gg.flyte.pluginPortal.PluginPortal
 import org.bukkit.configuration.file.FileConfiguration

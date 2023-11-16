@@ -8,8 +8,7 @@ import gg.flyte.pluginPortal.command.downloadable.UpdateSubCommand
 import gg.flyte.pluginPortal.command.info.HelpSubCommand
 import gg.flyte.pluginPortal.command.info.InfoSubCommand
 import gg.flyte.pluginPortal.command.info.ListSubCommand
-import gg.flyte.pluginPortal.command.info.SearchSubCommand
-import gg.flyte.pluginPortal.type.manager.PPPluginCache
+import gg.flyte.pluginPortal.manager.PPPluginCache
 import gg.flyte.twilight.scheduler.async
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bukkit.Bukkit
@@ -36,7 +35,6 @@ object CommandManager {
             HelpSubCommand(),
             InfoSubCommand(),
             ListSubCommand(),
-            SearchSubCommand(),
         )
     }
 

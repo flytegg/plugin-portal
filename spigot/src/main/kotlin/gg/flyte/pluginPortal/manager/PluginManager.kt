@@ -1,12 +1,12 @@
-package gg.flyte.pluginPortal.type.manager
+package gg.flyte.pluginPortal.manager
 
 import gg.flyte.common.api.plugins.schemas.InstalledPlugin
 import gg.flyte.common.api.plugins.schemas.MarketplacePlugin
 import gg.flyte.common.util.getHashes
 import gg.flyte.common.util.pluginApiInterface
-import gg.flyte.pluginPortal.type.manager.PPPluginCache.isInstalled
-import gg.flyte.pluginPortal.type.manager.PPPluginCache.pluginFolder
-import gg.flyte.pluginPortal.type.manager.PPPluginCache.updateFolder
+import gg.flyte.pluginPortal.manager.PPPluginCache.isInstalled
+import gg.flyte.pluginPortal.manager.PPPluginCache.pluginFolder
+import gg.flyte.pluginPortal.manager.PPPluginCache.updateFolder
 import gg.flyte.twilight.scheduler.async
 import java.io.File
 

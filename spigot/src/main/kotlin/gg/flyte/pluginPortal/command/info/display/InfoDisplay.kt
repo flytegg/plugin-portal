@@ -1,8 +1,8 @@
 package gg.flyte.pluginPortal.command.info.display
 
 import gg.flyte.common.api.plugins.schemas.MarketplacePlugin
-import gg.flyte.pluginPortal.type.manager.language.Message.serialize
-import gg.flyte.pluginPortal.type.manager.language.Message.toComponent
+import gg.flyte.pluginPortal.manager.language.Message.serialize
+import gg.flyte.pluginPortal.manager.language.Message.toComponent
 import gg.flyte.twilight.extension.solidLine
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent

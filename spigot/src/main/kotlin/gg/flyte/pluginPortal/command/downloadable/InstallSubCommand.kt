@@ -1,14 +1,11 @@
 package gg.flyte.pluginPortal.command.downloadable
 
-import gg.flyte.common.api.API
-import gg.flyte.common.api.plugins.schemas.MarketplacePlugin
 import gg.flyte.pluginPortal.command.CommandManager
-import gg.flyte.pluginPortal.type.extension.sendError
-import gg.flyte.pluginPortal.type.extension.sendInfo
-import gg.flyte.pluginPortal.type.extension.sendSuccess
-import gg.flyte.pluginPortal.type.manager.PPPluginCache
-import gg.flyte.pluginPortal.type.manager.PPPluginCache.isInstalled
-import gg.flyte.pluginPortal.type.manager.PluginManager
+import gg.flyte.pluginPortal.manager.language.sendError
+import gg.flyte.pluginPortal.manager.language.sendInfo
+import gg.flyte.pluginPortal.manager.language.sendSuccess
+import gg.flyte.pluginPortal.manager.PPPluginCache.isInstalled
+import gg.flyte.pluginPortal.manager.PluginManager
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.AutoComplete
 import revxrsal.commands.annotation.Command
