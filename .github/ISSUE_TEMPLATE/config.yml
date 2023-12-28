@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Flyte Discord
+    url: https://discord.flyte.gg
+    about: For smaller issues or questions, you can also join our Discord server.
