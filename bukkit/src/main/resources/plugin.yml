@@ -1,0 +1,25 @@
+name: PluginPortal
+main: gg.flyte.pluginportal.PluginPortal
+author: Flyte
+version: ${version}
+description: ${description}
+api-version: 1.13
+folia-supported: true
+website: https://flyte.gg
+commands:
+  pluginportal:
+    permission: pluginportal.command
+    description: Shows the Plugin Portal help page
+    aliases: [ pp, ppm ]
+permissions:
+  pluginportal.admin:
+    default: op
+    children:
+      pluginportal.command.autoteam: true
+      pluginportal.command.debug: true
+      pluginportal.command.displayleaks: true
+      pluginportal.command.dontbugme: true
+      pluginportal.command.dump: true
+      pluginportal.command.list: true
+      pluginportal.command.pps: true
+      pluginportal.command.reload: true

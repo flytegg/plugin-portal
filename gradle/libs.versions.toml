@@ -1,0 +1,77 @@
+metadata.format.version = "1.1"
+
+[versions]
+
+gson = "2.10.1"
+fastutil = "8.5.12"
+flare = "2.0.1"
+vianbt = "3.3.0"
+mcstructs = "2.4.1"
+
+# Common provided
+netty = "4.0.20.Final"
+guava = "17.0"
+snakeYaml = "1.18"
+snakeYaml2 = "2.0"
+
+junit = "5.9.3"
+checkerQual = "3.39.0"
+
+run-paper = "2.2.2"
+twilight = "1.0.34"
+paperlib = "1.0.7"
+bstats = "3.0.2"
+lamp = "3.1.8"
+adventure = "4.14.0"
+adventure-platform-bukkit = "4.3.2"
+
+# Platforms
+paper = "1.16.5-R0.1-SNAPSHOT"
+legacyBukkit = "1.8.8-R0.1-SNAPSHOT"
+bungee = "1.19-R0.1-SNAPSHOT"
+sponge = "8.0.0"
+velocity = "3.1.1"
+
+
+[libraries]
+
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
+flare = { group = "space.vectrix.flare", name = "flare", version.ref = "flare" }
+flareFastutil = { group = "space.vectrix.flare", name = "flare-fastutil", version.ref = "flare" }
+vianbt = { group = "com.viaversion", name = "nbt", version.ref = "vianbt" }
+text = { group = "net.lenni0451.mcstructs", name = "text", version.ref = "mcstructs" }
+
+netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
+guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
+snakeYaml = { group = "org.yaml", name = "snakeyaml", version.ref = "snakeYaml" }
+snakeYaml2 = { group = "org.yaml", name = "snakeyaml", version.ref = "snakeYaml2" }
+
+jupiterApi = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
+jupiterEngine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit" }
+checkerQual = { group = "org.checkerframework", name = "checker-qual", version.ref = "checkerQual" }
+
+twilight = { module = "gg.flyte:twilight", version.ref = "twilight" }
+paperlib = { module = "io.papermc:paperlib", version.ref = "paperlib" }
+bstats = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
+
+lamp-common = { module = "com.github.Revxrsal.Lamp:common", version.ref = "lamp" }
+lamp-bukkit = { module = "com.github.Revxrsal.Lamp:bukkit", version.ref = "lamp" }
+lamp-brigadier = { module = "com.github.Revxrsal.Lamp:brigadier", version.ref = "lamp" }
+
+adventure = { module = "net.kyori:adventure", version.ref = "adventure" }
+adventure-text-minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure" }
+adventure-platform-bukkit = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventure-platform-bukkit" }
+
+paper = { group = "com.destroystokyo.paper", name = "paper-api", version.ref = "paper" }
+legacyBukkit = { group = "org.bukkit", name = "bukkit", version.ref = "legacyBukkit" }
+bungee = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungee" }
+sponge = { group = "org.spongepowered", name = "spongeapi", version.ref = "sponge" }
+velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
+
+[plugins]
+run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
+
+[bundles]
+
+junit = ["jupiterApi", "jupiterEngine"]
