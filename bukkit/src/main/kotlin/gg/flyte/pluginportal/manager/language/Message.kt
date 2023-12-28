@@ -6,6 +6,8 @@ import link.portalbox.pluginportal.type.language.Language
 import link.portalbox.pluginportal.type.language.LanguageLoadingException
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 
@@ -113,6 +115,11 @@ object Message {
 
     fun String.toComponent(): Component = MiniMessage.miniMessage().deserialize(this)
     fun Component.serialize() = MiniMessage.miniMessage().serialize(this)
+
+    fun Component.solidLine(): TextComponent {
+        return Component.text("                                                                               ").decorate(
+            TextDecoration.STRIKETHROUGH)
+    }
 
     private fun FileConfiguration.getBetterString(path: String): String {
         val configString = this.getString(path)

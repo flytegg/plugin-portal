@@ -29,6 +29,7 @@ rootProject.name = "pluginportal-parent"
 includeBuild("build-logic")
 
 setupPPSubproject("api")
+setupPPSubproject("client")
 setupPPSubproject("scanner")
 setupPPSubproject("common")
 setupPPSubproject("bukkit")

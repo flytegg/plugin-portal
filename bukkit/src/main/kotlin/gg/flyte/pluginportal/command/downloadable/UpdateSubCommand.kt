@@ -1,7 +1,6 @@
 package gg.flyte.pluginportal.command.downloadable
 
-import gg.flyte.common.api.API
-import gg.flyte.common.api.plugins.schemas.InstalledPlugin
+import gg.flyte.pluginportal.api.type.CompactPlugin
 import gg.flyte.pluginportal.command.CommandManager
 import gg.flyte.pluginportal.manager.language.sendError
 import gg.flyte.pluginportal.manager.language.sendInfo
@@ -37,9 +36,9 @@ class UpdateSubCommand {
                 )
             }
         } else {
-            val plugin = API.getPluginById(plugins.first().id).body() ?: return sender.sendError("Failed to find plugin with ID ${plugins.first().id}")
+            val plugin = PluginManager.getPlugin(plugins.first().id) ?: return sender.sendError("Failed to find plugin with ID ${plugins.first().id}")
 
-            if (plugin.getDownloadURL() == null)
+            if (plugin.getLatestVersion()?.downloadUrl == null)
                 return sender.sendError("No download URL found for ${plugin.displayInfo.name}")
 
             sender.sendInfo("Updating ${plugin.getUniqueName()}")
@@ -54,7 +53,7 @@ class UpdateSubCommand {
     }
 
     private fun getPlugins(pluginName: String, isId: Boolean) = if (isId) {
-        HashSet<InstalledPlugin>()
+        HashSet<CompactPlugin>()
             .apply {
                 PPPluginCache.getInstalledPlugins()
                     .firstOrNull { it.id == pluginName }?.let { add(it) }

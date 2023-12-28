@@ -1,15 +1,15 @@
 package gg.flyte.pluginportal.command
 
-import gg.flyte.common.api.API
-import gg.flyte.common.api.plugins.schemas.MarketplacePlugin
 import gg.flyte.pluginportal.PluginPortal
+import gg.flyte.pluginportal.api.type.MarketplacePlugin
+import gg.flyte.pluginportal.client.PPClient
 import gg.flyte.pluginportal.command.downloadable.InstallSubCommand
 import gg.flyte.pluginportal.command.downloadable.UpdateSubCommand
 import gg.flyte.pluginportal.command.info.HelpSubCommand
 import gg.flyte.pluginportal.command.info.InfoSubCommand
 import gg.flyte.pluginportal.command.info.ListSubCommand
 import gg.flyte.pluginportal.manager.PPPluginCache
-import gg.flyte.twilight.scheduler.async
+import gg.flyte.pluginportal.manager.PluginManager
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bukkit.Bukkit
 import revxrsal.commands.bukkit.BukkitCommandHandler
@@ -67,7 +67,7 @@ object CommandManager {
                 val searchName = args[2]
 
                 if (searchName.length == 2) {
-                    async {
+                    PluginPortal.instance.asyncDispatch {
                         PPPluginCache.searchForPluginsByName(
                             searchName,
                         ).map { it.displayInfo.name }
@@ -97,7 +97,7 @@ object CommandManager {
     }
 
     fun getPlugins(pluginName: String, isId: Boolean) = if (isId) {
-        HashSet<MarketplacePlugin>().apply { API.getPluginById(pluginName).body()?.let { add(it) } }
+        HashSet<MarketplacePlugin>().apply { PluginManager.getPlugin(pluginName)?.let { add(it) } }
     } else {
         PPPluginCache.getPluginsByName(pluginName)
             .filter { it.displayInfo.name.equals(pluginName, true) }

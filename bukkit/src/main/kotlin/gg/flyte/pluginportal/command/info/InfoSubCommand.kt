@@ -25,7 +25,7 @@ class InfoSubCommand {
 
         if (plugins.size > 1) {
             plugins.forEach { plugin ->
-                sender.sendInfo(" - ${plugin.getUniqueName()} | ${plugin.versionData.latestVersion}", false)
+                sender.sendInfo(" - ${plugin.getUniqueName()} | ${plugin.releaseData.latestVersion}", false)
             }
         } else {
             val plugin = plugins.first()

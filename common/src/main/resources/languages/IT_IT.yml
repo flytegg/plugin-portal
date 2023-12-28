@@ -1,0 +1,73 @@
+# --------------- Variables --------------- #
+# These variables can be used in messages and will be replaced with the correct value.
+# To use these variables, use the following syntax: <variable-name>
+prefix: "<bold><gray>[<aqua>PP</aqua>]</gray> <dark_gray>></bold> "
+
+
+# --------------- Messages --------------- #
+
+console-plugin-portal-outdated: "<prefix><gray>Questo plugin non è aggiornato! Per favore aggiornalo all'ultima versione."
+player-plugin-portal-outdated: "<prefix><gray>Plugin Portal deve essere aggiornato. Per favore scarica l'ultima versione da: <aqua><bold><click:open_url:'https://pluginportal.link'><hover:show_text:'<aqua>Scarica PluginPortal da SpigotMC'>[CLICCA QUI]</hover></click>"
+player-manually-removed-plugins: "<prefix><gray>Abbiamo notato che hai rimosso manualmente <red>**{0}**</red>, gli abbiamo rimossi da PluginPortal per evitare errori."
+
+# --------------- Commands --------------- #
+
+no-permission: "<prefix><red>Non hai il permesso di usare questo comando."
+illegal-arguments: "<prefix><red>Argomenti Illegali! Per favore usa <aqua>/pp help</aqua> per più informazioni."
+no-plugin-specified: "<prefix><red>Nessun plugin specificato!"
+plugin-not-found: "<prefix><red>Plugin non trovato!"
+no-download-found: "<prefix><red>Non è stato trovato nessun download URL!"
+
+# ---------------- Delete ---------------- #
+
+plugin-not-installed: "<prefix><red>**{0}**non installato!"
+plugin-not-deleted: "<prefix><gray>Impossibile eliminare <red>**{0}**</red>! Ciò potrebbe essere dovuto al fatto che il plugin non è abilitato. Riavvia il server e riprova."
+plugin-deleted: "<prefix><aqua>**{0}**</aqua><gray> è stato eliminato!"
+
+# ---------------- Install ---------------- #
+
+plugin-already-installed: "<prefix><gray>Plugin già installato!"
+plugin-is-premium: "<prefix><red>PluginPortal può scaricare solo plugin che possono essere installati gratuitamente."
+plugin-is-being-installed: "<prefix><gray>Il plugin si sta installando, aspetta..."
+plugin-has-been-installed: "<prefix><aqua>**{0}**</aqua><gray> è stato installato!"
+plugin-attempted-enabling: "<prefix><gray>Il plugin ha tentato di avviarsi automaticamente, potrebbe essere ancora necessario un riavvio."
+restart-server-to-enable-plugin: "<prefix><gray>Per favore riavvia il tuo server per abilitare il plugin."
+service-not-supported: "<prefix><gray>Questo plugin non è disponibile su <red>**{0}**</red>. Per favore cambia il servizio supportato tramite il config.yml, o compra il premium (In Arrivo)."
+
+# ----------------- Help ------------------ #
+
+blank-strike-through-with-watermark: "<dark_gray><st>                         </st><gray>[<aqua><bold>PP</bold></aqua>]</gray><dark_gray><st>                         "
+blank-strike-through: "<dark_gray><st>                                                      "
+help-command-display: "<dark_gray> - </dark_gray><bold> <aqua>**{0}**</aqua></bold><dark_gray>: </dark_gray><gray>**{1}**</gray>"
+
+# ----------------- List ------------------ #
+
+no-plugins-installed: "<prefix><gray>Non hai plugin installati o riconosciuti da PluginPortal"
+listing-all-plugins: "<prefix><gray>Elencando tutti i plugin..."
+installed-plugin: "<green>+</green> <aqua>**{0}**"
+
+# ---------------- Request ----------------- #
+
+plugin-requested: "<prefix><gray>Il plugin è stato richiesto"
+plugin-is-supported: "<prefix><gray>Il plugin è supportato da PluginPortal"
+
+# ---------------- UpdateAll --------------- #
+
+no-plugin-requires-an-update: "<prefix><gray>Nessun plugin ha bisogno di un aggiornamento!"
+updating-plugins: "<prefix><gray>Aggiornando i plugin..."
+plugin-updated: "<prefix><aqua>**{0}**</aqua><gray> è stato aggiornato!"
+plugin-not-updated: "<prefix><aqua>**{0}**</aqua> non è stato aggiornato a causa di un errore. Per favore assicurati che il plugin sia abilitato."
+not-starred-on-hangar: "<prefix><gray>Non hai contrassegnato <click:open_url:'https://hangar.papermc.io/Flyte/PluginPortal'><blue><u>PluginPortal</u></blue></click> su Hangar. Per favore, contrassegnalo per utilizzare questo comando, potrebbe richiedere alcuni minuti per l'aggiornamento. Una volta contrassegnato, per favore cambia il valore di \"hangar-username\" nel file \"config.yml\". Se non riesci a creare un account, unisciti al nostro <click:open_url:'https://discord.gg/pluginportal'><blue><u>Discord</u></blue></click> per ricevere supporto."
+
+# ----------------- Update ----------------- #
+
+plugin-is-up-to-date: "<prefix><aqua>**{0}** <gray>è già aggiornato."
+listing-all-outdated-plugins: "<prefix><gray>Elencando tutti i plugin obsoleti."
+
+# ----------------- Preview ----------------- #
+
+open-url-preview-format-button: "<click:open_url:**{0}**><hover:show_text:'**{1}**'>**{2}**</hover></click>"
+run-command-preview-format-button: "<click:run_command:**{0}**><hover:show_text:'**{1}**'>**{2}**</hover></click>"
+
+no-plugins-found: "Keine Plugins gefunden"
+keep-typing: "Continua a digitare..."

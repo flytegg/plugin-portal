@@ -7,7 +7,7 @@ on:
 
 jobs:
   publish:
-    if: github.repository_owner == 'ViaVersion'
+    if: github.repository_owner == 'flytegg'
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout Repository

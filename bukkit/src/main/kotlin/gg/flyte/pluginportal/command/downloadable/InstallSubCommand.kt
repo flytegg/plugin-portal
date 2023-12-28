@@ -32,14 +32,14 @@ class InstallSubCommand {
 
         if (plugins.size > 1) {
             plugins.forEach {
-                sender.sendInfo(" - ${it.displayInfo.name} (${it.id}) | ${it.primaryServiceType} | ${it.versionData.latestVersion}", false)
+                sender.sendInfo(" - ${it.getUniqueName()} | ${it.getLatestVersion()?.name}", false)
             }
         } else {
             val plugin = plugins.first()
 
             if (plugin.isInstalled()) return sender.sendError("Plugin ${plugin.getUniqueName()} is already installed. Please use the update command.")
 
-            if (plugin.getDownloadURL() == null)
+            if (plugin.getLatestVersion()?.downloadUrl == null)
                 return sender.sendError("No download URL found for ${plugin.displayInfo.name}")
 
             sender.sendInfo("Downloading ${plugin.getUniqueName()}")

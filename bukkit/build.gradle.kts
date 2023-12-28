@@ -15,7 +15,12 @@ dependencies {
     implementation(libs.twilight)
     implementation(libs.lamp.common)
     implementation(libs.lamp.bukkit)
+    implementation(libs.adventure.text.minimessage)
     implementation(libs.adventure.platform.bukkit)
+
+    implementation(libs.mccoroutine.api)
+    implementation(libs.mccoroutine.core)
+    implementation(libs.kotlinx.coroutines.core)
 }
 
 publishShadowJar()

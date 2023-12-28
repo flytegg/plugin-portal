@@ -1,16 +1,11 @@
 package gg.flyte.pluginportal.command.info.display
 
-import gg.flyte.common.api.plugins.schemas.MarketplacePlugin
-import gg.flyte.pluginportal.manager.language.Message.serialize
-import gg.flyte.pluginportal.manager.language.Message.toComponent
-import gg.flyte.twilight.extension.solidLine
+import gg.flyte.pluginportal.api.type.MarketplacePlugin
+import gg.flyte.pluginportal.manager.language.Message.solidLine
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
-import net.kyori.adventure.text.event.HoverEvent
-import net.kyori.adventure.text.event.HoverEventSource
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
-import net.kyori.adventure.text.minimessage.MiniMessage
 import java.math.RoundingMode
 
 object InfoDisplay {
@@ -28,12 +23,12 @@ object InfoDisplay {
                 displayInformation(plugin.getUniqueName()),
                 Component.newline(),
                 Component.text("├─ ", NamedTextColor.GRAY),
-                Component.text(plugin.stats.downloads, NamedTextColor.AQUA),
+                Component.text(plugin.statistics.downloads, NamedTextColor.AQUA),
                 Component.space(),
                 Component.text("⬇", NamedTextColor.AQUA, TextDecoration.UNDERLINED, TextDecoration.BOLD),
                 Component.text(" | ", NamedTextColor.GRAY),
                 Component.text(
-                    plugin.stats.ratingAverage.toBigDecimal().setScale(
+                    plugin.statistics.ratingAverage.toBigDecimal().setScale(
                         1,
                         RoundingMode.UP
                     ).toDouble(),
@@ -43,7 +38,7 @@ object InfoDisplay {
                 Component.text(" ⭐", NamedTextColor.GOLD, TextDecoration.BOLD),
                 Component.text(" | ", NamedTextColor.GRAY),
                 Component.text(
-                    if ((plugin.stats.price ?: 0) > 0) "\$${plugin.stats.price}" else "FREE",
+                    if ((plugin.statistics.price ?: 0) > 0) "\$${plugin.statistics.price}" else "FREE",
                     NamedTextColor.AQUA
                 ),
 

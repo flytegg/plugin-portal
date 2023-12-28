@@ -1,15 +1,20 @@
 package gg.flyte.pluginportal.manager
 
-import com.github.benmanes.caffeine.cache.Cache
-import com.github.benmanes.caffeine.cache.Caffeine
-import gg.flyte.common.api.API
-import gg.flyte.common.api.plugins.schemas.InstalledPlugin
-import gg.flyte.common.api.plugins.schemas.MarketplacePlugin
-import gg.flyte.common.api.plugins.schemas.HashType
-import gg.flyte.common.util.GSON
-import gg.flyte.common.util.getHashes
+import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
+import com.github.shynixn.mccoroutine.bukkit.launch
+import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
 import gg.flyte.pluginportal.PluginPortal
-import gg.flyte.twilight.scheduler.async
+import gg.flyte.pluginportal.api.type.CompactPlugin
+import gg.flyte.pluginportal.api.type.HashType
+import gg.flyte.pluginportal.api.type.MarketplacePlugin
+import gg.flyte.pluginportal.api.util.gson
+import gg.flyte.pluginportal.client.PPClient
+import gg.flyte.pluginportal.extensions.getHashes
+import gg.flyte.twilight.Twilight
+import gg.flyte.twilight.gson.GsonKt
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -19,26 +24,27 @@ object PPPluginCache {
      * Key: Search Term
      * Value: HashSet<MarketplacePlugin>
      */
-    private val pluginCache: Cache<String, HashSet<MarketplacePlugin>> = Caffeine.newBuilder()
-        .expireAfterWrite(10, TimeUnit.MINUTES)
-        .build()
+    private val pluginCache = CacheBuilder.newBuilder()
+            .expireAfterWrite(60, TimeUnit.MINUTES)
+            .build<String, HashSet<MarketplacePlugin>>()
 
-    private val installedPlugins = HashSet<InstalledPlugin>()
+    private val installedPlugins = HashSet<CompactPlugin>()
 
     private val installedPluginsConfig get(): File = File(PluginPortal.instance.dataFolder, "plugins.json")
+
     val pluginFolder get(): File = PluginPortal.instance.dataFolder.parentFile
     val updateFolder get(): File = File(pluginFolder, "update").apply { if (!exists()) mkdirs() }
 
     fun getInstalledPlugins() = installedPlugins
-    fun removeInstalledPlugins(vararg plugin: InstalledPlugin) = installedPlugins.removeAll(plugin.toSet())
+    fun removeInstalledPlugins(vararg plugin: CompactPlugin) = installedPlugins.removeAll(plugin.toSet())
 
-    fun addInstalledPlugins(vararg plugin: InstalledPlugin, shouldSave: Boolean = true) = installedPlugins.addAll(plugin)
+    fun addInstalledPlugins(vararg plugin: CompactPlugin, shouldSave: Boolean = true) = installedPlugins.addAll(plugin)
         .also {
             if (shouldSave) saveInstalledPlugins()
         }
 
 
-    fun addInstalledPlugins(plugin: ArrayList<InstalledPlugin>) = installedPlugins.addAll(plugin)
+    fun addInstalledPlugins(plugin: HashSet<CompactPlugin>) = installedPlugins.addAll(plugin)
 
     fun getPluginsByName(name: String) = arrayListOf<MarketplacePlugin>().apply {
         pluginCache.asMap().keys.forEach {
@@ -57,7 +63,7 @@ object PPPluginCache {
             if (size >= 25 || pluginCache.asMap().keys.any { name.startsWith(it, true) })
                 return this.filter { it.displayInfo.name.startsWith(name, true) }
             else {
-                API.searchForPluginsByName(name).body()?.let { list ->
+                PluginManager.searchForPlugins(name).let { list ->
                     pluginCache.put(name, list)
 
                     return list.filter {
@@ -71,32 +77,27 @@ object PPPluginCache {
     }
 
     fun loadInstalledPlugins() {
-        async {
+        PluginPortal.instance.asyncDispatch {
             if (installedPluginsConfig.readText().isEmpty()) {
                 installedPluginsConfig.writeText("[]")
             }
 
-            GSON.fromJson(
+            gson.fromJson(
                 installedPluginsConfig.readText(),
-                Array<InstalledPlugin>::class.java
+                Array<CompactPlugin>::class.java
             ).forEach { addInstalledPlugins(it) }
+
 
             val requestHashes = HashSet<HashMap<HashType, String>>().apply {
                 pluginFolder.listFiles()
                     ?.filter { it.name.endsWith(".jar") }
-                    ?.filter { file ->
-                        !installedPlugins.any {
-                            it.hashes?.firstNotNullOfOrNull { hash ->
-                                file.getHashes().containsValue(hash.value)
-                            } ?: false
-                        }
-                    }
+                    ?.filter { file -> file.name.startsWith("[PP]") }
                     ?.forEach { add(it.getHashes()) }
             }
 
             if (requestHashes.isNotEmpty()) {
-                API.recognizePluginByHashes(requestHashes).body()?.forEach {
-                    addInstalledPlugins(it.toInstalledPlugin())
+                PPClient.recognizePluginByHashes(requestHashes).results.forEach {
+                    addInstalledPlugins(it.toCompactPlugin())
                 }
             }
 
@@ -105,7 +106,7 @@ object PPPluginCache {
     }
 
     fun saveInstalledPlugins() {
-        installedPluginsConfig.writeText(GSON.toJson(getInstalledPlugins()))
+        installedPluginsConfig.writeText(gson.toJson(getInstalledPlugins()))
     }
 
     fun MarketplacePlugin.isInstalled() = getInstalledPlugins().any { it.id == id }

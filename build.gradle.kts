@@ -12,6 +12,7 @@ allprojects {
 val main = setOf(
     projects.pluginportal,
     projects.pluginportalApi,
+    projects.pluginportalClient,
     projects.pluginportalScanner,
     projects.pluginportalCommon,
     projects.pluginportalBukkit,
