@@ -36,17 +36,30 @@ java {
 }
 
 publishing {
-    publications.create<MavenPublication>("mavenJava") {
-        groupId = rootProject.group as String
-        artifactId = project.name
-        version = rootProject.version as String
+    repositories {
+        maven {
+            name = "flyte-repository"
+            url = uri(
+                "https://repo.flyte.gg/${
+                    if (version.toString().endsWith("-SNAPSHOT")) "snapshots" else "releases"
+                }"
+            )
+            credentials {
+                username = System.getenv("MAVEN_USERNAME") ?: property("mavenUser").toString()
+                password = System.getenv("MAVEN_PASSWORD") ?: property("mavenPassword").toString()
+            }
+        }
     }
-    repositories.maven {
-        name = "flyte-repository"
-        url = uri("https://repo.flyte.gg/releases/")
-        credentials(PasswordCredentials::class)
-        authentication {
-            create<BasicAuthentication>("basic")
+
+    publishing {
+        publications {
+            create<MavenPublication>("maven") {
+                groupId = group.toString()
+                artifactId = "twilight"
+                version = version.toString()
+
+                from(components["java"])
+            }
         }
     }
 }
