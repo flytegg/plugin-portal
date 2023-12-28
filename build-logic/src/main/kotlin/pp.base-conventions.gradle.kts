@@ -53,7 +53,7 @@ publishing {
 
     publishing {
         publications {
-            create<MavenPublication>("maven") {
+            create<MavenPublication>("mavenJava") {
                 groupId = rootProject.group as String
                 artifactId = project.name
                 version = rootProject.version as String
