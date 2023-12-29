@@ -9,7 +9,7 @@ import gg.flyte.pluginportal.PluginPortal
 import gg.flyte.pluginportal.api.type.CompactPlugin
 import gg.flyte.pluginportal.api.type.HashType
 import gg.flyte.pluginportal.api.type.MarketplacePlugin
-import gg.flyte.pluginportal.api.util.gson
+import gg.flyte.pluginportal.util.gson
 import gg.flyte.pluginportal.client.PPClient
 import gg.flyte.pluginportal.extensions.getHashes
 import gg.flyte.twilight.Twilight
