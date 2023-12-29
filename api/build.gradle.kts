@@ -15,7 +15,7 @@ sourceSets {
 }
 
 dependencies {
-    compileOnlyApi(libs.gson)
+    implementation(libs.gson)
 
     compileOnlyApi(libs.snakeYaml)
     compileOnlyApi(libs.guava)
