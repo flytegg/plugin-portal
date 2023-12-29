@@ -2,6 +2,7 @@ package gg.flyte.pluginportal.manager
 
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
+import gg.flyte.pluginportal.PluginPortal
 import gg.flyte.pluginportal.api.PluginPortalAPI
 import gg.flyte.pluginportal.api.type.MarketplacePlugin
 import gg.flyte.pluginportal.client.PPClient
@@ -25,19 +26,20 @@ object PluginManager : PluginPortalAPI() {
     }
 
     override fun installPlugin(plugin: MarketplacePlugin, after: (Boolean) -> Unit) {
-        Twilight.plugin.launch {
-            withContext(Twilight.plugin.minecraftDispatcher) {
-                PPClient.downloadFile(plugin.getLatestVersion()?.downloadUrl!!, File(plugin.getInstallDirectory(), "[PP] ${plugin.getUniqueName()}.jar")) { success ->
-                    if (success) {
-                        PPPluginCache.addInstalledPlugins(plugin.toCompactPlugin())
-                        return@downloadFile after(true)
-                    }
-                    else {
-                        Twilight.plugin.logger.warning("Failed to install plugin ${plugin.getUniqueName()}")
-                        return@downloadFile after(true)
-                    }
+        PluginPortal.instance.asyncDispatch {
+            PPClient.downloadFile(
+                plugin.getLatestVersion()?.downloadUrl!!,
+                File(plugin.getInstallDirectory(), "[PP] ${plugin.getUniqueName()}.jar")
+            ) { success ->
+                if (success) {
+                    PPPluginCache.addInstalledPlugins(plugin.toCompactPlugin())
+                    return@downloadFile after(true)
+                } else {
+                    Twilight.plugin.logger.warning("Failed to install plugin ${plugin.getUniqueName()}")
+                    return@downloadFile after(true)
                 }
             }
         }
+
     }
 }
