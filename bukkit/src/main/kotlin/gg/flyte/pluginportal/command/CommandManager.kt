@@ -10,6 +10,7 @@ import gg.flyte.pluginportal.command.info.InfoSubCommand
 import gg.flyte.pluginportal.command.info.ListSubCommand
 import gg.flyte.pluginportal.manager.PPPluginCache
 import gg.flyte.pluginportal.manager.PluginManager
+import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bukkit.Bukkit
 import revxrsal.commands.bukkit.BukkitCommandHandler
@@ -77,12 +78,10 @@ object CommandManager {
                 if (searchName.length <= 2) {
                     return@registerSuggestion listOf("$searchName${if (searchName.isEmpty()) "" else " ~ "}Keep Typing")
                 } else {
-                    PPPluginCache.searchForPluginsByName(
-                        searchName,
-                    ).map { it.displayInfo.name }.apply {
-                        if (isEmpty()) {
-                            return@registerSuggestion listOf("$searchName ~ No Results Found")
-                        }
+                    runBlocking {
+                        PPPluginCache.searchForPluginsByName(searchName)
+                            .map { it.displayInfo.name }
+                            .ifEmpty { listOf("$searchName ~ No Results Found") }
                     }
                 }
             }.registerSuggestion("installedPlugin") { args, sender, command ->
@@ -97,7 +96,9 @@ object CommandManager {
     }
 
     fun getPlugins(pluginName: String, isId: Boolean) = if (isId) {
-        HashSet<MarketplacePlugin>().apply { PluginManager.getPlugin(pluginName)?.let { add(it) } }
+        runBlocking {
+            HashSet<MarketplacePlugin>().apply { PluginManager.getPlugin(pluginName)?.let { add(it) } }
+        }
     } else {
         PPPluginCache.getPluginsByName(pluginName)
             .filter { it.displayInfo.name.equals(pluginName, true) }

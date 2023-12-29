@@ -17,15 +17,17 @@ object PluginManager : PluginPortalAPI() {
 
     private fun MarketplacePlugin.getInstallDirectory() = if (isInstalled()) updateFolder else pluginFolder
 
-    override fun getPlugin(id: String): MarketplacePlugin? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun getPlugin(id: String): MarketplacePlugin? =
+        PPPluginCache.getCachedPlugins().firstOrNull { it.id == id }.let {
+            it ?: PPClient.getPluginById(id)
+        }
 
-    override fun searchForPlugins(query: String): HashSet<MarketplacePlugin> {
+
+    override suspend fun searchForPlugins(query: String): HashSet<MarketplacePlugin> {
         return hashSetOf()
     }
 
-    override fun installPlugin(plugin: MarketplacePlugin, after: (Boolean) -> Unit) {
+    override suspend fun installPlugin(plugin: MarketplacePlugin, after: (Boolean) -> Unit) {
         PluginPortal.instance.asyncDispatch {
             PPClient.downloadFile(
                 plugin.getLatestVersion()?.downloadUrl!!,

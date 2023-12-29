@@ -35,14 +35,13 @@ object PPPluginCache {
     val pluginFolder get(): File = PluginPortal.instance.dataFolder.parentFile
     val updateFolder get(): File = File(pluginFolder, "update").apply { if (!exists()) mkdirs() }
 
+    fun getCachedPlugins() = pluginCache.asMap().values.flatten()
+
     fun getInstalledPlugins() = installedPlugins
     fun removeInstalledPlugins(vararg plugin: CompactPlugin) = installedPlugins.removeAll(plugin.toSet())
 
     fun addInstalledPlugins(vararg plugin: CompactPlugin, shouldSave: Boolean = true) = installedPlugins.addAll(plugin)
-        .also {
-            if (shouldSave) saveInstalledPlugins()
-        }
-
+        .also { if (shouldSave) saveInstalledPlugins() }
 
     fun addInstalledPlugins(plugin: HashSet<CompactPlugin>) = installedPlugins.addAll(plugin)
 
@@ -56,7 +55,7 @@ object PPPluginCache {
         filter { it.displayInfo.name.startsWith(name, true) }
     }
 
-    fun searchForPluginsByName(name: String): List<MarketplacePlugin> {
+    suspend fun searchForPluginsByName(name: String): List<MarketplacePlugin> {
         val cachedMatches = mutableListOf<MarketplacePlugin>().apply {
             addAll(getPluginsByName(name))
 

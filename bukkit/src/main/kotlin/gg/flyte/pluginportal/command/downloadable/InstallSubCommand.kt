@@ -1,5 +1,6 @@
 package gg.flyte.pluginportal.command.downloadable
 
+import gg.flyte.pluginportal.PluginPortal
 import gg.flyte.pluginportal.command.CommandManager
 import gg.flyte.pluginportal.manager.language.sendError
 import gg.flyte.pluginportal.manager.language.sendInfo
@@ -44,11 +45,12 @@ class InstallSubCommand {
 
             sender.sendInfo("Downloading ${plugin.getUniqueName()}")
 
-            PluginManager.installPlugin(plugin) { success ->
-                if (success) sender.sendSuccess("Successfully installed ${plugin.getUniqueName()}")
-                else sender.sendError("Failed to install ${plugin.getUniqueName()}")
+            PluginPortal.instance.asyncDispatch {
+                PluginManager.installPlugin(plugin) { success ->
+                    if (success) sender.sendSuccess("Successfully installed ${plugin.getUniqueName()}")
+                    else sender.sendError("Failed to install ${plugin.getUniqueName()}")
+                }
             }
-
         }
     }
 

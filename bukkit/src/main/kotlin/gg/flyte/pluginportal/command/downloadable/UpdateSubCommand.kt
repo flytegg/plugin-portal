@@ -1,5 +1,6 @@
 package gg.flyte.pluginportal.command.downloadable
 
+import gg.flyte.pluginportal.PluginPortal
 import gg.flyte.pluginportal.api.type.CompactPlugin
 import gg.flyte.pluginportal.command.CommandManager
 import gg.flyte.pluginportal.manager.language.sendError
@@ -36,18 +37,20 @@ class UpdateSubCommand {
                 )
             }
         } else {
-            val plugin = PluginManager.getPlugin(plugins.first().id) ?: return sender.sendError("Failed to find plugin with ID ${plugins.first().id}")
+            PluginPortal.instance.asyncDispatch {
+                val plugin = PluginManager.getPlugin(plugins.first().id)
+                    ?: return@asyncDispatch sender.sendError("Failed to find plugin with ID ${plugins.first().id}")
 
-            if (plugin.getLatestVersion()?.downloadUrl == null)
-                return sender.sendError("No download URL found for ${plugin.displayInfo.name}")
+                if (plugin.getLatestVersion()?.downloadUrl == null)
+                    return@asyncDispatch sender.sendError("No download URL found for ${plugin.displayInfo.name}")
 
-            sender.sendInfo("Updating ${plugin.getUniqueName()}")
+                sender.sendInfo("Updating ${plugin.getUniqueName()}")
 
-            PluginManager.installPlugin(plugin) { success ->
-                if (success) sender.sendSuccess("Successfully updated ${plugin.getUniqueName()}")
-                else sender.sendError("Failed to update ${plugin.getUniqueName()}")
+                PluginManager.installPlugin(plugin) { success ->
+                    if (success) sender.sendSuccess("Successfully updated ${plugin.getUniqueName()}")
+                    else sender.sendError("Failed to update ${plugin.getUniqueName()}")
+                }
             }
-
         }
 
     }
