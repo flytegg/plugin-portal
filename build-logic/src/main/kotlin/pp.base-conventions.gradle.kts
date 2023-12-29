@@ -45,7 +45,7 @@ publishing {
                 }"
             )
             credentials {
-                username = System.getenv("MAVEN_USERNAME") ?: property("mavenUser").toString()
+                username = System.getenv("MAVEN_USERNAME") ?: property("mavenUsername").toString()
                 password = System.getenv("MAVEN_PASSWORD") ?: property("mavenPassword").toString()
             }
         }
