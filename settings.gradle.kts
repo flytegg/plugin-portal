@@ -31,6 +31,7 @@ includeBuild("build-logic")
 setupPPSubproject("api")
 setupPPSubproject("client")
 setupPPSubproject("scanner")
+setupPPSubproject("backend")
 setupPPSubproject("common")
 setupPPSubproject("bukkit")
 

@@ -1,9 +1,5 @@
 package gg.flyte.pluginportal.manager
 
-import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
-import com.github.shynixn.mccoroutine.bukkit.launch
-import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
-import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import gg.flyte.pluginportal.PluginPortal
 import gg.flyte.pluginportal.api.type.CompactPlugin
@@ -12,9 +8,6 @@ import gg.flyte.pluginportal.api.type.MarketplacePlugin
 import gg.flyte.pluginportal.util.gson
 import gg.flyte.pluginportal.client.PPClient
 import gg.flyte.pluginportal.extensions.getHashes
-import gg.flyte.twilight.Twilight
-import gg.flyte.twilight.gson.GsonKt
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -95,7 +88,7 @@ object PPPluginCache {
             }
 
             if (requestHashes.isNotEmpty()) {
-                PPClient.recognizePluginByHashes(requestHashes).results.forEach {
+                PPClient.recognizePluginByHashes(requestHashes).result.forEach {
                     addInstalledPlugins(it.toCompactPlugin())
                 }
             }

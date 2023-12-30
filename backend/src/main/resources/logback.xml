@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Disable warning "NativePRNGNonBlocking is not found, fallback to SHA1PRNG" -->
+    <logger name="io.ktor.util.random" level="ERROR"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%boldMagenta( PP-API ) %gray(|) %highlight(%-5level) %gray(\() %gray(%d{MM/dd HH:mm:ss}) %gray(\)) %gray(|) %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+    <logger name="org.eclipse.jetty" level="INFO"/>
+    <logger name="io.netty" level="INFO"/>
+
+</configuration>

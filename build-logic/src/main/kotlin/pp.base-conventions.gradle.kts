@@ -22,7 +22,7 @@ tasks {
         options.compilerArgs.addAll(listOf("-nowarn", "-Xlint:-unchecked", "-Xlint:-deprecation"))
     }
     compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "17"
     }
 
     test {
@@ -31,7 +31,7 @@ tasks {
 }
 
 java {
-    javaTarget(8)
+    javaTarget(17)
     withSourcesJar()
 }
 

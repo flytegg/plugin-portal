@@ -1,7 +1,7 @@
 package gg.flyte.pluginportal.util
 
-import gg.flyte.twilight.shaded.gson.Gson
-import gg.flyte.twilight.shaded.gson.GsonBuilder
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 
 val gson: Gson = GsonBuilder()
     .setPrettyPrinting()

@@ -14,6 +14,7 @@ val main = setOf(
     projects.pluginportalApi,
     projects.pluginportalClient,
     projects.pluginportalScanner,
+    projects.pluginportalBackend,
     projects.pluginportalCommon,
     projects.pluginportalBukkit,
 ).map { it.dependencyProject }

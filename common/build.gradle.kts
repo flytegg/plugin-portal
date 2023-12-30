@@ -3,6 +3,7 @@ dependencies {
     api(projects.pluginportalClient)
 
     implementation(libs.kotlinx.coroutines.core)
+    api(libs.gson)
 
     // Note: If manually starting tests doesn't work for you in IJ, change 'Gradle -> Run Tests Using' to 'IntelliJ IDEA'
     testImplementation(rootProject.libs.netty)

@@ -6,14 +6,14 @@ import gg.flyte.pluginportal.api.PluginPortalAPI
 import gg.flyte.pluginportal.command.CommandManager
 import gg.flyte.pluginportal.manager.Config
 import gg.flyte.pluginportal.manager.PPPluginCache
-import gg.flyte.twilight.TwilightKt.twilight
+import gg.flyte.twilight.twilight
 import io.papermc.lib.PaperLib
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.java.JavaPlugin
 
-class PluginPortal : JavaPlugin(){
+class PluginPortal : JavaPlugin() {
 
     companion object {
         lateinit var instance: PluginPortal
@@ -23,10 +23,8 @@ class PluginPortal : JavaPlugin(){
     override fun onEnable() {
         instance = this
 
-        twilight(this) { null }
-
+        twilight(this)
         Config.init(this)
-
         CommandManager.init()
 
         PPPluginCache.loadInstalledPlugins()
@@ -36,7 +34,9 @@ class PluginPortal : JavaPlugin(){
 
     }
 
-    override fun onDisable() { PPPluginCache.saveInstalledPlugins() }
+    override fun onDisable() {
+        PPPluginCache.saveInstalledPlugins()
+    }
 
     fun asyncDispatch(block: suspend () -> Unit) = launch { withContext(asyncDispatcher) { block() } }
 }

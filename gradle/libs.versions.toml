@@ -32,6 +32,7 @@ bungee = "1.19-R0.1-SNAPSHOT"
 sponge = "8.0.0"
 velocity = "3.1.1"
 
+kotlin = "2.0.0-Beta2"
 ktor = "2.3.7"
 ktorfit = "1.11.1"
 ksp = "2.0.0-Beta2-1.0.16"
@@ -39,6 +40,12 @@ logback = "1.4.14"
 
 coroutines = "1.8.0-RC2"
 mccoroutine = "2.13.0"
+
+dotenv-kotlin = "6.4.1"
+logging = "5.1.0"
+kmongo = "4.10.0"
+caffeine = "3.1.8"
+
 
 [libraries]
 
@@ -76,14 +83,28 @@ bungee = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungee" }
 sponge = { group = "org.spongepowered", name = "spongeapi", version.ref = "sponge" }
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 
+dotenv-kotlin = { module = "io.github.cdimascio:dotenv-kotlin", version.ref = "dotenv-kotlin" }
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+logging = { module = "io.github.oshai:kotlin-logging", version.ref = "logging" }
+kmongo = { module = "org.litote.kmongo:kmongo-coroutine", version.ref = "kmongo" }
+caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine" }
 
-ktor-core = { module  = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktor-cio = { module  = "io.ktor:ktor-client-cio", version.ref = "ktor" }
-ktor-content-negotiation = { module  = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
-ktor-serialization = { module  = "io.ktor:ktor-client-serialization", version.ref = "ktor" }
-ktor-serialization-gson = { module  = "io.ktor:ktor-serialization-gson", version.ref = "ktor" }
-ktor-logging = { module  = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
+ktor-server-serialization-gson = { module = "io.ktor:ktor-serialization-gson", version.ref = "ktor" }
+ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
+ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
+ktor-server-resources = { module = "io.ktor:ktor-server-resources", version.ref = "ktor" }
+
+ktor-server-auth = { module = "io.ktor:ktor-server-auth", version.ref = "ktor" }
+ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt", version.ref = "ktor" }
+ktor-server-rate-limit = { module = "io.ktor:ktor-server-rate-limit", version.ref = "ktor" }
+
+ktor-client-core = { module  = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-cio = { module  = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-content-negotiation = { module  = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-serialization = { module  = "io.ktor:ktor-client-serialization", version.ref = "ktor" }
+ktor-client-serialization-gson = { module  = "io.ktor:ktor-serialization-gson", version.ref = "ktor" }
+ktor-client-logging = { module  = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 
 ktorfit-ksp = { module = "de.jensklingenberg.ktorfit:ktorfit-ksp", version.ref = "ktorfit" }
 ktorfit-lib = { module = "de.jensklingenberg.ktorfit:ktorfit-lib", version.ref = "ktorfit" }
@@ -96,6 +117,7 @@ mccoroutine-core = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit
 run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 ktorfit = { id = "de.jensklingenberg.ktorfit", version .ref = "ktorfit" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 [bundles]
 
