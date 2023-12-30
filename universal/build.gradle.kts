@@ -1,7 +1,7 @@
 import io.papermc.hangarpublishplugin.model.Platforms
 
 plugins {
-    id("io.papermc.hangar-publish-plugin") version "0.1.1"
+    id("io.papermc.hangar-publish-plugin") version "0.1.0"
 //    id("com.modrinth.minotaur") version "2.+"
 }
 
