@@ -1,7 +1,7 @@
-package gg.flyte.pluginportal.command.info.display
+package gg.flyte.pluginportal.bukkit.command.info.display
 
 import gg.flyte.pluginportal.api.type.MarketplacePlugin
-import gg.flyte.pluginportal.manager.language.Message.solidLine
+import gg.flyte.pluginportal.bukkit.manager.language.Message.solidLine
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor

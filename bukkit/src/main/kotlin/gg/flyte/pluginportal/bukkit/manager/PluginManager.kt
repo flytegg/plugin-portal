@@ -1,12 +1,12 @@
-package gg.flyte.pluginportal.manager
+package gg.flyte.pluginportal.bukkit.manager
 
-import gg.flyte.pluginportal.PluginPortal
+import gg.flyte.pluginportal.bukkit.PluginPortal
 import gg.flyte.pluginportal.api.PluginPortalAPI
 import gg.flyte.pluginportal.api.type.MarketplacePlugin
 import gg.flyte.pluginportal.client.PPClient
-import gg.flyte.pluginportal.manager.PPPluginCache.isInstalled
-import gg.flyte.pluginportal.manager.PPPluginCache.pluginFolder
-import gg.flyte.pluginportal.manager.PPPluginCache.updateFolder
+import gg.flyte.pluginportal.bukkit.manager.PPPluginCache.isInstalled
+import gg.flyte.pluginportal.bukkit.manager.PPPluginCache.pluginFolder
+import gg.flyte.pluginportal.bukkit.manager.PPPluginCache.updateFolder
 import gg.flyte.twilight.Twilight
 import java.io.File
 
@@ -20,7 +20,7 @@ object PluginManager : PluginPortalAPI() {
         }
 
 
-    override suspend fun searchForPlugins(query: String): HashSet<MarketplacePlugin> =
+    suspend fun searchForPlugins(query: String): HashSet<MarketplacePlugin> =
         PPClient.searchForPlugins(query).result.toHashSet()
 
 

@@ -1,11 +1,13 @@
-package gg.flyte.pluginportal
+package gg.flyte.pluginportal.bukkit
 
+import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
 import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.launch
 import gg.flyte.pluginportal.api.PluginPortalAPI
-import gg.flyte.pluginportal.command.CommandManager
-import gg.flyte.pluginportal.manager.Config
-import gg.flyte.pluginportal.manager.PPPluginCache
+import gg.flyte.pluginportal.bukkit.command.CommandManager
+import gg.flyte.pluginportal.bukkit.manager.Config
+import gg.flyte.pluginportal.bukkit.manager.PPPluginCache
+import gg.flyte.pluginportal.bukkit.manager.PluginManager
 import gg.flyte.twilight.twilight
 import io.papermc.lib.PaperLib
 import kotlinx.coroutines.async
@@ -13,11 +15,11 @@ import kotlinx.coroutines.withContext
 import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.java.JavaPlugin
 
-class PluginPortal : JavaPlugin() {
+class PluginPortal : SuspendingJavaPlugin() {
 
     companion object {
         lateinit var instance: PluginPortal
-        lateinit var api: PluginPortalAPI
+        val api = PluginManager
     }
 
     override fun onEnable() {
@@ -38,5 +40,5 @@ class PluginPortal : JavaPlugin() {
         PPPluginCache.saveInstalledPlugins()
     }
 
-    fun asyncDispatch(block: suspend () -> Unit) = launch { withContext(asyncDispatcher) { block() } }
+    inline fun asyncDispatch(crossinline block: suspend () -> Unit) = launch { withContext(asyncDispatcher) { block() } }
 }

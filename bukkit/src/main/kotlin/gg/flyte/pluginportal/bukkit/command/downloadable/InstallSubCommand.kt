@@ -1,12 +1,12 @@
-package gg.flyte.pluginportal.command.downloadable
+package gg.flyte.pluginportal.bukkit.command.downloadable
 
-import gg.flyte.pluginportal.PluginPortal
-import gg.flyte.pluginportal.command.CommandManager
-import gg.flyte.pluginportal.manager.language.sendError
-import gg.flyte.pluginportal.manager.language.sendInfo
-import gg.flyte.pluginportal.manager.language.sendSuccess
-import gg.flyte.pluginportal.manager.PPPluginCache.isInstalled
-import gg.flyte.pluginportal.manager.PluginManager
+import gg.flyte.pluginportal.bukkit.PluginPortal
+import gg.flyte.pluginportal.bukkit.command.CommandManager
+import gg.flyte.pluginportal.bukkit.manager.language.sendError
+import gg.flyte.pluginportal.bukkit.manager.language.sendInfo
+import gg.flyte.pluginportal.bukkit.manager.language.sendSuccess
+import gg.flyte.pluginportal.bukkit.manager.PPPluginCache.isInstalled
+import gg.flyte.pluginportal.bukkit.manager.PluginManager
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.AutoComplete
 import revxrsal.commands.annotation.Command

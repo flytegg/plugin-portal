@@ -3,19 +3,7 @@ metadata.format.version = "1.1"
 [versions]
 
 gson = "2.10.1"
-fastutil = "8.5.12"
-flare = "2.0.1"
-vianbt = "3.3.0"
-mcstructs = "2.4.1"
-
-# Common provided
-netty = "4.0.20.Final"
 guava = "17.0"
-snakeYaml = "1.18"
-snakeYaml2 = "2.0"
-
-junit = "5.9.3"
-checkerQual = "3.39.0"
 
 run-paper = "2.2.2"
 twilight = "1.0.34"
@@ -27,9 +15,7 @@ adventure-platform-bukkit = "4.3.2"
 
 # Platforms
 paper = "1.16.5-R0.1-SNAPSHOT"
-legacyBukkit = "1.8.8-R0.1-SNAPSHOT"
 bungee = "1.19-R0.1-SNAPSHOT"
-sponge = "8.0.0"
 velocity = "3.1.1"
 
 kotlin = "2.0.0-Beta2"
@@ -50,20 +36,7 @@ hangar-wrapper = "2.0.2"
 [libraries]
 
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
-fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
-flare = { group = "space.vectrix.flare", name = "flare", version.ref = "flare" }
-flareFastutil = { group = "space.vectrix.flare", name = "flare-fastutil", version.ref = "flare" }
-vianbt = { group = "com.viaversion", name = "nbt", version.ref = "vianbt" }
-text = { group = "net.lenni0451.mcstructs", name = "text", version.ref = "mcstructs" }
-
-netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
-snakeYaml = { group = "org.yaml", name = "snakeyaml", version.ref = "snakeYaml" }
-snakeYaml2 = { group = "org.yaml", name = "snakeyaml", version.ref = "snakeYaml2" }
-
-jupiterApi = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
-jupiterEngine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit" }
-checkerQual = { group = "org.checkerframework", name = "checker-qual", version.ref = "checkerQual" }
 
 twilight = { module = "gg.flyte:twilight", version.ref = "twilight" }
 paperlib = { module = "io.papermc:paperlib", version.ref = "paperlib" }
@@ -78,9 +51,7 @@ adventure-text-minimessage = { module = "net.kyori:adventure-text-minimessage", 
 adventure-platform-bukkit = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventure-platform-bukkit" }
 
 paper = { group = "com.destroystokyo.paper", name = "paper-api", version.ref = "paper" }
-legacyBukkit = { group = "org.bukkit", name = "bukkit", version.ref = "legacyBukkit" }
 bungee = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungee" }
-sponge = { group = "org.spongepowered", name = "spongeapi", version.ref = "sponge" }
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 
 dotenv-kotlin = { module = "io.github.cdimascio:dotenv-kotlin", version.ref = "dotenv-kotlin" }
@@ -90,22 +61,22 @@ kmongo = { module = "org.litote.kmongo:kmongo-coroutine", version.ref = "kmongo"
 caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine" }
 hangar-wrapper = { module = "gg.flyte:hangarwrapper", version.ref = "hangar-wrapper" }
 
-ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
-ktor-server-serialization-gson = { module = "io.ktor:ktor-serialization-gson", version.ref = "ktor" }
-ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
-ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
-ktor-server-resources = { module = "io.ktor:ktor-server-resources", version.ref = "ktor" }
+ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
+ktor-server-serialization-gson = { module = "io.ktor:ktor-serialization-gson-jvm", version.ref = "ktor" }
+ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation-jvm", version.ref = "ktor" }
+ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
+ktor-server-resources = { module = "io.ktor:ktor-server-resources-jvm", version.ref = "ktor" }
 
-ktor-server-auth = { module = "io.ktor:ktor-server-auth", version.ref = "ktor" }
-ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt", version.ref = "ktor" }
-ktor-server-rate-limit = { module = "io.ktor:ktor-server-rate-limit", version.ref = "ktor" }
+ktor-server-auth = { module = "io.ktor:ktor-server-auth-jvm", version.ref = "ktor" }
+ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt-jvm", version.ref = "ktor" }
+ktor-server-rate-limit = { module = "io.ktor:ktor-server-rate-limit-jvm", version.ref = "ktor" }
 
-ktor-client-core = { module  = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktor-client-cio = { module  = "io.ktor:ktor-client-cio", version.ref = "ktor" }
-ktor-client-content-negotiation = { module  = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
-ktor-client-serialization = { module  = "io.ktor:ktor-client-serialization", version.ref = "ktor" }
-ktor-client-serialization-gson = { module  = "io.ktor:ktor-serialization-gson", version.ref = "ktor" }
-ktor-client-logging = { module  = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-client-core = { module  = "io.ktor:ktor-client-core-jvm", version.ref = "ktor" }
+ktor-client-cio = { module  = "io.ktor:ktor-client-cio-jvm", version.ref = "ktor" }
+ktor-client-content-negotiation = { module  = "io.ktor:ktor-client-content-negotiation-jvm", version.ref = "ktor" }
+ktor-client-serialization = { module  = "io.ktor:ktor-client-serialization-jvm", version.ref = "ktor" }
+ktor-client-serialization-gson = { module  = "io.ktor:ktor-serialization-gson-jvm", version.ref = "ktor" }
+ktor-client-logging = { module  = "io.ktor:ktor-client-logging-jvm", version.ref = "ktor" }
 
 ktorfit-ksp = { module = "de.jensklingenberg.ktorfit:ktorfit-ksp", version.ref = "ktorfit" }
 ktorfit-lib = { module = "de.jensklingenberg.ktorfit:ktorfit-lib", version.ref = "ktorfit" }
@@ -120,7 +91,3 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 ktorfit = { id = "de.jensklingenberg.ktorfit", version .ref = "ktorfit" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
-
-[bundles]
-
-junit = ["jupiterApi", "jupiterEngine"]

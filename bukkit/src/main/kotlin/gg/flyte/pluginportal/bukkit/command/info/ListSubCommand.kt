@@ -1,7 +1,7 @@
-package gg.flyte.pluginportal.command.info
+package gg.flyte.pluginportal.bukkit.command.info
 
-import gg.flyte.pluginportal.manager.PPPluginCache
-import gg.flyte.pluginportal.manager.language.Message.solidLine
+import gg.flyte.pluginportal.bukkit.manager.PPPluginCache
+import gg.flyte.pluginportal.bukkit.manager.language.Message.solidLine
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor

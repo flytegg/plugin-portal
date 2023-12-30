@@ -1,6 +1,6 @@
-package gg.flyte.pluginportal.manager
+package gg.flyte.pluginportal.bukkit.manager
 
-import gg.flyte.pluginportal.PluginPortal
+import gg.flyte.pluginportal.bukkit.PluginPortal
 import org.bukkit.configuration.file.FileConfiguration
 import java.io.File
 

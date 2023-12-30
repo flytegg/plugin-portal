@@ -15,8 +15,8 @@ sourceSets {
 }
 
 dependencies {
-    compileOnlyApi(libs.snakeYaml)
-    compileOnlyApi(libs.guava)
+//    compileOnlyApi(libs.snakeYaml)
+
 }
 
 java {

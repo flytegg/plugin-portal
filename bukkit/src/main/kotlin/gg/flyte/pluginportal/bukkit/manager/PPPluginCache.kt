@@ -1,11 +1,11 @@
-package gg.flyte.pluginportal.manager
+package gg.flyte.pluginportal.bukkit.manager
 
 import com.google.common.cache.CacheBuilder
-import gg.flyte.pluginportal.PluginPortal
+import gg.flyte.pluginportal.bukkit.PluginPortal
 import gg.flyte.pluginportal.api.type.CompactPlugin
 import gg.flyte.pluginportal.api.type.HashType
 import gg.flyte.pluginportal.api.type.MarketplacePlugin
-import gg.flyte.pluginportal.util.gson
+import gg.flyte.pluginportal.bukkit.util.gson
 import gg.flyte.pluginportal.client.PPClient
 import gg.flyte.pluginportal.extensions.getHashes
 import java.io.File

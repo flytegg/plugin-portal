@@ -1,6 +1,6 @@
-package gg.flyte.pluginportal.manager.language
+package gg.flyte.pluginportal.bukkit.manager.language
 
-import gg.flyte.pluginportal.manager.language.Message.toComponent
+import gg.flyte.pluginportal.bukkit.manager.language.Message.toComponent
 import net.kyori.adventure.audience.Audience
 
 var prefix = "<bold><gray>[<aqua>PP</aqua>]</gray> <dark_gray>></bold> "

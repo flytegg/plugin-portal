@@ -1,9 +1,9 @@
-package gg.flyte.pluginportal.command.info
+package gg.flyte.pluginportal.bukkit.command.info
 
-import gg.flyte.pluginportal.command.CommandManager
-import gg.flyte.pluginportal.command.info.display.InfoDisplay
-import gg.flyte.pluginportal.manager.language.sendError
-import gg.flyte.pluginportal.manager.language.sendInfo
+import gg.flyte.pluginportal.bukkit.command.CommandManager
+import gg.flyte.pluginportal.bukkit.command.info.display.InfoDisplay
+import gg.flyte.pluginportal.bukkit.manager.language.sendError
+import gg.flyte.pluginportal.bukkit.manager.language.sendInfo
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.*
 import revxrsal.commands.bukkit.annotation.CommandPermission

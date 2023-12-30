@@ -1,4 +1,4 @@
-package gg.flyte.pluginportal.command.info.display
+package gg.flyte.pluginportal.bukkit.command.info.display
 
 import gg.flyte.pluginportal.api.type.MarketplacePlugin
 import net.kyori.adventure.text.Component

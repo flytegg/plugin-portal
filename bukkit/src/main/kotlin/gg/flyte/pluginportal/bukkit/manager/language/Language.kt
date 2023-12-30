@@ -1,4 +1,4 @@
-package gg.flyte.pluginportal.manager.language
+package gg.flyte.pluginportal.bukkit.manager.language
 
 import java.net.URL
 

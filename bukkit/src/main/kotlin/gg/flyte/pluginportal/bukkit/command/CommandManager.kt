@@ -1,15 +1,13 @@
-package gg.flyte.pluginportal.command
+package gg.flyte.pluginportal.bukkit.command
 
-import gg.flyte.pluginportal.PluginPortal
 import gg.flyte.pluginportal.api.type.MarketplacePlugin
-import gg.flyte.pluginportal.client.PPClient
-import gg.flyte.pluginportal.command.downloadable.InstallSubCommand
-import gg.flyte.pluginportal.command.downloadable.UpdateSubCommand
-import gg.flyte.pluginportal.command.info.HelpSubCommand
-import gg.flyte.pluginportal.command.info.InfoSubCommand
-import gg.flyte.pluginportal.command.info.ListSubCommand
-import gg.flyte.pluginportal.manager.PPPluginCache
-import gg.flyte.pluginportal.manager.PluginManager
+import gg.flyte.pluginportal.bukkit.PluginPortal
+import gg.flyte.pluginportal.bukkit.command.downloadable.InstallSubCommand
+import gg.flyte.pluginportal.bukkit.command.info.HelpSubCommand
+import gg.flyte.pluginportal.bukkit.command.info.InfoSubCommand
+import gg.flyte.pluginportal.bukkit.command.info.ListSubCommand
+import gg.flyte.pluginportal.bukkit.manager.PPPluginCache
+import gg.flyte.pluginportal.bukkit.manager.PluginManager
 import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bukkit.Bukkit
@@ -32,7 +30,7 @@ object CommandManager {
     private fun BukkitCommandHandler.registerCommands() {
         register(
             InstallSubCommand(),
-            UpdateSubCommand(),
+            gg.flyte.pluginportal.bukkit.command.downloadable.UpdateSubCommand(),
             HelpSubCommand(),
             InfoSubCommand(),
             ListSubCommand(),

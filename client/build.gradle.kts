@@ -8,12 +8,12 @@ dependencies {
 
     implementation(libs.logback)
 
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.cio)
-    implementation(libs.ktor.client.content.negotiation)
-    implementation(libs.ktor.client.serialization)
-    implementation(libs.ktor.client.serialization.gson)
-    implementation(libs.ktor.client.logging)
+    api(libs.ktor.client.core)
+    api(libs.ktor.client.cio)
+    api(libs.ktor.client.content.negotiation)
+    api(libs.ktor.client.serialization)
+    api(libs.ktor.client.serialization.gson)
+    api(libs.ktor.client.logging)
 
     ksp(libs.ktorfit.ksp)
     implementation(libs.ktorfit.lib)

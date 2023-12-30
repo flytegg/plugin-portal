@@ -1,5 +1,5 @@
 name: PluginPortal
-main: gg.flyte.pluginportal.PluginPortal
+main: gg.flyte.pluginportal.bukkit.PluginPortal
 author: Flyte
 version: ${version}
 description: ${description}

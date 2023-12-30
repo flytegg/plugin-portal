@@ -7,8 +7,6 @@ abstract class PluginPortalAPI {
 
     abstract suspend fun getPlugin(id: String): MarketplacePlugin?
 
-    abstract suspend fun searchForPlugins(query: String): HashSet<MarketplacePlugin>
-
     abstract suspend fun installPlugin(plugin: MarketplacePlugin, after: (Boolean) -> Unit = {})
     suspend fun installPlugin(id: String, after: (Boolean) -> Unit = {}) = installPlugin(getPlugin(id)!!) { after(it) }
 

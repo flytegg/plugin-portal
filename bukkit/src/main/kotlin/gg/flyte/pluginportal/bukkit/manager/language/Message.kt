@@ -1,7 +1,7 @@
-package gg.flyte.pluginportal.manager.language
+package gg.flyte.pluginportal.bukkit.manager.language
 
-import gg.flyte.pluginportal.PluginPortal
-import gg.flyte.pluginportal.manager.Config
+import gg.flyte.pluginportal.bukkit.PluginPortal
+import gg.flyte.pluginportal.bukkit.manager.Config
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent

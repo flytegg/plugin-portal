@@ -1,4 +1,4 @@
-package gg.flyte.pluginportal.util
+package gg.flyte.pluginportal.bukkit.util
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
