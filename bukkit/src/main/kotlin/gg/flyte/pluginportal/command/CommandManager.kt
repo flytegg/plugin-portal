@@ -19,7 +19,7 @@ object CommandManager {
 
     private val mainInstance by lazy { PluginPortal.instance }
 
-    fun init() {
+    init {
         BukkitCommandHandler.create(mainInstance).apply {
             enableAdventure(BukkitAudiences.create(mainInstance))
             registerAutoComplete()

@@ -2,8 +2,6 @@ package gg.flyte.pluginportal.manager.language
 
 import gg.flyte.pluginportal.PluginPortal
 import gg.flyte.pluginportal.manager.Config
-import link.portalbox.pluginportal.type.language.Language
-import link.portalbox.pluginportal.type.language.LanguageLoadingException
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent

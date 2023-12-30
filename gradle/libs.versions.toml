@@ -43,9 +43,9 @@ mccoroutine = "2.13.0"
 
 dotenv-kotlin = "6.4.1"
 logging = "5.1.0"
-kmongo = "4.10.0"
+kmongo = "4.11.0"
 caffeine = "3.1.8"
-
+hangar-wrapper = "2.0.1"
 
 [libraries]
 
@@ -88,6 +88,7 @@ logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 logging = { module = "io.github.oshai:kotlin-logging", version.ref = "logging" }
 kmongo = { module = "org.litote.kmongo:kmongo-coroutine", version.ref = "kmongo" }
 caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine" }
+hangar-wrapper = { module = "gg.flyte:hangarwrapper", version.ref = "hangar-wrapper" }
 
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
 ktor-server-serialization-gson = { module = "io.ktor:ktor-serialization-gson", version.ref = "ktor" }

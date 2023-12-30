@@ -25,7 +25,7 @@ class PluginPortal : JavaPlugin() {
 
         twilight(this)
         Config.init(this)
-        CommandManager.init()
+        CommandManager
 
         PPPluginCache.loadInstalledPlugins()
 
