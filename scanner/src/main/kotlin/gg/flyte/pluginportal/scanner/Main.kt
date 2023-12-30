@@ -11,7 +11,6 @@ suspend fun main() {
 
     while (true) {
         HangarScanner.scan()
-
         delay(48.hours)
     }
 }

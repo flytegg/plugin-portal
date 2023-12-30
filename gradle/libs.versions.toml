@@ -45,7 +45,7 @@ dotenv-kotlin = "6.4.1"
 logging = "5.1.0"
 kmongo = "4.11.0"
 caffeine = "3.1.8"
-hangar-wrapper = "2.0.1"
+hangar-wrapper = "2.0.2"
 
 [libraries]
 

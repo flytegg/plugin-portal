@@ -1,9 +1,8 @@
-name: Publish to Hangar and Modrinth
+name: Publish to Hangar
 on:
   push:
     branches:
-      - master
-      - dev
+      - 2.x
 
 jobs:
   publish:
@@ -22,6 +21,6 @@ jobs:
           check-latest: true
       - name: Publish
         env:
-          HANGAR_TOKEN: ${{ secrets.HANGAR_TOKEN }}
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-        run: ./gradlew build modrinth publishAllPublicationsToHangar --stacktrace
+          HANGAR_API_KEY: ${{ secrets.HANGAR_API_KEY }}
+          MODRINTH_API_KEY: ${{ secrets.MODRINTH_API_KEY }}
+        run: ./gradlew build publishAllPublicationsToHangar --stacktrace
