@@ -1,6 +1,6 @@
-package gg.flyte.backend.routing.routes.v1.recognize
+package gg.flyte.pluginportal.backend.routing.routes.v1.recognize
 
-import gg.flyte.backend.routing.routes.v1.plugins.PluginService
+import gg.flyte.pluginportal.backend.routing.routes.v1.plugins.PluginService
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*

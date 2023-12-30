@@ -119,6 +119,7 @@ run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 ktorfit = { id = "de.jensklingenberg.ktorfit", version .ref = "ktorfit" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 
 [bundles]
 

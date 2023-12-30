@@ -1,4 +1,4 @@
-package gg.flyte.backend.base
+package gg.flyte.pluginportal.backend.base
 
 import io.ktor.serialization.gson.*
 import io.ktor.server.application.*

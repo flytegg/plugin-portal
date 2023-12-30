@@ -1,4 +1,4 @@
-package gg.flyte.backend.routing.routes.v1.plugins
+package gg.flyte.pluginportal.backend.routing.routes.v1.plugins
 
 import com.google.gson.annotations.SerializedName
 import gg.flyte.pluginportal.api.type.*

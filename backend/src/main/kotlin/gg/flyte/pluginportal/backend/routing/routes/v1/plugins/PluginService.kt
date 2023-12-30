@@ -1,12 +1,12 @@
-package gg.flyte.backend.routing.routes.v1.plugins
+package gg.flyte.pluginportal.backend.routing.routes.v1.plugins
 
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.client.model.Filters
-import gg.flyte.backend.gson
+import gg.flyte.pluginportal.backend.gson
 import gg.flyte.pluginportal.client.PaginatedResult
 import gg.flyte.pluginportal.client.Pagination
-import gg.flyte.backend.routing.routes.v1.recognize.HashType
+import gg.flyte.pluginportal.backend.routing.routes.v1.recognize.HashType
 import gg.flyte.pluginportal.api.type.MarketplacePlugin
 import io.github.cdimascio.dotenv.dotenv
 import kotlinx.coroutines.flow.Flow

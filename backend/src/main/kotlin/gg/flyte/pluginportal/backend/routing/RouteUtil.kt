@@ -1,6 +1,6 @@
-package gg.flyte.backend.routing
+package gg.flyte.pluginportal.backend.routing
 
-import gg.flyte.backend.routing.routes.APIVersion
+import gg.flyte.pluginportal.backend.routing.routes.APIVersion
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*

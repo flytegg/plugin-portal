@@ -1,4 +1,4 @@
-package gg.flyte.backend.base.auth
+package gg.flyte.pluginportal.backend.base.auth
 
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.ktor)
 }
 
 dependencies {
@@ -24,5 +25,13 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation("io.ktor:ktor-server-call-logging-jvm:2.3.7")
 }
+
+application {
+    mainClass.set("gg.flyte.pluginportal.backend.ApplicationKt")
+
+    val isDevelopment: Boolean = project.ext.has("development")
+    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+}
+
 
 publishShadowJar()

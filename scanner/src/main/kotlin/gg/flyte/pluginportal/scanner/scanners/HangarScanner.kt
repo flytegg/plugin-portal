@@ -29,7 +29,7 @@ object HangarScanner : Scanner() {
 
         val projectVersions = HangarClient.getVersions(
             name,
-            RequestPagination(1, 0),
+            RequestPagination(25, 0),
             Platform.PAPER,
             "Release"
         )

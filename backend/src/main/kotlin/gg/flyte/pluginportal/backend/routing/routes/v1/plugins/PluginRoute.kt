@@ -1,6 +1,6 @@
-package gg.flyte.backend.routing.routes.v1.plugins
+package gg.flyte.pluginportal.backend.routing.routes.v1.plugins
 
-import gg.flyte.backend.gson
+import gg.flyte.pluginportal.backend.gson
 import io.ktor.http.*
 import io.ktor.resources.*
 import io.ktor.server.application.*
@@ -19,22 +19,14 @@ fun Application.configurePluginRoutes() {
                 "Limit cannot be greater than 25"
             )
 
-            println("respnding")
-
-            val pagination =                 PluginService.getPaginatedResultFromDatabase(
-                plugin.limit,
-                plugin.offset,
-                plugin.name
-            )
-
-            println(gson.toJson(pagination))
-            println(pagination.pagination)
-
-            return@get call.respond("hi")
 
             call.respond(
                 HttpStatusCode.OK,
-                "hi "
+                PluginService.getPaginatedResultFromDatabase(
+                    plugin.limit,
+                    plugin.offset,
+                    plugin.name
+                )
             )
         }
 
