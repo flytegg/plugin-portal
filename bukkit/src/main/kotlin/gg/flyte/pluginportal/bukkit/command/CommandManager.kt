@@ -3,6 +3,7 @@ package gg.flyte.pluginportal.bukkit.command
 import gg.flyte.pluginportal.api.type.MarketplacePlugin
 import gg.flyte.pluginportal.bukkit.PluginPortal
 import gg.flyte.pluginportal.bukkit.command.downloadable.InstallSubCommand
+import gg.flyte.pluginportal.bukkit.command.downloadable.UpdateSubCommand
 import gg.flyte.pluginportal.bukkit.command.info.HelpSubCommand
 import gg.flyte.pluginportal.bukkit.command.info.InfoSubCommand
 import gg.flyte.pluginportal.bukkit.command.info.ListSubCommand
@@ -12,6 +13,7 @@ import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bukkit.Bukkit
 import revxrsal.commands.bukkit.BukkitCommandHandler
+import revxrsal.commands.ktx.supportSuspendFunctions
 
 object CommandManager {
 
@@ -21,16 +23,16 @@ object CommandManager {
         BukkitCommandHandler.create(mainInstance).apply {
             enableAdventure(BukkitAudiences.create(mainInstance))
             registerAutoComplete()
-            registerCommands()
             registerHelpWriter()
+            registerCommands()
             registerBrigadier()
         }
     }
 
-    private fun BukkitCommandHandler.registerCommands() {
+     private fun BukkitCommandHandler.registerCommands() {
         register(
             InstallSubCommand(),
-            gg.flyte.pluginportal.bukkit.command.downloadable.UpdateSubCommand(),
+            UpdateSubCommand(),
             HelpSubCommand(),
             InfoSubCommand(),
             ListSubCommand(),

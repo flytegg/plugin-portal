@@ -24,6 +24,7 @@ dependencies {
 
     implementation(libs.kotlinx.coroutines.core)
     implementation("io.ktor:ktor-server-call-logging-jvm:2.3.7")
+    implementation("io.ktor:ktor-server-caching-headers-jvm:2.3.7")
 }
 
 application {

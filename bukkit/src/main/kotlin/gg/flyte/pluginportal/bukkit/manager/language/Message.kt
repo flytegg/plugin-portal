@@ -5,10 +5,10 @@ import gg.flyte.pluginportal.bukkit.manager.Config
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
-
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
@@ -115,8 +115,10 @@ object Message {
     fun Component.serialize() = MiniMessage.miniMessage().serialize(this)
 
     fun Component.solidLine(): TextComponent {
-        return Component.text("                                                                               ").decorate(
-            TextDecoration.STRIKETHROUGH)
+        return Component.text("                                                                               ")
+            .decorate(
+                TextDecoration.STRIKETHROUGH
+            )
     }
 
     private fun FileConfiguration.getBetterString(path: String): String {
@@ -129,3 +131,39 @@ object Message {
     }
 }
 
+object Messages {
+
+    val GREETING = LocaleMessages(
+        ResponseTypes.INFO,
+        hashSetOf(
+            Language.EN_US to "Hello",
+            Language.ES_ES to "Hola"
+        )
+    )
+
+}
+
+data class LocaleMessages(
+    val responseType: ResponseTypes.Response,
+    val messages: HashSet<Pair<Language, String>>,
+)
+
+object ResponseTypes {
+
+    object INFO: Response {
+        override val color: NamedTextColor = NamedTextColor.GRAY
+    }
+
+    object SUCCESS: Response {
+        override val color: NamedTextColor = NamedTextColor.GREEN
+    }
+
+    object ERROR: Response {
+        override val color: NamedTextColor = NamedTextColor.RED
+    }
+
+    interface Response {
+        val color: NamedTextColor
+    }
+
+}

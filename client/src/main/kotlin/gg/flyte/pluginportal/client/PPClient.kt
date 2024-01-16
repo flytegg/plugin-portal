@@ -8,16 +8,21 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.cache.*
+import io.ktor.client.plugins.cache.storage.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.client.utils.CacheControl
 import io.ktor.http.*
 import io.ktor.serialization.gson.*
 import io.ktor.util.*
 import java.io.File
 import java.net.URLDecoder
 import java.net.URLEncoder
+import java.nio.file.Files
+import java.nio.file.Paths
 
 object PPClient {
 
@@ -97,6 +102,12 @@ object PPClient {
                         PPClient.userAgent = this
                         agent = this
                     }
+                }
+
+                install(HttpCache) {
+                    val cacheFile = Files.createDirectories(Paths.get("build/cache")).toFile()
+                    publicStorage(FileStorage(cacheFile))
+                    privateStorage(FileStorage(cacheFile))
                 }
             }
 

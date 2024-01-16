@@ -14,7 +14,7 @@ adventure = "4.14.0"
 adventure-platform-bukkit = "4.3.2"
 
 # Platforms
-paper = "1.16.5-R0.1-SNAPSHOT"
+paper = "1.20.2-R0.1-SNAPSHOT"
 bungee = "1.19-R0.1-SNAPSHOT"
 velocity = "3.1.1"
 
@@ -50,7 +50,7 @@ adventure = { module = "net.kyori:adventure", version.ref = "adventure" }
 adventure-text-minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure" }
 adventure-platform-bukkit = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventure-platform-bukkit" }
 
-paper = { group = "com.destroystokyo.paper", name = "paper-api", version.ref = "paper" }
+paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 bungee = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungee" }
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 
@@ -77,6 +77,7 @@ ktor-client-content-negotiation = { module  = "io.ktor:ktor-client-content-negot
 ktor-client-serialization = { module  = "io.ktor:ktor-client-serialization-jvm", version.ref = "ktor" }
 ktor-client-serialization-gson = { module  = "io.ktor:ktor-serialization-gson-jvm", version.ref = "ktor" }
 ktor-client-logging = { module  = "io.ktor:ktor-client-logging-jvm", version.ref = "ktor" }
+ktor-client-caching = { module = "io.ktor:ktor-client-c" }
 
 ktorfit-ksp = { module = "de.jensklingenberg.ktorfit:ktorfit-ksp", version.ref = "ktorfit" }
 ktorfit-lib = { module = "de.jensklingenberg.ktorfit:ktorfit-lib", version.ref = "ktorfit" }

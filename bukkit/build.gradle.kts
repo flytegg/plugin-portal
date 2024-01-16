@@ -1,11 +1,14 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 plugins {
     alias(libs.plugins.run.paper)
 }
 
+tasks.runServer {
+    minecraftVersion("1.20.4")
+}
+
 dependencies {
     implementation(projects.pluginportalCommon)
+
     compileOnly(libs.paper) {
         exclude("junit", "junit")
         exclude("com.google.code.gson", "gson")
@@ -26,4 +29,4 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
 }
 
-publishShadowJar()
+

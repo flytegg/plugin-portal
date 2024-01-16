@@ -19,7 +19,6 @@ object PluginManager : PluginPortalAPI() {
             it ?: PPClient.getPluginById(id)
         }
 
-
     suspend fun searchForPlugins(query: String): HashSet<MarketplacePlugin> =
         PPClient.searchForPlugins(query).result.toHashSet()
 
