@@ -21,17 +21,11 @@ fun main() {
 }
 
 fun Application.module() {
-//    installContent()
-//    configureSecurity()
+    installContent()
+    configureSecurity()
 
-    routing {
-        get("/") {
-            call.respond("Hello, world!")
-        }
-    }
-//
-//    configurePluginRoutes()
-//    configureRecognizeRoutes()
+    configurePluginRoutes()
+    configureRecognizeRoutes()
 }
 
 val gson = GsonBuilder()
