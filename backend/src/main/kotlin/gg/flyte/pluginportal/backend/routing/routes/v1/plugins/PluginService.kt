@@ -55,7 +55,7 @@ object PluginService {
     private val client = KMongo.createClient(
         MongoClientSettings.builder()
             .applyConnectionString(
-                ConnectionString(dotenv {}["MONGO_URI"] ?: System.getenv("MONGO_URI"))
+                ConnectionString(System.getenv("MONGO_URI") ?: dotenv {}["MONGO_URI"])
             )
             .build()
     ).coroutine
