@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.ktor)
+    application
 }
 
 dependencies {
@@ -16,12 +17,8 @@ dependencies {
     implementation(libs.ktor.server.auth.jwt)
     implementation(libs.ktor.server.rate.limit)
 
-//    implementation(libs.logback)
-//    implementation(libs.logging)
-
-    implementation("ch.qos.logback:logback-core:1.4.14")
-    implementation("org.slf4j:slf4j-api:2.0.11")
-    implementation("ch.qos.logback:logback-classic:1.4.14")
+    implementation(libs.logback)
+    implementation(libs.logging)
 
     implementation(libs.kmongo)
     implementation(libs.dotenv.kotlin)
@@ -35,5 +32,12 @@ application {
     mainClass.set("gg.flyte.pluginportal.backend.ApplicationKt")
 }
 
+tasks {
+    compileKotlin {
+        kotlinOptions {
+            jvmTarget = "17"
+        }
+    }
+}
 
 //publishShadowJar()

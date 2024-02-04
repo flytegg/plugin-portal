@@ -1,5 +1,6 @@
 package gg.flyte.pluginportal.backend
 
+import ch.qos.logback.classic.spi.LogbackServiceProvider
 import com.google.gson.GsonBuilder
 import gg.flyte.pluginportal.backend.base.auth.configureSecurity
 import gg.flyte.pluginportal.backend.base.installContent
@@ -20,17 +21,17 @@ fun main() {
 }
 
 fun Application.module() {
-    installContent()
-    configureSecurity()
+//    installContent()
+//    configureSecurity()
 
     routing {
         get("/") {
             call.respond("Hello, world!")
         }
     }
-
-    configurePluginRoutes()
-    configureRecognizeRoutes()
+//
+//    configurePluginRoutes()
+//    configureRecognizeRoutes()
 }
 
 val gson = GsonBuilder()
