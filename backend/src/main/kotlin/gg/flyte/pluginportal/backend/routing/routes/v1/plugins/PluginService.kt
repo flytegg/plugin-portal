@@ -55,9 +55,7 @@ object PluginService {
     private val client = KMongo.createClient(
         MongoClientSettings.builder()
             .applyConnectionString(
-                ConnectionString(dotenv() {
-                    systemProperties = true
-                }["MONGO_URI"])
+                ConnectionString(dotenv {}["MONGO_URI"] ?: System.getenv("MONGO_URI"))
             )
             .build()
     ).coroutine
@@ -78,7 +76,7 @@ object PluginService {
 
     suspend fun getPlugin(id: String) = pluginCollection.findOneById(id)
 
-    suspend fun getPluginByHashes(hashes: HashSet<HashMap<HashType, String>>): Flow<MongoPlugin> {
+    fun getPluginByHashes(hashes: HashSet<HashMap<HashType, String>>): Flow<MongoPlugin> {
 
         val newHashes = hashSetOf<String>().apply {
             hashes.forEach { hash -> addAll(hash.entries.map { it.value }) }
