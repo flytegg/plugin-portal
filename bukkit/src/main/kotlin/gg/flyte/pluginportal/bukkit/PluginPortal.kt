@@ -4,12 +4,12 @@ import gg.flyte.pluginportal.bukkit.command.CommandManager
 import gg.flyte.pluginportal.bukkit.manager.Config
 import gg.flyte.pluginportal.bukkit.manager.PPPluginCache
 import gg.flyte.pluginportal.bukkit.manager.PluginManager
-import gg.flyte.pluginportal.client.PPClient
 import gg.flyte.twilight.Twilight
 import gg.flyte.twilight.twilight
-import gg.flyte.twilight.scheduler.async
 import io.papermc.lib.PaperLib
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -18,6 +18,8 @@ class PluginPortal : JavaPlugin() {
     companion object {
         val instance by lazy { Twilight.plugin as PluginPortal }
         val api = PluginManager
+
+        val isPremium = false
     }
 
     override fun onEnable() {
@@ -37,6 +39,6 @@ class PluginPortal : JavaPlugin() {
         PPPluginCache.saveInstalledPlugins()
     }
 
-    //    inline fun asyncDispatch(crossinline block: suspend () -> Unit) = launch { runBlocking { block.invoke() } }
-    fun asyncDispatch(block: suspend () -> Unit) = async { runBlocking { block.invoke() } }
+    @OptIn(DelicateCoroutinesApi::class)
+    fun asyncDispatch(block: suspend () -> Unit) = GlobalScope.launch { block.invoke() }
 }

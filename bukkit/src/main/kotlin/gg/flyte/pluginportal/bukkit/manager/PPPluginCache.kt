@@ -79,19 +79,18 @@ object PPPluginCache {
                 Array<CompactPlugin>::class.java
             ).forEach { addInstalledPlugins(it) }
 
-
-            val requestHashes = HashSet<HashMap<HashType, String>>().apply {
-                pluginFolder.listFiles()
-                    ?.filter { it.name.endsWith(".jar") }
-                    ?.filter { file -> file.name.startsWith("[PP]") }
-                    ?.forEach { add(it.getHashes()) }
-            }
-
-            if (requestHashes.isNotEmpty()) {
-                PPClient.recognizePluginByHashes(requestHashes).result.forEach {
-                    addInstalledPlugins(it.toCompactPlugin())
-                }
-            }
+//            val requestHashes = HashSet<HashMap<HashType, String>>().apply {
+//                pluginFolder.listFiles()
+//                    ?.filter { it.name.endsWith(".jar") }
+//                    ?.filter { file -> file.name.startsWith("[PP]") }
+//                    ?.forEach { add(it.getHashes()) }
+//            }
+//
+//            if (requestHashes.isNotEmpty()) {
+//                PPClient.recognizePluginByHashes(requestHashes).result.forEach {
+//                    addInstalledPlugins(it.toCompactPlugin())
+//                }
+//            }
 
             saveInstalledPlugins()
         }

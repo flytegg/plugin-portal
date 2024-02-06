@@ -29,6 +29,27 @@ class HelpSubCommand {
                 "Update an installed plugin",
                 "/pp update <plugin>"
             ),
+            HelpMessage(
+                "Info",
+                "pluginportal.info",
+                listOf(),
+                "Get information about a plugin",
+                "/pp info <plugin>"
+            ),
+            HelpMessage(
+                "List",
+                "pluginportal.list",
+                listOf("ls"),
+                "List installed plugins",
+                "/pp list"
+            ),
+            HelpMessage(
+                "Menu",
+                "pluginportal.menu",
+                listOf("m"),
+                "Open the Plugin Portal menu",
+                "/pp menu"
+            )
         )
 
         val strike = Component.text("")

@@ -20,7 +20,7 @@ import revxrsal.commands.bukkit.annotation.CommandPermission
 class InstallSubCommand {
 
     @Subcommand("install", "i")
-    @CommandPermission("pluginportal.install")
+    @CommandPermission("pluginportal.command.install")
     @AutoComplete("@marketplacePlugin")
     fun installSubCommand(
         sender: Audience,

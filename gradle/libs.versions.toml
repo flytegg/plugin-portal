@@ -9,7 +9,7 @@ run-paper = "2.2.2"
 twilight = "1.0.34"
 paperlib = "1.0.7"
 bstats = "3.0.2"
-lamp = "3.1.8"
+lamp = "3.1.9"
 adventure = "4.14.0"
 adventure-platform-bukkit = "4.3.2"
 
@@ -30,6 +30,7 @@ logging = "5.1.0"
 kmongo = "4.11.0"
 caffeine = "3.1.8"
 hangar-wrapper = "2.0.2"
+triumph-guis = "3.1.7"
 
 [libraries]
 
@@ -42,7 +43,8 @@ bstats = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
 
 lamp-common = { module = "com.github.Revxrsal.Lamp:common", version.ref = "lamp" }
 lamp-bukkit = { module = "com.github.Revxrsal.Lamp:bukkit", version.ref = "lamp" }
-lamp-brigadier = { module = "com.github.Revxrsal.Lamp:brigadier", version.ref = "lamp" }
+
+triumph-guis = { module = "dev.triumphteam:triumph-gui", version.ref = "triumph-guis" }
 
 adventure = { module = "net.kyori:adventure", version.ref = "adventure" }
 adventure-text-minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure" }
@@ -79,8 +81,6 @@ ktorfit-ksp = { module = "de.jensklingenberg.ktorfit:ktorfit-ksp", version.ref =
 ktorfit-lib = { module = "de.jensklingenberg.ktorfit:ktorfit-lib", version.ref = "ktorfit" }
 
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
-mccoroutine-api = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-api", version.ref = "mccoroutine" }
-mccoroutine-core = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-core", version.ref = "mccoroutine" }
 
 [plugins]
 run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }

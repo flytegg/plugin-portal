@@ -19,13 +19,14 @@ dependencies {
     implementation(libs.bstats)
     implementation(libs.paperlib)
     implementation(libs.twilight)
+
     implementation(libs.lamp.common)
     implementation(libs.lamp.bukkit)
+
     implementation(libs.adventure.text.minimessage)
     implementation(libs.adventure.platform.bukkit)
+    implementation(libs.triumph.guis)
 
-    implementation(libs.mccoroutine.api)
-    implementation(libs.mccoroutine.core)
     implementation(libs.kotlinx.coroutines.core)
 }
 

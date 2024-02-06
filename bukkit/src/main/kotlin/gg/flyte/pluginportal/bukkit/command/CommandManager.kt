@@ -23,35 +23,20 @@ object CommandManager {
         BukkitCommandHandler.create(mainInstance).apply {
             enableAdventure(BukkitAudiences.create(mainInstance))
             registerAutoComplete()
-            registerHelpWriter()
             registerCommands()
             registerBrigadier()
         }
     }
 
-     private fun BukkitCommandHandler.registerCommands() {
+    private fun BukkitCommandHandler.registerCommands() {
         register(
             InstallSubCommand(),
             UpdateSubCommand(),
             HelpSubCommand(),
             InfoSubCommand(),
             ListSubCommand(),
+            MenuSubCommand(),
         )
-    }
-
-    private fun BukkitCommandHandler.registerHelpWriter() {
-        setHelpWriter { command, actor ->
-            if (command.path.toRealString().length > 5) {
-                String.format(
-                    "%s %s - %s",
-                    command.path.toRealString(),
-                    command.usage,
-                    command.description
-                )
-            } else {
-                null
-            }
-        }
     }
 
     private fun BukkitCommandHandler.registerAutoComplete() {

@@ -11,9 +11,10 @@ data class MarketplacePlugin(
     fun getUniqueName() = "${displayInfo.name} (${id})"
     fun getLatestVersion() = versions[releaseData.latestVersion]
 
-    fun toCompactPlugin() = CompactPlugin(
+    fun toCompactPlugin(sha256: String? = null) = CompactPlugin(
         this.id,
         this.displayInfo.name,
         this.getLatestVersion()?.name,
+        sha256
     )
 }

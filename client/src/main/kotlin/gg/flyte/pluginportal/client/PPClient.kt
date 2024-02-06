@@ -38,7 +38,7 @@ object PPClient {
 
     fun getKtorfit(): Ktorfit {
         if (!PPClient::ktorfit.isInitialized) {
-            throw IllegalStateException("Ktorfit has not been initialized! Please use HasteClient.Build() first!")
+            throw IllegalStateException("Ktorfit has not been initialized! Please use PPClient.Build() first!")
         }
 
         return ktorfit
@@ -56,15 +56,15 @@ object PPClient {
 
     suspend fun recognizePluginByHashes(hashes: HashSet<HashMap<HashType, String>>) = ppEndpoints.recognizePluginByHashes(hashes.encode())
 
-    suspend fun downloadFile(url: String, file: File, callback: suspend (boolean: Boolean) -> Unit) {
+    suspend fun downloadFile(url: String, file: File, callback: suspend (boolean: Boolean, file: File?) -> Unit) {
         try {
             ppEndpoints.downloadFile(url).let {
                 file.writeBytes(it)
-                callback(true)
+                callback(true, file)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            callback(false)
+            callback(false, null)
         }
     }
 
@@ -75,11 +75,6 @@ object PPClient {
         private var userAgent = "flytegg/pp-client"
         var baseUrl = "https://api.pluginportal.link/v1/"
 
-        var logging = false
-        var loggingLevel = LogLevel.NONE
-        var logger = Logger.DEFAULT
-        var customLogger: Logger? = null
-
         fun build(): HttpClient {
             client = HttpClient(CIO) {
                 install(ContentNegotiation) {
@@ -87,16 +82,7 @@ object PPClient {
                         setPrettyPrinting()
                     }
                 }
-                if (logging) {
-                    install(Logging) {
-                        this.logger = logger
-                        this.level = loggingLevel
 
-                        if (customLogger != null) {
-                            this.logger = customLogger!!
-                        }
-                    }
-                }
                 install(UserAgent) {
                     userAgent.apply {
                         PPClient.userAgent = this

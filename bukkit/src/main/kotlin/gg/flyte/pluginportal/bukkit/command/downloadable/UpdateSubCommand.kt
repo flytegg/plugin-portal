@@ -16,7 +16,7 @@ import revxrsal.commands.bukkit.annotation.CommandPermission
 class UpdateSubCommand {
 
     @Subcommand("update", "u")
-    @CommandPermission("pluginportal.update")
+    @CommandPermission("pluginportal.command.update")
     @AutoComplete("@installedPlugin")
     fun updateSubCommand(
         sender: Audience,
