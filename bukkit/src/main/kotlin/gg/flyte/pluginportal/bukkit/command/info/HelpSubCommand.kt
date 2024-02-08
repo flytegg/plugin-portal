@@ -4,13 +4,15 @@ import gg.flyte.pluginportal.bukkit.manager.language.Message.solidLine
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import org.incendo.cloud.annotations.Default
+import org.incendo.cloud.annotations.processing.CommandContainer
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.DefaultFor
 
-@Command("pp", "pluginportal", "ppm", "pportal")
+@CommandContainer
 class HelpSubCommand {
 
-    @DefaultFor("~", "~ help")
+    @Command("pluginportal help")
     fun onHelpCommand(
         sender: Audience
     ) {

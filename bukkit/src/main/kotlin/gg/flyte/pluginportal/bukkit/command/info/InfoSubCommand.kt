@@ -29,7 +29,7 @@ class InfoSubCommand {
 
             return sender.sendInfo(
                 """Usage: /pp info <plugin>
- - Plugin Portal Version: ${PluginPortal.instance.pluginMeta.version}
+ - Plugin Portal Version: ${PluginPortal.instance.description.version}
  - Native Support: ${isPaper()}
  - Outdated: ${"TODO"}
                          """

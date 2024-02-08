@@ -19,12 +19,17 @@ class ListSubCommand {
             .solidLine()
             .color(NamedTextColor.DARK_GRAY)
 
+        println(PPPluginCache.getInstalledPlugins())
+        println(PPPluginCache.getInstalledPlugins().isEmpty())
+
         sender.sendMessage(
             Component.text().append(
                 strike,
                 Component.newline(),
                 if (PPPluginCache.getInstalledPlugins().isEmpty()) {
-                    Component.text("No plugins installed.", NamedTextColor.RED)
+                    Component.text("No plugins installed.", NamedTextColor.RED).also {
+                        println("No plugins installed. Appending")
+                    }
                     Component.newline()
                 } else {
                     Component.text().append(

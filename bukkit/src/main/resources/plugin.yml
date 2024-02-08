@@ -6,16 +6,16 @@ description: ${description}
 api-version: 1.13
 folia-supported: true
 website: https://flyte.gg
-commands:
-  pluginportal:
-    permissions:
-      pluginportal.admin:
-        default: op
-        children:
-          pluginportal.command.install: true
-          pluginportal.command.list: true
-          pluginportal.command.info: true
-          pluginportal.command.menu: true
-          pluginportal.command.update: true
-    aliases: [ pp, ppm, pportal ]
-    description: Main command for PluginPortal.
+#commands:
+#  pluginportal:
+#    permissions:
+#      pluginportal.admin:
+#        default: op
+#        children:
+#          pluginportal.command.install: true
+#          pluginportal.command.list: true
+#          pluginportal.command.info: true
+#          pluginportal.command.menu: true
+#          pluginportal.command.update: true
+#    aliases: [ pp, ppm, pportal ]
+#    description: Main command for PluginPortal.

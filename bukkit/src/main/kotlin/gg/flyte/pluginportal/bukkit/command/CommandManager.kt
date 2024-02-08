@@ -13,7 +13,6 @@ import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bukkit.Bukkit
 import revxrsal.commands.bukkit.BukkitCommandHandler
-import revxrsal.commands.ktx.supportSuspendFunctions
 
 object CommandManager {
 
@@ -35,7 +34,7 @@ object CommandManager {
             HelpSubCommand(),
             InfoSubCommand(),
             ListSubCommand(),
-            MenuSubCommand(),
+//            MenuSubCommand(),
         )
     }
 
@@ -66,7 +65,7 @@ object CommandManager {
                     runBlocking {
                         PPPluginCache.searchForPluginsByName(searchName)
                             .map { it.displayInfo.name }
-                            .ifEmpty { listOf("$searchName ~ No Results Found") }
+                            .ifEmpty { listOf("$searchName ~ No Results Found") }.also { println(it) }
                     }
                 }
             }.registerSuggestion("installedPlugin") { args, sender, command ->

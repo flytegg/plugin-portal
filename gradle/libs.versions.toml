@@ -31,6 +31,7 @@ kmongo = "4.11.0"
 caffeine = "3.1.8"
 hangar-wrapper = "2.0.2"
 triumph-guis = "3.1.7"
+cloud = "2.0.0-beta.2"
 
 [libraries]
 
@@ -43,6 +44,12 @@ bstats = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
 
 lamp-common = { module = "com.github.Revxrsal.Lamp:common", version.ref = "lamp" }
 lamp-bukkit = { module = "com.github.Revxrsal.Lamp:bukkit", version.ref = "lamp" }
+
+cloud-paper = { module = "org.incendo:cloud-paper", version.ref = "cloud" }
+cloud-extras = { module = "org.incendo:cloud-minecraft-extras", version.ref = "cloud" }
+cloud-annotations = { module = "org.incendo:cloud-kotlin-coroutines-annotations", version.ref = "cloud" }
+cloud-extensions = { module = "org.incendo:cloud-kotlin-extensions", version.ref = "cloud" }
+cloud-coroutines = { module = "org.incendo:cloud-kotlin-coroutines", version.ref = "cloud" }
 
 triumph-guis = { module = "dev.triumphteam:triumph-gui", version.ref = "triumph-guis" }
 

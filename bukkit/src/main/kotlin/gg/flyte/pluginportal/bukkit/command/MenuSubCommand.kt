@@ -9,29 +9,35 @@ import gg.flyte.pluginportal.bukkit.PluginPortal
 import gg.flyte.pluginportal.bukkit.manager.PPPluginCache
 import gg.flyte.pluginportal.bukkit.manager.PluginManager
 import gg.flyte.pluginportal.extensions.getSha256Hash
-import gg.flyte.twilight.extension.name
-import gg.flyte.twilight.extension.texture
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import revxrsal.commands.annotation.Command
-import revxrsal.commands.annotation.DefaultFor
-import revxrsal.commands.annotation.Subcommand
-import revxrsal.commands.bukkit.annotation.CommandPermission
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Commands
+import org.incendo.cloud.annotations.Permission
+import org.incendo.cloud.annotations.processing.CommandContainer
 import java.io.File
 
-@Command("pp", "pluginportal", "ppm", "pportal")
-class MenuSubCommand {
+@CommandContainer
+object MenuSubCommand {
 
-    @Subcommand("menu", "m")
-    @CommandPermission("pluginportal.command.menu")
+
+//    @Permission("pluginportal.command.menu")
+    @Command("pluginportal menu")
     fun onMenuCommand(
-        sender: Player
+        sender: CommandSender
     ) {
+        println("Running command")
+        if (sender !is Player) {
+            sender.sendMessage("You must be a player to use this command.")
+            return
+        }
+
         Gui.gui(GuiType.HOPPER)
             .title(text("Plugin Portal Panel", NamedTextColor.BLACK, TextDecoration.BOLD))
             .disableAllInteractions()
@@ -94,7 +100,7 @@ class MenuSubCommand {
                                     ).unDecorate()
                                 ).lore(
                                     listComponent(text("Version: ", NamedTextColor.GRAY)
-                                        .append(text(plugin.pluginMeta.version, NamedTextColor.AQUA))),
+                                        .append(text(plugin.description.version, NamedTextColor.AQUA))),
                                     text(""),
                                     text("Left Click to view more info (COMING SOON)", NamedTextColor.GRAY).unDecorate(),
                                 )
@@ -169,7 +175,7 @@ class MenuSubCommand {
                     )
                     .lore(
                         listComponent(text("Version: ", NamedTextColor.GRAY)
-                            .append(text(PluginPortal.instance.pluginMeta.version, NamedTextColor.AQUA))),
+                            .append(text(PluginPortal.instance.description.version, NamedTextColor.AQUA))),
                         listComponent(text("Outdated: ", NamedTextColor.GRAY)
                             .append(text("TODO", NamedTextColor.AQUA))),
                     )

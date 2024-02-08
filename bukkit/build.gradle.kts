@@ -23,6 +23,13 @@ dependencies {
     implementation(libs.lamp.common)
     implementation(libs.lamp.bukkit)
 
+    implementation(libs.cloud.paper)
+    implementation(libs.cloud.extras)
+    implementation(libs.cloud.annotations)
+    implementation(libs.cloud.extensions)
+    implementation(libs.cloud.coroutines)
+
+
     implementation(libs.adventure.text.minimessage)
     implementation(libs.adventure.platform.bukkit)
     implementation(libs.triumph.guis)
