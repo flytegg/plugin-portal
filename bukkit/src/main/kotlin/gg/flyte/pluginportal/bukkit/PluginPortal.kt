@@ -14,16 +14,8 @@ import io.papermc.lib.PaperLib
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import net.kyori.adventure.audience.Audience
-import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bstats.bukkit.Metrics
-import org.bukkit.command.CommandSender
-import org.bukkit.event.server.TabCompleteEvent
 import org.bukkit.plugin.java.JavaPlugin
-import org.incendo.cloud.SenderMapper
-import org.incendo.cloud.annotations.AnnotationParser
-import org.incendo.cloud.execution.ExecutionCoordinator
-import org.incendo.cloud.paper.PaperCommandManager
 
 class PluginPortal : JavaPlugin() {
 
@@ -53,6 +45,8 @@ class PluginPortal : JavaPlugin() {
     }
 
     override fun onDisable() {
+        CloudCommandManager.audiences.close()
+
         PPPluginCache.saveInstalledPlugins()
     }
 

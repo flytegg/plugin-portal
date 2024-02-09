@@ -30,7 +30,7 @@ fun ShadowJar.configureRelocations() {
     relocate("de.jensklingenberg.ktorfit", "gg.flyte.pluginportal.libs.ktorfit")
     relocate("kotlinx", "gg.flyte.pluginportal.libs.kotlinx")
     relocate("kotlin", "gg.flyte.pluginportal.libs.kotlin")
-    relocate("net.kyori.adventure", "gg.flyte.pluginportal.libs.adventure")
+//    relocate("net.kyori.adventure", "gg.flyte.pluginportal.libs.adventure")
 
 //    relocate("com.github.steveice10.opennbt", "gg.flyte.pluginportal.libs.opennbt")
 //    relocate("it.unimi.dsi.fastutil", "gg.flyte.pluginportal.libs.fastutil")

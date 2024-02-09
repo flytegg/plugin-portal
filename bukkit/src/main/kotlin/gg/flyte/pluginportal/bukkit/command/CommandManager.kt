@@ -10,7 +10,6 @@ import gg.flyte.pluginportal.bukkit.command.info.ListSubCommand
 import gg.flyte.pluginportal.bukkit.manager.PPPluginCache
 import gg.flyte.pluginportal.bukkit.manager.PluginManager
 import kotlinx.coroutines.runBlocking
-import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bukkit.Bukkit
 import revxrsal.commands.bukkit.BukkitCommandHandler
 
@@ -20,7 +19,7 @@ object CommandManager {
 
     init {
         BukkitCommandHandler.create(mainInstance).apply {
-            enableAdventure(BukkitAudiences.create(mainInstance))
+//            enableAdventure(BukkitAudiences.create(mainInstance))
             registerAutoComplete()
             registerCommands()
             registerBrigadier()
@@ -29,11 +28,11 @@ object CommandManager {
 
     private fun BukkitCommandHandler.registerCommands() {
         register(
-            InstallSubCommand(),
-            UpdateSubCommand(),
-            HelpSubCommand(),
-            InfoSubCommand(),
-            ListSubCommand(),
+//            InstallSubCommand(),
+//            UpdateSubCommand(),
+////            HelpSubCommand(),
+//            InfoSubCommand(),
+//            ListSubCommand(),
 //            MenuSubCommand(),
         )
     }

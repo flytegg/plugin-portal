@@ -1,13 +1,11 @@
-package gg.flyte.pluginportal.bukkit.command
+package gg.flyte.pluginportal.bukkit.command.info
 
 import dev.triumphteam.gui.builder.item.ItemBuilder
 import dev.triumphteam.gui.components.GuiType
 import dev.triumphteam.gui.guis.Gui
-import dev.triumphteam.gui.guis.GuiItem
 import gg.flyte.pluginportal.api.type.CompactPlugin
 import gg.flyte.pluginportal.bukkit.PluginPortal
 import gg.flyte.pluginportal.bukkit.manager.PPPluginCache
-import gg.flyte.pluginportal.bukkit.manager.PluginManager
 import gg.flyte.pluginportal.extensions.getSha256Hash
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.TextComponent
@@ -16,23 +14,17 @@ import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 import org.incendo.cloud.annotations.Command
-import org.incendo.cloud.annotations.Commands
 import org.incendo.cloud.annotations.Permission
-import org.incendo.cloud.annotations.processing.CommandContainer
 import java.io.File
 
-@CommandContainer
 object MenuSubCommand {
 
-
-//    @Permission("pluginportal.command.menu")
-    @Command("pluginportal menu")
+    @Command("pluginportal|pp|ppm menu|m")
+    @Permission("pluginportal.command.menu")
     fun onMenuCommand(
         sender: CommandSender
     ) {
-        println("Running command")
         if (sender !is Player) {
             sender.sendMessage("You must be a player to use this command.")
             return

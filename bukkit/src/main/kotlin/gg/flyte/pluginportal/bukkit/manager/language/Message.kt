@@ -2,7 +2,7 @@ package gg.flyte.pluginportal.bukkit.manager.language
 
 import gg.flyte.pluginportal.bukkit.PluginPortal
 import gg.flyte.pluginportal.bukkit.manager.Config
-import net.kyori.adventure.platform.bukkit.BukkitAudiences
+import net.kyori.adventure.audience.Audiences
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
@@ -15,7 +15,7 @@ import java.io.File
 
 object Message {
     private lateinit var config: FileConfiguration
-    lateinit var audiences: BukkitAudiences
+//    lateinit var audiences: BukkitAudiences
 
     private val prefix get() = config.getBetterString("prefix")
 
@@ -89,7 +89,7 @@ object Message {
         pluginPortal.saveResource("languages${File.separator}$language.yml", true)
         config = YamlConfiguration.loadConfiguration(file)
 
-        audiences = BukkitAudiences.create(pluginPortal)
+//        audiences = Audiences.create(pluginPortal)
     }
 
     private fun parseString(string: String): Component {

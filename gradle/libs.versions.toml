@@ -10,7 +10,7 @@ twilight = "1.0.34"
 paperlib = "1.0.7"
 bstats = "3.0.2"
 lamp = "3.1.9"
-adventure = "4.14.0"
+adventure = "4.15.0"
 adventure-platform-bukkit = "4.3.2"
 
 # Platforms
@@ -23,7 +23,6 @@ ksp = "2.0.0-Beta2-1.0.16"
 logback = "1.4.14"
 
 coroutines = "1.8.0-RC2"
-mccoroutine = "2.13.0"
 
 dotenv-kotlin = "6.4.1"
 logging = "5.1.0"
