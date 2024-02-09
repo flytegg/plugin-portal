@@ -5,31 +5,24 @@ import gg.flyte.pluginportal.bukkit.manager.language.Message.solidLine
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import revxrsal.commands.annotation.Command
-import revxrsal.commands.annotation.Subcommand
-import revxrsal.commands.bukkit.annotation.CommandPermission
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
-@Command("pp", "pluginportal", "ppm", "pportal")
-class ListSubCommand {
+object ListSubCommand {
 
-    @Subcommand("list", "ls")
-    @CommandPermission("pluginportal.command.list")
-    fun listSubCommand(sender: Audience) {
+    @Command("pluginportal|pp|ppm list|ls")
+    @Permission("pluginportal.command.list")
+    fun onListSubCommand(sender: Audience) {
         val strike = Component.text("")
             .solidLine()
             .color(NamedTextColor.DARK_GRAY)
-
-        println(PPPluginCache.getInstalledPlugins())
-        println(PPPluginCache.getInstalledPlugins().isEmpty())
 
         sender.sendMessage(
             Component.text().append(
                 strike,
                 Component.newline(),
                 if (PPPluginCache.getInstalledPlugins().isEmpty()) {
-                    Component.text("No plugins installed.", NamedTextColor.RED).also {
-                        println("No plugins installed. Appending")
-                    }
+                    Component.text("No plugins installed.", NamedTextColor.RED)
                     Component.newline()
                 } else {
                     Component.text().append(

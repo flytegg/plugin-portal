@@ -32,7 +32,6 @@ class PluginPortal : JavaPlugin() {
         }
 
         Config.init(this)
-//        CommandManager
 
         Metrics(this, 18005)
         PaperLib.suggestPaper(this)

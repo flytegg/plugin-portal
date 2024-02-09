@@ -36,6 +36,8 @@ dependencies {
     implementation(libs.triumph.guis)
 
     implementation(libs.kotlinx.coroutines.core)
+    implementation(kotlin("reflect"))
+
 }
 
 

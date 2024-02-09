@@ -210,9 +210,9 @@ object MenuSubCommand {
             .open(this)
     }
 
-    fun TextComponent.unDecorate() = decoration(TextDecoration.ITALIC, false)
+    private fun TextComponent.unDecorate() = decoration(TextDecoration.ITALIC, false)
 
-    fun listComponent(component: TextComponent) = text("- ", NamedTextColor.DARK_GRAY)
+    private fun listComponent(component: TextComponent) = text("- ", NamedTextColor.DARK_GRAY)
         .unDecorate()
         .append(component.unDecorate())
 }

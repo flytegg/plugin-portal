@@ -5,27 +5,42 @@ import gg.flyte.pluginportal.bukkit.command.CommandManager
 import gg.flyte.pluginportal.bukkit.command.info.display.InfoDisplay
 import gg.flyte.pluginportal.bukkit.manager.language.sendError
 import gg.flyte.pluginportal.bukkit.manager.language.sendInfo
-import io.papermc.lib.PaperLib
 import io.papermc.lib.PaperLib.isPaper
-import jdk.jfr.Name
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import net.kyori.adventure.audience.Audience
-import net.kyori.adventure.text.Component.text
-import org.bukkit.Bukkit
-import revxrsal.commands.annotation.*
-import revxrsal.commands.bukkit.annotation.CommandPermission
+import org.bukkit.command.CommandSender
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Commands
+import org.incendo.cloud.annotations.Default
+import org.incendo.cloud.annotations.Flag
+import org.incendo.cloud.annotations.Permission
+import org.incendo.cloud.annotations.suggestion.Suggestions
+import org.incendo.cloud.context.CommandContext
+import org.incendo.cloud.kotlin.coroutines.suspendingSuggestionProvider
+import org.incendo.cloud.suggestion.Suggestion
+import java.util.stream.Stream
 
-@Command("pp", "pluginportal", "ppm", "pportal")
-class InfoSubCommand {
+object InfoSubCommand {
 
-    @Subcommand("info")
-    @CommandPermission("pluginportal.command.info")
-    @AutoComplete("@marketplacePlugin")
-    fun infoSubCommand(
+    @Command("pluginportal|pp|ppm info [pluginName]")
+    @Permission("pluginportal.command.info")
+    fun onInfoSubCommand(
         sender: Audience,
-        @CommandManager.PPPlugin @Named("pluginName") @Optional pluginName: String? = null,
-        @Flag @Optional @Default("false") isId: Boolean,
+
+        @Argument(
+            value = "pluginName",
+            description = "The name of the plugin you want to install.",
+            suggestions = "marketplace-plugin",
+        ) pluginName: String?,
+
+        @Flag(value =  "isId") isId: Boolean = false
+//        @CommandManager.PPPlugin @Named("pluginName") @Optional pluginName: String? = null,
+//        @Flag @Optional @Default("false") isId: Boolean,
     ) {
-        if (pluginName == null) {
+
+        if (pluginName.isNullOrBlank()) {
 
             return sender.sendInfo(
                 """Usage: /pp info <plugin>
@@ -50,5 +65,11 @@ class InfoSubCommand {
             sender.sendMessage(InfoDisplay.DefaultDisplay().getDisplayInfo(plugin))
         }
     }
+
+    @Suggestions("marketplace-plugin")
+    suspend fun suggestPluginNames(
+        context: CommandContext<CommandSender>,
+        input: String
+    ): Sequence<Suggestion> = sequenceOf("ViaVersion", "ViaBackwards", "ViaRewind").map(Suggestion::simple)
 
 }
