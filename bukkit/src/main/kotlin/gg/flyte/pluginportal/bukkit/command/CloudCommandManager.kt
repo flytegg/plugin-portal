@@ -54,11 +54,13 @@ object CloudCommandManager {
             AnnotationParser(this, CommandSender::class.java).apply {
                 installCoroutineSupport()
 
+//                parse(MenuSubCommand)
+
                 hashSetOf(
-                    MenuSubCommand,
-                    HelpSubCommand(help),
+////                    MenuSubCommand,
+////                    HelpSubCommand(help),
                     ListSubCommand,
-                    InfoSubCommand,
+//                    InfoSubCommand,
                 ).forEach { command -> parse(command) }
             }
         }

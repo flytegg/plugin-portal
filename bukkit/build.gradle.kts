@@ -28,7 +28,7 @@ dependencies {
     implementation(libs.cloud.extensions)
     implementation(libs.cloud.coroutines)
     implementation(libs.cloud.annotations)
-    annotationProcessor(libs.cloud.annotations)
+//    annotationProcessor(libs.cloud.annotations)
 
 
     implementation(libs.adventure.text.minimessage)
