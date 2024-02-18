@@ -6,50 +6,70 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.minimessage.MiniMessage
 import java.math.RoundingMode
 
 object InfoDisplay {
 
     class DefaultDisplay : InfoInterface {
+        val SOLID_LINE =
+            "<u><dark_gray>                                                                               </dark_gray></u>"
+
         override fun getDisplayInfo(plugin: MarketplacePlugin): Component {
-            return Component.text().append(
-                Component.empty()
-                    .solidLine()
-                    .color(NamedTextColor.DARK_GRAY),
 
-                Component.newline(),
-                Component.text("┌ ", NamedTextColor.GRAY),
-                Component.text("Name: ", NamedTextColor.AQUA, TextDecoration.BOLD),
-                displayInformation(plugin.getUniqueName()),
-                Component.newline(),
-                Component.text("├─ ", NamedTextColor.GRAY),
-                Component.text(plugin.statistics.downloads, NamedTextColor.AQUA),
-                Component.space(),
-                Component.text("⬇", NamedTextColor.AQUA, TextDecoration.UNDERLINED, TextDecoration.BOLD),
-                Component.text(" | ", NamedTextColor.GRAY),
-                Component.text(
-                    plugin.statistics.ratingAverage.toBigDecimal().setScale(
-                        1,
-                        RoundingMode.UP
-                    ).toDouble(),
-                    NamedTextColor.AQUA
-                ),
+            return MiniMessage.miniMessage().deserialize(
+                """
+                    $SOLID_LINE
+                    <gray>┌ </gray><aqua>${plugin.getUniqueName()}</aqua>
+                    <gray>├─ </gray><aqua>${plugin.statistics.downloads}</aqua> <aqua><u><bold>⬇</bold></u></aqua> <gray>| </gray><aqua>${plugin.statistics.ratingAverage.toBigDecimal().setScale(1, RoundingMode.UP).toDouble()}</aqua> <aqua><u><bold>⭐</bold></u></aqua> <gray>| </gray><aqua>${if ((plugin.statistics.price ?: 0) > 0) "\$${plugin.statistics.price}" else "FREE"}</aqua>
+                    <gray>├─ </gray><gray>${plugin.displayInfo.description}</gray>
+                    
+                    <click:suggest_command:'/ppm install ${plugin.id} -isId true'><green><b><u>INSTALL</u></b></green></click>
+                    
+                    $SOLID_LINE
+                """.trimIndent()
+            )
 
-                Component.text(" ⭐", NamedTextColor.GOLD, TextDecoration.BOLD),
-                Component.text(" | ", NamedTextColor.GRAY),
-                Component.text(
-                    if ((plugin.statistics.price ?: 0) > 0) "\$${plugin.statistics.price}" else "FREE",
-                    NamedTextColor.AQUA
-                ),
 
-                Component.newline(),
-                createDescriptionLines(plugin.displayInfo.description),
-                Component.newline(),
-                Component.empty()
-                    .solidLine()
-                    .color(NamedTextColor.DARK_GRAY)
-
-            ).build()
+//            return Component.text().append(
+//                Component.empty()
+//                    .solidLine()
+//                    .color(NamedTextColor.DARK_GRAY),
+//
+//                Component.newline(),
+//                Component.text("┌ ", NamedTextColor.GRAY),
+//                displayInformation(plugin.getUniqueName())
+//                    .color(NamedTextColor.AQUA)
+//                    .decorate(TextDecoration.BOLD),
+//                Component.newline(),
+//                Component.text("├─ ", NamedTextColor.GRAY),
+//                Component.text(plugin.statistics.downloads, NamedTextColor.AQUA),
+//                Component.space(),
+//                Component.text("⬇", NamedTextColor.AQUA, TextDecoration.UNDERLINED, TextDecoration.BOLD),
+//                Component.text(" | ", NamedTextColor.GRAY),
+//                Component.text(
+//                    plugin.statistics.ratingAverage.toBigDecimal().setScale(
+//                        1,
+//                        RoundingMode.UP
+//                    ).toDouble(),
+//                    NamedTextColor.AQUA
+//                ),
+//
+//                Component.text(" ⭐", NamedTextColor.GOLD, TextDecoration.BOLD),
+//                Component.text(" | ", NamedTextColor.GRAY),
+//                Component.text(
+//                    if ((plugin.statistics.price ?: 0) > 0) "\$${plugin.statistics.price}" else "FREE",
+//                    NamedTextColor.AQUA
+//                ),
+//
+//                Component.newline(),
+//                createDescriptionLines(plugin.displayInfo.description),
+//                Component.newline(),
+//                Component.empty()
+//                    .solidLine()
+//                    .color(NamedTextColor.DARK_GRAY)
+//
+//            ).build()
         }
     }
 

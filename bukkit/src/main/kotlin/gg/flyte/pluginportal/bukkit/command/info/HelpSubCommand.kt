@@ -7,7 +7,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.DefaultFor
 
-@Command("pp", "pluginportal", "ppm", "pportal")
+@Command("pp", "pluginportal", "ppm")
 class HelpSubCommand {
 
     @DefaultFor("~", "~ help")
@@ -65,7 +65,7 @@ class HelpSubCommand {
                         Component.text().append(
                             Component.text(" - ", NamedTextColor.GRAY),
                             Component.text(message.usage, NamedTextColor.AQUA),
-                            Component.text(" ( ${message.aliases.joinToString(" ")} ) ", NamedTextColor.DARK_GRAY),
+//                            Component.text(" ( ${message.aliases.joinToString(" ")} ) ", NamedTextColor.DARK_GRAY),
                             Component.text(" | ", NamedTextColor.GRAY),
                             Component.text(message.description, NamedTextColor.GRAY),
                             Component.newline(),

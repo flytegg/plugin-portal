@@ -12,6 +12,7 @@ import revxrsal.commands.annotation.AutoComplete
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Default
 import revxrsal.commands.annotation.Flag
+import revxrsal.commands.annotation.Named
 import revxrsal.commands.annotation.Optional
 import revxrsal.commands.annotation.Subcommand
 import revxrsal.commands.bukkit.annotation.CommandPermission
@@ -19,13 +20,13 @@ import revxrsal.commands.bukkit.annotation.CommandPermission
 @Command("pp", "pluginportal", "ppm", "pportal")
 class InstallSubCommand {
 
-    @Subcommand("install", "i")
+    @Subcommand("install")
     @CommandPermission("pluginportal.command.install")
     @AutoComplete("@marketplacePlugin")
     fun installSubCommand(
         sender: Audience,
         @CommandManager.PPPlugin pluginName: String,
-        @Flag @Optional @Default("false") isId: Boolean,
+        @Flag @Optional @Default("false") @Named("isId") isId: Boolean,
     ) {
         val plugins = CommandManager.getPlugins(pluginName, isId).also {
             if (it.isEmpty()) return sender.sendError("No plugins found with the name '$pluginName'")

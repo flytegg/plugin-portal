@@ -5,6 +5,7 @@ import gg.flyte.pluginportal.bukkit.manager.Config
 import gg.flyte.pluginportal.bukkit.manager.PPPluginCache
 import gg.flyte.pluginportal.bukkit.manager.PluginManager
 import gg.flyte.twilight.Twilight
+import gg.flyte.twilight.data.sql.QueryBuilder.Companion.eq
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.twilight
 import io.papermc.lib.PaperLib
@@ -14,8 +15,11 @@ import kotlinx.coroutines.launch
 import org.bstats.bukkit.Metrics
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerChatTabCompleteEvent
+import org.bukkit.event.player.PlayerCommandPreprocessEvent
+import org.bukkit.event.player.PlayerCommandSendEvent
 import org.bukkit.event.server.TabCompleteEvent
 import org.bukkit.plugin.java.JavaPlugin
+import revxrsal.commands.ktx.commandError
 
 class PluginPortal : JavaPlugin() {
 
@@ -33,7 +37,6 @@ class PluginPortal : JavaPlugin() {
         asyncDispatch { PPPluginCache.loadInstalledPlugins() }
 
         CommandManager
-        TabListener()
 
         Metrics(this, 18005)
         PaperLib.suggestPaper(this)
@@ -45,15 +48,4 @@ class PluginPortal : JavaPlugin() {
 
     @OptIn(DelicateCoroutinesApi::class)
     fun asyncDispatch(block: suspend () -> Unit) = GlobalScope.launch { block.invoke() }
-}
-
-class TabListener : Listener {
-    init {
-        println("asdfgh")
-        event<TabCompleteEvent> {
-            println("Tab complete event")
-            println(this.buffer)
-            println(this)
-        }
-    }
 }

@@ -12,7 +12,7 @@ import revxrsal.commands.bukkit.annotation.CommandPermission
 @Command("pp", "pluginportal", "ppm", "pportal")
 class ListSubCommand {
 
-    @Subcommand("list", "ls")
+    @Subcommand("list")
     @CommandPermission("pluginportal.command.list")
     fun listSubCommand(sender: Audience) {
         val strike = Component.text("")

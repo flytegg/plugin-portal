@@ -21,7 +21,7 @@ import java.io.File
 @Command("pp", "pluginportal", "ppm", "pportal")
 class MenuSubCommand {
 
-    @Subcommand("menu", "m")
+    @Subcommand("menu")
     @CommandPermission("pluginportal.command.menu")
     fun onMenuCommand(
         sender: Player
