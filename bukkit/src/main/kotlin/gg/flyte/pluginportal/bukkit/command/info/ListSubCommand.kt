@@ -7,8 +7,10 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.Permission
+import org.incendo.cloud.annotations.processing.CommandContainer
 
-object ListSubCommand {
+@CommandContainer
+class ListSubCommand {
 
     @Command("pluginportal|pp|ppm list|ls")
     @Permission("pluginportal.command.list")

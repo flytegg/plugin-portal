@@ -6,8 +6,6 @@ description: ${description}
 api-version: 1.13
 folia-supported: true
 website: https://flyte.gg
-libraries:
-  - org.jetbrains.kotlin:kotlin-reflect:1.9.20
 #commands:
 #  pluginportal:
 #    permissions:

@@ -21,6 +21,7 @@ data class MongoPlugin(
         this.id,
         this.displayInfo.name,
         this.getLatestVersion()?.name,
+        null,
     )
 
     fun toDto() = MarketplacePlugin(

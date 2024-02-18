@@ -20,7 +20,7 @@ pluginManagement {
         id("net.kyori.blossom") version "2.1.0"
         id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7"
         id("com.github.johnrengelman.shadow") version "8.1.1"
-        id("org.jetbrains.kotlin.jvm") version "2.0.0-Beta2"
+        id("org.jetbrains.kotlin.jvm") version "1.9.20"
     }
 }
 

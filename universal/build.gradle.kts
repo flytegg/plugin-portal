@@ -62,19 +62,19 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
 //        }
 //    }
 
-    hangarPublish {
-        publications.register("plugin") {
-            version.set(suffixedVersion)
-            id.set("PluginPortal")
-            channel.set(if (isRelease) "Release" else if (isMainBranch) "Snapshot" else "Alpha")
-            changelog.set(changelogContent)
-            apiKey.set(System.getenv("HANGAR_API_KEY"))
-            platforms {
-                register(Platforms.PAPER) {
-                    jar.set(tasks.shadowJar.flatMap { it.archiveFile })
-                    platformVersions.set(listOf(property("mcVersionRange") as String))
-                }
-            }
-        }
-    }
+//    hangarPublish {
+//        publications.register("plugin") {
+//            version.set(suffixedVersion)
+//            id.set("PluginPortal")
+//            channel.set(if (isRelease) "Release" else if (isMainBranch) "Snapshot" else "Alpha")
+//            changelog.set(changelogContent)
+//            apiKey.set(System.getenv("HANGAR_API_KEY"))
+//            platforms {
+//                register(Platforms.PAPER) {
+//                    jar.set(tasks.shadowJar.flatMap { it.archiveFile })
+//                    platformVersions.set(listOf(property("mcVersionRange") as String))
+//                }
+//            }
+//        }
+//    }
 }

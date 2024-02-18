@@ -1,6 +1,5 @@
 package gg.flyte.pluginportal.backend
 
-import ch.qos.logback.classic.spi.LogbackServiceProvider
 import com.google.gson.GsonBuilder
 import gg.flyte.pluginportal.backend.base.auth.configureSecurity
 import gg.flyte.pluginportal.backend.base.installContent
@@ -9,8 +8,6 @@ import gg.flyte.pluginportal.backend.routing.routes.v1.recognize.configureRecogn
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
 
 fun main() {
     embeddedServer(

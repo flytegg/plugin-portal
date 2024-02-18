@@ -44,7 +44,7 @@ class PluginPortal : JavaPlugin() {
     }
 
     override fun onDisable() {
-        CloudCommandManager.audiences.close()
+        CloudCommandManager.audiences?.let { it.close() }
 
         PPPluginCache.saveInstalledPlugins()
     }
