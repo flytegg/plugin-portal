@@ -12,18 +12,19 @@ import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import org.incendo.cloud.annotations.Command
-import org.incendo.cloud.annotations.Permission
+import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Subcommand
+import revxrsal.commands.bukkit.annotation.CommandPermission
 import java.io.File
 
-object MenuSubCommand {
+@Command("pp", "pluginportal", "ppm", "pportal")
+class MenuSubCommand {
 
-    @Command("pluginportal|pp|ppm menu|m")
-    @Permission("pluginportal.command.menu")
+    @Subcommand("menu", "m")
+    @CommandPermission("pluginportal.command.menu")
     fun onMenuCommand(
-        sender: CommandSender
+        sender: Player
     ) {
         if (sender !is Player) {
             sender.sendMessage("You must be a player to use this command.")

@@ -5,16 +5,16 @@ import gg.flyte.pluginportal.bukkit.manager.language.Message.solidLine
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import org.incendo.cloud.annotations.Command
-import org.incendo.cloud.annotations.Permission
-import org.incendo.cloud.annotations.processing.CommandContainer
+import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Subcommand
+import revxrsal.commands.bukkit.annotation.CommandPermission
 
-@CommandContainer
+@Command("pp", "pluginportal", "ppm", "pportal")
 class ListSubCommand {
 
-    @Command("pluginportal|pp|ppm list|ls")
-    @Permission("pluginportal.command.list")
-    fun onListSubCommand(sender: Audience) {
+    @Subcommand("list", "ls")
+    @CommandPermission("pluginportal.command.list")
+    fun listSubCommand(sender: Audience) {
         val strike = Component.text("")
             .solidLine()
             .color(NamedTextColor.DARK_GRAY)

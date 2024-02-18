@@ -1,13 +1,10 @@
 package gg.flyte.pluginportal.bukkit
 
-import gg.flyte.pluginportal.bukkit.command.CloudCommandManager
 import gg.flyte.pluginportal.bukkit.command.CommandManager
 import gg.flyte.pluginportal.bukkit.manager.Config
 import gg.flyte.pluginportal.bukkit.manager.PPPluginCache
 import gg.flyte.pluginportal.bukkit.manager.PluginManager
 import gg.flyte.twilight.Twilight
-import gg.flyte.twilight.event.custom.interact.listener.InteractEventListener
-import gg.flyte.twilight.event.disableCustomEventListeners
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.twilight
 import io.papermc.lib.PaperLib
@@ -15,6 +12,9 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.bstats.bukkit.Metrics
+import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerChatTabCompleteEvent
+import org.bukkit.event.server.TabCompleteEvent
 import org.bukkit.plugin.java.JavaPlugin
 
 class PluginPortal : JavaPlugin() {
@@ -27,28 +27,33 @@ class PluginPortal : JavaPlugin() {
     }
 
     override fun onEnable() {
-        twilight(this) {
-            disableCustomEventListeners(InteractEventListener)
-        }
+        twilight(this)
 
         Config.init(this)
+        asyncDispatch { PPPluginCache.loadInstalledPlugins() }
+
+        CommandManager
+        TabListener()
 
         Metrics(this, 18005)
         PaperLib.suggestPaper(this)
-
-        CloudCommandManager
-
-        asyncDispatch {
-            PPPluginCache.loadInstalledPlugins()
-        }
     }
 
     override fun onDisable() {
-        CloudCommandManager.audiences?.let { it.close() }
-
         PPPluginCache.saveInstalledPlugins()
     }
 
     @OptIn(DelicateCoroutinesApi::class)
     fun asyncDispatch(block: suspend () -> Unit) = GlobalScope.launch { block.invoke() }
+}
+
+class TabListener : Listener {
+    init {
+        println("asdfgh")
+        event<TabCompleteEvent> {
+            println("Tab complete event")
+            println(this.buffer)
+            println(this)
+        }
+    }
 }

@@ -6,7 +6,7 @@ gson = "2.10.1"
 guava = "17.0"
 
 run-paper = "2.2.2"
-twilight = "1.0.34"
+twilight = "1.1.7"
 paperlib = "1.0.7"
 bstats = "3.0.2"
 lamp = "3.1.9"
@@ -14,7 +14,7 @@ adventure = "4.15.0"
 adventure-platform-bukkit = "4.3.2"
 
 # Platforms
-paper = "1.20.2-R0.1-SNAPSHOT"
+paper = "1.20.4-R0.1-SNAPSHOT"
 
 kotlin = "1.9.20"
 ktor = "2.3.7"

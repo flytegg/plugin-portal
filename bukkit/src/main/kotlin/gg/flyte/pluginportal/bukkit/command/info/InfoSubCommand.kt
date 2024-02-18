@@ -10,37 +10,22 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import net.kyori.adventure.audience.Audience
 import org.bukkit.command.CommandSender
-import org.incendo.cloud.annotations.Argument
-import org.incendo.cloud.annotations.Command
-import org.incendo.cloud.annotations.Commands
-import org.incendo.cloud.annotations.Default
-import org.incendo.cloud.annotations.Flag
-import org.incendo.cloud.annotations.Permission
-import org.incendo.cloud.annotations.suggestion.Suggestions
-import org.incendo.cloud.context.CommandContext
-import org.incendo.cloud.kotlin.coroutines.suspendingSuggestionProvider
-import org.incendo.cloud.suggestion.Suggestion
+import revxrsal.commands.annotation.*
+import revxrsal.commands.bukkit.annotation.CommandPermission
 import java.util.stream.Stream
 
-object InfoSubCommand {
+@Command("pp", "pluginportal", "ppm", "pportal")
+class InfoSubCommand {
 
-    @Command("pluginportal|pp|ppm info [pluginName]")
-    @Permission("pluginportal.command.info")
-    fun onInfoSubCommand(
+    @Subcommand("info")
+    @CommandPermission("pluginportal.command.info")
+    @AutoComplete("@marketplacePlugin")
+    fun infoSubCommand(
         sender: Audience,
-
-        @Argument(
-            value = "pluginName",
-            description = "The name of the plugin you want to install.",
-            suggestions = "marketplace-plugin",
-        ) pluginName: String?,
-
-        @Flag(value =  "isId") isId: Boolean = false
-//        @CommandManager.PPPlugin @Named("pluginName") @Optional pluginName: String? = null,
-//        @Flag @Optional @Default("false") isId: Boolean,
+        @CommandManager.PPPlugin @Named("pluginName") @Optional pluginName: String? = null,
+        @Flag @Optional @Default("false") isId: Boolean,
     ) {
-
-        if (pluginName.isNullOrBlank()) {
+        if (pluginName == null) {
 
             return sender.sendInfo(
                 """Usage: /pp info <plugin>
@@ -65,11 +50,4 @@ object InfoSubCommand {
             sender.sendMessage(InfoDisplay.DefaultDisplay().getDisplayInfo(plugin))
         }
     }
-
-    @Suggestions("marketplace-plugin")
-    suspend fun suggestPluginNames(
-        context: CommandContext<CommandSender>,
-        input: String
-    ): Sequence<Suggestion> = sequenceOf("ViaVersion", "ViaBackwards", "ViaRewind").map(Suggestion::simple)
-
 }

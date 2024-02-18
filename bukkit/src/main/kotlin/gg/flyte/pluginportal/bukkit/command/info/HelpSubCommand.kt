@@ -4,25 +4,14 @@ import gg.flyte.pluginportal.bukkit.manager.language.Message.solidLine
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import org.bukkit.command.CommandSender
-import org.incendo.cloud.annotation.specifier.Greedy
-import org.incendo.cloud.annotations.Argument
-import org.incendo.cloud.annotations.Command
-import org.incendo.cloud.minecraft.extras.MinecraftHelp
+import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.DefaultFor
 
-class HelpSubCommand(
-    private val help: MinecraftHelp<CommandSender>
-) {
+@Command("pp", "pluginportal", "ppm", "pportal")
+class HelpSubCommand {
 
-    @Command("pluginportal|pp|ppm help|h")
+    @DefaultFor("~", "~ help")
     fun onHelpCommand(
-        sender: CommandSender,
-//        @Greedy @Argument(value = "query", description = "The help query") query: String?,
-    ) {
-        help.queryCommands("", sender)
-    }
-
-    fun onHelpCommandLamp(
         sender: Audience
     ) {
         val messages = hashSetOf(
@@ -97,4 +86,3 @@ class HelpSubCommand(
         val usage: String
     )
 }
-
