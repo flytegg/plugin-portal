@@ -33,7 +33,7 @@ setupPPSubproject("client")
 setupPPSubproject("scanner")
 setupPPSubproject("backend")
 setupPPSubproject("common")
-setupPPSubproject("bukkit")
+setupPPSubproject("paper")
 
 setupSubproject("pluginportal") {
     projectDir = file("universal")
@@ -49,4 +49,3 @@ inline fun setupSubproject(name: String, block: ProjectDescriptor.() -> Unit) {
     include(name)
     project(":$name").apply(block)
 }
-

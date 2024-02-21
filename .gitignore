@@ -112,4 +112,4 @@ nb-configuration.xml
 .DS_Store
 .env
 
-/bukkit/run/*
+/paper/run/*

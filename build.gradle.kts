@@ -16,7 +16,7 @@ val main = setOf(
     projects.pluginportalScanner,
     projects.pluginportalBackend,
     projects.pluginportalCommon,
-    projects.pluginportalBukkit,
+    projects.pluginportalPaper,
 ).map { it.dependencyProject }
 
 // val special = setOf().map { it.dependencyProject }
