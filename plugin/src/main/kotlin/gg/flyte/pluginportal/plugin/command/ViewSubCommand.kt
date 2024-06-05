@@ -6,11 +6,10 @@ import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Subcommand
 
 @Command("pp", "pluginportal", "ppm")
-class PluginPortalCommand {
+class ViewSubCommand {
 
     @Subcommand("view")
-    fun viewSubCommand(sender: Audience) {
-        sender.sendMessage(text("Viewed plugin"))
+    fun viewCommand(audience: Audience) {
+        audience.sendMessage(text("Viewing plugin portal..."))
     }
-
 }

@@ -1,0 +1,12 @@
+url = "https://panel.flyte.gg"
+
+[server]
+id = "5218ae25"
+
+[deploy]
+file = "./plugin/build/libs/plugin-all.jar"
+
+[watch_plugin]
+file_name = "plugin-all.jar"
+directory = "./plugin/build/libs"
+post_deploy_command = "restart"
