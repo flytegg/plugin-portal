@@ -143,3 +143,6 @@ gradle-app.setting
 *.hprof
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij+all,kotlin,gradle
+
+# all run folders no matter the parent
+run/
