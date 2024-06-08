@@ -21,4 +21,19 @@ object SearchPlugins {
 
         return response
     }
+
+    fun getCachedSearch(query: String): List<Plugin>? {
+        searchCache.asMap().forEach { (key, value) ->
+            if (query.contains(key, ignoreCase = true)) {
+                return value
+            }
+        }
+
+        return null
+    }
+}
+
+fun main() {
+    val plugins = SearchPlugins.search("Via")
+    println(plugins)
 }

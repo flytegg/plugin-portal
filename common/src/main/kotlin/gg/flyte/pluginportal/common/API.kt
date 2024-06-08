@@ -9,7 +9,6 @@ import okhttp3.OkHttpClient
 object API {
 
     private val client = OkHttpClient()
-    val pluginsCache = mutableListOf<Plugin>()
 
     private fun get(url: String, params: HashMap<String, String>): String {
         val request = okhttp3.Request.Builder()

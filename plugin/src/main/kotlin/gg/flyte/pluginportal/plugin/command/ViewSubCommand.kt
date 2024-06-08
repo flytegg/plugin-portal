@@ -14,9 +14,28 @@ import revxrsal.commands.annotation.Subcommand
 class ViewSubCommand {
 
     @Subcommand("view")
-    @AutoComplete("@plugin")
+    @AutoComplete("@pluginSearch *")
     fun viewCommand(audience: Audience, prefix: String) {
         val plugins = API.getPlugins(prefix)
+
+        if (plugins.isEmpty()) return audience.sendMessage(text("No plugins found"))
+
+        if (plugins.size == 1) {
+            val plugin = plugins
+                .first()
+
+            val platform = plugin.platforms.entries
+                .first()
+                .value
+
+            audience.sendMessage(
+                MiniMessage.miniMessage().deserialize(
+                    "<gradient:blue:green>${plugin.name}</gradient> <gray>${platform.description}</gray>"
+                )
+            )
+        }
+
+
 
         plugins.forEach { plugin ->
             audience.sendMessage(
