@@ -7,5 +7,6 @@ plugins {
 }
 
 dependencies {
-    api(project(":list"))
+    implementation("com.google.code.gson:gson:2.11.0")
+    api("com.squareup.okhttp3:okhttp:4.12.0")
 }

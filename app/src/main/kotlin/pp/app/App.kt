@@ -3,7 +3,7 @@
  */
 package pp.app
 
-import pp.utilities.StringUtils
+import gg.flyte.pluginportal.common.StringUtils
 
 import org.apache.commons.text.WordUtils
 

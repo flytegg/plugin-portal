@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
     implementation("org.apache.commons:commons-text")
-    implementation(project(":utilities"))
+    implementation(project(":common"))
 
     compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
 
@@ -29,6 +29,9 @@ dependencies {
 
     implementation("com.github.Revxrsal.Lamp:common:3.2.1")
     implementation("com.github.Revxrsal.Lamp:bukkit:3.2.1")
+    implementation("com.github.Revxrsal.Lamp:brigadier:3.2.1")
+
+    implementation("com.google.guava:guava:33.2.1-jre")
 
     api("io.papermc:paperlib:1.0.7")
 }
