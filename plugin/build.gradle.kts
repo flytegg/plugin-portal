@@ -18,7 +18,6 @@ repositories {
 }
 
 dependencies {
-    implementation("org.apache.commons:commons-text")
     implementation(project(":common"))
 
     compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
