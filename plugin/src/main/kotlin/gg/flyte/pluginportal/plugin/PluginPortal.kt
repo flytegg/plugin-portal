@@ -12,10 +12,6 @@ class PluginPortal : JavaPlugin() {
 
     companion object {
         lateinit var instance: JavaPlugin
-
-        val GSON = GsonBuilder()
-            .setPrettyPrinting()
-            .create()
     }
 
     override fun onEnable() {
