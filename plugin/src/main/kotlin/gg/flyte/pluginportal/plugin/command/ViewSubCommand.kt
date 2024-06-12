@@ -39,17 +39,31 @@ class ViewSubCommand {
             return
         }
 
+        audience.sendMessage(
+            solidLine()
+                .append(
+                    text("Multiple plugins found, click one to view more information", NamedTextColor.GRAY)
+                        .decoration(TextDecoration.STRIKETHROUGH, false)
+                )
+                .appendNewline()
+        )
+
         plugins.forEach { plugin ->
             audience.sendMessage(
-                text(
-                    plugin.name + plugin.platforms.keys.joinToString(
-                        prefix = " (", postfix = ")", separator = ", "
+                text(" - ", NamedTextColor.GRAY)
+                    .append(
+                        text(plugin.name, NamedTextColor.AQUA)
+                            .append(text(" (", NamedTextColor.DARK_GRAY)
+                                .append(text(plugin.platforms.keys.joinToString(", "), NamedTextColor.DARK_GRAY))
+                                .append(text(")", NamedTextColor.DARK_GRAY))
+                            )
                     )
-                )
                     .hoverEvent(text("Click to view more information"))
                     .clickEvent(ClickEvent.suggestCommand("/pp view ${plugin.name}"))
             )
         }
+
+        audience.sendMessage(solidLine(prefix = "", suffix = ""))
     }
 }
 

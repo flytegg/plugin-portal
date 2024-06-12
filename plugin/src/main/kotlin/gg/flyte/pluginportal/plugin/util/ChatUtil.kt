@@ -5,7 +5,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 
 fun solidLine(prefix: String = "", suffix: String = "\n") = text(
-    "$prefix                                                            $suffix",
+    "$prefix                                                                 $suffix",
     NamedTextColor.DARK_GRAY,
     TextDecoration.STRIKETHROUGH
 )
