@@ -8,7 +8,20 @@ data class Plugin(
     val id: String,
     val name: String,
     val platforms: MutableMap<MarketplacePlatform, PlatformPlugin>,
-)
+) {
+    fun getFirstPlatform(): PlatformPlugin? = platforms.values
+            .firstOrNull()
+
+    fun getImageURL(): String? = getFirstPlatform()?.imageURL
+
+    fun getDescription(): String? = getFirstPlatform()?.description
+
+    fun getDownloads(): Int = platforms.values
+        .sumOf { platform -> platform.downloads }
+
+
+
+}
 
 data class PlatformPlugin(
     val id: String,

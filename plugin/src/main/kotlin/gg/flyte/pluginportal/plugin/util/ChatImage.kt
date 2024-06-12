@@ -1,5 +1,6 @@
 package gg.flyte.pluginportal.plugin.util
 
+import gg.flyte.pluginportal.common.types.Plugin
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import java.awt.Color
@@ -64,7 +65,6 @@ object ChatImage {
         fun build(): Component {
             var component = Component.empty()
             lines.forEachIndexed { index, line ->
-                println("$index $line")
                 component = component.append(line)
                 if (index != lines.size - 1) component = component.append(Component.newline())
             }

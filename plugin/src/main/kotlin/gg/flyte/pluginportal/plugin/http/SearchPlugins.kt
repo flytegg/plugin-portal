@@ -35,5 +35,4 @@ object SearchPlugins {
 
 fun main() {
     val plugins = SearchPlugins.search("Via")
-    println(plugins)
 }
