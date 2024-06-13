@@ -12,37 +12,106 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import revxrsal.commands.annotation.AutoComplete
 import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Flag
+import revxrsal.commands.annotation.Optional
 import revxrsal.commands.annotation.Subcommand
-import java.net.URL
 
 @Command("pp", "pluginportal", "ppm")
 class InstallSubCommand {
 
+    // /pp install <name?> --id <id> --platform <platform>
     @Subcommand("install")
     @AutoComplete("@marketplacePluginSearch *")
-    fun installCommand(audience: Audience, prefix: String) {
+    fun installCommand(
+        audience: Audience,
+        @Optional prefix: String? = null,
+        @Optional @Flag("platform") platformFlag: MarketplacePlatform? = null,
+        @Optional @Flag("platformId") platformIdFlag: String? = null,
+        @Optional @Flag("id") idFlag: String? = null,
+    ) {
         val plugins = API.getPlugins(prefix)
 
-        if (plugins.isEmpty()) return audience.sendMessage(text("No plugins found"))
+        if (plugins.isEmpty()) {
+            return audience.sendMessage(
+                solidLine()
+                    .append(
+                        text("No plugins could be found.", NamedTextColor.GRAY)
+                            .decoration(TextDecoration.STRIKETHROUGH, false)
+                    )
+                    .append(solidLine(prefix = "\n", suffix = ""))
+            )
+        }
 
         if (plugins.size == 1) {
             val plugin = plugins.first()
+            val platforms = plugin.platforms
 
             audience.sendMessage(
                 solidLine()
-
                     .append(
                         text("Starting installation of ", NamedTextColor.GRAY)
                             .append(text(plugin.name, NamedTextColor.AQUA))
                             .append(text("...", NamedTextColor.GRAY))
                             .decoration(TextDecoration.STRIKETHROUGH, false)
                     )
-                    .append(solidLine(prefix = "\n", suffix = ""))
             )
 
-            plugin.download(plugin.platforms.keys.first())
+            if (platforms.size == 1 || platformFlag != null || platformIdFlag != null) {
+                val entry = platforms.entries
+                    .first()
 
-            audience.sendMessage(text("Downloaded file"))
+                val platform = platformFlag ?: entry.key
+                val platformPlugin = platforms[platformFlag] ?: entry.value
+
+                if (platformPlugin.download?.url == null) {
+                    return audience.sendMessage(
+                        text("No download URL found for platform ", NamedTextColor.RED)
+                            .append(text(platform.name, NamedTextColor.AQUA))
+                            .append(solidLine(prefix = "\n", suffix = ""))
+                    )
+                }
+
+                audience.sendMessage(
+
+                    text("\nFound download URL, starting installation from: ", NamedTextColor.GRAY)
+                        .append(text(platform.name, NamedTextColor.AQUA))
+                        .append(text("...", NamedTextColor.GRAY))
+
+                )
+
+                plugin.download(platforms.keys.first())
+
+                audience.sendMessage(
+                    text("\nSUCCESS:", NamedTextColor.GREEN)
+                        .append(
+                            text(" Downloaded plugin from ", NamedTextColor.GRAY)
+                                .append(text(platform.name, NamedTextColor.AQUA))
+                                .append(solidLine(prefix = "\n", suffix = ""))
+                        )
+                )
+            } else {
+                audience.sendMessage(
+                    text("\nERROR:", NamedTextColor.RED)
+                        .append(
+                            text(" Multiple platforms found, click one to prompt install command", NamedTextColor.GRAY)
+                                .decoration(TextDecoration.STRIKETHROUGH, false)
+                                .appendNewline()
+                        )
+                )
+
+                platforms.forEach { (platform, _) ->
+                    audience.sendMessage(
+                        text(" - ", NamedTextColor.GRAY)
+                            .append(
+                                text(platform.name, NamedTextColor.AQUA)
+                            )
+                            .hoverEvent(text("Click to install"))
+                            .clickEvent(ClickEvent.suggestCommand("/pp install ${plugin.name} --platform ${platform.name}"))
+                    )
+                }
+
+                audience.sendMessage(solidLine(prefix = "", suffix = ""))
+            }
 
             return
         }
@@ -57,18 +126,33 @@ class InstallSubCommand {
         )
 
         plugins.forEach { plugin ->
+            var platformsSuffix = text(" (", NamedTextColor.DARK_GRAY)
+
+            val platformSize = plugin.platforms.size
+
+            plugin.platforms.keys.forEachIndexed { index, platform ->
+                println("appending $platform")
+
+                platformsSuffix = platformsSuffix.append(
+                    text(
+                        "${platform.name}${if (index < platformSize - 1) ", " else ""}",
+                        NamedTextColor.DARK_GRAY
+                    )
+                        .hoverEvent(text("Click to install from ${platform.name}"))
+                        .clickEvent(ClickEvent.suggestCommand("/pp install ${plugin.name} --platform ${platform.name}"))
+                )
+            }
+
+            platformsSuffix = platformsSuffix.append(text(")", NamedTextColor.DARK_GRAY))
+
             audience.sendMessage(
                 text(" - ", NamedTextColor.GRAY)
                     .append(
                         text(plugin.name, NamedTextColor.AQUA)
-                            .append(
-                                text(" (", NamedTextColor.DARK_GRAY)
-                                    .append(text(plugin.platforms.keys.joinToString(", "), NamedTextColor.DARK_GRAY))
-                                    .append(text(")", NamedTextColor.DARK_GRAY))
-                            )
+                            .hoverEvent(text("Click to install"))
+                            .clickEvent(ClickEvent.suggestCommand("/pp install ${plugin.name}"))
+                            .append(platformsSuffix)
                     )
-                    .hoverEvent(text("Click to install"))
-                    .clickEvent(ClickEvent.suggestCommand("/pp install ${plugin.name}"))
             )
         }
 

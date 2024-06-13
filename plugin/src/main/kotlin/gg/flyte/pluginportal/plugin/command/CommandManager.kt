@@ -12,6 +12,8 @@ object CommandManager {
 
     init {
         BukkitCommandHandler.create(instance).apply {
+            flagPrefix = "--"
+
             enableAdventure(BukkitAudiences.create(instance))
             registerAutoComplete()
             registerCommands()
