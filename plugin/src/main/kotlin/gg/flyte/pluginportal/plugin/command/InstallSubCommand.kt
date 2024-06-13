@@ -26,9 +26,23 @@ class InstallSubCommand {
         audience: Audience,
         @Optional prefix: String? = null,
         @Optional @Flag("platform") platformFlag: MarketplacePlatform? = null,
-        @Optional @Flag("platformId") platformIdFlag: String? = null,
         @Optional @Flag("id") idFlag: String? = null,
     ) {
+        if (prefix == null) {
+            if (idFlag == null) {
+                return audience.sendMessage(
+                    solidLine()
+                        .append(
+                            text("Provide a plugin name or ID to install", NamedTextColor.GRAY)
+                                .decoration(TextDecoration.STRIKETHROUGH, false)
+                        )
+                        .append(solidLine(prefix = "\n", suffix = ""))
+                )
+            } else {
+                audience.sendMessage(text("Command not implemented yet", NamedTextColor.RED))
+            }
+        }
+
         val plugins = API.getPlugins(prefix)
 
         if (plugins.isEmpty()) {
@@ -56,7 +70,7 @@ class InstallSubCommand {
                     )
             )
 
-            if (platforms.size == 1 || platformFlag != null || platformIdFlag != null) {
+            if (platforms.size == 1 || platformFlag != null) {
                 val entry = platforms.entries
                     .first()
 
