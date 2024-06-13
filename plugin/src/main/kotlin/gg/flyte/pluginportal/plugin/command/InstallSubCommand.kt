@@ -19,7 +19,6 @@ import revxrsal.commands.annotation.Subcommand
 @Command("pp", "pluginportal", "ppm")
 class InstallSubCommand {
 
-    // /pp install <name?> --id <id> --platform <platform>
     @Subcommand("install")
     @AutoComplete("@marketplacePluginSearch *")
     fun installCommand(
@@ -31,12 +30,8 @@ class InstallSubCommand {
         if (prefix == null) {
             if (idFlag == null) {
                 return audience.sendMessage(
-                    solidLine()
-                        .append(
-                            text("Provide a plugin name or ID to install", NamedTextColor.GRAY)
-                                .decoration(TextDecoration.STRIKETHROUGH, false)
-                        )
-                        .append(solidLine(prefix = "\n", suffix = ""))
+                    status(Status.FAILURE, "No plugin name or ID provided")
+                        .boxed()
                 )
             } else {
                 audience.sendMessage(text("Command not implemented yet", NamedTextColor.RED))
@@ -47,12 +42,8 @@ class InstallSubCommand {
 
         if (plugins.isEmpty()) {
             return audience.sendMessage(
-                solidLine()
-                    .append(
-                        text("No plugins could be found.", NamedTextColor.GRAY)
-                            .decoration(TextDecoration.STRIKETHROUGH, false)
-                    )
-                    .append(solidLine(prefix = "\n", suffix = ""))
+                status(Status.FAILURE, "No plugins found")
+                    .boxed()
             )
         }
 
@@ -61,13 +52,10 @@ class InstallSubCommand {
             val platforms = plugin.platforms
 
             audience.sendMessage(
-                solidLine()
-                    .append(
-                        text("Starting installation of ", NamedTextColor.GRAY)
-                            .append(text(plugin.name, NamedTextColor.AQUA))
-                            .append(text("...", NamedTextColor.GRAY))
-                            .decoration(TextDecoration.STRIKETHROUGH, false)
-                    )
+                startLine()
+                    .appendSecondary("Starting installation of ")
+                    .appendPrimary(plugin.name)
+                    .appendSecondary("...")
             )
 
             if (platforms.size == 1 || platformFlag != null) {
