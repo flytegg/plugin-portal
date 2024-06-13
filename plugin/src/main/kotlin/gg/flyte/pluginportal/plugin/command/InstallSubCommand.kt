@@ -1,10 +1,9 @@
 package gg.flyte.pluginportal.plugin.command
 
+import gg.flyte.db.MarketplacePlatform
 import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.types.Plugin
-import gg.flyte.pluginportal.plugin.util.ChatImage
-import gg.flyte.pluginportal.plugin.util.solidLine
-import gg.flyte.pluginportal.plugin.util.translate
+import gg.flyte.pluginportal.plugin.util.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
@@ -14,6 +13,7 @@ import net.kyori.adventure.text.format.TextDecoration
 import revxrsal.commands.annotation.AutoComplete
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Subcommand
+import java.net.URL
 
 @Command("pp", "pluginportal", "ppm")
 class InstallSubCommand {
@@ -37,9 +37,12 @@ class InstallSubCommand {
                             .append(text("...", NamedTextColor.GRAY))
                             .decoration(TextDecoration.STRIKETHROUGH, false)
                     )
-
                     .append(solidLine(prefix = "\n", suffix = ""))
             )
+
+            plugin.download(plugin.platforms.keys.first())
+
+            audience.sendMessage(text("Downloaded file"))
 
             return
         }

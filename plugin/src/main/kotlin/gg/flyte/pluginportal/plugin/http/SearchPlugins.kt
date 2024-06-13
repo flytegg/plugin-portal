@@ -3,6 +3,7 @@ package gg.flyte.pluginportal.plugin.http
 import com.google.common.cache.CacheBuilder
 import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.types.Plugin
+import net.kyori.adventure.text.minimessage.MiniMessage
 import java.util.concurrent.TimeUnit
 
 object SearchPlugins {
@@ -31,8 +32,4 @@ object SearchPlugins {
 
         return null
     }
-}
-
-fun main() {
-    val plugins = SearchPlugins.search("Via")
 }
