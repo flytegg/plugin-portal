@@ -1,6 +1,5 @@
 package gg.flyte.pluginportal.common
 
-import com.google.gson.Gson
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.common.util.GSON
 import gg.flyte.pluginportal.common.util.Http.BASE_URL

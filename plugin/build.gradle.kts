@@ -37,7 +37,7 @@ dependencies {
 
 tasks {
     runServer {
-        minecraftVersion("1.20.6")
+        minecraftVersion("1.20.4")
         runDirectory(file("run/latest"))
         javaLauncher.set(
             project.javaToolchains.launcherFor {
@@ -45,6 +45,12 @@ tasks {
             }
         )
     }
+
+    shadowJar {
+        minimize()
+        exclude("com/google/common/")
+    }
+
 
     mapOf(
         8 to setOf("1.8.8"),
