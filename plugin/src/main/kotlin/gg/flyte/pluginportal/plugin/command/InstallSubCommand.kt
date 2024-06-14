@@ -2,19 +2,13 @@ package gg.flyte.pluginportal.plugin.command
 
 import gg.flyte.db.MarketplacePlatform
 import gg.flyte.pluginportal.common.API
-import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.plugin.util.*
 import net.kyori.adventure.audience.Audience
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
-import revxrsal.commands.annotation.AutoComplete
-import revxrsal.commands.annotation.Command
-import revxrsal.commands.annotation.Flag
-import revxrsal.commands.annotation.Optional
-import revxrsal.commands.annotation.Subcommand
+import revxrsal.commands.annotation.*
 
 @Command("pp", "pluginportal", "ppm")
 class InstallSubCommand {
@@ -38,13 +32,9 @@ class InstallSubCommand {
             }
         }
 
-        val plugins = API.getPlugins(prefix)
 
-        if (plugins.isEmpty()) {
-            return audience.sendMessage(
-                status(Status.FAILURE, "No plugins found")
-                    .boxed()
-            )
+        val plugins = API.getPlugins(prefix).ifEmpty {
+            return audience.sendMessage(status(Status.FAILURE, "No plugins found").boxed())
         }
 
         if (plugins.size == 1) {
@@ -59,8 +49,7 @@ class InstallSubCommand {
             )
 
             if (platforms.size == 1 || platformFlag != null) {
-                val entry = platforms.entries
-                    .first()
+                val entry = platforms.entries.first()
 
                 val platform = platformFlag ?: entry.key
                 val platformPlugin = platforms[platformFlag] ?: entry.value

@@ -3,10 +3,10 @@ package gg.flyte.pluginportal.plugin.http
 import com.google.common.cache.CacheBuilder
 import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.types.Plugin
-import net.kyori.adventure.text.minimessage.MiniMessage
 import java.util.concurrent.TimeUnit
 
 object SearchPlugins {
+    // TODO: Trie-like data structure?
     private val searchCache = CacheBuilder.newBuilder()
         .expireAfterWrite(1, TimeUnit.HOURS)
         .build<String, List<Plugin>>()
