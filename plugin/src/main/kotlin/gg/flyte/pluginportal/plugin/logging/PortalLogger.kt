@@ -5,10 +5,7 @@ import gg.flyte.pluginportal.plugin.appendLine
 import gg.flyte.pluginportal.plugin.createIfNotExists
 import gg.flyte.pluginportal.plugin.util.async
 import net.kyori.adventure.audience.Audience
-import net.kyori.adventure.audience.Audiences
 import net.kyori.adventure.identity.Identity
-import net.kyori.adventure.pointer.Pointer
-import net.kyori.adventure.text.Component
 import org.bukkit.command.CommandSender
 import java.io.File
 
@@ -31,7 +28,7 @@ object PortalLogger {
 
     enum class Action() {
         // Actions are queried linearly thus AUTO_UPDATE must precede UPDATE and etc.
-        INSTALL, DELETE, AUTO_UPDATE, UPDATE;
+        INITIATE_INSTALL, FAILED_INSTALL, INSTALLED, DELETE, AUTO_UPDATE, UPDATE;
 
         val pastTense = toString() + if (toString().endsWith("E")) "D" else "ED"
     }

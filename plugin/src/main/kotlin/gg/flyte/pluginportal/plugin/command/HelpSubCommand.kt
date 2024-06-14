@@ -7,6 +7,7 @@ import gg.flyte.pluginportal.plugin.util.colorPrimary
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.DefaultFor
 import revxrsal.commands.annotation.Subcommand
@@ -15,18 +16,17 @@ import revxrsal.commands.annotation.Subcommand
 class HelpSubCommand {
 
     val helpEntries = listOf(
-        HelpEntry("help", "Displays this help message"),
-        HelpEntry("view", "Search and view fora plugin"),
-        HelpEntry("install", "Install a plugin"),
-        HelpEntry("list", "List installed plugins"),
-        HelpEntry("uninstall", "Uninstall a plugin"),
+        HelpEntry("/pp help", "Displays this help message"),
+        HelpEntry("/pp view <plugin>", "Search and view fora plugin"),
+        HelpEntry("/pp install <plugin>", "Install a plugin"),
+        HelpEntry("/pp list", "List installed plugins"), // Not implemented yet, will be next
+//        HelpEntry("/pp uninstall", "Uninstall a plugin"), // Not implemented yet
     )
 
     @Subcommand("help")
     fun helpCommand(audience: Audience) {
-        var message = text("Plugin Portal Help")
-            .colorPrimary()
-            .bold()
+        var message = text("Plugin Portal Help", NamedTextColor.AQUA)
+            .append(text("\n")) // Look into appendNewLine, didn't work for me in past
 
         helpEntries.forEach { message = message.append(text("\n").append(it.toComponent())) }
 
@@ -42,7 +42,6 @@ class HelpSubCommand {
     data class HelpEntry(val command: String, val description: String) {
         fun toComponent() = text(command)
             .colorPrimary()
-            .bold()
             .append(text(" - ", NamedTextColor.DARK_GRAY))
             .appendSecondary(description)
     }
