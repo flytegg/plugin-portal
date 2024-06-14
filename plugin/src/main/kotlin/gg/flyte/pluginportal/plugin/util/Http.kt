@@ -1,6 +1,6 @@
 package gg.flyte.pluginportal.plugin.util
 
-import gg.flyte.db.MarketplacePlatform
+import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.types.Plugin
 import java.io.File
 import java.net.URL

@@ -1,6 +1,6 @@
 package gg.flyte.pluginportal.plugin.command
 
-import gg.flyte.db.MarketplacePlatform
+import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.plugin.util.*
 import net.kyori.adventure.audience.Audience

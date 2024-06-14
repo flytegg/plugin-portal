@@ -11,9 +11,7 @@ object API {
 
     private fun get(url: String, params: HashMap<String, String>): String {
         val request = okhttp3.Request.Builder()
-            .url(
-                "$BASE_URL$url?" + params.map { "${it.key}=${it.value}" }.joinToString("&")
-            )
+            .url("$BASE_URL$url?" + params.map { "${it.key}=${it.value}" }.joinToString("&"))
             .build()
         val response = client.newCall(request).execute()
         return response.body?.string() ?: ""
@@ -30,8 +28,7 @@ object API {
                 "/plugins",
                 params
             ), Array<Plugin>::class.java
-        )
-            .toList()
+        ).toList()
     }
 
 }

@@ -1,7 +1,6 @@
 package gg.flyte.pluginportal.common.types
 
 import com.google.gson.annotations.SerializedName
-import gg.flyte.db.MarketplacePlatform
 
 data class Plugin(
     @SerializedName("_id")
@@ -9,15 +8,13 @@ data class Plugin(
     val name: String,
     val platforms: MutableMap<MarketplacePlatform, PlatformPlugin>,
 ) {
-    fun getFirstPlatform(): PlatformPlugin? = platforms.values
-            .firstOrNull()
+    fun getFirstPlatform(): PlatformPlugin? = platforms.values.firstOrNull()
 
     fun getImageURL(): String? = getFirstPlatform()?.imageURL
 
     fun getDescription(): String? = getFirstPlatform()?.description
 
-    fun getDownloads(): Int = platforms.values
-        .sumOf { platform -> platform.downloads }
+    fun getDownloads(): Int = platforms.values.sumOf { platform -> platform.downloads }
 
 }
 
