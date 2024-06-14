@@ -4,6 +4,7 @@ import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.plugin.format
 import gg.flyte.pluginportal.plugin.util.ChatImage
+import gg.flyte.pluginportal.plugin.util.boxed
 import gg.flyte.pluginportal.plugin.util.solidLine
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
@@ -26,15 +27,7 @@ class ViewSubCommand {
         if (plugins.isEmpty()) return audience.sendMessage(text("No plugins found"))
 
         if (plugins.size == 1) {
-            audience.sendMessage(
-                solidLine()
-                    .append(
-                        plugins.first()
-                            .getImageComponent()
-                            .decoration(TextDecoration.STRIKETHROUGH, false)
-                    )
-                    .append(solidLine(prefix = "\n", suffix = ""))
-            )
+            audience.sendMessage(plugins.first().getImageComponent().boxed())
 
             return
         }
@@ -53,9 +46,10 @@ class ViewSubCommand {
                 text(" - ", NamedTextColor.GRAY)
                     .append(
                         text(plugin.name, NamedTextColor.AQUA)
-                            .append(text(" (", NamedTextColor.DARK_GRAY)
-                                .append(text(plugin.platforms.keys.joinToString(", "), NamedTextColor.DARK_GRAY))
-                                .append(text(")", NamedTextColor.DARK_GRAY))
+                            .append(
+                                text(" (", NamedTextColor.DARK_GRAY)
+                                    .append(text(plugin.platforms.keys.joinToString(", "), NamedTextColor.DARK_GRAY))
+                                    .append(text(")", NamedTextColor.DARK_GRAY))
                             )
                     )
                     .hoverEvent(text("Click to view more information"))

@@ -75,9 +75,9 @@ class InstallSubCommand {
                 val targetMessage = "${plugin.name} from $targetPlatform with ID ${plugin.id}"
 
 
-                PortalLogger.log(audience, PortalLogger.Action.INITIATE_INSTALL, targetMessage) // Put before download in-case of error
+                PortalLogger.log(audience, PortalLogger.Action.INITIATED_INSTALL, targetMessage) // Put before download in-case of error
                 plugin.download(targetPlatform)
-                PortalLogger.log(audience, PortalLogger.Action.INSTALLED, targetMessage) // Thoughts on this? Some cases may fail. Figured its best to show
+                PortalLogger.log(audience, PortalLogger.Action.INSTALL, targetMessage) // Thoughts on this? Some cases may fail. Figured its best to show
 
                 audience.sendMessage(
                     text("\nSUCCESS:", NamedTextColor.GREEN)

@@ -28,7 +28,7 @@ object PortalLogger {
 
     enum class Action() {
         // Actions are queried linearly thus AUTO_UPDATE must precede UPDATE and etc.
-        INITIATE_INSTALL, FAILED_INSTALL, INSTALLED, DELETE, AUTO_UPDATE, UPDATE;
+        INITIATED_INSTALL, FAILED_INSTALL, INSTALL, DELETE, AUTO_UPDATE, UPDATE;
 
         val pastTense = toString() + if (toString().endsWith("E")) "D" else "ED"
     }
