@@ -2,9 +2,9 @@ package gg.flyte.pluginportal.plugin.command
 
 import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.types.Plugin
+import gg.flyte.pluginportal.plugin.format
 import gg.flyte.pluginportal.plugin.util.ChatImage
 import gg.flyte.pluginportal.plugin.util.solidLine
-import gg.flyte.pluginportal.plugin.util.translate
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
@@ -76,7 +76,7 @@ fun Plugin.getImageComponent(): Component {
         .apply {
             description.forEachIndexed { index, line -> setLine(index + 2, text(line, NamedTextColor.GRAY)) }
         }
-        .setLine(description.size + 3, text("Downloads: ${getDownloads()}", NamedTextColor.GRAY))
+        .setLine(description.size + 3, text("Downloads: ${getDownloads().format()}", NamedTextColor.GRAY))
         .setLine(description.size + 4, text("Platforms: ${platforms.keys.joinToString()}", NamedTextColor.GRAY))
         .build()
 
