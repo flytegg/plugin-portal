@@ -76,7 +76,7 @@ class InstallSubCommand {
 
                 )
 
-                PortalLogger.log(sender, PortalLogger.Action.INSTALL, plugin.name) // Put before download in-case of error
+                PortalLogger.log(audience, PortalLogger.Action.INSTALL, plugin.name) // Put before download in-case of error
                 plugin.download(platforms.keys.first())
 
                 audience.sendMessage(
