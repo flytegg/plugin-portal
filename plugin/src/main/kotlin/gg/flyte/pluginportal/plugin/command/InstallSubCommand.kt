@@ -2,7 +2,6 @@ package gg.flyte.pluginportal.plugin.command
 
 import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.types.MarketplacePlatform
-import gg.flyte.pluginportal.plugin.asAudience
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.util.*
 import net.kyori.adventure.audience.Audience
@@ -10,7 +9,6 @@ import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
-import org.bukkit.command.CommandSender
 import revxrsal.commands.annotation.*
 
 @Command("pp", "pluginportal", "ppm")
@@ -24,9 +22,6 @@ class InstallSubCommand {
         @Optional @Flag("platform") platformFlag: MarketplacePlatform? = null,
         @Optional @Flag("id") idFlag: String? = null,
     ) {
-        // Feel free to uncomment this and revert the code if you have a reason for it
-        // val audience = sender.asAudience()
-
         if (prefix == null) {
             if (idFlag == null) {
                 return audience.sendMessage(

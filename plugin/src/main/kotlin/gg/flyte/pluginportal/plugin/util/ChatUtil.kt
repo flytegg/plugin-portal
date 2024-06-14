@@ -34,11 +34,13 @@ fun status(status: Status, text: String): Component =
     )
 
 fun TextComponent.appendStatus(status: Status, text: String) = append(status(status, text))
-fun TextComponent.appendPrimary(text: String) = append(text(text).colorPrimary())
-fun TextComponent.appendSecondary(text: String) = append(text(text).colorSecondary())
+fun TextComponent.appendPrimary(text: String) = append(text(text).colorPrimary().removeStrikethrough())
+fun TextComponent.appendSecondary(text: String) = append(text(text).colorSecondary().removeStrikethrough())
 
 fun TextComponent.colorPrimary() = color(AQUA)
 fun TextComponent.colorSecondary() = color(GRAY)
+
+fun TextComponent.removeStrikethrough() = decoration(TextDecoration.STRIKETHROUGH, false)
 
 fun TextComponent.bold() = decoration(TextDecoration.BOLD, true)
 
