@@ -1,12 +1,20 @@
 package gg.flyte.pluginportal.plugin.util
 
+import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.types.Plugin
+import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import java.io.File
 import java.net.URL
 
 fun Plugin.download(marketplacePlatform: MarketplacePlatform) {
     download(URL(platforms[marketplacePlatform]!!.download?.url), "[PP] $name ($marketplacePlatform).jar")
+
+    LocalPluginCache.add(LocalPlugin(
+        name = marketplacePlatform.name
+    ))
+
+    LocalPluginCache.save()
 }
 
 fun download(url: URL, name: String) {

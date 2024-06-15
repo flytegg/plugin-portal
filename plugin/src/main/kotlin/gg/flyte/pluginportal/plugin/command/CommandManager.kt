@@ -24,7 +24,8 @@ object CommandManager {
         register(
             InstallSubCommand(),
             HelpSubCommand(),
-            ViewSubCommand()
+            ViewSubCommand(),
+            ListSubCommand(),
         )
     }
 
