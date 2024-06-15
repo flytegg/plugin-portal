@@ -83,8 +83,8 @@ class InstallSubCommand {
                     text("\nSUCCESS:", NamedTextColor.GREEN)
                         .append(
                             text(" Downloaded plugin from ", NamedTextColor.GRAY)
-                                .append(text(platform.name, NamedTextColor.AQUA))
-                                .append(solidLine(prefix = "\n", suffix = ""))
+                                .appendPrimary(plugin.name)
+                                .append(endLine())
                         )
                 )
             } else {

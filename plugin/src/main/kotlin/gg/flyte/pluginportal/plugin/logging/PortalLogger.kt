@@ -1,8 +1,8 @@
 package gg.flyte.pluginportal.plugin.logging
 
 import gg.flyte.pluginportal.plugin.PluginPortal
-import gg.flyte.pluginportal.plugin.appendLine
-import gg.flyte.pluginportal.plugin.createIfNotExists
+import gg.flyte.pluginportal.plugin.util.appendLine
+import gg.flyte.pluginportal.plugin.util.createIfNotExists
 import gg.flyte.pluginportal.plugin.util.async
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.identity.Identity

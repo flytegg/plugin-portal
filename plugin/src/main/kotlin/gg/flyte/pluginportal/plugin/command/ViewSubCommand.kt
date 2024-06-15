@@ -2,7 +2,7 @@ package gg.flyte.pluginportal.plugin.command
 
 import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.types.Plugin
-import gg.flyte.pluginportal.plugin.format
+import gg.flyte.pluginportal.plugin.util.format
 import gg.flyte.pluginportal.plugin.util.ChatImage
 import gg.flyte.pluginportal.plugin.util.boxed
 import gg.flyte.pluginportal.plugin.util.solidLine

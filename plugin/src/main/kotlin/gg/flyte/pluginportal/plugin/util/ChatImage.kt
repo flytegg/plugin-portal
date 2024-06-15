@@ -60,7 +60,7 @@ object ChatImage {
         }
 
         fun getFullLine(index: Int) = lines[index]
-        fun getSkullLine(index: Int) = originalLines[index]
+        fun getImageLine(index: Int) = originalLines[index]
 
         fun build(): Component {
             var component = Component.empty()
