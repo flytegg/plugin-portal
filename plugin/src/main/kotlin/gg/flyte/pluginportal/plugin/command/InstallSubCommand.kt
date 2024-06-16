@@ -64,11 +64,9 @@ class InstallSubCommand {
                 }
 
                 audience.sendMessage(
-
-                    text("\nFound download URL, starting installation from: ", NamedTextColor.GRAY)
-                        .append(text(platform.name, NamedTextColor.AQUA))
-                        .append(text("...", NamedTextColor.GRAY))
-
+                    textSecondary("\nFound download URL, starting installation from: ")
+                        .appendPrimary(platform.name)
+                        .appendSecondary("...")
                 )
 
                 val targetPlatform = platforms.keys.first()
@@ -97,22 +95,16 @@ class InstallSubCommand {
                 )
             } else {
                 audience.sendMessage(
-                    text("\nERROR:", NamedTextColor.RED)
-                        .append(
-                            text(" Multiple platforms found, click one to prompt install command", NamedTextColor.GRAY)
-                                .decoration(TextDecoration.STRIKETHROUGH, false)
-                                .appendNewline()
-                        )
+                    status(Status.FAILURE, "Multiple platforms found, click one to prompt install command")
+                        .appendNewline()
                 )
 
                 platforms.forEach { (platform, _) ->
                     audience.sendMessage(
-                        text(" - ", NamedTextColor.GRAY)
-                            .append(
-                                text(platform.name, NamedTextColor.AQUA)
-                            )
+                        textSecondary(" - ")
+                            .appendPrimary(plugin.name)
                             .hoverEvent(text("Click to install"))
-                            .clickEvent(ClickEvent.suggestCommand("/pp install ${plugin.name} --platform ${platform.name}"))
+                            .suggestCommand("/pp install ${plugin.name} --platform ${platform.name}")
                     )
                 }
 
@@ -122,38 +114,35 @@ class InstallSubCommand {
             return
         }
 
+
         audience.sendMessage(
-            solidLine()
-                .append(
-                    text("Multiple plugins found, click one to prompt install command", NamedTextColor.GRAY)
-                        .decoration(TextDecoration.STRIKETHROUGH, false)
-                )
+            startLine()
+                .appendSecondary("Multiple plugins found, click one to prompt install command")
                 .appendNewline()
         )
 
         plugins.forEach { plugin ->
-            var platformsSuffix = text(" (", NamedTextColor.DARK_GRAY)
+            var platformsSuffix = textDark(" (")
 
             val platformSize = plugin.platforms.size
+
 
             plugin.platforms.keys.forEachIndexed { index, platform ->
                 platformsSuffix =
                     platformsSuffix.appendDark("${platform.name}${if (index < platformSize - 1) ", " else ""}")
                         .hoverEvent(text("Click to install from ${platform.name}"))
-                        .clickEvent(ClickEvent.suggestCommand("/pp install ${plugin.name} --platform ${platform.name}"))
+                        .suggestCommand("/pp install ${plugin.name} --platform ${platform.name}")
 
             }
 
-            platformsSuffix = platformsSuffix.append(text(")", NamedTextColor.DARK_GRAY))
+            platformsSuffix = platformsSuffix.appendDark(")")
 
             audience.sendMessage(
-                text(" - ", NamedTextColor.GRAY)
-                    .append(
-                        text(plugin.name, NamedTextColor.AQUA)
-                            .hoverEvent(text("Click to install"))
-                            .clickEvent(ClickEvent.suggestCommand("/pp install ${plugin.name}"))
-                            .append(platformsSuffix)
-                    )
+                textSecondary(" - ")
+                    .appendPrimary(plugin.name)
+                    .hoverEvent(text("Click to install"))
+                    .suggestCommand("/pp install ${plugin.name}")
+                    .append(platformsSuffix)
             )
         }
 

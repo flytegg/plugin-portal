@@ -9,7 +9,6 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextDecoration
 import revxrsal.commands.annotation.*
 
 @Command("pp", "pluginportal", "ppm")
@@ -26,8 +25,7 @@ class ViewSubCommand {
         if (prefix == null) {
             if (idFlag == null) {
                 return audience.sendMessage(
-                    status(Status.FAILURE, "No plugin name or ID provided")
-                        .boxed()
+                    status(Status.FAILURE, "No plugin name or ID provided").boxed()
                 )
             } else {
                 audience.sendMessage(text("Command not implemented yet", NamedTextColor.RED))
@@ -40,47 +38,40 @@ class ViewSubCommand {
 
         if (plugins.size == 1) return audience.sendMessage(plugins.first().getImageComponent().boxed())
 
-
         audience.sendMessage(
-            solidLine()
-                .append(
-                    text("Multiple plugins found, click one to view more information", NamedTextColor.GRAY)
-                        .decoration(TextDecoration.STRIKETHROUGH, false)
-                )
+            startLine()
+                .appendSecondary("Multiple plugins found, click one to view more information")
                 .appendNewline()
         )
 
         plugins.forEach { plugin ->
             audience.sendMessage(
-                text(" - ", NamedTextColor.GRAY)
+                textSecondary(" - ")
+                    .appendPrimary(plugin.name)
                     .append(
-                        text(plugin.name, NamedTextColor.AQUA)
-                            .append(
-                                text(" (", NamedTextColor.DARK_GRAY)
-                                    .append(text(plugin.platforms.keys.joinToString(", "), NamedTextColor.DARK_GRAY))
-                                    .append(text(")", NamedTextColor.DARK_GRAY))
-                            )
+                        textSecondary(" (")
+                            .appendDark(plugin.platforms.keys.joinToString(", "))
+                            .appendDark(")")
                     )
                     .hoverEvent(text("Click to view more information"))
-                    .clickEvent(ClickEvent.suggestCommand("/pp view ${plugin.name}"))
+                    .suggestCommand("/pp view ${plugin.name}")
             )
         }
 
-        audience.sendMessage(solidLine(prefix = "", suffix = ""))
+        audience.sendMessage(endLine())
     }
 }
 
 fun Plugin.getImageComponent(): Component {
-    val description: List<String> =
-        splitDescriptionIntoLines(getDescription() ?: "", 35)
+    val description: List<String> = splitDescriptionIntoLines(getDescription() ?: "", 35)
 
     val image = ChatImage.ImageTextBuilder(getImageURL() ?: "")
-        .setLine(0, text(name, NamedTextColor.AQUA, TextDecoration.BOLD))
+        .setLine(0, textPrimary(name).bold())
         .apply {
-            description.forEachIndexed { index, line -> setLine(index + 2, text(line, NamedTextColor.GRAY)) }
+            description.forEachIndexed { index, line -> setLine(index + 2, textSecondary(line)) }
         }
-        .setLine(description.size + 3, text("Downloads: ${getDownloads().format()}", NamedTextColor.GRAY))
-        .setLine(description.size + 4, text("Platforms: ${platforms.keys.joinToString()}", NamedTextColor.GRAY))
+        .setLine(description.size + 3, textSecondary("Downloads: ${getDownloads().format()}"))
+        .setLine(description.size + 4, textSecondary("Platforms: ${platforms.keys.joinToString()}"))
         .build()
 
     return image
