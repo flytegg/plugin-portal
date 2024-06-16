@@ -1,36 +1,45 @@
 package gg.flyte.pluginportal.plugin.command
 
 import gg.flyte.pluginportal.common.API
+import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.types.Plugin
-import gg.flyte.pluginportal.plugin.util.format
-import gg.flyte.pluginportal.plugin.util.ChatImage
-import gg.flyte.pluginportal.plugin.util.boxed
-import gg.flyte.pluginportal.plugin.util.solidLine
+import gg.flyte.pluginportal.plugin.util.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
-import revxrsal.commands.annotation.AutoComplete
-import revxrsal.commands.annotation.Command
-import revxrsal.commands.annotation.Subcommand
+import revxrsal.commands.annotation.*
 
 @Command("pp", "pluginportal", "ppm")
 class ViewSubCommand {
 
     @Subcommand("view")
     @AutoComplete("@marketplacePluginSearch *")
-    fun viewCommand(audience: Audience, prefix: String) {
-        val plugins = API.getPlugins(prefix)
-
-        if (plugins.isEmpty()) return audience.sendMessage(text("No plugins found"))
-
-        if (plugins.size == 1) {
-            audience.sendMessage(plugins.first().getImageComponent().boxed())
-
-            return
+    fun viewCommand(
+        audience: Audience,
+        @Optional prefix: String? = null,
+        @Optional @Flag("platform") platformFlag: MarketplacePlatform? = null,
+        @Optional @Flag("id") idFlag: String? = null,
+    ) {
+        if (prefix == null) {
+            if (idFlag == null) {
+                return audience.sendMessage(
+                    status(Status.FAILURE, "No plugin name or ID provided")
+                        .boxed()
+                )
+            } else {
+                audience.sendMessage(text("Command not implemented yet", NamedTextColor.RED))
+            }
         }
+
+        val plugins = API.getPlugins(prefix).ifEmpty {
+            return audience.sendMessage(status(Status.FAILURE, "No plugins found").boxed())
+        }
+
+        if (plugins.size == 1) return audience.sendMessage(plugins.first().getImageComponent().boxed())
+
 
         audience.sendMessage(
             solidLine()

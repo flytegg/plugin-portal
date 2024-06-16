@@ -11,7 +11,10 @@ fun Plugin.download(marketplacePlatform: MarketplacePlatform) {
     download(URL(platforms[marketplacePlatform]!!.download?.url), "[PP] $name ($marketplacePlatform).jar")
 
     LocalPluginCache.add(LocalPlugin(
-        name = marketplacePlatform.name
+        id = id,
+        name = name,
+        platform = marketplacePlatform,
+        installedAt = System.currentTimeMillis()
     ))
 
     LocalPluginCache.save()
@@ -29,6 +32,4 @@ fun download(url: URL, name: String) {
         inputStream.copyTo(outputStream)
     }
     inputStream.close()
-
-    println("Downloaded ${url.file}")
 }

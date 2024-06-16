@@ -75,9 +75,17 @@ class InstallSubCommand {
                 val targetMessage = "${plugin.name} from $targetPlatform with ID ${plugin.id}"
 
 
-                PortalLogger.log(audience, PortalLogger.Action.INITIATED_INSTALL, targetMessage) // Put before download in-case of error
+                PortalLogger.log(
+                    audience,
+                    PortalLogger.Action.INITIATED_INSTALL,
+                    targetMessage
+                ) // Put before download in-case of error
                 plugin.download(targetPlatform)
-                PortalLogger.log(audience, PortalLogger.Action.INSTALL, targetMessage) // Thoughts on this? Some cases may fail. Figured its best to show
+                PortalLogger.log(
+                    audience,
+                    PortalLogger.Action.INSTALL,
+                    targetMessage
+                ) // Thoughts on this? Some cases may fail. Figured its best to show
 
                 audience.sendMessage(
                     text("\nSUCCESS:", NamedTextColor.GREEN)
@@ -129,16 +137,11 @@ class InstallSubCommand {
             val platformSize = plugin.platforms.size
 
             plugin.platforms.keys.forEachIndexed { index, platform ->
-                println("appending $platform")
-
-                platformsSuffix = platformsSuffix.append(
-                    text(
-                        "${platform.name}${if (index < platformSize - 1) ", " else ""}",
-                        NamedTextColor.DARK_GRAY
-                    )
+                platformsSuffix =
+                    platformsSuffix.appendDark("${platform.name}${if (index < platformSize - 1) ", " else ""}")
                         .hoverEvent(text("Click to install from ${platform.name}"))
                         .clickEvent(ClickEvent.suggestCommand("/pp install ${plugin.name} --platform ${platform.name}"))
-                )
+
             }
 
             platformsSuffix = platformsSuffix.append(text(")", NamedTextColor.DARK_GRAY))
@@ -154,6 +157,6 @@ class InstallSubCommand {
             )
         }
 
-        audience.sendMessage(solidLine(prefix = "", suffix = ""))
+        audience.sendMessage(endLine())
     }
 }

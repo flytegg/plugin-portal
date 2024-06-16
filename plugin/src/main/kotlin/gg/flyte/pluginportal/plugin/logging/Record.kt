@@ -19,7 +19,9 @@ class Record(
 ) {
     private val date = Date.from(Instant.ofEpochMilli(timestamp))
 
-    val description: String = "[${dateFormat.format(date)}] $initiator $action $target"
+    val timelessDescription = "[$initiator $action $target]"
+    val description: String = "[${dateFormat.format(date)}] $timelessDescription"
+
     override fun toString() = description
 
     companion object {

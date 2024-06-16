@@ -26,17 +26,15 @@ object PortalLogger {
         log(Record(System.currentTimeMillis(), initiator.name, action, target))
 
     fun log(record: Record) {
-        PluginPortal.instance.logger.log(Level.INFO, record.description)
+        PluginPortal.instance.logger.log(Level.INFO, record.timelessDescription)
         writeToFile(record)
     }
 
     private fun writeToFile(record: Record) = async { file.appendLine(record.description) }
 
-    enum class Action() {
+    enum class Action {
         // Actions are queried linearly thus AUTO_UPDATE must precede UPDATE and etc.
         INITIATED_INSTALL, FAILED_INSTALL, INSTALL, DELETE, AUTO_UPDATE, UPDATE, LOAD_PLUGINS, SAVE_PLUGINS;
-
-//        val pastTense = toString() + if (toString().endsWith("E")) "D" else "ED"
     }
 
 }

@@ -19,7 +19,7 @@ class ListSubCommand {
         val plugins = LocalPluginCache
             .sortedBy { plugin -> plugin.name }
 
-        if (plugins.isEmpty()) return audience.sendMessage(text("No plugins found").boxed())
+        if (plugins.isEmpty()) return audience.sendMessage(text("No plugins found", NamedTextColor.GRAY).boxed())
 
         var message = text("Plugins installed with Plugin Portal", NamedTextColor.GRAY)
 
@@ -27,6 +27,9 @@ class ListSubCommand {
             message = message.append(text("\n"))
                 .append(text(" - ", NamedTextColor.DARK_GRAY))
                 .appendPrimary(plugin.name)
+                .append(text(" (", NamedTextColor.DARK_GRAY))
+                .append(text(plugin.platform.name))
+                .append(text(")", NamedTextColor.DARK_GRAY))
         }
 
         audience.sendMessage(message.boxed())

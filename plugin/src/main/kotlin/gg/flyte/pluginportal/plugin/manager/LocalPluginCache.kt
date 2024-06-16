@@ -6,7 +6,6 @@ import gg.flyte.pluginportal.common.util.GSON
 import gg.flyte.pluginportal.plugin.PluginPortal
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.util.createIfNotExists
-import org.bukkit.Bukkit
 import java.io.File
 
 object LocalPluginCache : PluginCache<LocalPlugin>() {
@@ -25,10 +24,8 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
     }
 
     fun save() {
-        val text = GSON.toJson(toTypedArray())
+        val text = GSON.toJson(toTypedArray().distinctBy { plugin -> plugin.id })
         getPluginsFile().writeText(text)
-
-        println(getPluginsFile().absolutePath)
 
         PortalLogger.info(PortalLogger.Action.SAVE_PLUGINS, "Saved $size plugins to local cache")
     }
