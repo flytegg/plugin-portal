@@ -1,77 +1,77 @@
 package gg.flyte.pluginportal.plugin.command
 
 import gg.flyte.pluginportal.common.API
+import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.types.Plugin
-import gg.flyte.pluginportal.plugin.format
-import gg.flyte.pluginportal.plugin.util.ChatImage
-import gg.flyte.pluginportal.plugin.util.boxed
-import gg.flyte.pluginportal.plugin.util.solidLine
+import gg.flyte.pluginportal.plugin.util.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextDecoration
-import revxrsal.commands.annotation.AutoComplete
-import revxrsal.commands.annotation.Command
-import revxrsal.commands.annotation.Subcommand
+import revxrsal.commands.annotation.*
 
 @Command("pp", "pluginportal", "ppm")
 class ViewSubCommand {
 
     @Subcommand("view")
     @AutoComplete("@marketplacePluginSearch *")
-    fun viewCommand(audience: Audience, prefix: String) {
-        val plugins = API.getPlugins(prefix)
-
-        if (plugins.isEmpty()) return audience.sendMessage(text("No plugins found"))
-
-        if (plugins.size == 1) {
-            audience.sendMessage(plugins.first().getImageComponent().boxed())
-
-            return
+    fun viewCommand(
+        audience: Audience,
+        @Optional prefix: String? = null,
+        @Optional @Flag("platform") platformFlag: MarketplacePlatform? = null,
+        @Optional @Flag("id") idFlag: String? = null,
+    ) {
+        if (prefix == null) {
+            if (idFlag == null) {
+                return audience.sendMessage(
+                    status(Status.FAILURE, "No plugin name or ID provided").boxed()
+                )
+            } else {
+                audience.sendMessage(text("Command not implemented yet", NamedTextColor.RED))
+            }
         }
 
+        val plugins = API.getPlugins(prefix).ifEmpty {
+            return audience.sendMessage(status(Status.FAILURE, "No plugins found").boxed())
+        }
+
+        if (plugins.size == 1) return audience.sendMessage(plugins.first().getImageComponent().boxed())
+
         audience.sendMessage(
-            solidLine()
-                .append(
-                    text("Multiple plugins found, click one to view more information", NamedTextColor.GRAY)
-                        .decoration(TextDecoration.STRIKETHROUGH, false)
-                )
+            startLine()
+                .appendSecondary("Multiple plugins found, click one to view more information")
                 .appendNewline()
         )
 
         plugins.forEach { plugin ->
             audience.sendMessage(
-                text(" - ", NamedTextColor.GRAY)
+                textSecondary(" - ")
+                    .appendPrimary(plugin.name)
                     .append(
-                        text(plugin.name, NamedTextColor.AQUA)
-                            .append(
-                                text(" (", NamedTextColor.DARK_GRAY)
-                                    .append(text(plugin.platforms.keys.joinToString(", "), NamedTextColor.DARK_GRAY))
-                                    .append(text(")", NamedTextColor.DARK_GRAY))
-                            )
+                        textSecondary(" (")
+                            .appendDark(plugin.platforms.keys.joinToString(", "))
+                            .appendDark(")")
                     )
                     .hoverEvent(text("Click to view more information"))
-                    .clickEvent(ClickEvent.suggestCommand("/pp view ${plugin.name}"))
+                    .suggestCommand("/pp view ${plugin.name}")
             )
         }
 
-        audience.sendMessage(solidLine(prefix = "", suffix = ""))
+        audience.sendMessage(endLine())
     }
 }
 
 fun Plugin.getImageComponent(): Component {
-    val description: List<String> =
-        splitDescriptionIntoLines(getDescription() ?: "", 35)
+    val description: List<String> = splitDescriptionIntoLines(getDescription() ?: "", 35)
 
     val image = ChatImage.ImageTextBuilder(getImageURL() ?: "")
-        .setLine(0, text(name, NamedTextColor.AQUA, TextDecoration.BOLD))
+        .setLine(0, textPrimary(name).bold())
         .apply {
-            description.forEachIndexed { index, line -> setLine(index + 2, text(line, NamedTextColor.GRAY)) }
+            description.forEachIndexed { index, line -> setLine(index + 2, textSecondary(line)) }
         }
-        .setLine(description.size + 3, text("Downloads: ${getDownloads().format()}", NamedTextColor.GRAY))
-        .setLine(description.size + 4, text("Platforms: ${platforms.keys.joinToString()}", NamedTextColor.GRAY))
+        .setLine(description.size + 3, textSecondary("Downloads: ${getDownloads().format()}"))
+        .setLine(description.size + 4, textSecondary("Platforms: ${platforms.keys.joinToString()}"))
         .build()
 
     return image

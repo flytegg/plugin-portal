@@ -19,7 +19,9 @@ class Record(
 ) {
     private val date = Date.from(Instant.ofEpochMilli(timestamp))
 
-    val description: String = "[${dateFormat.format(date)}] $initiator $action $target"
+    val timelessDescription = "$initiator $action $target"
+    val description: String = "[${dateFormat.format(date)}] $timelessDescription"
+
     override fun toString() = description
 
     companion object {
@@ -27,7 +29,7 @@ class Record(
 
         fun read(record: String): Record {
             val time = dateFormat.parse(record.substring(1, 18)).time
-            val action = PortalLogger.Action.entries.find { record.contains(it.toString()) }!! // Should never be null
+            val action = PortalLogger.Action.entries.find { record.contains(it.name) }!! // Should never be null
             val (initiator, target) = record.substring(20).split(" $action ")
             return Record(time, initiator, action, target)
         }
