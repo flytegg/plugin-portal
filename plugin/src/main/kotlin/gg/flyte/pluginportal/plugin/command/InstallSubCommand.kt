@@ -6,9 +6,7 @@ import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.util.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.text
-import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextDecoration
 import revxrsal.commands.annotation.*
 
 @Command("pp", "pluginportal", "ppm")
@@ -72,18 +70,17 @@ class InstallSubCommand {
                 val targetPlatform = platforms.keys.first()
                 val targetMessage = "${plugin.name} from $targetPlatform with ID ${plugin.id}"
 
-
                 PortalLogger.log(
                     audience,
                     PortalLogger.Action.INITIATED_INSTALL,
                     targetMessage
-                ) // Put before download in-case of error
+                )
                 plugin.download(targetPlatform)
                 PortalLogger.log(
                     audience,
                     PortalLogger.Action.INSTALL,
                     targetMessage
-                ) // Thoughts on this? Some cases may fail. Figured its best to show
+                )
 
                 audience.sendMessage(
                     text("\nSUCCESS:", NamedTextColor.GREEN)
@@ -114,7 +111,6 @@ class InstallSubCommand {
             return
         }
 
-
         audience.sendMessage(
             startLine()
                 .appendSecondary("Multiple plugins found, click one to prompt install command")
@@ -123,9 +119,7 @@ class InstallSubCommand {
 
         plugins.forEach { plugin ->
             var platformsSuffix = textDark(" (")
-
             val platformSize = plugin.platforms.size
-
 
             plugin.platforms.keys.forEachIndexed { index, platform ->
                 platformsSuffix =
