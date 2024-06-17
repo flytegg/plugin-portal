@@ -91,15 +91,19 @@ class InstallSubCommand {
                         )
                 )
             } else {
+
                 audience.sendMessage(
-                    status(Status.FAILURE, "Multiple platforms found, click one to prompt install command")
-                        .appendNewline()
+                    text("\n")
+                        .append(
+                            status(Status.FAILURE, "Multiple platforms found, click one to prompt install command")
+                                .appendNewline()
+                        )
                 )
 
                 platforms.forEach { (platform, _) ->
                     audience.sendMessage(
                         textSecondary(" - ")
-                            .appendPrimary(plugin.name)
+                            .appendPrimary(platform.name)
                             .hoverEvent(text("Click to install"))
                             .suggestCommand("/pp install ${plugin.name} --platform ${platform.name}")
                     )
@@ -130,6 +134,7 @@ class InstallSubCommand {
             }
 
             platformsSuffix = platformsSuffix.appendDark(")")
+
 
             audience.sendMessage(
                 textSecondary(" - ")

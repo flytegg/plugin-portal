@@ -25,9 +25,8 @@ class HelpSubCommand {
 
     @Subcommand("help")
     fun helpCommand(audience: Audience) {
-        var message = text("Plugin Portal Help", NamedTextColor.AQUA)
-            .append(text("\n")) // Look into appendNewLine, didn't work for me in the past
-        helpEntries.forEach { message = message.append(text("\n").append(it.toComponent())) }
+        var message = text("")
+        helpEntries.forEach { message = message.append(it.toComponent().append(text("\n"))) }
 
         audience.sendMessage(
             message.boxed()
