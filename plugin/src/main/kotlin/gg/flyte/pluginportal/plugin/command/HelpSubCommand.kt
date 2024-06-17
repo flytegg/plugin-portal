@@ -17,16 +17,16 @@ class HelpSubCommand {
 
     val helpEntries = listOf(
         HelpEntry("/pp help", "Displays this help message"),
+        HelpEntry("/pp list", "List installed plugins"),
         HelpEntry("/pp view <plugin>", "Search and view fora plugin"),
         HelpEntry("/pp install <plugin>", "Install a plugin"),
-        HelpEntry("/pp list", "List installed plugins"), // Not implemented yet, will be next
-//        HelpEntry("/pp uninstall", "Uninstall a plugin"), // Not implemented yet
+        HelpEntry("/pp delete <plugin>", "Uninstall a plugin"),
     )
 
     @Subcommand("help")
     fun helpCommand(audience: Audience) {
         var message = text("")
-        helpEntries.forEach { message = message.append(it.toComponent().append(text("\n"))) }
+        helpEntries.forEach { message = message.append(text("\n").append(it.toComponent())) }
 
         audience.sendMessage(
             message.boxed()

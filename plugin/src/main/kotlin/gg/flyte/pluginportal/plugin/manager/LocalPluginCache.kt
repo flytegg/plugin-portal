@@ -30,6 +30,13 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
         PortalLogger.info(PortalLogger.Action.SAVE_PLUGINS, "Saved $size plugins to local cache")
     }
 
+    fun deletePlugin(plugin: LocalPlugin) {
+
+
+
+    }
+
+
     private fun getPluginsFile() = File(PluginPortal.instance.dataFolder, "plugins.json").createIfNotExists()
 
 }

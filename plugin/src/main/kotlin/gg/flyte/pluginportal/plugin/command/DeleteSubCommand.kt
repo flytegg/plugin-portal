@@ -1,5 +1,6 @@
 package gg.flyte.pluginportal.plugin.command
 
+import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.util.Status
 import gg.flyte.pluginportal.plugin.util.boxed
 import gg.flyte.pluginportal.plugin.util.status
@@ -18,6 +19,12 @@ class DeleteSubCommand {
         audience: Audience,
         name: String
     ) {
+        val plugin = LocalPluginCache.filter { it.name == name }
+
+        if (plugin.isEmpty()) {
+            return audience.sendMessage(status(Status.FAILURE, "Plugin not found"))
+        }
+
 
 
 
