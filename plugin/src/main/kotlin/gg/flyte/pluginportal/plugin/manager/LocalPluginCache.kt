@@ -5,6 +5,7 @@ import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.util.GSON
 import gg.flyte.pluginportal.plugin.PluginPortal
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
+import gg.flyte.pluginportal.plugin.util.calculateSHA256
 import gg.flyte.pluginportal.plugin.util.createIfNotExists
 import java.io.File
 
@@ -30,12 +31,36 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
         PortalLogger.info(PortalLogger.Action.SAVE_PLUGINS, "Saved $size plugins to local cache")
     }
 
+
     fun deletePlugin(plugin: LocalPlugin) {
 
+        val file = plugin.findFile() ?: return println("File not found")
+        println(file.name)
 
+        if (!file.delete()) {
+            println("Failed to delete file")
+            return
+        }
+
+        println("removed file")
+        remove(plugin)
+        save()
 
     }
 
+    fun LocalPlugin.findFile(): File? {
+        val pluginsFolder = File("plugins")
+        val updateFolder = File(pluginsFolder, "update")
+
+        val files = mutableListOf<File>().apply {
+            addAll(pluginsFolder.listFiles() ?: emptyArray())
+            addAll(updateFolder.listFiles() ?: emptyArray())
+        }
+
+        return files.filter { file -> file.isFile }
+            .filter { file -> file.name.endsWith(".jar") }
+            .firstOrNull { file -> calculateSHA256(file) == sha256 }
+    }
 
     private fun getPluginsFile() = File(PluginPortal.instance.dataFolder, "plugins.json").createIfNotExists()
 

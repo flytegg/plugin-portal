@@ -25,8 +25,8 @@ class DeleteSubCommand {
             return audience.sendMessage(status(Status.FAILURE, "Plugin not found"))
         }
 
+        LocalPluginCache.deletePlugin(plugin.first())
 
-
-
+        audience.sendMessage(status(Status.SUCCESS, "Plugin deleted").boxed())
     }
 }

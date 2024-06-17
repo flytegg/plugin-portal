@@ -1,5 +1,7 @@
 package gg.flyte.pluginportal.common.types
 
+import java.io.File
+
 /*
     * Represents a plugin that is installed on the local server.
  */
