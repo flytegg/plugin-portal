@@ -9,8 +9,15 @@ import java.io.FileInputStream
 import java.net.URL
 import java.security.MessageDigest
 
-fun Plugin.download(marketplacePlatform: MarketplacePlatform) {
-    val file = download(URL(platforms[marketplacePlatform]!!.download?.url), "[PP] $name ($marketplacePlatform).jar")
+fun Plugin.download(marketplacePlatform: MarketplacePlatform, updating: Boolean = false) {
+
+    val directory = File(if (updating) "plugins" + File.separator + "update"  else "plugins")
+    val jarFile = File(directory, "[PP] $name ($marketplacePlatform).jar")
+
+    val file = download(
+        URL(platforms[marketplacePlatform]!!.download?.url),
+        jarFile
+    )
 
     val sha256 = calculateSHA256(file)
 
@@ -25,12 +32,12 @@ fun Plugin.download(marketplacePlatform: MarketplacePlatform) {
     LocalPluginCache.save()
 }
 
-fun download(url: URL, name: String): File {
+fun download(url: URL, file: File): File {
     val connection = url.openConnection()
     connection.setRequestProperty("User-Agent", "Mozilla/5.0")
     connection.connect()
     val inputStream = connection.getInputStream()
-    val file = File("plugins/$name")
+
     file.parentFile.mkdirs()
     file.createNewFile()
     file.outputStream().use { outputStream ->

@@ -1,9 +1,6 @@
 package gg.flyte.pluginportal.plugin.command
 
-import gg.flyte.pluginportal.plugin.util.appendSecondary
-import gg.flyte.pluginportal.plugin.util.bold
-import gg.flyte.pluginportal.plugin.util.boxed
-import gg.flyte.pluginportal.plugin.util.colorPrimary
+import gg.flyte.pluginportal.plugin.util.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
@@ -43,7 +40,7 @@ class HelpSubCommand {
     data class HelpEntry(val command: String, val description: String) {
         fun toComponent() = text(command)
             .colorPrimary()
-            .append(text(" - ", NamedTextColor.DARK_GRAY))
+            .appendDark(" - ")
             .appendSecondary(description)
     }
 }

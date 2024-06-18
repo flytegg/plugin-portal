@@ -1,5 +1,7 @@
 package gg.flyte.pluginportal.plugin.command
 
+import gg.flyte.pluginportal.common.API
+import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache.findFile
 import gg.flyte.pluginportal.plugin.util.*
@@ -18,11 +20,32 @@ class UpdateSubCommand {
         audience: Audience,
         name: String
     ) {
-        val plugin = LocalPluginCache.filter { it.name == name }
+        val plugins = LocalPluginCache.filter { it.name == name }
 
-        if (plugin.isEmpty()) return audience.sendMessage(status(Status.FAILURE, "Plugin not found").boxed())
-        if (plugin.size > 1) return audience.sendMessage(status(Status.FAILURE, "Multiple plugins found").boxed())
+        if (plugins.isEmpty()) return audience.sendMessage(status(Status.FAILURE, "Plugin not found").boxed())
+        if (plugins.size > 1) return audience.sendMessage(status(Status.FAILURE, "Multiple plugins found").boxed())
 
-        audience.sendMessage(textSecondary("Updating ur plugin...").boxed())
+        val localPlugin = plugins.first()
+        val marketplacePlugin = API.getPlugins(localPlugin.name).firstOrNull { it.id == localPlugin.id }
+
+        audience.sendMessage(
+            startLine().appendSecondary("Starting update of ").appendPrimary(localPlugin.name).appendSecondary("...")
+        )
+
+        val targetPlatform = localPlugin.platform
+        val targetMessage = "${localPlugin.name} from $targetPlatform with ID ${localPlugin.id}"
+
+        PortalLogger.log(
+            audience,
+            PortalLogger.Action.INITIATED_INSTALL,
+            targetMessage
+        )
+
+        marketplacePlugin!!.download(targetPlatform, true)
+        PortalLogger.log(
+            audience,
+            PortalLogger.Action.INSTALL,
+            targetMessage
+        )
     }
 }
