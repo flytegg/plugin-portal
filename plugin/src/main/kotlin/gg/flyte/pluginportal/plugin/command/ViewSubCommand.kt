@@ -49,7 +49,7 @@ class ViewSubCommand {
                 textSecondary(" - ")
                     .appendPrimary(plugin.name)
                     .append(
-                        textSecondary(" (")
+                        textDark(" (")
                             .appendDark(plugin.platforms.keys.joinToString(", "))
                             .appendDark(")")
                     )

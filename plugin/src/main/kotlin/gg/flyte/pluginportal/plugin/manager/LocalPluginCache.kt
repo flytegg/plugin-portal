@@ -33,16 +33,9 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
 
 
     fun deletePlugin(plugin: LocalPlugin) {
+        val file = plugin.findFile() ?: return
+        if (!file.delete()) return
 
-        val file = plugin.findFile() ?: return println("File not found")
-        println(file.name)
-
-        if (!file.delete()) {
-            println("Failed to delete file")
-            return
-        }
-
-        println("removed file")
         remove(plugin)
         save()
 

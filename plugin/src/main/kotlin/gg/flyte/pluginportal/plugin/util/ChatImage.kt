@@ -20,9 +20,9 @@ object ChatImage {
 
         for (row in grid) {
             for (cell in row) {
-                val colour = getAverageColor(cell)
-                val chatColour = String.format("<#%02x%02x%02x>", colour.red, colour.green, colour.blue)
-                sb.append(chatColour).append("█")
+                val color = getAverageColor(cell)
+                val chatColor = String.format("<#%02x%02x%02x>", color.red, color.green, color.blue)
+                sb.append(chatColor).append("█")
             }
             sb.append("\n")
         }

@@ -20,6 +20,7 @@ class HelpSubCommand {
         HelpEntry("/pp list", "List installed plugins"),
         HelpEntry("/pp view <plugin>", "Search and view fora plugin"),
         HelpEntry("/pp install <plugin>", "Install a plugin"),
+        HelpEntry("/pp update <plugin>", "Update a plugin"),
         HelpEntry("/pp delete <plugin>", "Uninstall a plugin"),
     )
 
@@ -29,7 +30,9 @@ class HelpSubCommand {
         helpEntries.forEach { message = message.append(text("\n").append(it.toComponent())) }
 
         audience.sendMessage(
-            message.boxed()
+            message
+                .append(text("\n"))
+                .boxed()
         )
     }
 

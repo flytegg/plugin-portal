@@ -25,6 +25,7 @@ object CommandManager {
     private fun BukkitCommandHandler.registerCommands() {
         register(
             InstallSubCommand(),
+            UpdateSubCommand(),
             DeleteSubCommand(),
             HelpSubCommand(),
             ViewSubCommand(),

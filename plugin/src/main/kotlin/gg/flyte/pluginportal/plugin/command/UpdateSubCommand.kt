@@ -2,10 +2,7 @@ package gg.flyte.pluginportal.plugin.command
 
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache.findFile
-import gg.flyte.pluginportal.plugin.util.Status
-import gg.flyte.pluginportal.plugin.util.boxed
-import gg.flyte.pluginportal.plugin.util.endLine
-import gg.flyte.pluginportal.plugin.util.status
+import gg.flyte.pluginportal.plugin.util.*
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.AutoComplete
 import revxrsal.commands.annotation.Command
@@ -13,11 +10,11 @@ import revxrsal.commands.annotation.Optional
 import revxrsal.commands.annotation.Subcommand
 
 @Command("pp", "pluginportal", "ppm")
-class DeleteSubCommand {
+class UpdateSubCommand {
 
-    @Subcommand("delete")
+    @Subcommand("update")
     @AutoComplete("@installedPluginSearch *")
-    fun deleteCommand(
+    fun updateCommand(
         audience: Audience,
         name: String
     ) {
@@ -26,14 +23,6 @@ class DeleteSubCommand {
         if (plugin.isEmpty()) return audience.sendMessage(status(Status.FAILURE, "Plugin not found").boxed())
         if (plugin.size > 1) return audience.sendMessage(status(Status.FAILURE, "Multiple plugins found").boxed())
 
-        val file = plugin.first().findFile()
-        if (file == null) {
-            LocalPluginCache.deletePlugin(plugin.first())
-            return audience.sendMessage(status(Status.FAILURE, "Plugin file not found").boxed())
-        }
-
-        LocalPluginCache.deletePlugin(plugin.first())
-
-        audience.sendMessage(status(Status.SUCCESS, "Plugin deleted").append(endLine()))
+        audience.sendMessage(textSecondary("Updating ur plugin...").boxed())
     }
 }
