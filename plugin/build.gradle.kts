@@ -31,6 +31,7 @@ dependencies {
     implementation("com.github.Revxrsal.Lamp:brigadier:3.2.1")
 
     implementation("com.google.guava:guava:33.2.1-jre")
+    implementation("dev.masecla:Modrinth4J:2.0.0")
 
     api("io.papermc:paperlib:1.0.7")
 }
