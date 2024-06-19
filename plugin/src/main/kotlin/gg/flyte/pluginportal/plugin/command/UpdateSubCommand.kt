@@ -73,19 +73,4 @@ class UpdateSubCommand {
 
         PortalLogger.log(audience, PortalLogger.Action.UPDATE, targetMessage)
     }
-
-    private fun sendLocalPluginListMessage(audience: Audience, message: String, plugins: List<LocalPlugin>, command: String) {
-        audience.sendMessage(startLine().appendSecondary(message).appendNewline())
-        plugins.forEach { plugin ->
-            val platformSuffix = textDark(" (${plugin.platform.name})")
-
-            audience.sendMessage(
-                textSecondary(" - ").appendPrimary(plugin.name)
-                    .hoverEvent(text("Click to $command"))
-                    .suggestCommand("/pp $command ${plugin.name} --platform ${plugin.platform.name}")
-                    .append(platformSuffix)
-            )
-        }
-        audience.sendMessage(endLine())
-    }
 }

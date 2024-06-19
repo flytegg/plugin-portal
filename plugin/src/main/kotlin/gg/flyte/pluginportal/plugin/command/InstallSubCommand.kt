@@ -1,16 +1,14 @@
 package gg.flyte.pluginportal.plugin.command
 
-import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.plugin.config.Config
-import gg.flyte.pluginportal.plugin.logging.PortalLogger
+import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.manager.MarketplacePluginCache
 import gg.flyte.pluginportal.plugin.util.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.newline
 import net.kyori.adventure.text.Component.text
-import net.kyori.adventure.text.format.NamedTextColor
 import revxrsal.commands.annotation.*
 
 @Command("pp", "pluginportal", "ppm")
@@ -41,12 +39,22 @@ class InstallSubCommand {
         if (plugins.size == 1) {
             handleSinglePlugin(audience, plugins.first(), platformFlag)
         } else {
-            sendPluginListMessage(audience, "Multiple plugins found, click one to prompt install command", plugins, "install")
+            sendPluginListMessage(
+                audience,
+                "Multiple plugins found, click one to prompt install command",
+                plugins,
+                "install"
+            )
         }
     }
 
     private fun handleSinglePlugin(audience: Audience, plugin: Plugin, platformFlag: MarketplacePlatform?) {
         val platforms = plugin.platforms
+
+        if (LocalPluginCache.any { localPlugin -> localPlugin.id == plugin.id }) {
+            return sendFailureMessage(audience, "Plugin already installed, use the update command instead")
+        }
+
         audience.sendMessage(
             startLine()
                 .appendSecondary("Starting installation of ")
@@ -67,8 +75,10 @@ class InstallSubCommand {
         } else {
             audience.sendMessage(
                 newline()
-                    .append(status(Status.FAILURE, "Multiple platforms found, click one to prompt install command")
-                        .appendNewline())
+                    .append(
+                        status(Status.FAILURE, "Multiple platforms found, click one to prompt install command")
+                            .appendNewline()
+                    )
             )
             platforms.forEach { (platform, _) ->
                 audience.sendMessage(

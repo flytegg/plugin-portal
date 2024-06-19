@@ -7,7 +7,9 @@ import gg.flyte.pluginportal.plugin.http.SearchPlugins
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.util.async
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
+import org.bukkit.Bukkit
 import revxrsal.commands.bukkit.BukkitCommandHandler
+import java.io.File
 
 object CommandManager {
 
@@ -30,6 +32,7 @@ object CommandManager {
             HelpSubCommand(),
             ViewSubCommand(),
             ListSubCommand(),
+            RecognizeSubCommand(),
         )
     }
 
@@ -45,9 +48,14 @@ object CommandManager {
                 else
                     SearchPlugins.getCachedSearch(searchName)?.map(Plugin::name) ?: listOf("$searchName ~ Loading")
             }
-
             .registerSuggestion("installedPluginSearch") { args, _, _ ->
                 LocalPluginCache.map(LocalPlugin::name)
+            }
+            .registerSuggestion("pluginFileSearch") { args, _, _ ->
+                File("plugins").listFiles()!!
+                    .filter { file -> file.isFile }
+                    .filter { file -> file.name.endsWith(".jar") }
+                    .map { file -> file.name }
             }
     }
 }

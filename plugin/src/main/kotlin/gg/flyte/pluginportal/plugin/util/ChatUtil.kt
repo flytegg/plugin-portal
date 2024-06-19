@@ -1,5 +1,6 @@
 package gg.flyte.pluginportal.plugin.util
 
+import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.Plugin
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
@@ -89,6 +90,21 @@ fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plu
                 .hoverEvent(text("Click to $command"))
                 .suggestCommand("/pp $command ${plugin.name}")
                 .append(platformSuffix.appendDark(")"))
+        )
+    }
+    audience.sendMessage(endLine())
+}
+
+fun sendLocalPluginListMessage(audience: Audience, message: String, plugins: List<LocalPlugin>, command: String) {
+    audience.sendMessage(startLine().appendSecondary(message).appendNewline())
+    plugins.forEach { plugin ->
+        val platformSuffix = textDark(" (${plugin.platform.name})")
+
+        audience.sendMessage(
+            textSecondary(" - ").appendPrimary(plugin.name)
+                .hoverEvent(text("Click to $command"))
+                .suggestCommand("/pp $command ${plugin.name} --platform ${plugin.platform.name}")
+                .append(platformSuffix)
         )
     }
     audience.sendMessage(endLine())

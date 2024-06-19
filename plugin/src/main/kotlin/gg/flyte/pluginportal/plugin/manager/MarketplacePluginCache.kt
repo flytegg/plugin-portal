@@ -33,6 +33,7 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
     ) {
         val platformPlugin =
             plugin.platforms[platform] ?: return sendFailureMessage(audience, "No platform plugin found")
+
         val downloadURL = platformPlugin.download?.url
             ?: return audience.sendMessage(
                 text("No download URL found for platform ", NamedTextColor.RED)
