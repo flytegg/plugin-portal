@@ -1,0 +1,6 @@
+# The directory where your server's plugins are located
+install-directory: plugins
+
+# Plugins will be moved over to the plugins directory when the server is updated
+# See: https://bukkit.fandom.com/wiki/Installing_Plugins#Updating_Plugins
+update-directory: plugins/update

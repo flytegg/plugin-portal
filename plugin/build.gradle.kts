@@ -31,6 +31,7 @@ dependencies {
     implementation("com.github.Revxrsal.Lamp:brigadier:3.2.1")
 
     implementation("com.google.guava:guava:33.2.1-jre")
+    implementation("dev.dejvokep:boosted-yaml:1.3.5")
 
     api("io.papermc:paperlib:1.0.7")
 }
