@@ -34,7 +34,7 @@ object PortalLogger {
 
     enum class Action {
         // Actions are queried linearly thus AUTO_UPDATE must precede UPDATE and etc.
-        INITIATED_INSTALL, FAILED_INSTALL, INSTALL, DELETE, AUTO_UPDATE, UPDATE, LOAD_PLUGINS, SAVE_PLUGINS;
+        INITIATED_INSTALL, FAILED_INSTALL, INSTALL, DELETE, AUTO_UPDATE, INITIATED_UPDATE, UPDATE, LOAD_PLUGINS, SAVE_PLUGINS;
     }
 
 }
