@@ -18,8 +18,6 @@ fun Plugin.download(marketplacePlatform: MarketplacePlatform, targetDirectory: S
         jarFile
     )
 
-    val sha256 = calculateSHA256(file)
-
     LocalPluginCache.removeIf { plugin -> plugin.id == id }
 
     LocalPluginCache.add(
@@ -27,7 +25,8 @@ fun Plugin.download(marketplacePlatform: MarketplacePlatform, targetDirectory: S
             id = id,
             name = name,
             platform = marketplacePlatform,
-            sha256 = sha256,
+            sha256 = calculateSHA256(file),
+            sha512 = calculateSHA512(file),
             installedAt = System.currentTimeMillis(),
         )
     )
@@ -70,6 +69,24 @@ fun calculateSHA256(file: File): String {
 
 fun calculateSHA1(file: File): String {
     val digest = MessageDigest.getInstance("SHA-1")
+    FileInputStream(file).use { fis ->
+        val byteArray = ByteArray(1024)
+        var bytesCount: Int
+
+        while (fis.read(byteArray).also { bytesCount = it } != -1) {
+            digest.update(byteArray, 0, bytesCount)
+        }
+    }
+    val bytes = digest.digest()
+    val sb = StringBuilder()
+    for (byte in bytes) {
+        sb.append(String.format("%02x", byte))
+    }
+    return sb.toString()
+}
+
+fun calculateSHA512(file: File): String {
+    val digest = MessageDigest.getInstance("SHA-512")
     FileInputStream(file).use { fis ->
         val byteArray = ByteArray(1024)
         var bytesCount: Int

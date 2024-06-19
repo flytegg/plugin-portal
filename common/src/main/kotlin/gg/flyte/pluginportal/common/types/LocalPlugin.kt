@@ -10,5 +10,6 @@ data class LocalPlugin(
     val name: String,
     val platform: MarketplacePlatform,
     val sha256: String,
+    val sha512: String,
     val installedAt: Long
 )

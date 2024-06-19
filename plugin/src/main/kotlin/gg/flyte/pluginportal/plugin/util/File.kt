@@ -18,18 +18,3 @@ fun isJarDownloadUrl(url: String): Boolean {
         it.contains("attachment") && it.contains("filename=") && it.contains(".jar")
     } ?: false
 }
-
-
-fun getFinalRedirectURL(url: String): String {
-    var currentUrl = url
-    while (true) {
-        val connection = URL(currentUrl).openConnection() as HttpURLConnection
-        connection.instanceFollowRedirects = false
-        val redirectUrl = connection.getHeaderField("Location") ?: return currentUrl
-        currentUrl = if (redirectUrl.startsWith("/")) {
-            URL(URL(currentUrl), redirectUrl).toString()
-        } else {
-            redirectUrl
-        }
-    }
-}
