@@ -4,10 +4,7 @@ import gg.flyte.pluginportal.plugin.command.CommandManager
 import gg.flyte.pluginportal.plugin.config.Config
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import io.papermc.lib.PaperLib
-import org.bukkit.plugin.PluginDescriptionFile
 import org.bukkit.plugin.java.JavaPlugin
-import org.bukkit.plugin.java.JavaPluginLoader
-import java.io.File
 
 
 class PluginPortal : JavaPlugin() {
@@ -20,12 +17,14 @@ class PluginPortal : JavaPlugin() {
         instance = this
 
         CommandManager
+        Config
 
         LocalPluginCache.load()
 
         PaperLib.suggestPaper(this)
 
-        Config.config[""]
+        println(Config.INSTALL_DIRECTORY)
+        println(Config.UPDATE_DIRECTORY)
     }
 
 }

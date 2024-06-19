@@ -1,17 +1,22 @@
 package gg.flyte.pluginportal.plugin.config
 
-import dev.dejvokep.boostedyaml.YamlDocument
 import gg.flyte.pluginportal.plugin.PluginPortal
-import java.io.File
+import org.bukkit.configuration.file.FileConfiguration
 
 object Config {
+    private var config: FileConfiguration
 
-    private val configFile = File("config.yml")
+    val INSTALL_DIRECTORY get() = config.getString("install-directory")!!
+    val UPDATE_DIRECTORY get() = config.getString("update-directory")!!
 
-    val config by lazy {
-        YamlDocument.create(configFile, PluginPortal.instance.getResource("config.yml")!!)
+    init {
+        PluginPortal.instance.apply {
+            saveDefaultConfig()
+            config.options().copyDefaults()
+            saveConfig()
+
+            this@Config.config = config
+        }
+
     }
-
-
-
 }
