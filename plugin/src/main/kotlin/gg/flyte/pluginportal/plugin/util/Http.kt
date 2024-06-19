@@ -9,10 +9,9 @@ import java.io.FileInputStream
 import java.net.URL
 import java.security.MessageDigest
 
-fun Plugin.download(marketplacePlatform: MarketplacePlatform, updating: Boolean = false) {
+fun Plugin.download(marketplacePlatform: MarketplacePlatform, targetDirectory: String) {
 
-    val directory = File(if (updating) "plugins" + File.separator + "update"  else "plugins")
-    val jarFile = File(directory, "[PP] $name ($marketplacePlatform).jar")
+    val jarFile = File(targetDirectory, "[PP] $name ($marketplacePlatform).jar")
 
     val file = download(
         URL(platforms[marketplacePlatform]!!.download?.url),

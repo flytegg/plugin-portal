@@ -8,6 +8,7 @@ import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.manager.MarketplacePluginCache
 import gg.flyte.pluginportal.plugin.util.*
 import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.text.Component.newline
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
 import revxrsal.commands.annotation.*
@@ -23,7 +24,6 @@ class InstallSubCommand {
         @Optional @Flag("platform") platformFlag: MarketplacePlatform? = null,
         @Optional @Flag("id") idFlag: String? = null,
     ) {
-
         if (prefix == null && idFlag == null) {
             return sendFailureMessage(audience, "No plugin name or ID provided")
         }
@@ -64,28 +64,9 @@ class InstallSubCommand {
                 platform,
                 Config.INSTALL_DIRECTORY
             )
-
-
-
-//            audience.sendMessage(
-//                textSecondary("Found download URL, starting installation from: ")
-//                    .appendPrimary(platform.name).appendSecondary("...")
-//                    .appendNewline()
-//            )
-
-//            val targetMessage = "${plugin.name} from ${platform.name} with ID ${plugin.id}"
-//            PortalLogger.log(audience, PortalLogger.Action.INITIATED_INSTALL, targetMessage)
-//            plugin.download(platform)
-//            PortalLogger.log(audience, PortalLogger.Action.INSTALL, targetMessage)
-
-//            audience.sendMessage(
-//                text("\nSUCCESS:", NamedTextColor.GREEN)
-//                    .append(text(" Downloaded plugin from ", NamedTextColor.GRAY))
-//                    .appendPrimary(plugin.name).append(endLine())
-//            )
         } else {
             audience.sendMessage(
-                text("\n")
+                newline()
                     .append(status(Status.FAILURE, "Multiple platforms found, click one to prompt install command")
                         .appendNewline())
             )

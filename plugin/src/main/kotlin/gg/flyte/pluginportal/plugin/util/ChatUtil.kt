@@ -30,9 +30,9 @@ fun Component.boxed() = text()
 
 fun status(status: Status, text: String): Component =
     text("[${status.name}]: ", status.color)
-    .append(
-        text(text, GRAY)
-    )
+        .append(
+            text(text, GRAY)
+        )
 
 fun textPrimary(text: String) = text(text).colorPrimary()
 fun textSecondary(text: String) = text(text).colorSecondary()
@@ -67,14 +67,28 @@ fun sendFailureMessage(audience: Audience, message: String) {
 fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plugin>, command: String) {
     audience.sendMessage(startLine().appendSecondary(message).appendNewline())
     plugins.forEach { plugin ->
-        val platformSuffix = plugin.platforms.keys.joinToString(", ", " (", ")") {
-            it.name
+
+        var platformSuffix = textDark(" (")
+
+        plugin.platforms.keys.forEachIndexed { index, platform ->
+            platformSuffix = platformSuffix.append(
+                textDark(platform.name)
+                    .hoverEvent(text("Click to $command with ${platform.name}"))
+                    .suggestCommand(
+                        "/pp $command ${plugin.name} --platform ${platform.name}"
+                    )
+            )
+
+            if (index != plugin.platforms.size - 1) {
+                platformSuffix = platformSuffix.appendDark(", ")
+            }
         }
+
         audience.sendMessage(
             textSecondary(" - ").appendPrimary(plugin.name)
                 .hoverEvent(text("Click to $command"))
-                .clickEvent(ClickEvent.suggestCommand("/pp $command ${plugin.name}"))
-                .append(textDark(platformSuffix))
+                .suggestCommand("/pp $command ${plugin.name}")
+                .append(platformSuffix.appendDark(")"))
         )
     }
     audience.sendMessage(endLine())

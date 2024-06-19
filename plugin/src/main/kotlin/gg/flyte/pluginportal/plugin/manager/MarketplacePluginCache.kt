@@ -3,6 +3,7 @@ package gg.flyte.pluginportal.plugin.manager
 import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.types.Plugin
+import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.util.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.newline
@@ -53,7 +54,7 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
                         - The URL must be a direct download link
                         - The URL must download a JAR file
                         - Please contact us in our discord for more information
-                    """.trimIndent()
+                            """.trimIndent()
                         )
                     )
             )
@@ -63,13 +64,12 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
             textSecondary("Found download URL, starting installation from: ")
                 .appendPrimary(platform.name).appendSecondary("...")
         )
-//
-//        val download = API.downloadFile(platformPlugin.download!!.url)
-//        val file = File("plugins/${plugin.id}/${platform.name}/${download.fileName}")
-//
-//        file.createIfNotExists()
-//        file.writeBytes(download.bytes)
 
+
+        val targetMessage = "${plugin.name} from ${platform.name} with ID ${plugin.id}"
+        PortalLogger.log(audience, PortalLogger.Action.INITIATED_INSTALL, targetMessage)
+        plugin.download(platform, targetDirectory)
+        PortalLogger.log(audience, PortalLogger.Action.INSTALL, targetMessage)
 
         audience.sendMessage(
             newline()
