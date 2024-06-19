@@ -22,9 +22,6 @@ class PluginPortal : JavaPlugin() {
         LocalPluginCache.load()
 
         PaperLib.suggestPaper(this)
-
-        println(Config.INSTALL_DIRECTORY)
-        println(Config.UPDATE_DIRECTORY)
     }
 
 }

@@ -49,15 +49,5 @@ object CommandManager {
             .registerSuggestion("installedPluginSearch") { args, _, _ ->
                 LocalPluginCache.map(LocalPlugin::name)
             }
-
-//            .registerSuggestion("installedPlugin") { args, sender, command ->
-//                PPPluginCache.getInstalledPlugins().map { it.name }.let { list ->
-//                    if (list.isEmpty()) {
-//                        return@registerSuggestion listOf("No Plugins Installed")
-//                    }
-//
-//                    return@registerSuggestion list
-//                }
-//            }
     }
 }

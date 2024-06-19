@@ -1,5 +1,7 @@
 package gg.flyte.pluginportal.plugin.util
 
+import gg.flyte.pluginportal.common.types.Plugin
+import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.TextComponent
@@ -56,4 +58,24 @@ enum class Status(val color: NamedTextColor) {
     FAILURE(RED),
     WARNING(YELLOW),
     INFO(GRAY),
+}
+
+fun sendFailureMessage(audience: Audience, message: String) {
+    audience.sendMessage(status(Status.FAILURE, message).boxed())
+}
+
+fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plugin>, command: String) {
+    audience.sendMessage(startLine().appendSecondary(message).appendNewline())
+    plugins.forEach { plugin ->
+        val platformSuffix = plugin.platforms.keys.joinToString(", ", " (", ")") {
+            it.name
+        }
+        audience.sendMessage(
+            textSecondary(" - ").appendPrimary(plugin.name)
+                .hoverEvent(text("Click to $command"))
+                .clickEvent(ClickEvent.suggestCommand("/pp $command ${plugin.name}"))
+                .append(textDark(platformSuffix))
+        )
+    }
+    audience.sendMessage(endLine())
 }

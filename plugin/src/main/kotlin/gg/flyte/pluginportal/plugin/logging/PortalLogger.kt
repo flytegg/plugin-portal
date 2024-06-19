@@ -33,8 +33,11 @@ object PortalLogger {
     private fun writeToFile(record: Record) = async { file.appendLine(record.description) }
 
     enum class Action {
-        // Actions are queried linearly thus AUTO_UPDATE must precede UPDATE and etc.
-        INITIATED_INSTALL, FAILED_INSTALL, INSTALL, DELETE, AUTO_UPDATE, INITIATED_UPDATE, UPDATE, LOAD_PLUGINS, SAVE_PLUGINS;
+        // Actions are queried linearly thus AUTO_UPDATE must precede UPDATE etc.
+        INITIATED_INSTALL, FAILED_INSTALL, INSTALL,
+        DELETE,
+        AUTO_UPDATE, INITIATED_UPDATE, UPDATE,
+        LOAD_PLUGINS, SAVE_PLUGINS;
     }
 
 }

@@ -3,7 +3,6 @@ package gg.flyte.pluginportal.plugin.command
 import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
-import gg.flyte.pluginportal.plugin.manager.LocalPluginCache.findFile
 import gg.flyte.pluginportal.plugin.util.*
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.AutoComplete
@@ -16,43 +15,25 @@ class UpdateSubCommand {
 
     @Subcommand("update")
     @AutoComplete("@installedPluginSearch *")
-    fun updateCommand(
-        audience: Audience,
-        name: String,
-    ) {
-        // Allow ID searching, make a nice method to support installing and updating.
+    fun updateCommand(audience: Audience, name: String) {
         val plugins = LocalPluginCache.filter { it.name == name }
 
-        if (plugins.isEmpty()) return audience.sendMessage(status(Status.FAILURE, "Plugin not found").boxed())
-
-        // Allow searching by id, prompt a list of solutions similar to view and install
-        if (plugins.size > 1) return audience.sendMessage(status(Status.FAILURE, "Multiple plugins found").boxed())
+        if (plugins.isEmpty()) return sendFailureMessage(audience, "Plugin not found")
+        if (plugins.size > 1) return sendFailureMessage(audience, "Multiple plugins found")
 
         val localPlugin = plugins.first()
         val marketplacePlugin = API.getPlugins(localPlugin.name).firstOrNull { it.id == localPlugin.id }
+            ?: return sendFailureMessage(audience, "Marketplace plugin not found")
 
         audience.sendMessage(
-            startLine()
-                .appendSecondary("Starting update of ")
-                .appendPrimary(localPlugin.name)
-                .appendSecondary("...")
+            startLine().appendSecondary("Starting update of ").appendPrimary(localPlugin.name).appendSecondary("...")
         )
 
         val targetPlatform = localPlugin.platform
         val targetMessage = "${localPlugin.name} from $targetPlatform with ID ${localPlugin.id}"
 
-        PortalLogger.log(
-            audience,
-            PortalLogger.Action.INITIATED_UPDATE,
-            targetMessage
-        )
-
-        marketplacePlugin!!.download(targetPlatform, true)
-
-        PortalLogger.log(
-            audience,
-            PortalLogger.Action.UPDATE,
-            targetMessage
-        )
+        PortalLogger.log(audience, PortalLogger.Action.INITIATED_UPDATE, targetMessage)
+        marketplacePlugin.download(targetPlatform, true)
+        PortalLogger.log(audience, PortalLogger.Action.UPDATE, targetMessage)
     }
 }
