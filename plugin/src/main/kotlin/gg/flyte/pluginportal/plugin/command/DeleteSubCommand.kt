@@ -7,12 +7,14 @@ import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache.findFile
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.*
+import revxrsal.commands.bukkit.annotation.CommandPermission
 
 @Command("pp", "pluginportal", "ppm")
 class DeleteSubCommand {
 
     @Subcommand("delete", "uninstall")
     @AutoComplete("@installedPluginSearch *")
+    @CommandPermission("pluginportal.manage.uninstall")
     fun deleteCommand(
         audience: Audience,
         @Optional prefix: String? = null,

@@ -9,12 +9,14 @@ import net.kyori.adventure.text.format.NamedTextColor
 import revxrsal.commands.annotation.AutoComplete
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Subcommand
+import revxrsal.commands.bukkit.annotation.CommandPermission
 
 @Command("pp", "pluginportal", "ppm")
 class ListSubCommand {
 
     @Subcommand("list",)
     @AutoComplete("@marketplacePluginSearch *")
+    @CommandPermission("pluginportal.view")
     fun listCommand(audience: Audience) {
         val plugins = LocalPluginCache
             .sortedBy { plugin -> plugin.name }

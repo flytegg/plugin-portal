@@ -8,12 +8,14 @@ import gg.flyte.pluginportal.plugin.chat.sendFailureMessage
 import gg.flyte.pluginportal.plugin.chat.sendPluginListMessage
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.*
+import revxrsal.commands.bukkit.annotation.CommandPermission
 
 @Command("pp", "pluginportal", "ppm")
 class ViewSubCommand {
 
     @Subcommand("view")
     @AutoComplete("@marketplacePluginSearch *")
+    @CommandPermission("pluginportal.view")
     fun viewCommand(
         audience: Audience,
         @Optional prefix: String? = null,

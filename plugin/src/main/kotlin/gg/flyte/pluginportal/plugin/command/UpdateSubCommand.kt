@@ -1,19 +1,21 @@
 package gg.flyte.pluginportal.plugin.command
 
 import gg.flyte.pluginportal.common.types.LocalPlugin
-import gg.flyte.pluginportal.plugin.chat.*
 import gg.flyte.pluginportal.plugin.config.Config
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.manager.MarketplacePluginCache
+import gg.flyte.pluginportal.plugin.util.*
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.*
+import revxrsal.commands.bukkit.annotation.CommandPermission
 
 @Command("pp", "pluginportal", "ppm")
 class UpdateSubCommand {
 
     @Subcommand("update")
     @AutoComplete("@installedPluginSearch *")
+    @CommandPermission("pluginportal.maintain.update")
     fun updateCommand(
         audience: Audience,
         @Optional prefix: String? = null,

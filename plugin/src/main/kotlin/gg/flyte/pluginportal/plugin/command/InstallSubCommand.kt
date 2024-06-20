@@ -10,12 +10,14 @@ import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.newline
 import net.kyori.adventure.text.Component.text
 import revxrsal.commands.annotation.*
+import revxrsal.commands.bukkit.annotation.CommandPermission
 
 @Command("pp", "pluginportal", "ppm")
 class InstallSubCommand {
 
     @Subcommand("install")
     @AutoComplete("@marketplacePluginSearch *")
+    @CommandPermission("pluginportal.manage.install")
     fun installCommand(
         audience: Audience,
         @Optional prefix: String? = null,

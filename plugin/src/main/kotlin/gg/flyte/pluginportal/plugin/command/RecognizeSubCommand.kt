@@ -16,6 +16,7 @@ import revxrsal.commands.annotation.AutoComplete
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Optional
 import revxrsal.commands.annotation.Subcommand
+import revxrsal.commands.bukkit.annotation.CommandPermission
 import java.io.File
 
 @Command("pp", "pluginportal", "ppm")
@@ -32,6 +33,7 @@ class RecognizeSubCommand {
 
     @Subcommand("recognize")
     @AutoComplete("@pluginFileSearch *")
+    @CommandPermission("pluginportal.manage.recognize")
     fun recognizeCommand(audience: Audience, @Optional pluginFileName: String? = null) {
         if (pluginFileName == null)
             return sendFailureMessage(audience, "No plugin file name provided")
