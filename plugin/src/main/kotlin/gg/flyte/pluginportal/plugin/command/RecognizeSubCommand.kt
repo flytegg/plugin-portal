@@ -10,6 +10,7 @@ import masecla.modrinth4j.model.version.FileHash
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.AutoComplete
 import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Optional
 import revxrsal.commands.annotation.Subcommand
 import java.io.File
 
@@ -27,19 +28,22 @@ class RecognizeSubCommand {
 
     @Subcommand("recognize")
     @AutoComplete("@pluginFileSearch *")
-    fun recognizeCommand(audience: Audience, pluginFileName: String) {
+    fun recognizeCommand(audience: Audience, @Optional pluginFileName: String? = null) {
+        if (pluginFileName == null)
+            return sendFailureMessage(audience, "No plugin file name provided")
+
         val pluginFile = File("plugins", pluginFileName)
 
-        if (!pluginFile.exists() || pluginFile.extension != "jar") return audience.sendMessage(
-            status(Status.FAILURE, "Could not find a plugin file at $pluginFile").boxed())
+        if (!pluginFile.exists() || pluginFile.extension != "jar")
+            return sendFailureMessage(audience, "Could not find a plugin file at $pluginFile")
 
         val sha512 = calculateSHA512(pluginFile)
 
-        if (LocalPluginCache.any { it.sha512 == sha512 }) return audience.sendMessage(
-            status(Status.FAILURE, "PluginPortal already recognizes $pluginFileName").boxed())
+        if (LocalPluginCache.any { it.sha512 == sha512 })
+            return sendFailureMessage(audience, "PluginPortal already recognizes $pluginFileName")
 
-        val version = modrinth.versions().files().getVersionByHash(FileHash.SHA512, sha512)
-            .get() ?: return sendFailureMessage(audience, "Could not recognize plugin")
+        val version = modrinth.versions().files().getVersionByHash(FileHash.SHA512, sha512).get()
+            ?: return sendFailureMessage(audience, "Could not recognize plugin")
 
         val project = modrinth.projects().get(version.projectId).get()
 
