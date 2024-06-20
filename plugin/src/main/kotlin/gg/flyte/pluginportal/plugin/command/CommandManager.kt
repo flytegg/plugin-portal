@@ -3,6 +3,7 @@ package gg.flyte.pluginportal.plugin.command
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.plugin.PluginPortal.Companion.instance
+import gg.flyte.pluginportal.plugin.command.lamp.LampExceptionHandler
 import gg.flyte.pluginportal.plugin.http.SearchPlugins
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.util.async
@@ -17,10 +18,13 @@ object CommandManager {
         BukkitCommandHandler.create(instance).apply {
             flagPrefix = "--"
 
-            enableAdventure(BukkitAudiences.create(instance))
+            val audiences = BukkitAudiences.create(instance)
+
+            enableAdventure(audiences)
             registerAutoComplete()
             registerCommands()
             registerBrigadier()
+            exceptionHandler = LampExceptionHandler(audiences)
         }
     }
 
