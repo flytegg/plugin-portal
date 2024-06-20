@@ -13,7 +13,7 @@ class HelpSubCommand {
     val helpEntries = listOf(
         HelpEntry("/pp help", "Displays this help message"),
         HelpEntry("/pp list", "List installed plugins"),
-        HelpEntry("/pp view <plugin>", "Search and view for a plugin"),
+        HelpEntry("/pp view <plugin>", "Search and view a plugin"),
         HelpEntry("/pp install <plugin>", "Install a plugin"),
         HelpEntry("/pp update <plugin>", "Update a plugin"),
         HelpEntry("/pp delete <plugin>", "Uninstall a plugin"),
