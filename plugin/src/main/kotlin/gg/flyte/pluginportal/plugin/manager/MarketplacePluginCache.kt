@@ -54,7 +54,7 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
                             """
                         - The URL must be a direct download link
                         - The URL must download a JAR file
-                        - Please contact us in our discord for more information
+                        - Please contact us in our Discord for more information
                             """.trimIndent()
                         )
                     )
