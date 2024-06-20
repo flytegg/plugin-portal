@@ -34,8 +34,6 @@ class ViewSubCommand {
         }
 
         if (plugins.size == 1) {
-            val plugin = plugins.first()
-            audience.sendMessage(centerComponentLine(SharedComponents.getInstallButton(plugin.name, false)))
             return audience.sendMessage(plugins.first().getImageComponent().boxed())
         }
 

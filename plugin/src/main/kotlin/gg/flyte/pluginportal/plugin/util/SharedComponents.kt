@@ -11,7 +11,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 object SharedComponents {
 
     fun getInstallButton(name: String, installed: Boolean): Component {
-        val install = if (installed) "Uninstall" else "Install"
+        val install = if (installed) "uninstall" else "install"
         val color = if (installed) NamedTextColor.RED else NamedTextColor.AQUA
 
         return button(install.capitaliseFirst(), "", "/pp $install $name", color)

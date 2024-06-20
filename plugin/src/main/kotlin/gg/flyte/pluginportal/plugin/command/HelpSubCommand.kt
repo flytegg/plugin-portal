@@ -28,14 +28,6 @@ class HelpSubCommand {
     @Subcommand("help")
     @CommandPermission("pluginportal.view")
     fun helpCommand(audience: Audience) {
-        audience.sendMessage(centerComponentLine(
-            textPrimary("Plugin Portal").bold()
-        ))
-
-        audience.sendMessage(centerComponentLine(
-            textSecondary("by Flyte")
-        ))
-
         var message = centerComponentLine(
             textPrimary("Plugin Portal").bold()
         )
