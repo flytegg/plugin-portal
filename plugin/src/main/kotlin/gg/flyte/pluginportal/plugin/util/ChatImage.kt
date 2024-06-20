@@ -4,8 +4,6 @@ import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
-import net.kyori.adventure.text.event.ClickEvent
-import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.minimessage.MiniMessage
 import java.awt.Color
 import java.awt.image.BufferedImage
@@ -147,20 +145,12 @@ fun Plugin.getImageComponent(): Component {
         }
         .setLine(description.size + 3, textSecondary("Downloads: ${getDownloads().format()}"))
         .setLine(description.size + 4, textSecondary("Platforms: ${platforms.keys.joinToString()}"))
-        .setLine(11, getInstallButton(this))
+        .setLine(11, text("          ").append(SharedComponents.getInstallButton(name, LocalPluginCache.hasPlugin(id))))
         .build()
     return image
 }
 
-private fun getInstallButton(plugin: Plugin): Component {
-    val hasPlugin = LocalPluginCache.hasPlugin(plugin)
-    val install = if (hasPlugin) "uninstall" else "install"
 
-    return text("          ")
-        .append(textDark("[").appendPrimary(install.capitaliseFirst()).appendDark("]")
-            .hoverEvent(HoverEvent.showText(textPrimary("Click to $install ${plugin.name}")))
-            .clickEvent(ClickEvent.suggestCommand("/pp $install ${plugin.name}")))
-}
 
 private fun splitDescriptionIntoLines(description: String, maxLineLength: Int, maxLines: Int): List<String> {
     val words = description.split(" ")

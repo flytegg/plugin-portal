@@ -1,9 +1,7 @@
 package gg.flyte.pluginportal.plugin.command
 
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
-import gg.flyte.pluginportal.plugin.util.appendPrimary
-import gg.flyte.pluginportal.plugin.util.boxed
-import gg.flyte.pluginportal.plugin.util.textDark
+import gg.flyte.pluginportal.plugin.util.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
@@ -27,8 +25,12 @@ class ListSubCommand {
         plugins.forEach { plugin ->
             message = message.append(text("\n"))
                 .append(text(" - ", NamedTextColor.DARK_GRAY))
-                .appendPrimary(plugin.name)
-                .append(textDark(" (${plugin.platform.name})"))
+                .append(textPrimary(plugin.name)
+                    .showOnHover("Click to view this plugin")
+                    .suggestCommand("/pp view ${plugin.name}")
+                )
+                .append(textDark(" (${plugin.platform.name}) "))
+                .append(SharedComponents.getInstallButton(plugin.name, true))
         }
 
         audience.sendMessage(message.boxed())

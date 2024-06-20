@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.NamedTextColor.*
 import net.kyori.adventure.text.format.TextDecoration
@@ -49,6 +50,7 @@ fun TextComponent.colorSecondary() = color(GRAY)
 fun TextComponent.colorDark() = color(DARK_GRAY)
 
 fun TextComponent.suggestCommand(command: String) = clickEvent(ClickEvent.suggestCommand(command))
+fun TextComponent.showOnHover(text: String, colour: NamedTextColor = WHITE) = hoverEvent(HoverEvent.showText(text(text, colour)))
 
 fun TextComponent.removeStrikethrough() = decoration(TextDecoration.STRIKETHROUGH, false)
 
