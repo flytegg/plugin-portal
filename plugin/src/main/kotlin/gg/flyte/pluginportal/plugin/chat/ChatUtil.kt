@@ -121,7 +121,7 @@ val miniMessage = MiniMessage.builder()
 
 fun centerComponentLine(component: Component) = centerMessage(miniMessage.serialize(component))
 
-fun centerMessage(message: String): Component {
+fun centerMessage(message: String, maxLength: Int = 154): Component {
     val describedCharacters = splitCharsByBoldTags(message)
     val boldedCharacters = describedCharacters.first.removeTags()
     val nonBoldedCharacters = describedCharacters.second.removeTags()
