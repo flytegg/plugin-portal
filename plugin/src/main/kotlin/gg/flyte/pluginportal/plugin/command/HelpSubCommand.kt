@@ -28,29 +28,23 @@ class HelpSubCommand {
     @Subcommand("help")
     @CommandPermission("pluginportal.view")
     fun helpCommand(audience: Audience) {
+        audience.sendMessage(centerComponentLine(
+            textPrimary("Plugin Portal").bold()
+        ))
 
-        val comp = textPrimary("Plugin Portal")
-            .bold()
+        audience.sendMessage(centerComponentLine(
+            textSecondary("by Flyte")
+        ))
+
+        var message = centerComponentLine(
+            textPrimary("Plugin Portal").bold()
+        )
             .appendNewline()
-            .append(textSecondary("by Flyte"))
-
-        audience.sendMessage(
-            comp
-        )
-
-        audience.sendMessage(
-            centerComponent(comp).also {
-                println("centerComponent(comp): $it")
-                println(MiniMessage.miniMessage().serialize(it))
-            }
-        )
-
-        audience.sendMessage(centerComponent(text("Plugin Portal")))
-        audience.sendMessage(centerMessage("Plugin Portal"))
-
-
-        var message = centerMessage("<bold>Plugin Portal</bold> by Flyte")
-            .color(NamedTextColor.AQUA)
+            .append(
+                centerComponentLine(
+                    textSecondary("by Flyte")
+                )
+            )
             .appendNewline()
             .appendNewline()
 

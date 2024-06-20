@@ -115,15 +115,16 @@ fun sendLocalPluginListMessage(audience: Audience, message: String, plugins: Lis
     audience.sendMessage(endLine())
 }
 
-fun centerComponent(component: Component) = centerMessage(MiniMessage.miniMessage().serialize(component))
+val miniMessage = MiniMessage.builder()
+    .strict(true)
+    .build()
+
+fun centerComponentLine(component: Component) = centerMessage(miniMessage.serialize(component))
 
 fun centerMessage(message: String): Component {
     val describedCharacters = splitCharsByBoldTags(message)
-    val boldedCharacters = describedCharacters.first
-    val nonBoldedCharacters = describedCharacters.second
-
-    println(boldedCharacters)
-    println(nonBoldedCharacters)
+    val boldedCharacters = describedCharacters.first.removeTags()
+    val nonBoldedCharacters = describedCharacters.second.removeTags()
 
     val messageWidth =
         boldedCharacters.sumOf {
@@ -150,3 +151,6 @@ fun splitCharsByBoldTags(input: String): Pair<List<Char>, List<Char>> {
     return Pair(boldContent.toList(), nonBoldContent.toList())
 }
 
+fun <Char> List<Char>.removeTags() = joinToString("")
+    .replace(Regex("<[^<]+>"), "")
+    .toList()
