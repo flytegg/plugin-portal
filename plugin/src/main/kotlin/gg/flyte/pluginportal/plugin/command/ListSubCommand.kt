@@ -32,6 +32,8 @@ class ListSubCommand {
                     .suggestCommand("/pp view ${plugin.name}")
                 )
                 .append(textDark(" (${plugin.platform.name}) "))
+                .append(SharedComponents.getUpdateButton(plugin.name))
+                .append(text(" "))
                 .append(SharedComponents.getInstallButton(plugin.name, true))
         }
 
