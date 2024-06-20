@@ -28,7 +28,7 @@ class ListSubCommand {
             message = message.append(text("\n"))
                 .append(text(" - ", NamedTextColor.DARK_GRAY))
                 .append(textPrimary(plugin.name)
-                    .showOnHover("Click to view this plugin")
+                    .showOnHover("Click to view this plugin", NamedTextColor.AQUA)
                     .suggestCommand("/pp view ${plugin.name}")
                 )
                 .append(textDark(" (${plugin.platform.name}) "))
