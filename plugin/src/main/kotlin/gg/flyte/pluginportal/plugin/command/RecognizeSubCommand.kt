@@ -29,11 +29,14 @@ class RecognizeSubCommand {
     @AutoComplete("@pluginFileSearch *")
     fun recognizeCommand(audience: Audience, pluginFileName: String) {
         val pluginFile = File("plugins", pluginFileName)
+
+        if (!pluginFile.exists() || pluginFile.extension != "jar") return audience.sendMessage(
+            status(Status.FAILURE, "Could not find a plugin file at $pluginFile").boxed())
+
         val sha512 = calculateSHA512(pluginFile)
 
         if (LocalPluginCache.any { it.sha512 == sha512 }) return audience.sendMessage(
-            status(Status.FAILURE, "PluginPortal already recognises $pluginFileName").boxed()
-        )
+            status(Status.FAILURE, "PluginPortal already recognizes $pluginFileName").boxed())
 
         val version = modrinth.versions().files().getVersionByHash(FileHash.SHA512, sha512)
             .get() ?: return sendFailureMessage(audience, "Could not recognize plugin")
