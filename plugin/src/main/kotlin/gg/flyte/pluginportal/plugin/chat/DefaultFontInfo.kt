@@ -102,8 +102,8 @@ enum class DefaultFontInfo(val character: Char, val length: Int) {
     }
 
     companion object {
-        fun getDefaultFontInfo(c: Char): DefaultFontInfo {
-            return entries.find { it.character == c } ?: DEFAULT
+        fun getDefaultFontInfo(character: Char): DefaultFontInfo {
+            return entries.find { entry -> entry.character == character } ?: DEFAULT
         }
     }
 }

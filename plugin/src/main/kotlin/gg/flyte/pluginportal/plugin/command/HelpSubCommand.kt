@@ -26,7 +26,7 @@ class HelpSubCommand {
     @Subcommand("help")
     @CommandPermission("pluginportal.view")
     fun helpCommand(audience: Audience) {
-        var message = centerMessage("Plugin Portal by Flyte")
+        var message = centerMessage("<bold>Plugin Portal</bold> by Flyte")
             .color(NamedTextColor.AQUA)
             .appendNewline()
             .appendNewline()

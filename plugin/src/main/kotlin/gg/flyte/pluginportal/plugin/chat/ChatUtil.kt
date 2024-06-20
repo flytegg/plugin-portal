@@ -12,6 +12,7 @@ import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.NamedTextColor.*
 import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.minimessage.MiniMessage
 
 fun solidLine(prefix: String = "", suffix: String = "\n") = text(
     "$prefix                                                                                $suffix",
@@ -51,7 +52,8 @@ fun TextComponent.colorSecondary() = color(GRAY)
 fun TextComponent.colorDark() = color(DARK_GRAY)
 
 fun TextComponent.suggestCommand(command: String) = clickEvent(ClickEvent.suggestCommand(command))
-fun TextComponent.showOnHover(text: String, colour: NamedTextColor = WHITE) = hoverEvent(HoverEvent.showText(text(text, colour)))
+fun TextComponent.showOnHover(text: String, colour: NamedTextColor = WHITE) =
+    hoverEvent(HoverEvent.showText(text(text, colour)))
 
 fun TextComponent.removeStrikethrough() = decoration(TextDecoration.STRIKETHROUGH, false)
 
@@ -113,12 +115,37 @@ fun sendLocalPluginListMessage(audience: Audience, message: String, plugins: Lis
     audience.sendMessage(endLine())
 }
 
+fun deserialize(component: Component) = MiniMessage.miniMessage().serialize(component)
 
 fun centerMessage(message: String): Component {
-    val messageWidth = message.sumOf { DefaultFontInfo.getDefaultFontInfo(it).length + 1 }
+    val describedCharacters = splitCharsByBoldTags(message)
+    val boldedCharacters = describedCharacters.first
+    val nonBoldedCharacters = describedCharacters.second
+
+    println(boldedCharacters)
+    println(nonBoldedCharacters)
+
+    val messageWidth =
+        boldedCharacters.sumOf {
+            DefaultFontInfo.getDefaultFontInfo(it).getBoldLength() + 1
+        } + nonBoldedCharacters.sumOf { DefaultFontInfo.getDefaultFontInfo(it).length + 1 }
+
+
+//    val messageWidth = message.sumOf { DefaultFontInfo.getDefaultFontInfo(it).length + 1 }
     val paddingWidth = (154 - messageWidth / 2).coerceAtLeast(0)
     val spaceWidth = DefaultFontInfo.SPACE.length + 1
     val padding = " ".repeat(paddingWidth / spaceWidth)
 
-    return text("$padding$message")
+    return MiniMessage.miniMessage().deserialize("$padding$message")
 }
+
+fun splitCharsByBoldTags(input: String): Pair<List<Char>, List<Char>> {
+    val regex = "<bold>(.*?)</bold>".toRegex()
+    val boldContent = regex.findAll(input)
+        .flatMap { it.groupValues[1].toList() } // Extract content inside <bold> tags as list of chars
+
+    val nonBoldContent = input.replace(regex, "") // Remove <bold> tags and extract remaining characters
+
+    return Pair(boldContent.toList(), nonBoldContent.toList())
+}
+
