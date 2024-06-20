@@ -1,7 +1,9 @@
 package gg.flyte.pluginportal.plugin.util
 
 import gg.flyte.pluginportal.common.types.Plugin
+import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.minimessage.MiniMessage
 import java.awt.Color
 import java.awt.image.BufferedImage
@@ -131,8 +133,11 @@ fun createImageGrid(image: BufferedImage, rows: Int, cols: Int): Array<Array<Buf
     return chunks
 }
 
+private const val MAX_DESCRIPTION_LINES = 5
+
 fun Plugin.getImageComponent(): Component {
-    val description = splitDescriptionIntoLines(getDescription() ?: "", 35)
+    val description = splitDescriptionIntoLines(getDescription() ?: "", 35, MAX_DESCRIPTION_LINES)
+
     val image = ChatImage.ImageTextBuilder(getImageURL() ?: "")
         .setLine(0, textPrimary(name).bold())
         .apply {
@@ -140,11 +145,14 @@ fun Plugin.getImageComponent(): Component {
         }
         .setLine(description.size + 3, textSecondary("Downloads: ${getDownloads().format()}"))
         .setLine(description.size + 4, textSecondary("Platforms: ${platforms.keys.joinToString()}"))
+        .setLine(11, text("          ").append(SharedComponents.getInstallButton(name, LocalPluginCache.hasPlugin(id))))
         .build()
     return image
 }
 
-private fun splitDescriptionIntoLines(description: String, maxLineLength: Int): List<String> {
+
+
+private fun splitDescriptionIntoLines(description: String, maxLineLength: Int, maxLines: Int): List<String> {
     val words = description.split(" ")
     val lines = mutableListOf<String>()
     var currentLine = StringBuilder()
@@ -152,6 +160,12 @@ private fun splitDescriptionIntoLines(description: String, maxLineLength: Int): 
     for (word in words) {
         if (currentLine.length + word.length + 1 > maxLineLength) {
             lines.add(currentLine.toString())
+
+            if (lines.size == maxLines) { // Enforce max line count.
+                lines[maxLines-1] = currentLine.append("...").toString()
+                break
+            }
+
             currentLine = StringBuilder()
         }
         if (currentLine.isNotEmpty()) {

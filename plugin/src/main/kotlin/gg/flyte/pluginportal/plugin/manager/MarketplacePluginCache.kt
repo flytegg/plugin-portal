@@ -41,9 +41,12 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
                     .append(endLine())
             )
 
-        text("Invalid download URL for platform ", NamedTextColor.RED)
+
+/*  What is this here for?
+          text("Invalid download URL for platform ", NamedTextColor.RED)
             .append(text(platform.name, NamedTextColor.AQUA))
             .append(endLine())
+*/
 
         if (!isValidDownload(downloadURL)) {
             return audience.sendMessage(
@@ -54,10 +57,11 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
                             """
                         - The URL must be a direct download link
                         - The URL must download a JAR file
-                        - Please contact us in our discord for more information
+                        - Please contact us in our Discord for more information
                             """.trimIndent()
                         )
                     )
+                    .append(endLine())
             )
         }
 
@@ -74,7 +78,8 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
 
         audience.sendMessage(
             newline()
-                .appendStatus(Status.SUCCESS, "Downloaded ${plugin.name} from ${platform.name}")
+                .appendStatus(Status.SUCCESS, "Downloaded ${plugin.name} from ${platform.name}.\n")
+                .appendSecondary("- Please restart your server to enable this plugin")
                 .append(endLine())
         )
     }
