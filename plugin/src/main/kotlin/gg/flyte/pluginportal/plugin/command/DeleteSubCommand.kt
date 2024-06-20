@@ -1,14 +1,9 @@
 package gg.flyte.pluginportal.plugin.command
 
-import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.types.LocalPlugin
-import gg.flyte.pluginportal.common.types.MarketplacePlatform
-import gg.flyte.pluginportal.common.types.Plugin
-import gg.flyte.pluginportal.plugin.config.Config
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache.findFile
-import gg.flyte.pluginportal.plugin.manager.MarketplacePluginCache
 import gg.flyte.pluginportal.plugin.util.*
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.*
@@ -16,7 +11,7 @@ import revxrsal.commands.annotation.*
 @Command("pp", "pluginportal", "ppm")
 class DeleteSubCommand {
 
-    @Subcommand("delete")
+    @Subcommand("delete", "uninstall")
     @AutoComplete("@installedPluginSearch *")
     fun deleteCommand(
         audience: Audience,
