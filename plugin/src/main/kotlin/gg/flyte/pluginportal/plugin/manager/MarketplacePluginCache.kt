@@ -78,7 +78,8 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
 
         audience.sendMessage(
             newline()
-                .appendStatus(Status.SUCCESS, "Downloaded ${plugin.name} from ${platform.name}")
+                .appendStatus(Status.SUCCESS, "Downloaded ${plugin.name} from ${platform.name}.\n")
+                .appendSecondary("- Please restart your server to enable this plugin")
                 .append(endLine())
         )
     }
