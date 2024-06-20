@@ -1,8 +1,9 @@
 package gg.flyte.pluginportal.plugin.command
 
-import gg.flyte.pluginportal.plugin.util.*
+import gg.flyte.pluginportal.plugin.chat.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.format.NamedTextColor
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.DefaultFor
 import revxrsal.commands.annotation.Subcommand
@@ -22,7 +23,11 @@ class HelpSubCommand {
 
     @Subcommand("help")
     fun helpCommand(audience: Audience) {
-        var message = text("")
+        var message = centerMessage("Plugin Portal by Flyte")
+            .color(NamedTextColor.AQUA)
+            .appendNewline()
+            .appendNewline()
+
         helpEntries.forEachIndexed { index, entry ->
             if (index > 0) { message = message.append(text("\n")) }
             message = message.append(entry.toComponent())

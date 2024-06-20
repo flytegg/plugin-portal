@@ -12,7 +12,7 @@ data class Plugin(
 
     fun getImageURL(): String? = getFirstPlatform()?.imageURL
 
-    fun getDescription(): String? = getFirstPlatform()?.description
+    fun getDescription(): String? = getFirstPlatform()?.description?.replace("\n", " ")
 
     fun getDownloads(): Int = platforms.values.sumOf { platform -> platform.downloads }
 

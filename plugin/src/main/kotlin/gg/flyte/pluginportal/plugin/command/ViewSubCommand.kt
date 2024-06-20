@@ -2,10 +2,10 @@ package gg.flyte.pluginportal.plugin.command
 
 import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.plugin.manager.MarketplacePluginCache
-import gg.flyte.pluginportal.plugin.util.boxed
+import gg.flyte.pluginportal.plugin.chat.boxed
 import gg.flyte.pluginportal.plugin.util.getImageComponent
-import gg.flyte.pluginportal.plugin.util.sendFailureMessage
-import gg.flyte.pluginportal.plugin.util.sendPluginListMessage
+import gg.flyte.pluginportal.plugin.chat.sendFailureMessage
+import gg.flyte.pluginportal.plugin.chat.sendPluginListMessage
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.*
 

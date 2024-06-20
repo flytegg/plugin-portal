@@ -3,6 +3,7 @@ package gg.flyte.pluginportal.plugin.manager
 import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.types.Plugin
+import gg.flyte.pluginportal.plugin.chat.*
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.util.*
 import net.kyori.adventure.audience.Audience

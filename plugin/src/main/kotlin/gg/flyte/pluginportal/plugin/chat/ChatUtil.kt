@@ -1,5 +1,6 @@
-package gg.flyte.pluginportal.plugin.util
+package gg.flyte.pluginportal.plugin.chat
 
+import DefaultFontInfo
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.Plugin
 import net.kyori.adventure.audience.Audience
@@ -13,7 +14,7 @@ import net.kyori.adventure.text.format.NamedTextColor.*
 import net.kyori.adventure.text.format.TextDecoration
 
 fun solidLine(prefix: String = "", suffix: String = "\n") = text(
-    "$prefix                                                                 $suffix",
+    "$prefix                                                                                $suffix",
     DARK_GRAY,
     TextDecoration.STRIKETHROUGH
 )
@@ -110,4 +111,14 @@ fun sendLocalPluginListMessage(audience: Audience, message: String, plugins: Lis
         )
     }
     audience.sendMessage(endLine())
+}
+
+
+fun centerMessage(message: String): Component {
+    val messageWidth = message.sumOf { DefaultFontInfo.getDefaultFontInfo(it).length + 1 }
+    val paddingWidth = (154 - messageWidth / 2).coerceAtLeast(0)
+    val spaceWidth = DefaultFontInfo.SPACE.length + 1
+    val padding = " ".repeat(paddingWidth / spaceWidth)
+
+    return text("$padding$message")
 }

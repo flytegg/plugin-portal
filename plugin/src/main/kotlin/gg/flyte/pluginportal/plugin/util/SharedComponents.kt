@@ -1,8 +1,11 @@
 package gg.flyte.pluginportal.plugin.util
 
+import gg.flyte.pluginportal.plugin.chat.appendDark
+import gg.flyte.pluginportal.plugin.chat.suggestCommand
+import gg.flyte.pluginportal.plugin.chat.textDark
+import gg.flyte.pluginportal.plugin.chat.textPrimary
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
-import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
 
@@ -14,7 +17,7 @@ object SharedComponents {
 
         return textDark("[").append(text(install.capitaliseFirst(), colour)).appendDark("]")
                 .hoverEvent(HoverEvent.showText(textPrimary("Click to $install $name")))
-                .clickEvent(ClickEvent.suggestCommand("/pp $install $name"))
+                .suggestCommand("/pp $install $name")
     }
 
 }

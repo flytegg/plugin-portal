@@ -1,6 +1,9 @@
 package gg.flyte.pluginportal.plugin.util
 
 import gg.flyte.pluginportal.common.types.Plugin
+import gg.flyte.pluginportal.plugin.chat.bold
+import gg.flyte.pluginportal.plugin.chat.textPrimary
+import gg.flyte.pluginportal.plugin.chat.textSecondary
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
