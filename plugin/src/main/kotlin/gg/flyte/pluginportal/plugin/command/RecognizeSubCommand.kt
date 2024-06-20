@@ -1,25 +1,17 @@
 package gg.flyte.pluginportal.plugin.command
 
-import com.google.gson.JsonObject
-import com.google.gson.JsonParser
-import com.google.gson.JsonSyntaxException
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.MarketplacePlatform
-import gg.flyte.pluginportal.common.util.GSON
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.util.*
 import masecla.modrinth4j.client.agent.UserAgent
 import masecla.modrinth4j.main.ModrinthAPI
 import masecla.modrinth4j.model.version.FileHash
 import net.kyori.adventure.audience.Audience
-import net.kyori.adventure.text.Component.text
 import revxrsal.commands.annotation.AutoComplete
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Subcommand
-import java.awt.SystemColor.text
 import java.io.File
-import java.net.HttpURLConnection
-import java.net.URL
 
 @Command("pp", "pluginportal", "ppm")
 class RecognizeSubCommand {
@@ -35,9 +27,13 @@ class RecognizeSubCommand {
 
     @Subcommand("recognize")
     @AutoComplete("@pluginFileSearch *")
-    fun recognizeCommand(audience: Audience, pluginFile: String) {
-        val pluginFile = File("plugins", pluginFile)
+    fun recognizeCommand(audience: Audience, pluginFileName: String) {
+        val pluginFile = File("plugins", pluginFileName)
         val sha512 = calculateSHA512(pluginFile)
+
+        if (LocalPluginCache.any { it.sha512 == sha512 }) return audience.sendMessage(
+            status(Status.FAILURE, "PluginPortal already recognises $pluginFileName").boxed()
+        )
 
         val version = modrinth.versions().files().getVersionByHash(FileHash.SHA512, sha512)
             .get() ?: return sendFailureMessage(audience, "Could not recognize plugin")
