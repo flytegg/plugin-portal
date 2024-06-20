@@ -6,8 +6,10 @@ import net.kyori.adventure.text.Component.text
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.DefaultFor
 import revxrsal.commands.annotation.Subcommand
+import revxrsal.commands.bukkit.annotation.CommandPermission
 
 @Command("pp", "pluginportal", "ppm")
+@CommandPermission("pluginportal.view")
 class HelpSubCommand {
 
     val helpEntries = listOf(
@@ -21,6 +23,7 @@ class HelpSubCommand {
     )
 
     @Subcommand("help")
+    @CommandPermission("pluginportal.view")
     fun helpCommand(audience: Audience) {
         var message = text("")
         helpEntries.forEachIndexed { index, entry ->
