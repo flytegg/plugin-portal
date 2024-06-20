@@ -52,8 +52,8 @@ fun TextComponent.colorSecondary() = color(GRAY)
 fun TextComponent.colorDark() = color(DARK_GRAY)
 
 fun TextComponent.suggestCommand(command: String) = clickEvent(ClickEvent.suggestCommand(command))
-fun TextComponent.showOnHover(text: String, colour: NamedTextColor = WHITE) =
-    hoverEvent(HoverEvent.showText(text(text, colour)))
+fun TextComponent.showOnHover(text: String, color: NamedTextColor = WHITE) =
+    hoverEvent(HoverEvent.showText(text(text, color)))
 
 fun TextComponent.removeStrikethrough() = decoration(TextDecoration.STRIKETHROUGH, false)
 
@@ -115,7 +115,7 @@ fun sendLocalPluginListMessage(audience: Audience, message: String, plugins: Lis
     audience.sendMessage(endLine())
 }
 
-fun deserialize(component: Component) = MiniMessage.miniMessage().serialize(component)
+fun centerComponent(component: Component) = centerMessage(MiniMessage.miniMessage().serialize(component))
 
 fun centerMessage(message: String): Component {
     val describedCharacters = splitCharsByBoldTags(message)
@@ -130,8 +130,6 @@ fun centerMessage(message: String): Component {
             DefaultFontInfo.getDefaultFontInfo(it).getBoldLength() + 1
         } + nonBoldedCharacters.sumOf { DefaultFontInfo.getDefaultFontInfo(it).length + 1 }
 
-
-//    val messageWidth = message.sumOf { DefaultFontInfo.getDefaultFontInfo(it).length + 1 }
     val paddingWidth = (154 - messageWidth / 2).coerceAtLeast(0)
     val spaceWidth = DefaultFontInfo.SPACE.length + 1
     val padding = " ".repeat(paddingWidth / spaceWidth)
@@ -140,11 +138,14 @@ fun centerMessage(message: String): Component {
 }
 
 fun splitCharsByBoldTags(input: String): Pair<List<Char>, List<Char>> {
-    val regex = "<bold>(.*?)</bold>".toRegex()
+    val regex = "<bold>(.+)(?:</bold>)?".toRegex()
     val boldContent = regex.findAll(input)
-        .flatMap { it.groupValues[1].toList() } // Extract content inside <bold> tags as list of chars
+        .flatMap { it.groupValues[1].toList() }
+        .joinToString("")
+        .replace(Regex("<[^<]+>"), "")
+        .toList()
 
-    val nonBoldContent = input.replace(regex, "") // Remove <bold> tags and extract remaining characters
+    val nonBoldContent = input.replace(regex, "")
 
     return Pair(boldContent.toList(), nonBoldContent.toList())
 }
