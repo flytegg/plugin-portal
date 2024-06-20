@@ -2,6 +2,7 @@ package gg.flyte.pluginportal.plugin.manager
 
 import com.google.gson.JsonSyntaxException
 import gg.flyte.pluginportal.common.types.LocalPlugin
+import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.common.util.GSON
 import gg.flyte.pluginportal.plugin.PluginPortal
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
@@ -10,6 +11,9 @@ import gg.flyte.pluginportal.plugin.util.createIfNotExists
 import java.io.File
 
 object LocalPluginCache : PluginCache<LocalPlugin>() {
+
+    fun hasPlugin(plugin: Plugin) = hasPlugin(plugin.id)
+    fun hasPlugin(id: String) = any { it.id == id }
 
     fun load() {
         val text = getPluginsFile().readText()
