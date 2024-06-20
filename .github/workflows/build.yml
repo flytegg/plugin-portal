@@ -4,6 +4,9 @@ on:
   release:
     types:
       - created
+  push:
+    branches:
+      - recode
 
 jobs:
   build_release:
