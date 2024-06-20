@@ -95,6 +95,7 @@ enum class DefaultFontInfo(val character: Char, val length: Int) {
     PERIOD('.', 1),
     COMMA(',', 1),
     SPACE(' ', 3),
+    SQUARE('█', 6),
     DEFAULT('a', 4);
 
     fun getBoldLength(): Int {

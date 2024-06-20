@@ -119,7 +119,9 @@ val miniMessage = MiniMessage.builder()
     .strict(true)
     .build()
 
-fun centerComponentLine(component: Component) = centerMessage(miniMessage.serialize(component))
+fun centerComponentLine(component: Component, maxLength: Int = 154) = centerMessage(miniMessage.serialize(component), maxLength).also {
+    println(miniMessage.serialize(component))
+}
 
 fun centerMessage(message: String, maxLength: Int = 154): Component {
     val describedCharacters = splitCharsByBoldTags(message)
@@ -131,7 +133,7 @@ fun centerMessage(message: String, maxLength: Int = 154): Component {
             DefaultFontInfo.getDefaultFontInfo(it).getBoldLength() + 1
         } + nonBoldedCharacters.sumOf { DefaultFontInfo.getDefaultFontInfo(it).length + 1 }
 
-    val paddingWidth = (154 - messageWidth / 2).coerceAtLeast(0)
+    val paddingWidth = (maxLength - messageWidth / 2).coerceAtLeast(0)
     val spaceWidth = DefaultFontInfo.SPACE.length + 1
     val padding = " ".repeat(paddingWidth / spaceWidth)
 
