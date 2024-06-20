@@ -41,9 +41,12 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
                     .append(endLine())
             )
 
-        text("Invalid download URL for platform ", NamedTextColor.RED)
+
+/*  What is this here for?
+          text("Invalid download URL for platform ", NamedTextColor.RED)
             .append(text(platform.name, NamedTextColor.AQUA))
             .append(endLine())
+*/
 
         if (!isValidDownload(downloadURL)) {
             return audience.sendMessage(
@@ -58,6 +61,7 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
                             """.trimIndent()
                         )
                     )
+                    .append(endLine())
             )
         }
 

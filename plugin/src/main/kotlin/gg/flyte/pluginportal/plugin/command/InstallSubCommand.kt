@@ -51,7 +51,7 @@ class InstallSubCommand {
     private fun handleSinglePlugin(audience: Audience, plugin: Plugin, platformFlag: MarketplacePlatform?) {
         val platforms = plugin.platforms
 
-        if (LocalPluginCache.any { localPlugin -> localPlugin.id == plugin.id }) {
+        if (LocalPluginCache.hasPlugin(plugin)) {
             return sendFailureMessage(audience, "Plugin already installed, use the update command instead")
         }
 
