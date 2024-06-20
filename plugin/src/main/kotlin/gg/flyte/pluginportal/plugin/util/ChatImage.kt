@@ -2,6 +2,7 @@ package gg.flyte.pluginportal.plugin.util
 
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.plugin.chat.bold
+import gg.flyte.pluginportal.plugin.chat.showOnHover
 import gg.flyte.pluginportal.plugin.chat.textPrimary
 import gg.flyte.pluginportal.plugin.chat.textSecondary
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
@@ -144,7 +145,7 @@ fun Plugin.getImageComponent(): Component {
     val image = ChatImage.ImageTextBuilder(getImageURL() ?: "")
         .setLine(0, textPrimary(name).bold())
         .apply {
-            description.forEachIndexed { index, line -> setLine(index + 2, textSecondary(line)) }
+            description.forEachIndexed { index, line -> setLine(index + 2, textSecondary(line).showOnHover(getDescription() ?: "")) }
         }
         .setLine(description.size + 3, textSecondary("Downloads: ${getDownloads().format()}"))
         .setLine(description.size + 4, textSecondary("Platforms: ${platforms.keys.joinToString()}"))
@@ -169,6 +170,7 @@ private fun splitDescriptionIntoLines(description: String, maxLineLength: Int, m
 
             if (lines.size == maxLines) { // Enforce max line count.
                 lines[maxLines-1] = currentLine.append("...").toString()
+                currentLine.clear()
                 break
             }
 
