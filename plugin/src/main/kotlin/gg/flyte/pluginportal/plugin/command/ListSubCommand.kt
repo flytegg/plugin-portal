@@ -1,6 +1,5 @@
 package gg.flyte.pluginportal.plugin.command
 
-import gg.flyte.pluginportal.plugin.chat.*
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.util.*
 import net.kyori.adventure.audience.Audience
@@ -28,12 +27,13 @@ class ListSubCommand {
         plugins.forEach { plugin ->
             message = message.append(text("\n"))
                 .append(text(" - ", NamedTextColor.DARK_GRAY))
-                .append(
-                    textPrimary(plugin.name)
-                    .showOnHover("Click to view this plugin")
+                .append(textPrimary(plugin.name)
+                    .showOnHover("Click to view this plugin", NamedTextColor.AQUA)
                     .suggestCommand("/pp view ${plugin.name}")
                 )
                 .append(textDark(" (${plugin.platform.name}) "))
+                .append(SharedComponents.getUpdateButton(plugin.name))
+                .append(text(" "))
                 .append(SharedComponents.getInstallButton(plugin.name, true))
         }
 
