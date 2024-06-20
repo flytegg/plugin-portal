@@ -126,9 +126,6 @@ fun centerMessage(message: String, maxLength: Int = 240): Component {
 
     val messageWidth = message.withoutTags.pixelLength - boldCharactersNonBoldLength + boldCharactersLength
 
-    println("BOld Chars: $boldCharacters")
-    println("Message w/out tags: ${message.withoutTags}")
-
     if (messageWidth > maxLength) {
         // TODO
     }
