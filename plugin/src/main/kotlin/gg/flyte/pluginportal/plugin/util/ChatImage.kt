@@ -20,9 +20,9 @@ object ChatImage {
 
         for (row in grid) {
             for (cell in row) {
-                val colour = getAverageColor(cell)
-                val chatColour = String.format("<#%02x%02x%02x>", colour.red, colour.green, colour.blue)
-                sb.append(chatColour).append("█")
+                val color = getAverageColor(cell)
+                val chatColor = String.format("<#%02x%02x%02x>", color.red, color.green, color.blue)
+                sb.append(chatColor).append("█")
             }
             sb.append("\n")
         }
@@ -129,6 +129,40 @@ fun createImageGrid(image: BufferedImage, rows: Int, cols: Int): Array<Array<Buf
         }
     }
     return chunks
+}
+
+fun Plugin.getImageComponent(): Component {
+    val description = splitDescriptionIntoLines(getDescription() ?: "", 35)
+    val image = ChatImage.ImageTextBuilder(getImageURL() ?: "")
+        .setLine(0, textPrimary(name).bold())
+        .apply {
+            description.forEachIndexed { index, line -> setLine(index + 2, textSecondary(line)) }
+        }
+        .setLine(description.size + 3, textSecondary("Downloads: ${getDownloads().format()}"))
+        .setLine(description.size + 4, textSecondary("Platforms: ${platforms.keys.joinToString()}"))
+        .build()
+    return image
+}
+
+private fun splitDescriptionIntoLines(description: String, maxLineLength: Int): List<String> {
+    val words = description.split(" ")
+    val lines = mutableListOf<String>()
+    var currentLine = StringBuilder()
+
+    for (word in words) {
+        if (currentLine.length + word.length + 1 > maxLineLength) {
+            lines.add(currentLine.toString())
+            currentLine = StringBuilder()
+        }
+        if (currentLine.isNotEmpty()) {
+            currentLine.append(" ")
+        }
+        currentLine.append(word)
+    }
+    if (currentLine.isNotEmpty()) {
+        lines.add(currentLine.toString())
+    }
+    return lines
 }
 
 fun translate(text: String) = MiniMessage.miniMessage().deserialize(text)

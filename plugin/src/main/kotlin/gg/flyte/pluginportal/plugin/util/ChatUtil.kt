@@ -1,5 +1,8 @@
 package gg.flyte.pluginportal.plugin.util
 
+import gg.flyte.pluginportal.common.types.LocalPlugin
+import gg.flyte.pluginportal.common.types.Plugin
+import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.TextComponent
@@ -28,9 +31,9 @@ fun Component.boxed() = text()
 
 fun status(status: Status, text: String): Component =
     text("[${status.name}]: ", status.color)
-    .append(
-        text(text, GRAY)
-    )
+        .append(
+            text(text, GRAY)
+        )
 
 fun textPrimary(text: String) = text(text).colorPrimary()
 fun textSecondary(text: String) = text(text).colorSecondary()
@@ -56,4 +59,53 @@ enum class Status(val color: NamedTextColor) {
     FAILURE(RED),
     WARNING(YELLOW),
     INFO(GRAY),
+}
+
+fun sendFailureMessage(audience: Audience, message: String) {
+    audience.sendMessage(status(Status.FAILURE, message).boxed())
+}
+
+fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plugin>, command: String) {
+    audience.sendMessage(startLine().appendSecondary(message).appendNewline())
+    plugins.forEach { plugin ->
+
+        var platformSuffix = textDark(" (")
+
+        plugin.platforms.keys.forEachIndexed { index, platform ->
+            platformSuffix = platformSuffix.append(
+                textDark(platform.name)
+                    .hoverEvent(text("Click to $command with ${platform.name}"))
+                    .suggestCommand(
+                        "/pp $command ${plugin.name} --platform ${platform.name}"
+                    )
+            )
+
+            if (index != plugin.platforms.size - 1) {
+                platformSuffix = platformSuffix.appendDark(", ")
+            }
+        }
+
+        audience.sendMessage(
+            textSecondary(" - ").appendPrimary(plugin.name)
+                .hoverEvent(text("Click to $command"))
+                .suggestCommand("/pp $command ${plugin.name}")
+                .append(platformSuffix.appendDark(")"))
+        )
+    }
+    audience.sendMessage(endLine())
+}
+
+fun sendLocalPluginListMessage(audience: Audience, message: String, plugins: List<LocalPlugin>, command: String) {
+    audience.sendMessage(startLine().appendSecondary(message).appendNewline())
+    plugins.forEach { plugin ->
+        val platformSuffix = textDark(" (${plugin.platform.name})")
+
+        audience.sendMessage(
+            textSecondary(" - ").appendPrimary(plugin.name)
+                .hoverEvent(text("Click to $command"))
+                .suggestCommand("/pp $command ${plugin.name} --platform ${plugin.platform.name}")
+                .append(platformSuffix)
+        )
+    }
+    audience.sendMessage(endLine())
 }

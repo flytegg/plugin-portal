@@ -1,9 +1,11 @@
 package gg.flyte.pluginportal.plugin
 
 import gg.flyte.pluginportal.plugin.command.CommandManager
+import gg.flyte.pluginportal.plugin.config.Config
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import io.papermc.lib.PaperLib
 import org.bukkit.plugin.java.JavaPlugin
+
 
 class PluginPortal : JavaPlugin() {
 
@@ -15,6 +17,7 @@ class PluginPortal : JavaPlugin() {
         instance = this
 
         CommandManager
+        Config
 
         LocalPluginCache.load()
 

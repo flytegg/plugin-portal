@@ -1,11 +1,15 @@
 package gg.flyte.pluginportal.plugin.command
 
+import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.plugin.PluginPortal.Companion.instance
 import gg.flyte.pluginportal.plugin.http.SearchPlugins
+import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.util.async
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
+import org.bukkit.Bukkit
 import revxrsal.commands.bukkit.BukkitCommandHandler
+import java.io.File
 
 object CommandManager {
 
@@ -23,9 +27,12 @@ object CommandManager {
     private fun BukkitCommandHandler.registerCommands() {
         register(
             InstallSubCommand(),
+            UpdateSubCommand(),
+            DeleteSubCommand(),
             HelpSubCommand(),
             ViewSubCommand(),
             ListSubCommand(),
+            RecognizeSubCommand(),
         )
     }
 
@@ -37,19 +44,18 @@ object CommandManager {
                 if (searchName.length == 2) async { SearchPlugins.search(searchName) }
 
                 if (searchName.length <= 2)
-                    listOf("$searchName${if (searchName.isEmpty()) "" else " ~ "}Keep Typing")
+                    listOf("$searchName${if (searchName.isEmpty()) "" else " ~ "}Keep typing...")
                 else
                     SearchPlugins.getCachedSearch(searchName)?.map(Plugin::name) ?: listOf("$searchName ~ Loading")
             }
-
-//            .registerSuggestion("installedPlugin") { args, sender, command ->
-//                PPPluginCache.getInstalledPlugins().map { it.name }.let { list ->
-//                    if (list.isEmpty()) {
-//                        return@registerSuggestion listOf("No Plugins Installed")
-//                    }
-//
-//                    return@registerSuggestion list
-//                }
-//            }
+            .registerSuggestion("installedPluginSearch") { args, _, _ ->
+                LocalPluginCache.map(LocalPlugin::name)
+            }
+            .registerSuggestion("pluginFileSearch") { args, _, _ ->
+                File("plugins").listFiles()!!
+                    .filter { file -> file.isFile }
+                    .filter { file -> file.name.endsWith(".jar") }
+                    .map { file -> file.name }
+            }
     }
 }
