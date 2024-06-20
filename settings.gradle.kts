@@ -11,4 +11,4 @@ plugins {
 }
 
 rootProject.name = "plugin-portal"
-include("list", "common", "plugin")
+include("common", "plugin")

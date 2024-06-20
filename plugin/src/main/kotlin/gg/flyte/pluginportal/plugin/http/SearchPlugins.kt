@@ -6,7 +6,6 @@ import gg.flyte.pluginportal.common.types.Plugin
 import java.util.concurrent.TimeUnit
 
 object SearchPlugins {
-    // TODO: Trie-like data structure?
     private val searchCache = CacheBuilder.newBuilder()
         .expireAfterWrite(1, TimeUnit.HOURS)
         .build<String, List<Plugin>>()
