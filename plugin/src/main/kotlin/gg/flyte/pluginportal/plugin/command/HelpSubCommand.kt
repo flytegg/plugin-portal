@@ -23,11 +23,13 @@ class HelpSubCommand {
     @Subcommand("help")
     fun helpCommand(audience: Audience) {
         var message = text("")
-        helpEntries.forEach { message = message.append(text("\n").append(it.toComponent())) }
+        helpEntries.forEachIndexed { index, entry ->
+            if (index > 0) { message = message.append(text("\n")) }
+            message = message.append(entry.toComponent())
+        }
 
         audience.sendMessage(
             message
-                .append(text("\n"))
                 .boxed()
         )
     }
