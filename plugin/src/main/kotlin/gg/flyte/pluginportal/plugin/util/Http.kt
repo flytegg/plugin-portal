@@ -3,20 +3,24 @@ package gg.flyte.pluginportal.plugin.util
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.types.Plugin
+import gg.flyte.pluginportal.plugin.chat.*
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
+import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.text.Component.text
 import java.io.File
 import java.io.FileInputStream
 import java.net.URL
 import java.security.MessageDigest
 
-fun Plugin.download(marketplacePlatform: MarketplacePlatform, targetDirectory: String) {
+fun Plugin.download(marketplacePlatform: MarketplacePlatform, targetDirectory: String, audience: Audience? = null): Boolean {
 
     val jarFile = File(targetDirectory, "[PP] $name ($marketplacePlatform).jar")
 
     val file = download(
         URL(platforms[marketplacePlatform]!!.download?.url),
-        jarFile
-    )
+        jarFile,
+        audience
+    ) ?: return false
 
     LocalPluginCache.removeIf { plugin -> plugin.id == id }
 
@@ -32,13 +36,27 @@ fun Plugin.download(marketplacePlatform: MarketplacePlatform, targetDirectory: S
     )
 
     LocalPluginCache.save()
+
+    return true
 }
 
-fun download(url: URL, file: File): File {
+fun download(url: URL, file: File, audience: Audience?): File? {
     val connection = url.openConnection()
     connection.setRequestProperty("User-Agent", "Mozilla/5.0")
     connection.connect()
-    val inputStream = connection.getInputStream()
+    val inputStream = connection.runCatching {
+        getInputStream()
+    }.onFailure {
+        it.printStackTrace()
+        audience?.sendMessage(text("\n").append(
+            status(Status.FAILURE, "An error occurred while downloading\n")
+                .append(textSecondary("- Please try again, or join our ")
+                    .append(SharedComponents.DISCORD_COMPONENT)
+                    .appendSecondary(" for support.")
+                ).append(endLine()))
+        )
+        return null
+    }.getOrNull()!! // Returns above if failure.
 
     file.parentFile.mkdirs()
     file.createNewFile()

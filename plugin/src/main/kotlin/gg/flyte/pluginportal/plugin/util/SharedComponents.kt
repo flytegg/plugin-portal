@@ -6,9 +6,14 @@ import gg.flyte.pluginportal.plugin.chat.suggestCommand
 import gg.flyte.pluginportal.plugin.chat.textDark
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
 
 object SharedComponents {
+
+    val DISCORD_COMPONENT = text("Discord", NamedTextColor.AQUA)
+        .showOnHover("Click here to join our Discord", NamedTextColor.AQUA)
+        .clickEvent(ClickEvent.openUrl("https://discord.gg/flyte"))
 
     fun getInstallButton(name: String, installed: Boolean): Component {
         val install = if (installed) "uninstall" else "install"
@@ -29,5 +34,6 @@ object SharedComponents {
         textDark("[").append(text(buttonName, color)).appendDark("]")
             .showOnHover(hoverText, NamedTextColor.AQUA)
             .suggestCommand(clickSuggest)
+
 
 }
