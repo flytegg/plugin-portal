@@ -74,8 +74,11 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
 
         val targetMessage = "${plugin.name} from ${platform.name} with ID ${plugin.id}"
         PortalLogger.log(audience, PortalLogger.Action.INITIATED_INSTALL, targetMessage)
-        plugin.download(platform, targetDirectory)
-        PortalLogger.log(audience, PortalLogger.Action.INSTALL, targetMessage)
+
+        if (plugin.download(platform, targetDirectory, audience))
+            PortalLogger.log(audience, PortalLogger.Action.INSTALL, targetMessage)
+        else
+            return PortalLogger.log(audience, PortalLogger.Action.FAILED_INSTALL, targetMessage)
 
         audience.sendMessage(
             newline()
