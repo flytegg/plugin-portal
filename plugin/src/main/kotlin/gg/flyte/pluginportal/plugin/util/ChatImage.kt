@@ -13,8 +13,8 @@ import javax.imageio.ImageIO
 
 object ChatImage {
 
-    private fun getImage(imageURL: String): BufferedImage =
-        ImageIO.read(URI(imageURL).toURL())
+    private fun getImage(imageURL: String?): BufferedImage =
+        ImageIO.read(URI(if (imageURL.isNullOrEmpty()) "https://cdn.internal.flyte.gg/plugin-portal/favicon.png" else imageURL).toURL())
 
     private fun imageToChat(image: BufferedImage): String {
         val sb = StringBuilder()

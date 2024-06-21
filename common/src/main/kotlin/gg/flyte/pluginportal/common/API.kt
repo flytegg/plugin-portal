@@ -17,11 +17,11 @@ object API {
         return response.body?.string() ?: ""
     }
 
-    fun getPlugins(prefix: String? = null): List<Plugin> {
+    fun getPlugins(prefix: String? = null, limit: Int? = 100): List<Plugin> {
         val params = hashMapOf<String, String>()
-        if (prefix != null) {
-            params["prefix"] = prefix
-        }
+
+        if (prefix != null) params["prefix"] = prefix
+        if (limit != null) params["limit"] = limit.toString()
 
         return GSON.fromJson(
             get(

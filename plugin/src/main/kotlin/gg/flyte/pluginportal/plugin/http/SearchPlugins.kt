@@ -15,7 +15,7 @@ object SearchPlugins {
             return searchCache.getIfPresent(query)!!
         }
 
-        val response = API.getPlugins(query).also {
+        val response = API.getPlugins(query, 100).also {
             searchCache.put(query, it)
         }
 
