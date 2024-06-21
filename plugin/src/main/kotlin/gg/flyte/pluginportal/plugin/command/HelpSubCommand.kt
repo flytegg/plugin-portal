@@ -3,9 +3,6 @@ package gg.flyte.pluginportal.plugin.command
 import gg.flyte.pluginportal.plugin.chat.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.text
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextDecoration
-import net.kyori.adventure.text.minimessage.MiniMessage
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.DefaultFor
 import revxrsal.commands.annotation.Subcommand

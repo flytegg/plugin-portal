@@ -8,7 +8,6 @@ import gg.flyte.pluginportal.plugin.http.SearchPlugins
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.util.async
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
-import org.bukkit.Bukkit
 import revxrsal.commands.bukkit.BukkitCommandHandler
 import java.io.File
 

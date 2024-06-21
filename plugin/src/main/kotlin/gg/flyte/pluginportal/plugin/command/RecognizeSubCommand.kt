@@ -7,7 +7,8 @@ import gg.flyte.pluginportal.plugin.chat.boxed
 import gg.flyte.pluginportal.plugin.chat.sendFailureMessage
 import gg.flyte.pluginportal.plugin.chat.status
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
-import gg.flyte.pluginportal.plugin.util.*
+import gg.flyte.pluginportal.plugin.util.calculateSHA256
+import gg.flyte.pluginportal.plugin.util.calculateSHA512
 import masecla.modrinth4j.client.agent.UserAgent
 import masecla.modrinth4j.main.ModrinthAPI
 import masecla.modrinth4j.model.version.FileHash
