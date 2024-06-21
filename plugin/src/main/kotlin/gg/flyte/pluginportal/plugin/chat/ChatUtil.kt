@@ -115,44 +115,38 @@ fun sendLocalPluginListMessage(audience: Audience, message: String, plugins: Lis
     audience.sendMessage(endLine())
 }
 
-val miniMessage = MiniMessage.builder()
-    .strict(true)
-    .build()
+val miniMessage = MiniMessage.builder().strict(true).build()
 
-fun centerComponentLine(component: Component, maxLength: Int = 154) = centerMessage(miniMessage.serialize(component), maxLength).also {
-    println(miniMessage.serialize(component))
-}
+fun centerComponentLine(component: Component, maxLength: Int = 240) = centerMessage(miniMessage.serialize(component), maxLength)
 
-fun centerMessage(message: String, maxLength: Int = 154): Component {
-    val describedCharacters = splitCharsByBoldTags(message)
-    val boldedCharacters = describedCharacters.first.removeTags()
-    val nonBoldedCharacters = describedCharacters.second.removeTags()
+fun centerMessage(message: String, maxLength: Int = 240): Component {
+    val boldCharacters = getBoldCharacters(message)
+    val boldCharactersLength = boldCharacters.sumOf { DefaultFontInfo.getDefaultFontInfo(it).getBoldLength() }
+    val boldCharactersNonBoldLength = boldCharacters.pixelLength
 
-    val messageWidth =
-        boldedCharacters.sumOf {
-            DefaultFontInfo.getDefaultFontInfo(it).getBoldLength() + 1
-        } + nonBoldedCharacters.sumOf { DefaultFontInfo.getDefaultFontInfo(it).length + 1 }
+    val messageWidth = message.withoutTags.pixelLength - boldCharactersNonBoldLength + boldCharactersLength
 
-    val paddingWidth = (maxLength - messageWidth / 2).coerceAtLeast(0)
-    val spaceWidth = DefaultFontInfo.SPACE.length + 1
+    if (messageWidth > maxLength) {
+        // TODO
+    }
+
+    val paddingWidth = ((maxLength - messageWidth) / 2).coerceAtLeast(0)
+    val spaceWidth = DefaultFontInfo.SPACE.length
     val padding = " ".repeat(paddingWidth / spaceWidth)
 
     return MiniMessage.miniMessage().deserialize("$padding$message")
 }
+// TODO: Matches all abc in '<bold> a </bold> b <bold> c </bold>'
+private val BOLD_TAG_TEXT_REGEX = "(?<=<bold>)(.+)(?=</bold>)".toRegex()
 
-fun splitCharsByBoldTags(input: String): Pair<List<Char>, List<Char>> {
-    val regex = "<bold>(.+)(?:</bold>)?".toRegex()
-    val boldContent = regex.findAll(input)
-        .flatMap { it.groupValues[1].toList() }
-        .joinToString("")
-        .replace(Regex("<[^<]+>"), "")
-        .toList()
+fun getBoldCharacters(input: String) = miniMessage.stripTags(BOLD_TAG_TEXT_REGEX.findAll(input)
+    .map { it.value }
+    .joinToString(""))
+    .replace(" ", "")
 
-    val nonBoldContent = input.replace(regex, "")
 
-    return Pair(boldContent.toList(), nonBoldContent.toList())
-}
+private val String.withoutTags get() = miniMessage.stripTags(this)
 
-fun <Char> List<Char>.removeTags() = joinToString("")
-    .replace(Regex("<[^<]+>"), "")
-    .toList()
+val Char.pixelLength get() = DefaultFontInfo.getDefaultFontInfo(this).length
+val String.pixelLength get() = sumOf { it.pixelLength }
+

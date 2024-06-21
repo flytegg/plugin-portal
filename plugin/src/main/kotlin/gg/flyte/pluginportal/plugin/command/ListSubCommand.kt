@@ -2,7 +2,7 @@ package gg.flyte.pluginportal.plugin.command
 
 import gg.flyte.pluginportal.plugin.chat.*
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
-import gg.flyte.pluginportal.plugin.util.*
+import gg.flyte.pluginportal.plugin.util.SharedComponents
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor

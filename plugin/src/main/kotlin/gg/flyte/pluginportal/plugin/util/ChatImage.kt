@@ -140,25 +140,21 @@ fun Plugin.getImageComponent(): Component {
     val description = splitDescriptionIntoLines(getDescription() ?: "", 35, MAX_DESCRIPTION_LINES)
     val installed = LocalPluginCache.hasPlugin(id)
     val image = ChatImage.ImageTextBuilder(getImageURL() ?: "")
-        .setLine(0, centerComponentLine(textPrimary(name).bold(), 82))
+        .setLine(0, centerComponentLine(textPrimary(name).bold(), 165))
         .apply {
             description.forEachIndexed { index, line ->
-                setLine(
-                    index + 2,
-                    textSecondary(line).showOnHover(getDescription() ?: "")
-                )
+                setLine(index + 2, textSecondary(line).showOnHover(getDescription() ?: ""))
             }
         }
         .setLine(description.size + 3, textSecondary("Downloads: ${getDownloads().format()}"))
         .setLine(description.size + 4, textSecondary("Platforms: ${platforms.keys.joinToString()}"))
-
         .setLine(
-            11, text("      ").let {
+            11, centerComponentLine(text("").let {
                 if (installed) it.append(SharedComponents.getUpdateButton(name)).append(text(" "))
                 else it.append(text("    "))
             }.append(
                 SharedComponents.getInstallButton(name, installed)
-            )
+            ), 165)
         )
         .build()
     return image
