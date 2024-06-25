@@ -3,14 +3,9 @@ package gg.flyte.pluginportal.plugin.util
 import gg.flyte.pluginportal.plugin.PluginPortal
 import org.bukkit.Bukkit
 
-fun isFolia(): Boolean {
-    try {
-        Class.forName("io.papermc.paper.threadedregions.RegionizedServer")
-        return true
-    } catch (e: ClassNotFoundException) {
-        return false
-    }
-}
+fun isFolia() = runCatching {
+    Class.forName("io.papermc.paper.threadedregions.RegionizedServer")
+}.isSuccess
 
 fun async(block: () -> Unit) {
     if (isFolia()) {
