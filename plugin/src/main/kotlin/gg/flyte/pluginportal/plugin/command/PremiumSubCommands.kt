@@ -6,17 +6,23 @@ import gg.flyte.pluginportal.plugin.chat.status
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.AutoComplete
 import revxrsal.commands.annotation.Command
-import revxrsal.commands.annotation.Optional
 import revxrsal.commands.annotation.Subcommand
 import revxrsal.commands.bukkit.annotation.CommandPermission
 
 @Command("pp", "pluginportal", "ppm")
-class RecognizeSubCommand {
+class PremiumSubCommands {
 
     @Subcommand("recognize")
     @AutoComplete("@pluginFileSearch *")
     @CommandPermission("pluginportal.manage.recognize")
-    fun recognizeCommand(audience: Audience, @Optional pluginFileName: String? = null) {
+    fun recognizeCommand(audience: Audience) = premiumCommand(audience)
+
+    @Subcommand("scan")
+    @AutoComplete("@pluginFileSearch *")
+    @CommandPermission("pluginportal.manage.scan")
+    fun scanCommand(audience: Audience) = premiumCommand(audience)
+
+    fun premiumCommand(audience: Audience) {
         audience.sendMessage(status(Status.FAILURE, "This command is only available for Plugin Portal Premium.").boxed())
     }
 }

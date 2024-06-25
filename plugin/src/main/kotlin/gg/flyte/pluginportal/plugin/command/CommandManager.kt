@@ -35,7 +35,7 @@ object CommandManager {
             HelpSubCommand(),
             ViewSubCommand(),
             ListSubCommand(),
-            RecognizeSubCommand(),
+            PremiumSubCommands(),
         )
     }
 
