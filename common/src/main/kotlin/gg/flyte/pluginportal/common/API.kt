@@ -5,10 +5,8 @@ import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.common.util.GSON
 import gg.flyte.pluginportal.common.util.Http.BASE_URL
 import okhttp3.OkHttpClient
-import okio.IOException
 
 object API {
-
     private val client = OkHttpClient()
 
     private fun get(url: String, params: HashMap<String, String>): String {

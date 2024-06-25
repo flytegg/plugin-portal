@@ -44,6 +44,7 @@ class UpdateSubCommand {
     }
 
     private fun handleSinglePlugin(audience: Audience, localPlugin: LocalPlugin) {
+        // TODO: localPlugin.id is no longer the universal id, its the platform specific id
 
         val marketplacePlugin = MarketplacePluginCache.getFilteredPlugins(id = localPlugin.id)
             .firstOrNull() ?: return sendFailureMessage(audience, "Marketplace plugin not found")

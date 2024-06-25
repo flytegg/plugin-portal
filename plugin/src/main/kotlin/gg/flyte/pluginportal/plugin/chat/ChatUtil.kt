@@ -81,7 +81,7 @@ fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plu
                 textDark(platform.name)
                     .hoverEvent(text("Click to $command with ${platform.name}"))
                     .suggestCommand(
-                        "/pp $command ${plugin.name} --platform ${platform.name}"
+                        "/pp $command \"${plugin.name}\" --platform ${platform.name}"
                     )
             )
 
@@ -93,7 +93,7 @@ fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plu
         audience.sendMessage(
             textSecondary(" - ").appendPrimary(plugin.name)
                 .hoverEvent(text("Click to $command"))
-                .suggestCommand("/pp $command ${plugin.name}")
+                .suggestCommand("/pp $command \"${plugin.name}\"")
                 .append(platformSuffix.appendDark(")"))
         )
     }
