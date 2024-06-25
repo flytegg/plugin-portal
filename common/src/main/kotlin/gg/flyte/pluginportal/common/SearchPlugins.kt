@@ -1,7 +1,6 @@
-package gg.flyte.pluginportal.plugin.http
+package gg.flyte.pluginportal.common
 
 import com.google.common.cache.CacheBuilder
-import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.types.Plugin
 import java.util.concurrent.TimeUnit
 

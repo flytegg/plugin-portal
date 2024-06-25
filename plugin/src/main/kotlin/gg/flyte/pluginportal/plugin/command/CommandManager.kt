@@ -1,10 +1,10 @@
 package gg.flyte.pluginportal.plugin.command
 
+import gg.flyte.pluginportal.common.SearchPlugins
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.plugin.PluginPortal.Companion.instance
 import gg.flyte.pluginportal.plugin.command.lamp.LampExceptionHandler
-import gg.flyte.pluginportal.plugin.http.SearchPlugins
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.util.async
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
