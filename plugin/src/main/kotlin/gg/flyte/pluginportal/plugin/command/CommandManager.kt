@@ -42,15 +42,16 @@ object CommandManager {
     private fun BukkitCommandHandler.registerAutoComplete() {
         autoCompleter
             .registerSuggestion("marketplacePluginSearch") { args, _, _ ->
-                if (args.size < 3) return@registerSuggestion listOf<String>()
-                val searchName = args[2]
+                val searchName = args[0]
 
                 if (searchName.length == 2) async { SearchPlugins.search(searchName) }
 
                 if (searchName.length <= 2)
                     listOf("$searchName${if (searchName.isEmpty()) "" else " ~ "}Keep typing...")
-                else
+                else {
                     SearchPlugins.getCachedSearch(searchName)?.map(Plugin::name) ?: listOf("$searchName ~ Loading")
+                }
+
             }
             .registerSuggestion("installedPluginSearch") { args, _, _ ->
                 LocalPluginCache.map(LocalPlugin::name)

@@ -14,7 +14,7 @@ import revxrsal.commands.bukkit.annotation.CommandPermission
 class ViewSubCommand {
 
     @Subcommand("view")
-    @AutoComplete("@marketplacePluginSearch *")
+    @AutoComplete("@marketplacePluginSearch")
     @CommandPermission("pluginportal.view")
     fun viewCommand(
         audience: Audience,
