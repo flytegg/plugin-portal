@@ -1,9 +1,11 @@
 package gg.flyte.pluginportal.common
 
+import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.common.util.GSON
 import gg.flyte.pluginportal.common.util.Http.BASE_URL
 import okhttp3.OkHttpClient
+import okio.IOException
 
 object API {
 
@@ -15,6 +17,37 @@ object API {
             .build()
         val response = client.newCall(request).execute()
         return response.body?.string() ?: ""
+    }
+
+    private class AuthorisationException(code: Int)
+        : RuntimeException("Server returned code $code: You do not have permission to access this resource")
+
+    private class PluginRequestFailedException(platform: MarketplacePlatform, id: String)
+        : RuntimeException("An unexpected error occurred when attempting to retrieve plugin $id from $platform. " +
+            "PLEASE REPORT THIS TO THE PLUGIN PORTAL AUTHORS")
+
+    fun getPlugin(platform: MarketplacePlatform, id: String): Plugin? {
+        val response = get("/plugins/${platform.toString().lowercase()}/$id", hashMapOf()).ifEmpty {
+            return PluginRequestFailedException(platform, id).printStackTrace().let { null }
+        }
+        val statusCode: Int = response.substringAfter("\"statusCode\": ", "200").slice(0..2).toInt()
+        when (statusCode) {
+            200 -> return GSON.fromJson(response, Plugin::class.java)
+            404 -> return null // not found
+            401,403 -> { // not authorised
+                AuthorisationException(statusCode).printStackTrace()
+                return null
+            }
+            400 -> { // bad request
+                IllegalArgumentException("Server returned code 400: The request was invalid. PLEASE REPORT THIS TO THE PLUGIN PORTAL AUTHORS")
+                    .printStackTrace()
+                return null
+            }
+            else -> { // I've covered every documented response!
+                PluginRequestFailedException(platform, id).printStackTrace()
+                return null
+            }
+        }
     }
 
     fun getPlugins(prefix: String? = null, limit: Int? = 100): List<Plugin> {
