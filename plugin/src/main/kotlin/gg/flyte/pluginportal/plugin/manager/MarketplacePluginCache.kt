@@ -21,6 +21,13 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
         val plugins = API.getPlugins(prefix)
 
         if (id != null) return plugins.filter { plugin -> plugin.id == id }
+
+        if (plugins.any { plugin -> plugin.name.equals(prefix, ignoreCase = true) }) {
+            if (platform != null)
+                return plugins.filter { plugin -> plugin.name.equals(prefix, ignoreCase = true) }
+                    .filter { plugin -> plugin.platforms.containsKey(platform) }
+        }
+
         if (platform != null) return plugins.filter { plugin -> plugin.platforms.containsKey(platform) }
 
         return plugins
@@ -41,13 +48,6 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
                     .append(text(platform.name, NamedTextColor.AQUA))
                     .append(endLine())
             )
-
-
-/*  What is this here for?
-          text("Invalid download URL for platform ", NamedTextColor.RED)
-            .append(text(platform.name, NamedTextColor.AQUA))
-            .append(endLine())
-*/
 
         if (!isValidDownload(downloadURL)) {
             return audience.sendMessage(
@@ -87,5 +87,4 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
                 .append(endLine())
         )
     }
-
 }

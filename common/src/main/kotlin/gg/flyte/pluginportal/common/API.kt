@@ -50,7 +50,7 @@ object API {
         }
     }
 
-    fun getPlugins(prefix: String? = null, limit: Int? = 100): List<Plugin> {
+    fun getPlugins(prefix: String? = null, limit: Int? = 50): List<Plugin> {
         val params = hashMapOf<String, String>()
 
         if (prefix != null) params["prefix"] = prefix
