@@ -6,7 +6,7 @@ import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.common.util.GSON
 import gg.flyte.pluginportal.plugin.PluginPortal
-import gg.flyte.pluginportal.plugin.chat.sendFailureMessage
+import gg.flyte.pluginportal.plugin.chat.sendFailure
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.util.calculateSHA256
 import gg.flyte.pluginportal.plugin.util.createIfNotExists
@@ -73,12 +73,12 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
         ifSingle: (LocalPlugin) -> Unit, // Sync
         ifMore: (List<LocalPlugin>) -> Unit // Sync
     ) {
-        if (prefix == null && platformId == null) return audience.sendFailureMessage("No plugin name or ID provided")
+        if (prefix == null && platformId == null) return audience.sendFailure("No plugin name or ID provided")
 
         val plugins = if (platformId != null) LocalPluginCache.find { it.platformId == platformId }?.let { listOf(it) } ?: listOf()
         else LocalPluginCache.filter { plugin -> plugin.name.startsWith(prefix ?: "", ignoreCase = true) }
 
-        plugins.ifEmpty { return audience.sendFailureMessage("No plugins found") }
+        plugins.ifEmpty { return audience.sendFailure("No plugins found") }
 
         if (plugins.size == 1) ifSingle.invoke(plugins.first())
         else ifMore.invoke(plugins)

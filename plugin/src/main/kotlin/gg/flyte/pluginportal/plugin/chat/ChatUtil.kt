@@ -71,7 +71,7 @@ fun sendFailureMessage(audience: Audience, message: String) {
     audience.sendMessage(status(Status.FAILURE, message).boxed())
 }
 
-fun Audience.sendFailureMessage(message: String) = sendFailureMessage(this, message)
+fun Audience.sendFailure(message: String) = sendFailureMessage(this, message)
 
 fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plugin>, command: String) {
     audience.sendMessage(startLine().appendSecondary(message).appendNewline())

@@ -35,18 +35,18 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
         ifMore: (List<Plugin>) -> Unit // Also Async
     ) {
         if (id != null) {
-            if (platform == null) return audience.sendFailureMessage("Specify a platform to check the platformId: $id")
+            if (platform == null) return audience.sendFailure("Specify a platform to check the platformId: $id")
             return async {
-                getPluginById(platform, id)?.let { ifSingle.invoke(it) } ?: audience.sendFailureMessage("No plugin found")
+                getPluginById(platform, id)?.let { ifSingle.invoke(it) } ?: audience.sendFailure("No plugin found")
             }
         }
 
-        if (prefix == null) return audience.sendFailureMessage("No plugin name or ID provided")
+        if (prefix == null) return audience.sendFailure("No plugin name or ID provided")
 
         async {
             val plugins = getFilteredPlugins(prefix, platform) // May not return all results
 
-            if (plugins.isEmpty()) return@async audience.sendFailureMessage("No plugins found")
+            if (plugins.isEmpty()) return@async audience.sendFailure("No plugins found")
 
             if (plugins.size == 1) ifSingle.invoke(plugins.first())
             else ifMore.invoke(plugins)

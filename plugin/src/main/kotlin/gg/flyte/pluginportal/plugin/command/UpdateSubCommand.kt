@@ -36,7 +36,7 @@ class UpdateSubCommand {
     private fun handleSinglePlugin(audience: Audience, localPlugin: LocalPlugin) {
         val marketplacePlugin = MarketplacePluginCache.getPluginById(localPlugin.platform, localPlugin.platformId)
             ?: return run { // They possibly manually changed ID or our database down?
-                audience.sendFailureMessage("Update Failed: Plugin not found in marketplace")
+                audience.sendFailure("Update Failed: Plugin not found in marketplace")
 
                 val target = "${localPlugin.name} with ID ${localPlugin.platformId} on ${localPlugin.platform}"
                 PortalLogger.log(audience, PortalLogger.Action.FAILED_UPDATE, target)
