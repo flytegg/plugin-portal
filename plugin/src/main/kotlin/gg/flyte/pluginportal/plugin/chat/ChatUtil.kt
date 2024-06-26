@@ -2,8 +2,8 @@ package gg.flyte.pluginportal.plugin.chat
 
 import DefaultFontInfo
 import gg.flyte.pluginportal.common.types.LocalPlugin
+import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.types.Plugin
-import gg.flyte.pluginportal.plugin.config.Config
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
@@ -93,14 +93,13 @@ fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plu
             }
         }
 
-        val available = plugin.platforms.keys.map { it.name }
-        val priority = Config.PLATFORM_PRIORITY
-        val priorityPlatform = priority.firstOrNull { it in available } ?: available.first()
+        val platform = MarketplacePlatform.entries.find { platform -> plugin.platforms.containsKey(platform) }
+            ?: plugin.platforms.keys.first()
 
         audience.sendMessage(
             textSecondary(" - ").appendPrimary(plugin.name)
                 .hoverEvent(text("Click to $command"))
-                .suggestCommand("/pp $command \"${plugin.name}\" --platform $priorityPlatform")
+                .suggestCommand("/pp $command \"${plugin.name}\" --platform $platform")
                 .append(platformSuffix.appendDark(")"))
         )
     }
@@ -124,7 +123,8 @@ fun sendLocalPluginListMessage(audience: Audience, message: String, plugins: Lis
 
 val miniMessage = MiniMessage.builder().strict(true).build()
 
-fun centerComponentLine(component: Component, maxLength: Int = 240) = centerMessage(miniMessage.serialize(component), maxLength)
+fun centerComponentLine(component: Component, maxLength: Int = 240) =
+    centerMessage(miniMessage.serialize(component), maxLength)
 
 fun centerMessage(message: String, maxLength: Int = 240): Component {
     val boldCharacters = getBoldCharacters(message)

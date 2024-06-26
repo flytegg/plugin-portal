@@ -49,7 +49,7 @@ object API {
                     .printStackTrace()
                 return null
             }
-            else -> { // I've covered every documented response!
+            else -> {
                 PluginRequestFailedException(platform, id).printStackTrace()
                 return null
             }
