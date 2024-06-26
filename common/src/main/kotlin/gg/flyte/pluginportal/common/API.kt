@@ -5,6 +5,7 @@ import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.common.util.GSON
 import gg.flyte.pluginportal.common.util.Http.BASE_URL
 import okhttp3.OkHttpClient
+import java.net.URLEncoder
 
 object API {
     private val client = OkHttpClient()
@@ -19,6 +20,7 @@ object API {
         val request = okhttp3.Request.Builder()
             .url("$BASE_URL$url?" + params.map { "${it.key}=${it.value}" }.joinToString("&"))
             .build()
+
         val response = client.newCall(request).execute()
         return response.body?.string() ?: ""
     }
@@ -43,7 +45,7 @@ object API {
                 return null
             }
             400 -> { // bad request
-                IllegalArgumentException("Server returned code 400: The request was invalid. PLEASE REPORT THIS TO THE PLUGIN PORTAL AUTHORS")
+                IllegalArgumentException("Server returned code 400: The request for $id on $platform PLEASE REPORT THIS TO THE PLUGIN PORTAL AUTHORS")
                     .printStackTrace()
                 return null
             }
@@ -57,7 +59,7 @@ object API {
     fun getPlugins(prefix: String? = null, limit: Int? = 50): List<Plugin> {
         val params = hashMapOf<String, String>()
 
-        if (prefix != null) params["prefix"] = prefix
+        if (prefix != null) params["prefix"] = URLEncoder.encode(prefix, "UTF-8")
         if (limit != null) params["limit"] = limit.toString()
 
         return GSON.fromJson(
