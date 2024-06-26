@@ -91,10 +91,14 @@ fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plu
             }
         }
 
+        val available = plugin.platforms.keys.map { it.name }
+        val priority = Config.PLATFORM_PRIORITY
+        val priorityPlatform = priority.firstOrNull { it in available } ?: available.first()
+
         audience.sendMessage(
             textSecondary(" - ").appendPrimary(plugin.name)
                 .hoverEvent(text("Click to $command"))
-                .suggestCommand("/pp $command \"${plugin.name}\" --platform ${plugin.platforms.keys.first()}")
+                .suggestCommand("/pp $command \"${plugin.name}\" --platform $priorityPlatform")
                 .append(platformSuffix.appendDark(")"))
         )
     }
