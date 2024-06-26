@@ -3,6 +3,7 @@ package gg.flyte.pluginportal.plugin.chat
 import DefaultFontInfo
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.Plugin
+import gg.flyte.pluginportal.plugin.config.Config
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
@@ -93,7 +94,7 @@ fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plu
         audience.sendMessage(
             textSecondary(" - ").appendPrimary(plugin.name)
                 .hoverEvent(text("Click to $command"))
-                .suggestCommand("/pp $command \"${plugin.name}\"")
+                .suggestCommand("/pp $command \"${plugin.name}\" --platform ${plugin.platforms.keys.first()}")
                 .append(platformSuffix.appendDark(")"))
         )
     }

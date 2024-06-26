@@ -1,5 +1,6 @@
 package gg.flyte.pluginportal.plugin
 
+import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.plugin.command.CommandManager
 import gg.flyte.pluginportal.plugin.config.Config
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
@@ -22,6 +23,10 @@ class PluginPortal : JavaPlugin() {
         LocalPluginCache.load()
 
         PaperLib.suggestPaper(this)
+    }
+
+    override fun onDisable() {
+        API.closeClient()
     }
 
 }

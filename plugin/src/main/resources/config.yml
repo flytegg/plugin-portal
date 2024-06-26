@@ -4,3 +4,9 @@ install-directory: plugins
 # Plugins will be moved over to the plugins directory when the server is updated
 # See: https://bukkit.fandom.com/wiki/Installing_Plugins#Updating_Plugins
 update-directory: plugins/update
+
+# Utilize platforms in this order when multiple platforms are available
+platform-priority:
+  - MODRINTH
+  - HANGAR
+  - SPIGOTMC

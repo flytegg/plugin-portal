@@ -9,6 +9,12 @@ import okhttp3.OkHttpClient
 object API {
     private val client = OkHttpClient()
 
+    fun closeClient() {
+        client.dispatcher.executorService.shutdown()
+        client.connectionPool.evictAll()
+        client.cache?.close()
+    }
+
     private fun get(url: String, params: HashMap<String, String>): String {
         val request = okhttp3.Request.Builder()
             .url("$BASE_URL$url?" + params.map { "${it.key}=${it.value}" }.joinToString("&"))
