@@ -34,7 +34,7 @@ object API {
         val response = get("/plugins/${platform.toString().lowercase()}/$id", hashMapOf()).ifEmpty {
             return PluginRequestFailedException(platform, id).printStackTrace().let { null }
         }
-        val statusCode: Int = response.substringAfter("\"statusCode\": ", "200").slice(0..2).toInt()
+        val statusCode: Int = response.substringAfter("\"statusCode\":", "200").slice(0..2).toInt()
         when (statusCode) {
             200 -> return GSON.fromJson(response, Plugin::class.java)
             404 -> return null // not found
