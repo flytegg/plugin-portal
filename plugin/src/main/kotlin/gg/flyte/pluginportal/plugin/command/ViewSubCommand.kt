@@ -5,6 +5,7 @@ import gg.flyte.pluginportal.plugin.chat.boxed
 import gg.flyte.pluginportal.plugin.chat.sendFailureMessage
 import gg.flyte.pluginportal.plugin.chat.sendPluginListMessage
 import gg.flyte.pluginportal.plugin.manager.MarketplacePluginCache
+import gg.flyte.pluginportal.plugin.util.async
 import gg.flyte.pluginportal.plugin.util.getImageComponent
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.*
@@ -35,7 +36,9 @@ class ViewSubCommand {
         }
 
         if (plugins.size == 1) {
-            return audience.sendMessage(plugins.first().getImageComponent().boxed())
+            return async {
+                audience.sendMessage(plugins.first().getImageComponent().boxed())
+            }
         }
 
         sendPluginListMessage(audience, "Multiple plugins found, click one to view more information", plugins, "view")

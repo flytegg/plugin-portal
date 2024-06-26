@@ -6,6 +6,7 @@ import gg.flyte.pluginportal.plugin.config.Config
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.manager.MarketplacePluginCache
+import gg.flyte.pluginportal.plugin.util.async
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.*
 import revxrsal.commands.bukkit.annotation.CommandPermission
@@ -32,7 +33,9 @@ class UpdateSubCommand {
             }
 
         if (plugins.size == 1) {
-            handleSinglePlugin(audience, plugins.first())
+            async {
+                handleSinglePlugin(audience, plugins.first())
+            }
         } else {
             sendLocalPluginListMessage(
                 audience,

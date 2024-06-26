@@ -6,6 +6,7 @@ import gg.flyte.pluginportal.plugin.chat.*
 import gg.flyte.pluginportal.plugin.config.Config
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.manager.MarketplacePluginCache
+import gg.flyte.pluginportal.plugin.util.async
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.newline
 import net.kyori.adventure.text.Component.text
@@ -28,26 +29,29 @@ class InstallSubCommand {
             return sendFailureMessage(audience, "No plugin name or ID provided")
         }
 
-        val plugins = MarketplacePluginCache.getFilteredPlugins(
-            prefix = prefix,
-            platform = platformFlag,
-            id = idFlag
-        )
-
-        if (plugins.isEmpty()) {
-            return sendFailureMessage(audience, "No plugins found")
-        }
-
-        if (plugins.size == 1) {
-            handleSinglePlugin(audience, plugins.first(), platformFlag)
-        } else {
-            sendPluginListMessage(
-                audience,
-                "Multiple plugins found, click one to prompt install command",
-                plugins,
-                "install"
+        async {
+            val plugins = MarketplacePluginCache.getFilteredPlugins(
+                prefix = prefix,
+                platform = platformFlag,
+                id = idFlag
             )
+
+            if (plugins.isEmpty()) {
+                sendFailureMessage(audience, "No plugins found")
+            }
+
+            if (plugins.size == 1) {
+                handleSinglePlugin(audience, plugins.first(), platformFlag)
+            } else {
+                sendPluginListMessage(
+                    audience,
+                    "Multiple plugins found, click one to prompt install command",
+                    plugins,
+                    "install"
+                )
+            }
         }
+
     }
 
     private fun handleSinglePlugin(audience: Audience, plugin: Plugin, platformFlag: MarketplacePlatform?) {
@@ -74,6 +78,7 @@ class InstallSubCommand {
                 platform,
                 Config.INSTALL_DIRECTORY
             )
+
         } else {
             audience.sendMessage(
                 newline()
