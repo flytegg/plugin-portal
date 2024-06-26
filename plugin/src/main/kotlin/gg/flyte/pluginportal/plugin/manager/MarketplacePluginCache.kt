@@ -21,7 +21,8 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
     ): List<Plugin> {
         var plugins = API.getPlugins(prefix)
         if (platform != null) plugins = plugins.filter { it.platforms.containsKey(platform) }
-        return plugins
+        val exactMatch = plugins.find { prefix.equals(it.name, true) } // ViaVersion when ViaVersionStatus exists
+        return exactMatch?.let { listOf(it) } ?: plugins
     }
 
     fun getPluginById(platform: MarketplacePlatform, platformId: String) = API.getPlugin(platform, platformId) // TODO: Add a caching layer here
