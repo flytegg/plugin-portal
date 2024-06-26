@@ -23,6 +23,8 @@ class PluginPortal : JavaPlugin() {
         LocalPluginCache.load()
 
         PaperLib.suggestPaper(this)
+
+        API // LOAD FOR ONDISABLE
     }
 
     override fun onDisable() {
