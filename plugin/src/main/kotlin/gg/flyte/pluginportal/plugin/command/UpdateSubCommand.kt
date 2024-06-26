@@ -49,7 +49,7 @@ class UpdateSubCommand {
     private fun handleSinglePlugin(audience: Audience, localPlugin: LocalPlugin) {
         // TODO: localPlugin.id is no longer the universal id, its the platform specific id
 
-        val marketplacePlugin = MarketplacePluginCache.getFilteredPlugins(id = localPlugin.id)
+        val marketplacePlugin = MarketplacePluginCache.getFilteredPlugins(id = localPlugin.platformId)
             .firstOrNull() ?: return sendFailureMessage(audience, "Marketplace plugin not found")
 
         audience.sendMessage(
@@ -61,7 +61,7 @@ class UpdateSubCommand {
         )
 
         val targetPlatform = localPlugin.platform
-        val targetMessage = "${localPlugin.name} from $targetPlatform with ID ${localPlugin.id}"
+        val targetMessage = "${localPlugin.name} from $targetPlatform with ID ${localPlugin.platformId}"
 
         PortalLogger.log(audience, PortalLogger.Action.INITIATED_UPDATE, targetMessage)
 

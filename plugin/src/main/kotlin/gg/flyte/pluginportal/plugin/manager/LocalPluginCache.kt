@@ -13,7 +13,7 @@ import java.io.File
 object LocalPluginCache : PluginCache<LocalPlugin>() {
 
     fun hasPlugin(plugin: Plugin) = hasPlugin(plugin.id)
-    fun hasPlugin(id: String) = any { it.id == id }
+    fun hasPlugin(id: String) = any { it.platformId == id }
 
     fun load() {
         val text = getPluginsFile().readText()
@@ -29,7 +29,7 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
     }
 
     fun save() {
-        val text = GSON.toJson(toTypedArray().distinctBy { plugin -> plugin.id })
+        val text = GSON.toJson(toTypedArray().distinctBy { plugin -> plugin.platformId })
         getPluginsFile().writeText(text)
 
         PortalLogger.info(PortalLogger.Action.SAVE_PLUGINS, "Saved $size plugins to local cache")

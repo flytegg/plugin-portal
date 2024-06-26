@@ -22,11 +22,11 @@ fun Plugin.download(marketplacePlatform: MarketplacePlatform, targetDirectory: S
         audience
     ) ?: return false
 
-    LocalPluginCache.removeIf { plugin -> plugin.id == id }
+    LocalPluginCache.removeIf { plugin -> plugin.platformId == id }
 
     LocalPluginCache.add(
         LocalPlugin(
-            id = platforms[marketplacePlatform]!!.id,
+            platformId = platforms[marketplacePlatform]!!.id,
             name = name,
             platform = marketplacePlatform,
             sha256 = calculateSHA256(file),
