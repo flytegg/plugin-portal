@@ -11,7 +11,7 @@ fun isJarDownloadUrl(url: String): Boolean {
     if (url.endsWith(".jar")) return true
 
     // Support horrible SpigotMC download URLs
-    val connection = URL(url).openConnection() as HttpURLConnection
+    val connection = runCatching { URL(url).openConnection() as HttpURLConnection }.getOrNull() ?: return false
     connection.instanceFollowRedirects = false
     val contentDisposition = connection.getHeaderField("Content-Disposition")
     return contentDisposition?.let {
