@@ -5,7 +5,9 @@ import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.plugin.chat.*
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
-import gg.flyte.pluginportal.plugin.util.*
+import gg.flyte.pluginportal.plugin.util.async
+import gg.flyte.pluginportal.plugin.util.download
+import gg.flyte.pluginportal.plugin.util.isValidDownload
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.newline
 import net.kyori.adventure.text.Component.text
@@ -14,23 +16,41 @@ import net.kyori.adventure.text.format.NamedTextColor
 object MarketplacePluginCache : PluginCache<Plugin>() {
 
     fun getFilteredPlugins(
-        prefix: String? = null,
+        prefix: String,
         platform: MarketplacePlatform? = null,
-        id: String? = null
     ): List<Plugin> {
-        val plugins = API.getPlugins(prefix)
+        var plugins = API.getPlugins(prefix)
+        if (platform != null) plugins = plugins.filter { it.platforms.containsKey(platform) }
+        return plugins
+    }
 
-        if (id != null) return plugins.filter { plugin -> plugin.id == id }
+    fun getPluginById(platform: MarketplacePlatform, platformId: String) = API.getPlugin(platform, platformId) // TODO: Add a caching layer here
 
-        if (plugins.any { plugin -> plugin.name.equals(prefix, ignoreCase = true) }) {
-            if (platform != null)
-                return plugins.filter { plugin -> plugin.name.equals(prefix, ignoreCase = true) }
-                    .filter { plugin -> plugin.platforms.containsKey(platform) }
+    fun handlePluginSearchFeedback (
+        audience: Audience,
+        prefix: String?,
+        platform: MarketplacePlatform?,
+        id: String?,
+        ifSingle: (Plugin) -> Unit, // Async
+        ifMore: (List<Plugin>) -> Unit // Also Async
+    ) {
+        if (id != null) {
+            if (platform == null) return audience.sendFailureMessage("Specify a platform to check the platformId: $id")
+            return async {
+                getPluginById(platform, id)?.let { ifSingle.invoke(it) } ?: audience.sendFailureMessage("No plugin found")
+            }
         }
 
-        if (platform != null) return plugins.filter { plugin -> plugin.platforms.containsKey(platform) }
+        if (prefix == null) return audience.sendFailureMessage("No plugin name or ID provided")
 
-        return plugins
+        async {
+            val plugins = getFilteredPlugins(prefix, platform) // May not return all results
+
+            if (plugins.isEmpty()) return@async audience.sendFailureMessage("No plugins found")
+
+            if (plugins.size == 1) ifSingle.invoke(plugins.first())
+            else ifMore.invoke(plugins)
+        }
     }
 
     fun installPlugin(
