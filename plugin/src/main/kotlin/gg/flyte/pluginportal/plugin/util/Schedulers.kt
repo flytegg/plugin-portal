@@ -15,5 +15,7 @@ fun async(block: () -> Unit) {
     }
 }
 
+fun <T> ((T) -> Unit).async(): (T) -> Unit = { t: T -> async { invoke(t) } }
+
 fun delay(ticks: Long, block: () -> Unit) =
     Bukkit.getScheduler().runTaskLater(PluginPortal.instance, block, ticks)

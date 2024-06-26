@@ -2,8 +2,8 @@ package gg.flyte.pluginportal.plugin.logging
 
 import gg.flyte.pluginportal.plugin.PluginPortal
 import gg.flyte.pluginportal.plugin.util.appendLine
-import gg.flyte.pluginportal.plugin.util.createIfNotExists
 import gg.flyte.pluginportal.plugin.util.async
+import gg.flyte.pluginportal.plugin.util.createIfNotExists
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.identity.Identity
 import org.bukkit.command.CommandSender
@@ -36,7 +36,7 @@ object PortalLogger {
         // Actions are queried linearly thus AUTO_UPDATE must precede UPDATE etc.
         INITIATED_INSTALL, FAILED_INSTALL, INSTALL,
         DELETE,
-        AUTO_UPDATE, INITIATED_UPDATE, UPDATE,
+        AUTO_UPDATE, INITIATED_UPDATE, FAILED_UPDATE, UPDATE,
         LOAD_PLUGINS, SAVE_PLUGINS;
     }
 

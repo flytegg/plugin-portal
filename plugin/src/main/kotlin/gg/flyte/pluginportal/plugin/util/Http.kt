@@ -26,7 +26,7 @@ fun Plugin.download(marketplacePlatform: MarketplacePlatform, targetDirectory: S
 
     LocalPluginCache.add(
         LocalPlugin(
-            platformId = platforms[marketplacePlatform]!!.id,
+            platformId = platforms[marketplacePlatform]!!.platformId,
             name = name,
             platform = marketplacePlatform,
             sha256 = calculateSHA256(file),

@@ -1,10 +1,14 @@
 package gg.flyte.pluginportal.plugin.command
 
 import gg.flyte.pluginportal.common.types.LocalPlugin
-import gg.flyte.pluginportal.plugin.chat.*
+import gg.flyte.pluginportal.plugin.chat.Status
+import gg.flyte.pluginportal.plugin.chat.boxed
+import gg.flyte.pluginportal.plugin.chat.sendLocalPluginListMessage
+import gg.flyte.pluginportal.plugin.chat.status
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache.findFile
+import gg.flyte.pluginportal.plugin.util.async
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.*
 import revxrsal.commands.bukkit.annotation.CommandPermission
@@ -20,26 +24,15 @@ class DeleteSubCommand {
         @Optional prefix: String? = null,
         @Optional @Flag("platformId") platformId: String? = null,
     ) {
-        if (prefix == null && platformId == null) {
-            return sendFailureMessage(audience, "No plugin name or ID provided")
-        }
-
-        val plugins = LocalPluginCache
-            .filter { plugin -> plugin.name.startsWith(prefix ?: "", ignoreCase = true) }
-            .ifEmpty {
-                return sendFailureMessage(audience, "No plugins found")
+        LocalPluginCache.searchPluginsWithFeedback(
+            audience,
+            prefix,
+            platformId,
+            ifSingle = { plugin: LocalPlugin -> handleSinglePlugin(audience, plugin) }.async(),
+            ifMore = {
+                sendLocalPluginListMessage(audience, "Multiple plugins found, click one to prompt delete command", it, "delete")
             }
-
-        if (plugins.size == 1) {
-            handleSinglePlugin(audience, plugins.first())
-        } else {
-            sendLocalPluginListMessage(
-                audience,
-                "Multiple plugins found, click one to prompt delete command",
-                plugins,
-                "delete"
-            )
-        }
+        )
     }
 
     private fun handleSinglePlugin(audience: Audience, localPlugin: LocalPlugin) {

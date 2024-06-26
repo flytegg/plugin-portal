@@ -19,7 +19,7 @@ data class Plugin(
 }
 
 data class PlatformPlugin(
-    val id: String,
+    val platformId: String,
     val name: String,
     val author: String?,
     val description: String?,
