@@ -6,6 +6,7 @@ import gg.flyte.pluginportal.plugin.config.Config
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.manager.MarketplacePluginCache
+import gg.flyte.pluginportal.plugin.util.async
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.*
 import revxrsal.commands.bukkit.annotation.CommandPermission
@@ -32,7 +33,9 @@ class UpdateSubCommand {
             }
 
         if (plugins.size == 1) {
-            handleSinglePlugin(audience, plugins.first())
+            async {
+                handleSinglePlugin(audience, plugins.first())
+            }
         } else {
             sendLocalPluginListMessage(
                 audience,
@@ -46,7 +49,7 @@ class UpdateSubCommand {
     private fun handleSinglePlugin(audience: Audience, localPlugin: LocalPlugin) {
         // TODO: localPlugin.id is no longer the universal id, its the platform specific id
 
-        val marketplacePlugin = MarketplacePluginCache.getFilteredPlugins(id = localPlugin.id)
+        val marketplacePlugin = MarketplacePluginCache.getFilteredPlugins(id = localPlugin.platformId)
             .firstOrNull() ?: return sendFailureMessage(audience, "Marketplace plugin not found")
 
         audience.sendMessage(
@@ -58,7 +61,7 @@ class UpdateSubCommand {
         )
 
         val targetPlatform = localPlugin.platform
-        val targetMessage = "${localPlugin.name} from $targetPlatform with ID ${localPlugin.id}"
+        val targetMessage = "${localPlugin.name} from $targetPlatform with ID ${localPlugin.platformId}"
 
         PortalLogger.log(audience, PortalLogger.Action.INITIATED_UPDATE, targetMessage)
 

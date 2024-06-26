@@ -18,9 +18,9 @@ class DeleteSubCommand {
     fun deleteCommand(
         audience: Audience,
         @Optional prefix: String? = null,
-        @Optional @Flag("id") idFlag: String? = null,
+        @Optional @Flag("platformId") platformId: String? = null,
     ) {
-        if (prefix == null && idFlag == null) {
+        if (prefix == null && platformId == null) {
             return sendFailureMessage(audience, "No plugin name or ID provided")
         }
 
@@ -44,7 +44,7 @@ class DeleteSubCommand {
 
     private fun handleSinglePlugin(audience: Audience, localPlugin: LocalPlugin) {
         val targetPlatform = localPlugin.platform
-        val targetMessage = "${localPlugin.name} from $targetPlatform with ID ${localPlugin.id}"
+        val targetMessage = "${localPlugin.name} from $targetPlatform with ID ${localPlugin.platformId}"
 
         val file = localPlugin.findFile()
         if (file == null) {
