@@ -9,12 +9,15 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.net.URI
+import java.net.URL
 import javax.imageio.ImageIO
 
 object ChatImage {
 
-    private fun getImage(imageURL: String?): BufferedImage =
-        ImageIO.read(URI(if (imageURL.isNullOrEmpty()) "https://cdn.internal.flyte.gg/plugin-portal/favicon.png" else imageURL).toURL())
+    private fun getImage(imageURL: String?): BufferedImage = runCatching {
+        return ImageIO.read(URL(imageURL))
+    }.getOrElse { getImage("https://cdn.internal.flyte.gg/plugin-portal/favicon.png") }
+
 
     private fun imageToChat(image: BufferedImage): String {
         val sb = StringBuilder()

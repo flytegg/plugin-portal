@@ -33,6 +33,8 @@ dependencies {
     implementation("dev.masecla:Modrinth4J:2.0.0")
 
     api("io.papermc:paperlib:1.0.7")
+
+    implementation ("org.bstats:bstats-bukkit:3.0.2")
 }
 
 tasks {
@@ -49,6 +51,8 @@ tasks {
     shadowJar {
         minimize()
         exclude("com/google/common/")
+
+        relocate("org.bstats", "gg.flyte.pluginportal.lib.bstats")
     }
 
 

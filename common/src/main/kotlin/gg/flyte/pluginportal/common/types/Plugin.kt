@@ -10,7 +10,10 @@ data class Plugin(
 ) {
     fun getFirstPlatform(): PlatformPlugin? = platforms.values.firstOrNull()
 
-    fun getImageURL(): String? = getFirstPlatform()?.imageURL
+    fun getImageURL(): String? = platforms.values
+        .firstOrNull {
+            it.imageURL?.contains(".png") == true || it.imageURL?.contains(".jpg") == true
+        }?.imageURL ?: platforms.values.firstOrNull()?.imageURL
 
     fun getDescription(): String? = getFirstPlatform()?.description?.replace("\n", " ")
 

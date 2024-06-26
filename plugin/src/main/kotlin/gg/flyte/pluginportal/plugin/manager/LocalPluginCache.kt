@@ -8,24 +8,38 @@ import gg.flyte.pluginportal.common.util.GSON
 import gg.flyte.pluginportal.plugin.PluginPortal
 import gg.flyte.pluginportal.plugin.chat.sendFailure
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
-import gg.flyte.pluginportal.plugin.util.calculateSHA256
-import gg.flyte.pluginportal.plugin.util.createIfNotExists
+import gg.flyte.pluginportal.plugin.util.*
 import net.kyori.adventure.audience.Audience
 import java.io.File
 
 object LocalPluginCache : PluginCache<LocalPlugin>() {
 
-    fun hasPlugin(plugin: Plugin) = any { local -> plugin.platforms[local.platform]?.equals(local.platformId) == true }
+    fun hasPlugin(plugin: Plugin) = any { local -> plugin.platforms[local.platform]?.id.equals(local.platformId) }
     fun hasPlugin(id: String) = any { it.platformId == id }
-    fun hasPlugin(platformId: String, platform: MarketplacePlatform) = any { it.platform == platform && it.platformId == platformId }
+    fun hasPlugin(platformId: String, platform: MarketplacePlatform) =
+        any { it.platform == platform && it.platformId == platformId }
 
     fun load() {
+        val ppLocalPlugin = LocalPlugin(
+            name = "PluginPortal",
+            platform = MarketplacePlatform.MODRINTH,
+            platformId = "5qkQnnWO",
+            sha256 = calculateSHA256(pluginPortalJarFile),
+            sha512 = calculateSHA512(pluginPortalJarFile),
+            installedAt = System.currentTimeMillis(),
+        )
+
         val text = getPluginsFile().readText()
-        if (text.isEmpty()) return
+        if (text.isEmpty()) {
+            add(ppLocalPlugin)
+            return
+        }
 
         try {
             val plugins = GSON.fromJson(text, Array<LocalPlugin>::class.java)
             plugins.forEach { plugin -> add(plugin) }
+
+            if (any { it.platformId == ppLocalPlugin.platformId }) add(ppLocalPlugin)
 
             PortalLogger.info(PortalLogger.Action.LOAD_PLUGINS, "Loaded ${plugins.size} plugins from local cache")
         } catch (_: JsonSyntaxException) {
@@ -75,7 +89,8 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
     ) {
         if (prefix == null && platformId == null) return audience.sendFailure("No plugin name or ID provided")
 
-        val plugins = if (platformId != null) LocalPluginCache.find { it.platformId == platformId }?.let { listOf(it) } ?: listOf()
+        val plugins = if (platformId != null) LocalPluginCache.find { it.platformId == platformId }?.let { listOf(it) }
+            ?: listOf()
         else LocalPluginCache.filter { plugin -> plugin.name.startsWith(prefix ?: "", ignoreCase = true) }
 
         plugins.ifEmpty { return audience.sendFailure("No plugins found") }
@@ -83,5 +98,4 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
         if (plugins.size == 1) ifSingle.invoke(plugins.first())
         else ifMore.invoke(plugins)
     }
-
 }

@@ -113,8 +113,8 @@ fun sendLocalPluginListMessage(audience: Audience, message: String, plugins: Lis
 
         audience.sendMessage(
             textSecondary(" - ").appendPrimary(plugin.name)
-                .hoverEvent(text("Click to $command"))
-                .suggestCommand("/pp $command ${plugin.name} --platform ${plugin.platform.name}")
+                .hoverEvent(text("Click to $command ${plugin.name} from ${plugin.platform.name} by ID"))
+                .suggestCommand("/pp $command --platformId ${plugin.platformId}")
                 .append(platformSuffix)
         )
     }

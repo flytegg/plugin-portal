@@ -9,6 +9,7 @@ import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache.findFile
 import gg.flyte.pluginportal.plugin.util.async
+import gg.flyte.pluginportal.plugin.util.pluginPortalJarFile
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.*
 import revxrsal.commands.bukkit.annotation.CommandPermission
@@ -40,6 +41,14 @@ class DeleteSubCommand {
         val targetMessage = "${localPlugin.name} from $targetPlatform with ID ${localPlugin.platformId}"
 
         val file = localPlugin.findFile()
+
+        println(pluginPortalJarFile.absolutePath)
+        println(file?.absolutePath)
+
+        if ((file?.absolutePath ?: "") == pluginPortalJarFile.absolutePath) {
+            return audience.sendMessage(status(Status.FAILURE, "You cannot delete Plugin Portal"))
+        }
+
         if (file == null) {
             LocalPluginCache.deletePlugin(localPlugin)
             return audience.sendMessage(status(Status.FAILURE, "Plugin file not found"))
