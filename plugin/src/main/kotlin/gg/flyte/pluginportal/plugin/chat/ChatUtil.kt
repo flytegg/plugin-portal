@@ -103,7 +103,7 @@ fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plu
                 .append(platformSuffix.appendDark(")"))
         )
     }
-    audience.sendMessage(endLine())
+    audience.sendMessage(solidLine("", ""))
 }
 
 fun sendLocalPluginListMessage(audience: Audience, message: String, plugins: List<LocalPlugin>, command: String) {

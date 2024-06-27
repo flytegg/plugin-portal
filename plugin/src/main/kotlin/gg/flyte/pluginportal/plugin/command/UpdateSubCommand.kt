@@ -20,7 +20,7 @@ class UpdateSubCommand {
     fun updateCommand(
         audience: Audience,
         @Optional prefix: String? = null,
-        @Optional @Flag("id") platformId: String? = null,
+        @Optional @Flag("platformId") platformId: String? = null,
     ) {
         LocalPluginCache.searchPluginsWithFeedback(
             audience,
@@ -44,6 +44,11 @@ class UpdateSubCommand {
                 IllegalArgumentException("Failed Attempting to update $target").printStackTrace()
             }
 
+        if (localPlugin.version == marketplacePlugin.platforms[localPlugin.platform]?.download?.version) {
+            audience.sendFailure("Plugin is already up to date")
+            return
+        }
+
         audience.sendMessage(
             startLine()
                 .appendSecondary("Starting update of ")
@@ -63,6 +68,23 @@ class UpdateSubCommand {
             targetPlatform,
             Config.UPDATE_DIRECTORY
         )
+
+        // Upon updating, old and new plugin would show up in /pp update. This removes the old one
+        LocalPluginCache.filter { it.platformId == localPlugin.platformId }.let { plugins ->
+            if (plugins.size == 2) {
+                val updatedPlugin = plugins.maxBy { plugin -> plugin.installedAt }
+
+                plugins.forEach { plugin ->
+                    if (plugin != updatedPlugin) {
+                        LocalPluginCache.remove(plugin)
+                    }
+                }
+            }
+        }
+
+        println(LocalPluginCache)
+
+        LocalPluginCache.save()
 
         PortalLogger.log(audience, PortalLogger.Action.UPDATE, targetMessage)
     }

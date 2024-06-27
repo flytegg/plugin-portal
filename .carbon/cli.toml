@@ -9,4 +9,4 @@ file = "./plugin/build/libs/plugin-all.jar"
 [watch_plugin]
 file_name = "plugin-all.jar"
 directory = "./plugin/build/libs"
-post_deploy_command = "plugman reload PluginPortal"
+post_deploy_command = "reload confirm"
