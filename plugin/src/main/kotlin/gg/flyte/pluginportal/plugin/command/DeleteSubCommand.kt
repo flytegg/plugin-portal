@@ -18,7 +18,7 @@ import revxrsal.commands.bukkit.annotation.CommandPermission
 class DeleteSubCommand {
 
     @Subcommand("delete", "uninstall")
-    @AutoComplete("@installedPluginSearch *")
+    @AutoComplete("@installedPluginSearchWithoutSelf *")
     @CommandPermission("pluginportal.manage.uninstall")
     fun deleteCommand(
         audience: Audience,

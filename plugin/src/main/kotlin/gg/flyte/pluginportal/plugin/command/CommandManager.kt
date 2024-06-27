@@ -56,6 +56,10 @@ object CommandManager {
             .registerSuggestion("installedPluginSearch") { args, _, _ ->
                 LocalPluginCache.map(LocalPlugin::name)
             }
+            .registerSuggestion("installedPluginSearchWithoutSelf") { args, _, _ ->
+                LocalPluginCache.map(LocalPlugin::name)
+                    .filter { name -> name != instance.description.name }
+            }
             .registerSuggestion("pluginFileSearch") { args, _, _ ->
                 File("plugins").listFiles()!!
                     .filter { file -> file.isFile }
