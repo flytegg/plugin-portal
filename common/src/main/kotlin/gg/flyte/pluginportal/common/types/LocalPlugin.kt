@@ -6,6 +6,7 @@ package gg.flyte.pluginportal.common.types
 data class LocalPlugin(
     val platformId: String,
     val name: String,
+    val version: String,
     val platform: MarketplacePlatform,
     val sha256: String,
     val sha512: String,

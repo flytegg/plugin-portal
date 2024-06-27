@@ -21,9 +21,10 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
 
     fun load() {
         val ppLocalPlugin = LocalPlugin(
-            name = "PluginPortal",
-            platform = MarketplacePlatform.MODRINTH,
             platformId = "5qkQnnWO",
+            name = "PluginPortal",
+            version = PluginPortal.instance.description.version,
+            platform = MarketplacePlatform.MODRINTH,
             sha256 = calculateSHA256(pluginPortalJarFile),
             sha512 = calculateSHA512(pluginPortalJarFile),
             installedAt = System.currentTimeMillis(),
