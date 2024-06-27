@@ -1,5 +1,6 @@
 package gg.flyte.pluginportal.plugin.command
 
+import gg.flyte.pluginportal.plugin.PluginPortal
 import gg.flyte.pluginportal.plugin.chat.*
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.util.SharedComponents
@@ -20,6 +21,7 @@ class ListSubCommand {
     fun listCommand(audience: Audience) {
         val plugins = LocalPluginCache
             .sortedBy { plugin -> plugin.name }
+            .filter { plugin -> plugin.name != PluginPortal.instance.name }
 
         if (plugins.isEmpty()) return audience.sendMessage(text("No plugins found", NamedTextColor.GRAY).boxed())
 

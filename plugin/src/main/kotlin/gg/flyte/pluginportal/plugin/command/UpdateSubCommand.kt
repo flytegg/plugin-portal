@@ -29,7 +29,8 @@ class UpdateSubCommand {
             ifSingle = { plugin: LocalPlugin -> handleSinglePlugin(audience, plugin) }.async(),
             ifMore = {
                 sendLocalPluginListMessage(audience, "Multiple plugins found, click one to prompt update command", it,"update")
-            }
+            },
+
         )
     }
 

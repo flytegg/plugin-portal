@@ -32,7 +32,7 @@ class DeleteSubCommand {
             ifSingle = { plugin: LocalPlugin -> handleSinglePlugin(audience, plugin) }.async(),
             ifMore = {
                 sendLocalPluginListMessage(audience, "Multiple plugins found, click one to prompt delete command", it, "delete")
-            }
+            },
         )
     }
 
@@ -42,8 +42,8 @@ class DeleteSubCommand {
 
         val file = localPlugin.findFile()
 
-        println(pluginPortalJarFile.absolutePath)
-        println(file?.absolutePath)
+//        println(pluginPortalJarFile.absolutePath)
+//        println(file?.absolutePath) // This was null for pp
 
         if ((file?.absolutePath ?: "") == pluginPortalJarFile.absolutePath) {
             return audience.sendMessage(status(Status.FAILURE, "You cannot delete Plugin Portal"))
