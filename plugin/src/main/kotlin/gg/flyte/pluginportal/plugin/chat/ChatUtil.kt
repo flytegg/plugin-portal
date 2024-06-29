@@ -34,11 +34,8 @@ fun Component.boxed() = text()
     .appendEndLine()
 
 
-fun status(status: Status, text: String): Component =
-    text("[${status.name}]: ", status.color)
-        .append(
-            text(text, GRAY)
-        )
+fun status(status: Status, text: String): TextComponent = text("[${status.name}]: ", status.color)
+    .append(text(text, GRAY))
 
 fun textPrimary(text: String) = text(text).colorPrimary()
 fun textSecondary(text: String) = text(text).colorSecondary()

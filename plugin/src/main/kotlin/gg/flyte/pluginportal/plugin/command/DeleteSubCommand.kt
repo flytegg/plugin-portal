@@ -1,17 +1,17 @@
 package gg.flyte.pluginportal.plugin.command
 
 import gg.flyte.pluginportal.common.types.LocalPlugin
-import gg.flyte.pluginportal.plugin.chat.Status
-import gg.flyte.pluginportal.plugin.chat.boxed
-import gg.flyte.pluginportal.plugin.chat.sendLocalPluginListMessage
-import gg.flyte.pluginportal.plugin.chat.status
+import gg.flyte.pluginportal.plugin.chat.*
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache.findFile
 import gg.flyte.pluginportal.plugin.util.async
 import gg.flyte.pluginportal.plugin.util.pluginPortalJarFile
 import net.kyori.adventure.audience.Audience
-import revxrsal.commands.annotation.*
+import revxrsal.commands.annotation.AutoComplete
+import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Subcommand
+import revxrsal.commands.annotation.Switch
 import revxrsal.commands.bukkit.annotation.CommandPermission
 
 @Command("pp", "pluginportal", "ppm")
@@ -58,6 +58,7 @@ class DeleteSubCommand {
 
         PortalLogger.log(audience, PortalLogger.Action.DELETE, targetMessage)
 
-        audience.sendMessage(status(Status.SUCCESS, "Plugin deleted").boxed())
+        audience.sendMessage(status(Status.SUCCESS, "${localPlugin.name} has been deleted\n")
+            .appendSecondary("- Please restart your server for these changes to take effect").boxed())
     }
 }
