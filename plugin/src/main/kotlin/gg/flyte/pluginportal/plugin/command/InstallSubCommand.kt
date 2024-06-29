@@ -21,7 +21,7 @@ class InstallSubCommand {
     fun installCommand(
         audience: Audience,
         name: String,
-        @Optional platform: MarketplacePlatform? = null,
+        @Optional @Named("platform") platform: MarketplacePlatform? = null,
         @Switch("byId") byId: Boolean = false,
     ) {
         MarketplacePluginCache.handlePluginSearchFeedback(

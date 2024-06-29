@@ -18,7 +18,7 @@ class ViewSubCommand {
     fun viewCommand(
         audience: Audience,
         name: String,
-        @Optional platform: MarketplacePlatform? = null,
+        @Optional @Named("platform") platform: MarketplacePlatform? = null,
         @Switch("byId") byId: Boolean = false,
     ) {
         MarketplacePluginCache.handlePluginSearchFeedback(
