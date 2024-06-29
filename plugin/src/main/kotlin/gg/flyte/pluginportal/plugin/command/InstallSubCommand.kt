@@ -42,8 +42,6 @@ class InstallSubCommand {
     }
 
     private fun handleSinglePlugin(audience: Audience, plugin: Plugin, platformFlag: MarketplacePlatform?) {
-        val platforms = plugin.platforms
-
         if (LocalPluginCache.hasPlugin(plugin)) {
             return sendFailureMessage(audience, "Plugin already installed, use the update command instead")
         }
@@ -56,32 +54,11 @@ class InstallSubCommand {
                 .appendNewline()
         )
 
-        if (platforms.size == 1 || platformFlag != null) {
-            val platform = platformFlag ?: platforms.keys.first()
-
-            MarketplacePluginCache.installPlugin(
-                audience,
-                plugin,
-                platform,
-                Config.INSTALL_DIRECTORY
-            )
-
-        } else {
-            audience.sendMessage(
-                newline()
-                    .append(
-                        status(Status.FAILURE, "Multiple platforms found, click one to prompt install command")
-                            .appendNewline()
-                    )
-            )
-            platforms.forEach { (platform, _) ->
-                audience.sendMessage(
-                    textSecondary(" - ").appendPrimary(platform.name)
-                        .hoverEvent(text("Click to install"))
-                        .suggestCommand("/pp install ${plugin.name} ${platform.name}")
-                )
-            }
-            audience.sendMessage(solidLine(prefix = "", suffix = ""))
-        }
+        MarketplacePluginCache.installPlugin(
+            audience,
+            plugin,
+            platformFlag ?: plugin.highestPriorityPlatform,
+            Config.INSTALL_DIRECTORY
+        )
     }
 }
