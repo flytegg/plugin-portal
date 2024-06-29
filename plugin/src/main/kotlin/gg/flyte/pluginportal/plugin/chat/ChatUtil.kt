@@ -76,8 +76,7 @@ fun Audience.sendFailure(message: String) = sendFailureMessage(this, message)
 
 fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plugin>, command: String) {
     audience.sendMessage(startLine().appendSecondary(message).appendNewline())
-    plugins.forEach { plugin ->
-
+    plugins.sortedByDescending { it.totalDownloads }.forEach { plugin ->
         var platformSuffix = textDark(" (")
 
         plugin.platforms.keys.forEachIndexed { index, platform ->
