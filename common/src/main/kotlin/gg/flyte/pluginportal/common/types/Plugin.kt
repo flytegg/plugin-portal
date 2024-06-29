@@ -8,6 +8,7 @@ data class Plugin(
     val name: String,
     val platforms: MutableMap<MarketplacePlatform, PlatformPlugin>,
 ) {
+    val highestPriorityPlatform = MarketplacePlatform.entries.firstOrNull(platforms::containsKey) ?: platforms.keys.first()
     fun getFirstPlatform(): PlatformPlugin? = platforms.values.firstOrNull()
 
     fun getImageURL(): String? = platforms.values
@@ -17,7 +18,7 @@ data class Plugin(
 
     fun getDescription(): String? = getFirstPlatform()?.description?.replace("\n", " ")
 
-    fun getDownloads(): Int = platforms.values.sumOf { platform -> platform.downloads }
+    val totalDownloads: Int get() = platforms.values.sumOf { platform -> platform.downloads }
 
 }
 

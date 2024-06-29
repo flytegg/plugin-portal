@@ -4,6 +4,7 @@ import DefaultFontInfo
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.types.Plugin
+import gg.flyte.pluginportal.plugin.util.format
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
@@ -84,7 +85,7 @@ fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plu
                 textDark(platform.name)
                     .hoverEvent(text("Click to $command with ${platform.name}"))
                     .suggestCommand(
-                        "/pp $command \"${plugin.name}\" $platform"
+                        "/pp $command \"${plugin.platforms[platform]!!.id}\" $platform -byId"
                     )
             )
 
@@ -93,13 +94,13 @@ fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plu
             }
         }
 
-        val platform = MarketplacePlatform.entries.find { platform -> plugin.platforms.containsKey(platform) }
-            ?: plugin.platforms.keys.first()
+        val platform = plugin.highestPriorityPlatform
 
         audience.sendMessage(
-            textSecondary(" - ").appendPrimary(plugin.name)
+            textSecondary(" - ").appendPrimary("${plugin.name} - ${plugin.totalDownloads.format()}")
+                .append(text("⬇", AQUA, TextDecoration.UNDERLINED))
                 .hoverEvent(text("Click to $command"))
-                .suggestCommand("/pp $command \"${plugin.name}\" $platform")
+                .suggestCommand("/pp $command \"${plugin.platforms[platform]!!.id}\" $platform -byId")
                 .append(platformSuffix.appendDark(")"))
         )
     }

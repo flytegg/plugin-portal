@@ -8,7 +8,6 @@ import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.minimessage.MiniMessage
 import java.awt.Color
 import java.awt.image.BufferedImage
-import java.net.URI
 import java.net.URL
 import javax.imageio.ImageIO
 
@@ -149,7 +148,7 @@ fun Plugin.getImageComponent(): Component {
                 setLine(index + 2, textSecondary(line).showOnHover(getDescription() ?: ""))
             }
         }
-        .setLine(description.size + 3, textSecondary("Downloads: ${getDownloads().format()}"))
+        .setLine(description.size + 3, textSecondary("Downloads: ${totalDownloads.format()}"))
         .setLine(description.size + 4, textSecondary("Platforms: ${platforms.keys.joinToString()}"))
         .setLine(
             11, centerComponentLine(text("").let {
