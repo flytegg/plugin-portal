@@ -29,12 +29,15 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
 
     fun handlePluginSearchFeedback (
         audience: Audience,
-        prefix: String?,
+        name: String,
         platform: MarketplacePlatform?,
-        id: String?,
+        nameIsId: Boolean,
         ifSingle: (Plugin) -> Unit, // Async
         ifMore: (List<Plugin>) -> Unit // Also Async
     ) {
+        val prefix = if (nameIsId) null else name
+        val id = if (nameIsId) name else null
+
         if (id != null) {
             if (platform == null) return audience.sendFailure("Specify a platform to check the platformId: $id")
             return async {
@@ -42,10 +45,8 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
             }
         }
 
-        if (prefix == null) return audience.sendFailure("No plugin name or ID provided")
-
         async {
-            val plugins = getFilteredPlugins(prefix, platform) // May not return all results
+            val plugins = getFilteredPlugins(prefix!!, platform) // May not return all results
 
             if (plugins.isEmpty()) return@async audience.sendFailure("No plugins found")
 

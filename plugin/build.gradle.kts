@@ -12,6 +12,7 @@ plugins {
 }
 
 repositories {
+    mavenCentral()
     maven("https://oss.sonatype.org/content/repositories/central")
     maven("https://jitpack.io")
     maven("https://repo.papermc.io/repository/maven-public/")

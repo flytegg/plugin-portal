@@ -17,15 +17,15 @@ class ViewSubCommand {
     @CommandPermission("pluginportal.view")
     fun viewCommand(
         audience: Audience,
-        @Optional prefix: String? = null,
-        @Optional @Flag("platform") platform: MarketplacePlatform? = null,
-        @Optional @Flag("platformId") platformId: String? = null,
+        name: String,
+        @Optional platform: MarketplacePlatform? = null,
+        @Switch("byId") byId: Boolean = false,
     ) {
         MarketplacePluginCache.handlePluginSearchFeedback(
             audience,
-            prefix,
+            name,
             platform,
-            platformId,
+            byId,
             ifSingle = { audience.sendMessage(it.getImageComponent().boxed()) },
             ifMore = { sendPluginListMessage(audience, "Multiple plugins found, click one to view more information", it, "view") }
         )

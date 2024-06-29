@@ -86,12 +86,13 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
 
     fun searchPluginsWithFeedback(
         audience: Audience,
-        prefix: String?,
-        platformId: String?,
+        name: String,
+        nameIsId: Boolean,
         ifSingle: (LocalPlugin) -> Unit, // Sync
         ifMore: (List<LocalPlugin>) -> Unit // Sync
     ) {
-        if (prefix == null && platformId == null) return audience.sendFailure("No plugin name or ID provided")
+        val prefix = if (nameIsId) null else name
+        val platformId = if (nameIsId) name else null
 
         val plugins = if (platformId != null) LocalPluginCache.find { it.platformId == platformId }?.let { listOf(it) }
             ?: listOf()

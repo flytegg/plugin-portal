@@ -22,13 +22,13 @@ class DeleteSubCommand {
     @CommandPermission("pluginportal.manage.uninstall")
     fun deleteCommand(
         audience: Audience,
-        @Optional prefix: String? = null,
-        @Optional @Flag("platformId") platformId: String? = null,
+        name: String,
+        @Switch("byId") byId: Boolean = false,
     ) {
         LocalPluginCache.searchPluginsWithFeedback(
             audience,
-            prefix,
-            platformId,
+            name,
+            byId,
             ifSingle = { plugin: LocalPlugin -> handleSinglePlugin(audience, plugin) }.async(),
             ifMore = {
                 sendLocalPluginListMessage(audience, "Multiple plugins found, click one to prompt delete command", it, "delete")

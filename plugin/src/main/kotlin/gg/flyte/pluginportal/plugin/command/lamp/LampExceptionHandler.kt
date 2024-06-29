@@ -6,7 +6,6 @@ import gg.flyte.pluginportal.plugin.chat.boxed
 import gg.flyte.pluginportal.plugin.chat.sendFailureMessage
 import gg.flyte.pluginportal.plugin.chat.status
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
 import revxrsal.commands.bukkit.exception.BukkitExceptionAdapter

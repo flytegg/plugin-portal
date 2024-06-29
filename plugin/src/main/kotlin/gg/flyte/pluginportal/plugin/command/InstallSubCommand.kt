@@ -20,15 +20,15 @@ class InstallSubCommand {
     @CommandPermission("pluginportal.manage.install")
     fun installCommand(
         audience: Audience,
-        @Optional prefix: String? = null,
-        @Optional @Flag("platform") platform: MarketplacePlatform? = null,
-        @Optional @Flag("platformId") platformId: String? = null,
+        name: String,
+        @Optional platform: MarketplacePlatform? = null,
+        @Switch("byId") byId: Boolean = false,
     ) {
         MarketplacePluginCache.handlePluginSearchFeedback(
             audience,
-            prefix,
+            name,
             platform,
-            platformId,
+            byId,
             ifSingle = { handleSinglePlugin(audience, it, platform) }, // Can slightly optimise by adding quick isInstalled check first
             ifMore = {
                 sendPluginListMessage(
@@ -78,7 +78,7 @@ class InstallSubCommand {
                 audience.sendMessage(
                     textSecondary(" - ").appendPrimary(platform.name)
                         .hoverEvent(text("Click to install"))
-                        .suggestCommand("/pp install ${plugin.name} --platform ${platform.name}")
+                        .suggestCommand("/pp install ${plugin.name} ${platform.name}")
                 )
             }
             audience.sendMessage(solidLine(prefix = "", suffix = ""))
