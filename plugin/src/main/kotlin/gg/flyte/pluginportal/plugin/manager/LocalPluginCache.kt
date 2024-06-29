@@ -58,11 +58,19 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
     }
 
 
-    fun deletePlugin(plugin: LocalPlugin, toDelete: List<File>) {
+    fun deletePlugin(plugin: LocalPlugin, toDelete: List<File?>) {
         remove(plugin)
         save()
-        toDelete.forEach(File::delete)
+        toDelete.forEach { it?.delete() }
     }
+
+    private val updatedPluginMap: HashMap<LocalPlugin, File?> = hashMapOf()
+    fun addToUpdatedPluginMap(newPlugin: LocalPlugin, oldPlugin: LocalPlugin) { updatedPluginMap[newPlugin] = oldPlugin.findFile() }
+    /**
+     * @return The file for the currently installed version of this plugin, if this [LocalPlugin] was installed via an update,
+     *             otherwise null
+     */
+    fun LocalPlugin.popCurrentVersionFile() = updatedPluginMap.remove(this)
 
     private val pluginsFolder = File("plugins")
     private val updateFolder = File(pluginsFolder, "update").apply { if (!exists()) mkdirs() }
@@ -77,10 +85,6 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
             .filter { file -> file.name.endsWith(".jar") }
             .firstOrNull { file -> calculateSHA256(file) == sha256 }
     }
-
-    /** @return Relevant files from plugins and updates directory matching this plugins hash */
-    fun LocalPlugin.findAssociatedFiles(): List<File> = (pluginsFolder.listFiles()!! + updateFolder.listFiles()!!)
-        .filter { it.isFile && it.extension == "jar" && calculateSHA256(it) == sha256 }
 
 
     private fun getPluginsFile() = File(PluginPortal.instance.dataFolder, "plugins.json").createIfNotExists()

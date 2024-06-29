@@ -4,7 +4,8 @@ import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.plugin.chat.*
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
-import gg.flyte.pluginportal.plugin.manager.LocalPluginCache.findAssociatedFiles
+import gg.flyte.pluginportal.plugin.manager.LocalPluginCache.findFile
+import gg.flyte.pluginportal.plugin.manager.LocalPluginCache.popCurrentVersionFile
 import gg.flyte.pluginportal.plugin.util.async
 import gg.flyte.pluginportal.plugin.util.isPluginPortal
 import net.kyori.adventure.audience.Audience
@@ -41,9 +42,11 @@ class DeleteSubCommand {
             return audience.sendMessage(status(Status.FAILURE, "You cannot delete Plugin Portal").boxed())
         }
 
-        val files = localPlugin.findAssociatedFiles()
+        val file = localPlugin.findFile()
+        val otherFile = localPlugin.popCurrentVersionFile()
+        val files = listOf(file, otherFile)
 
-        if (files.isEmpty()) {
+        if (file == null && otherFile == null) {
             LocalPluginCache.deletePlugin(localPlugin, files)
             return audience.sendMessage(status(Status.FAILURE, "Could not find plugin jar to delete").boxed())
         }

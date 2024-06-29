@@ -76,6 +76,7 @@ class UpdateSubCommand {
 
                 plugins.forEach { plugin ->
                     if (plugin != updatedPlugin) {
+                        LocalPluginCache.addToUpdatedPluginMap(updatedPlugin, plugin)
                         LocalPluginCache.remove(plugin)
                     }
                 }
