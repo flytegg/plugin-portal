@@ -46,12 +46,12 @@ class DeleteSubCommand {
 //        println(file?.absolutePath) // This was null for pp
 
         if (localPlugin.isPluginPortal) {
-            return audience.sendMessage(status(Status.FAILURE, "You cannot delete Plugin Portal"))
+            return audience.sendMessage(status(Status.FAILURE, "You cannot delete Plugin Portal").boxed())
         }
 
         if (file == null) {
             LocalPluginCache.deletePlugin(localPlugin)
-            return audience.sendMessage(status(Status.FAILURE, "Plugin file not found"))
+            return audience.sendMessage(status(Status.FAILURE, "Plugin file not found").boxed())
         }
 
         LocalPluginCache.deletePlugin(localPlugin)
