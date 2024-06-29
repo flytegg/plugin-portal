@@ -4,7 +4,7 @@ import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.plugin.chat.*
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
-import gg.flyte.pluginportal.plugin.manager.LocalPluginCache.findFile
+import gg.flyte.pluginportal.plugin.manager.LocalPluginCache.findAssociatedFiles
 import gg.flyte.pluginportal.plugin.util.async
 import gg.flyte.pluginportal.plugin.util.isPluginPortal
 import net.kyori.adventure.audience.Audience
@@ -37,21 +37,18 @@ class DeleteSubCommand {
         val targetPlatform = localPlugin.platform
         val targetMessage = "${localPlugin.name} from $targetPlatform with ID ${localPlugin.platformId}"
 
-        val file = localPlugin.findFile()
-
-//        println(pluginPortalJarFile.absolutePath)
-//        println(file?.absolutePath) // This was null for pp
-
         if (localPlugin.isPluginPortal) {
             return audience.sendMessage(status(Status.FAILURE, "You cannot delete Plugin Portal").boxed())
         }
 
-        if (file == null) {
-            LocalPluginCache.deletePlugin(localPlugin)
-            return audience.sendMessage(status(Status.FAILURE, "Plugin file not found").boxed())
+        val files = localPlugin.findAssociatedFiles()
+
+        if (files.isEmpty()) {
+            LocalPluginCache.deletePlugin(localPlugin, files)
+            return audience.sendMessage(status(Status.FAILURE, "Could not find plugin jar to delete").boxed())
         }
 
-        LocalPluginCache.deletePlugin(localPlugin)
+        LocalPluginCache.deletePlugin(localPlugin, files)
 
         PortalLogger.log(audience, PortalLogger.Action.DELETE, targetMessage)
 

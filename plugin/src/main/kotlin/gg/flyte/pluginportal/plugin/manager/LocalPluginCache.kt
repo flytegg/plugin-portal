@@ -49,28 +49,25 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
     }
 
     fun save() {
-        val text = GSON.toJson(toTypedArray().distinctBy { plugin -> plugin.platformId })
-        getPluginsFile().writeText(text)
-
-        async { registerPluginDownloads() }
-
-        PortalLogger.info(PortalLogger.Action.SAVE_PLUGINS, "Saved $size plugins to local cache")
+        async {
+            val text = GSON.toJson(toTypedArray().distinctBy { plugin -> plugin.platformId })
+            getPluginsFile().writeText(text)
+            PortalLogger.info(PortalLogger.Action.SAVE_PLUGINS, "Saved $size plugins to local cache")
+            registerPluginDownloads()
+        }
     }
 
 
-    fun deletePlugin(plugin: LocalPlugin) {
-        val file = plugin.findFile() ?: return
-        if (!file.delete()) return
-
+    fun deletePlugin(plugin: LocalPlugin, toDelete: List<File>) {
         remove(plugin)
         save()
-
+        toDelete.forEach(File::delete)
     }
 
-    fun LocalPlugin.findFile(): File? {
-        val pluginsFolder = File("plugins")
-        val updateFolder = File(pluginsFolder, "update")
+    private val pluginsFolder = File("plugins")
+    private val updateFolder = File(pluginsFolder, "update").apply { if (!exists()) mkdirs() }
 
+    fun LocalPlugin.findFile(): File? {
         val files = mutableListOf<File>().apply {
             addAll(pluginsFolder.listFiles() ?: emptyArray())
             addAll(updateFolder.listFiles() ?: emptyArray())
@@ -80,6 +77,11 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
             .filter { file -> file.name.endsWith(".jar") }
             .firstOrNull { file -> calculateSHA256(file) == sha256 }
     }
+
+    /** @return Relevant files from plugins and updates directory matching this plugins hash */
+    fun LocalPlugin.findAssociatedFiles(): List<File> = (pluginsFolder.listFiles()!! + updateFolder.listFiles()!!)
+        .filter { it.isFile && it.extension == "jar" && calculateSHA256(it) == sha256 }
+
 
     private fun getPluginsFile() = File(PluginPortal.instance.dataFolder, "plugins.json").createIfNotExists()
 
