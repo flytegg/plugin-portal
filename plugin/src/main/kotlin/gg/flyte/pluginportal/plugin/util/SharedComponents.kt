@@ -1,5 +1,8 @@
 package gg.flyte.pluginportal.plugin.util
 
+import gg.flyte.pluginportal.common.types.LocalPlugin
+import gg.flyte.pluginportal.common.types.MarketplacePlatform
+import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.plugin.chat.appendDark
 import gg.flyte.pluginportal.plugin.chat.showOnHover
 import gg.flyte.pluginportal.plugin.chat.suggestCommand
@@ -15,13 +18,22 @@ object SharedComponents {
         .showOnHover("Click here to join our Discord", NamedTextColor.AQUA)
         .clickEvent(ClickEvent.openUrl("https://discord.gg/flyte"))
 
-    fun getInstallButton(name: String, installed: Boolean): Component {
+    private fun getInstallButton(name: String, id: String, platform: MarketplacePlatform, installed: Boolean): Component {
         val install = if (installed) "uninstall" else "install"
         val color = if (installed) NamedTextColor.RED else NamedTextColor.AQUA
 
-        return button(install.capitaliseFirst(), "", "/pp $install $name", color)
+        return button(install.capitaliseFirst(),
+            "",
+            "/pp $install \"$id\"${if (installed) "" else " $platform"} -byId", // no platform for uninstall
+            color)
             .showOnHover("Click here to $install $name", color)
     }
+
+    fun getInstallButton(plugin: LocalPlugin, installed: Boolean) =
+        getInstallButton(plugin.name, plugin.platformId, plugin.platform, installed)
+
+    fun getInstallButton(plugin: Plugin, installed: Boolean) =
+        getInstallButton(plugin.name, plugin.platforms[plugin.highestPriorityPlatform]!!.id, plugin.highestPriorityPlatform, installed)
 
     // TODO: Grey out button if is up to date, but only if this info is already in the cache
     fun getUpdateButton(name: String) = button(

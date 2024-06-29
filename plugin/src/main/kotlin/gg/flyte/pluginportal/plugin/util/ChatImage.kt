@@ -140,7 +140,7 @@ private const val MAX_DESCRIPTION_LINES = 5
 
 fun Plugin.getImageComponent(): Component {
     val description = splitDescriptionIntoLines(getDescription() ?: "", 35, MAX_DESCRIPTION_LINES)
-    val installed = LocalPluginCache.hasPlugin(id)
+    val installed = LocalPluginCache.hasPlugin(this)
     val image = ChatImage.ImageTextBuilder(getImageURL() ?: "")
         .setLine(0, centerComponentLine(textPrimary(name).bold(), 120))
         .apply {
@@ -155,7 +155,7 @@ fun Plugin.getImageComponent(): Component {
                 if (installed) it.append(SharedComponents.getUpdateButton(name)).append(text(" "))
                 else it.append(text("    "))
             }.append(
-                SharedComponents.getInstallButton(name, installed)
+                SharedComponents.getInstallButton(this, installed)
             ), 90)
         )
         .build()

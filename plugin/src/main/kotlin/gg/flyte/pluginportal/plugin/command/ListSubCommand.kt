@@ -37,7 +37,7 @@ class ListSubCommand {
                 .append(textDark(" (${plugin.platform.name}) "))
                 .append(SharedComponents.getUpdateButton(plugin.name))
                 .append(text(" "))
-                .append(SharedComponents.getInstallButton(plugin.name, true))
+                .append(SharedComponents.getInstallButton(plugin, true))
         }
 
         audience.sendMessage(message.boxed())
