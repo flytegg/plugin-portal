@@ -32,7 +32,7 @@ class ListSubCommand {
                 .append(text(" - ", NamedTextColor.DARK_GRAY))
                 .append(textPrimary(plugin.name)
                     .showOnHover("Click to view this plugin", NamedTextColor.AQUA)
-                    .suggestCommand("/pp view ${plugin.name}")
+                    .suggestCommand("/pp view ${plugin.platformId} ${plugin.platform} -byId")
                 )
                 .append(textDark(" (${plugin.platform.name}) "))
                 .append(SharedComponents.getUpdateButton(plugin.name))
