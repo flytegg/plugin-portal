@@ -8,7 +8,9 @@ data class Plugin(
     val name: String,
     val platforms: MutableMap<MarketplacePlatform, PlatformPlugin>,
 ) {
+    val isPluginPortal: Boolean = platforms[MarketplacePlatform.MODRINTH]?.id == "5qkQnnWO" // can add premium here too
     val highestPriorityPlatform get() = MarketplacePlatform.entries.find(platforms::containsKey) ?: platforms.keys.first()
+
     fun getFirstPlatform(): PlatformPlugin? = platforms.values.firstOrNull()
 
     fun getImageURL(): String? = platforms.values
