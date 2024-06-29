@@ -8,7 +8,7 @@ data class Plugin(
     val name: String,
     val platforms: MutableMap<MarketplacePlatform, PlatformPlugin>,
 ) {
-    val highestPriorityPlatform = MarketplacePlatform.entries.firstOrNull(platforms::containsKey) ?: platforms.keys.first()
+    val highestPriorityPlatform get() = MarketplacePlatform.entries.find(platforms::containsKey) ?: platforms.keys.first()
     fun getFirstPlatform(): PlatformPlugin? = platforms.values.firstOrNull()
 
     fun getImageURL(): String? = platforms.values

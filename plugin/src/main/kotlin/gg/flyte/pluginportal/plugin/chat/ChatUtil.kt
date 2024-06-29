@@ -98,8 +98,10 @@ fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plu
         audience.sendMessage(
             textSecondary(" - ").appendPrimary("${plugin.name} - ${plugin.totalDownloads.format()}")
                 .append(text("⬇", AQUA, TextDecoration.UNDERLINED))
-                .hoverEvent(text("Click to $command"))
-                .suggestCommand("/pp $command \"${plugin.platforms[platform]!!.id}\" $platform -byId")
+                .hoverEvent(
+                    text("Click to $command ${plugin.name}", AQUA).appendNewline()
+                        .append(text(plugin.getDescription() ?: "", GRAY))
+                ).suggestCommand("/pp $command \"${plugin.platforms[platform]!!.id}\" $platform -byId")
                 .append(platformSuffix.appendDark(")"))
         )
     }
@@ -113,7 +115,7 @@ fun sendLocalPluginListMessage(audience: Audience, message: String, plugins: Lis
 
         audience.sendMessage(
             textSecondary(" - ").appendPrimary(plugin.name)
-                .hoverEvent(text("Click to $command ${plugin.name} from ${plugin.platform.name} by ID"))
+                .hoverEvent(text("Click to $command ${plugin.name} from ${plugin.platform.name}"))
                 .suggestCommand("/pp $command ${plugin.platformId} ${plugin.platform} -byId")
                 .append(platformSuffix)
         )
