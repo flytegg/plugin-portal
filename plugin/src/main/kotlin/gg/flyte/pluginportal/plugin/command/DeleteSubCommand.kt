@@ -6,7 +6,7 @@ import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache.findFile
 import gg.flyte.pluginportal.plugin.util.async
-import gg.flyte.pluginportal.plugin.util.pluginPortalJarFile
+import gg.flyte.pluginportal.plugin.util.isPluginPortal
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.AutoComplete
 import revxrsal.commands.annotation.Command
@@ -45,7 +45,7 @@ class DeleteSubCommand {
 //        println(pluginPortalJarFile.absolutePath)
 //        println(file?.absolutePath) // This was null for pp
 
-        if ((file?.absolutePath ?: "") == pluginPortalJarFile.absolutePath) {
+        if (localPlugin.isPluginPortal) {
             return audience.sendMessage(status(Status.FAILURE, "You cannot delete Plugin Portal"))
         }
 

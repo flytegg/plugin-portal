@@ -7,8 +7,6 @@ import gg.flyte.pluginportal.plugin.config.Config
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.manager.MarketplacePluginCache
 import net.kyori.adventure.audience.Audience
-import net.kyori.adventure.text.Component.newline
-import net.kyori.adventure.text.Component.text
 import revxrsal.commands.annotation.*
 import revxrsal.commands.bukkit.annotation.CommandPermission
 

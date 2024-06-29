@@ -41,7 +41,7 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
             val plugins = GSON.fromJson(text, Array<LocalPlugin>::class.java)
             plugins.forEach { plugin -> add(plugin) }
 
-            if (none { it.platformId == ppLocalPlugin.platformId }) add(ppLocalPlugin)
+            if (none(LocalPlugin::isPluginPortal)) add(ppLocalPlugin)
 
             PortalLogger.info(PortalLogger.Action.LOAD_PLUGINS, "Loaded ${plugins.size} plugins from local cache")
         } catch (_: JsonSyntaxException) {
