@@ -18,7 +18,7 @@ class InstallSubCommand {
     @CommandPermission("pluginportal.manage.install")
     fun installCommand(
         audience: Audience,
-        name: String,
+        @Named("name") name: String,
         @Optional @Named("platform") platform: MarketplacePlatform? = null,
         @Switch("byId") byId: Boolean = false,
     ) {

@@ -19,7 +19,7 @@ class UpdateSubCommand {
     @CommandPermission("pluginportal.maintain.update")
     fun updateCommand(
         audience: Audience,
-        name: String,
+        @Named("name") name: String,
         @Switch("byId") byId: Boolean = false,
     ) {
         LocalPluginCache.searchPluginsWithFeedback(

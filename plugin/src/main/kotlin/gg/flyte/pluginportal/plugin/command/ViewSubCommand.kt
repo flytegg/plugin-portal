@@ -17,7 +17,7 @@ class ViewSubCommand {
     @CommandPermission("pluginportal.view")
     fun viewCommand(
         audience: Audience,
-        name: String,
+        @Named("name") name: String,
         @Optional @Named("platform") platform: MarketplacePlatform? = null,
         @Switch("byId") byId: Boolean = false,
     ) {
