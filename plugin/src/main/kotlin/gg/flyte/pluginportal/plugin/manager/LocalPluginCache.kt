@@ -51,7 +51,6 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
         async {
             val text = GSON.toJson(toTypedArray().distinctBy { plugin -> plugin.platformId })
             getPluginsFile().writeText(text)
-            PortalLogger.info(PortalLogger.Action.SAVE_PLUGINS, "Saved $size plugins to local cache")
         }
     }
 
