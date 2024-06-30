@@ -21,8 +21,7 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
     ): List<Plugin> {
         var plugins = API.getPlugins(prefix)
         if (platform != null) plugins = plugins.filter { it.platforms.containsKey(platform) }
-        val exactMatches = plugins.filter { prefix.equals(it.name, true) } // ViaVersion when ViaVersionStatus exists
-        return exactMatches.ifEmpty { plugins }
+        return plugins
     }
 
     fun getPluginById(platform: MarketplacePlatform, platformId: String) = API.getPlugin(platform, platformId) // TODO: Add a caching layer here
@@ -51,7 +50,7 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
             if (plugins.isEmpty()) return@async audience.sendFailure("No plugins found")
 
             if (plugins.size == 1) ifSingle.invoke(plugins.first())
-            else ifMore.invoke(plugins)
+            else ifMore.invoke(plugins.sortedByRelevance(name))
         }
     }
 
@@ -108,5 +107,12 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
                 .appendSecondary("- Please restart your server to enable this plugin")
                 .append(endLine())
         )
+    }
+
+    /**
+     * Sorts the plugins by relevance to the query, this also takes downloads etc. into accoutnt
+     */
+    fun List<Plugin>.sortedByRelevance(query: String): List<Plugin> = sortedByDescending {
+        it.totalDownloads * if (query.equals(it.name, true)) 50 else 1 // Arbitrary bias to exact matches
     }
 }

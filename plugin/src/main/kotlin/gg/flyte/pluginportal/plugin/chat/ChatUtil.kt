@@ -2,7 +2,6 @@ package gg.flyte.pluginportal.plugin.chat
 
 import DefaultFontInfo
 import gg.flyte.pluginportal.common.types.LocalPlugin
-import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.plugin.util.format
 import net.kyori.adventure.audience.Audience
@@ -73,7 +72,7 @@ fun Audience.sendFailure(message: String) = sendFailureMessage(this, message)
 
 fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plugin>, command: String) {
     audience.sendMessage(startLine().appendSecondary(message).appendNewline())
-    plugins.sortedByDescending { it.totalDownloads }.forEach { plugin ->
+    plugins.forEach { plugin ->
         var platformSuffix = textDark(" (")
 
         plugin.platforms.keys.forEachIndexed { index, platform ->
