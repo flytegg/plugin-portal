@@ -14,6 +14,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.NamedTextColor.*
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
+import java.util.concurrent.atomic.AtomicInteger
 
 fun solidLine(prefix: String = "", suffix: String = "\n") = text(
     "$prefix                                                                                $suffix",
@@ -72,7 +73,7 @@ fun Audience.sendFailure(message: String) = sendFailureMessage(this, message)
 
 fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plugin>, command: String) {
     audience.sendMessage(startLine().appendSecondary(message).appendNewline())
-    plugins.take(20).forEach { plugin ->
+    plugins.take(15).forEach { plugin ->
         var platformSuffix = textDark(" (")
 
         plugin.platforms.keys.forEachIndexed { index, platform ->
@@ -91,8 +92,13 @@ fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plu
 
         val platform = plugin.highestPriorityPlatform
 
+        val additionalPixels = 29 + plugin.totalDownloads.format().pixelLength + plugin.platforms.keys.joinToString(", ").pixelLength
+        val namePixels = plugin.name.pixelLength
+        val name = plugin.name.takeIf { namePixels + additionalPixels <= MAX_LINE_LENGTH }
+            ?: (plugin.name.shortenTo(MAX_LINE_LENGTH - additionalPixels - 3) + "...")
+
         audience.sendMessage(
-            textSecondary(" - ").appendPrimary("${plugin.name} - ${plugin.totalDownloads.format()}")
+            textSecondary(" - ").appendPrimary("$name - ${plugin.totalDownloads.format()}")
                 .append(text("⬇", AQUA, TextDecoration.UNDERLINED))
                 .hoverEvent(
                     text("Click to $command ${plugin.name}", AQUA).appendNewline()
@@ -124,7 +130,9 @@ val miniMessage = MiniMessage.builder().strict(true).build()
 fun centerComponentLine(component: Component, maxLength: Int = 240) =
     centerMessage(miniMessage.serialize(component), maxLength)
 
-fun centerMessage(message: String, maxLength: Int = 240): Component {
+private const val MAX_LINE_LENGTH = 240
+
+fun centerMessage(message: String, maxLength: Int = MAX_LINE_LENGTH): Component {
     val boldCharacters = getBoldCharacters(message)
     val boldCharactersLength = boldCharacters.sumOf { DefaultFontInfo.getDefaultFontInfo(it).getBoldLength() }
     val boldCharactersNonBoldLength = boldCharacters.pixelLength
@@ -149,6 +157,7 @@ fun getBoldCharacters(input: String) = miniMessage.stripTags(BOLD_TAG_TEXT_REGEX
     .joinToString(""))
     .replace(" ", "")
 
+private fun String.shortenTo(pixels: Int) = AtomicInteger(0).let { i -> takeWhile { i.addAndGet(it.pixelLength) < pixels } }
 
 private val String.withoutTags get() = miniMessage.stripTags(this)
 
