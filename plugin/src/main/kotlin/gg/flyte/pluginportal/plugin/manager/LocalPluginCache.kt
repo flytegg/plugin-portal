@@ -9,7 +9,6 @@ import gg.flyte.pluginportal.plugin.PluginPortal
 import gg.flyte.pluginportal.plugin.chat.sendFailure
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.util.*
-import gg.flyte.pluginportal.plugin.util.Metrics.registerPluginDownloads
 import net.kyori.adventure.audience.Audience
 import java.io.File
 
@@ -53,7 +52,6 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
             val text = GSON.toJson(toTypedArray().distinctBy { plugin -> plugin.platformId })
             getPluginsFile().writeText(text)
             PortalLogger.info(PortalLogger.Action.SAVE_PLUGINS, "Saved $size plugins to local cache")
-            registerPluginDownloads()
         }
     }
 
