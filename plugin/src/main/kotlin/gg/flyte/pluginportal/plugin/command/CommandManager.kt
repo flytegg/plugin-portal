@@ -36,6 +36,7 @@ object CommandManager {
             ViewSubCommand(),
             ListSubCommand(),
             PremiumSubCommands(),
+            DumpSubCommand(),
         )
     }
 

@@ -4,6 +4,7 @@ import gg.flyte.pluginportal.plugin.PluginPortal
 import gg.flyte.pluginportal.plugin.util.appendLine
 import gg.flyte.pluginportal.plugin.util.async
 import gg.flyte.pluginportal.plugin.util.createIfNotExists
+import gs.mclo.api.MclogsClient
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.identity.Identity
 import org.bukkit.command.CommandSender
@@ -39,5 +40,4 @@ object PortalLogger {
         AUTO_UPDATE, INITIATED_UPDATE, FAILED_UPDATE, UPDATE,
         LOAD_PLUGINS, SAVE_PLUGINS;
     }
-
 }
