@@ -23,5 +23,3 @@ fun isJarDownloadUrl(url: String): Boolean {
         it.contains("attachment") && it.contains("filename=") && it.contains(".jar")
     } ?: false
 }
-
-val pluginPortalJarFile = File(PluginPortal::class.java.getProtectionDomain().codeSource.location.path)

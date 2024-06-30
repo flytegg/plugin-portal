@@ -6,6 +6,7 @@ import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.common.util.GSON
 import gg.flyte.pluginportal.plugin.PluginPortal
+import gg.flyte.pluginportal.plugin.PluginPortal.Companion.pluginPortalJarFile
 import gg.flyte.pluginportal.plugin.chat.sendFailure
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.util.*

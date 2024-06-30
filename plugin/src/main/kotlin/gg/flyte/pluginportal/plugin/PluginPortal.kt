@@ -7,16 +7,20 @@ import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import io.papermc.lib.PaperLib
 import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.java.JavaPlugin
+import java.io.File
 
 
 class PluginPortal : JavaPlugin() {
 
     companion object {
         lateinit var instance: JavaPlugin
+        lateinit var pluginPortalJarFile: File
     }
+
 
     override fun onEnable() {
         instance = this
+        pluginPortalJarFile = this.file
 
         CommandManager
         Config
