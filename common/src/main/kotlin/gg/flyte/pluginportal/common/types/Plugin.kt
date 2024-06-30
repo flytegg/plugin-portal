@@ -9,6 +9,8 @@ data class Plugin(
     val platforms: MutableMap<MarketplacePlatform, PlatformPlugin>,
 ) {
     val highestPriorityPlatform get() = MarketplacePlatform.entries.find(platforms::containsKey) ?: platforms.keys.first()
+    val downloadableName get() = name.replace("/", "")
+        .replace("\\", "")
 
     fun getFirstPlatform(): PlatformPlugin? = platforms.values.firstOrNull()
 
