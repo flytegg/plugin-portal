@@ -83,8 +83,6 @@ class UpdateSubCommand {
             }
         }
 
-        println(LocalPluginCache)
-
         LocalPluginCache.save()
 
         PortalLogger.log(audience, PortalLogger.Action.UPDATE, targetMessage)
