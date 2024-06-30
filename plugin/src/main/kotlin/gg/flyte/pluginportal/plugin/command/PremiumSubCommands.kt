@@ -22,6 +22,14 @@ class PremiumSubCommands {
     @CommandPermission("pluginportal.manage.scan")
     fun scanCommand(audience: Audience) = premiumCommand(audience)
 
+    @Subcommand("import")
+    @CommandPermission("pluginportal.manage.import")
+    fun importCommand(audience: Audience) = premiumCommand(audience)
+
+    @Subcommand("export")
+    @CommandPermission("pluginportal.manage.export")
+    fun exportCommand(audience: Audience) = premiumCommand(audience)
+
     fun premiumCommand(audience: Audience) {
         audience.sendMessage(status(Status.FAILURE, "This command is only available for Plugin Portal Premium.").boxed())
     }
