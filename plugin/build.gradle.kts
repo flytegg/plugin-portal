@@ -54,50 +54,50 @@ tasks {
 val branch = rootProject.branchName()
 val baseVersion = project.version as String
 val isRelease = !baseVersion.contains('-')
-val isMainBranch = branch == "master"
-if (!isRelease || isMainBranch) { // Only publish releases from the main branch
-    val suffixedVersion = if (isRelease) baseVersion else baseVersion + "+" + System.getenv("GITHUB_RUN_NUMBER")
-    val changelogContent = if (isRelease) {
-        "See [GitHub](https://github.com/flytegg/plugin-portal) for release notes."
-    } else {
-        val commitHash = rootProject.latestCommitHash()
-        "[$commitHash](https://github.com/flytegg/plugin-portal/commit/$commitHash) ${rootProject.latestCommitMessage()}"
-    }
+//val isMainBranch = branch == "master"
+//if (!isRelease || isMainBranch) { // Only publish releases from the main branch
+val suffixedVersion = if (isRelease) baseVersion else baseVersion + "+" + System.getenv("GITHUB_RUN_NUMBER")
+val changelogContent = if (isRelease) {
+    "See [GitHub](https://github.com/flytegg/plugin-portal) for release notes."
+} else {
+    val commitHash = rootProject.latestCommitHash()
+    "[$commitHash](https://github.com/flytegg/plugin-portal/commit/$commitHash) ${rootProject.latestCommitMessage()}"
+}
 
-    modrinth {
-        val mcVersions: List<String> = (property("mcVersions") as String)
-            .split(",")
-            .map { it.trim() }
-        token.set(System.getenv("MODRINTH_TOKEN"))
-        projectId.set("pluginportal")
-        versionType.set(if (isRelease) "release" else if (isMainBranch) "beta" else "alpha")
-        versionNumber.set(suffixedVersion)
-        versionName.set(suffixedVersion)
+modrinth {
+    val mcVersions: List<String> = (property("mcVersions") as String)
+        .split(",")
+        .map { it.trim() }
+    token.set(System.getenv("MODRINTH_TOKEN"))
+    projectId.set("pluginportal")
+    versionType.set(if (isRelease) "release" else "beta")
+    versionNumber.set(suffixedVersion)
+    versionName.set(suffixedVersion)
+    changelog.set(changelogContent)
+    uploadFile.set(tasks.shadowJar.flatMap { it.archiveFile })
+    gameVersions.set(mcVersions)
+    loaders.add("bukkit")
+    loaders.add("spigot")
+    loaders.add("paper")
+    loaders.add("folia")
+    loaders.add("purpur")
+    autoAddDependsOn.set(false)
+    detectLoaders.set(false)
+}
+
+hangarPublish {
+    publications.register("plugin") {
+        version.set(suffixedVersion)
+        id.set("PluginPortal")
+        channel.set(if (isRelease) "Release" else "Snapshot")
         changelog.set(changelogContent)
-        uploadFile.set(tasks.shadowJar.flatMap { it.archiveFile })
-        gameVersions.set(mcVersions)
-        loaders.add("bukkit")
-        loaders.add("spigot")
-        loaders.add("paper")
-        loaders.add("folia")
-        loaders.add("purpur")
-        autoAddDependsOn.set(false)
-        detectLoaders.set(false)
-    }
-
-    hangarPublish {
-        publications.register("plugin") {
-            version.set(suffixedVersion)
-            id.set("PluginPortal")
-            channel.set(if (isRelease) "Release" else if (isMainBranch) "Snapshot" else "Alpha")
-            changelog.set(changelogContent)
-            apiKey.set(System.getenv("HANGAR_API_KEY"))
-            platforms {
-                paper {
-                    jar.set(tasks.shadowJar.flatMap { it.archiveFile })
-                    platformVersions.set(listOf(property("mcVersionRange") as String))
-                }
+        apiKey.set(System.getenv("HANGAR_API_KEY"))
+        platforms {
+            paper {
+                jar.set(tasks.shadowJar.flatMap { it.archiveFile })
+                platformVersions.set(listOf(property("mcVersionRange") as String))
             }
         }
     }
 }
+//}
