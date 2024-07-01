@@ -8,13 +8,11 @@ data class Plugin(
     val name: String,
     val platforms: Map<MarketplacePlatform, PlatformPlugin>,
 ) {
-    val highestPriorityPlatform by lazy {
-        MarketplacePlatform.entries.find { platforms.containsKey(it) } ?: platforms.keys.first()
-    }
+  
+    val highestPriorityPlatform get() = MarketplacePlatform.entries.find(platforms::containsKey) ?: platforms.keys.first()
 
-    val downloadableName by lazy {
-        name.replace(Regex("[/\\\\]"), "")
-    }
+    val downloadableName = name.replace(Regex("[/\\\\]"), "")
+
 
     fun getFirstPlatform(): PlatformPlugin? = platforms.values.firstOrNull()
 
