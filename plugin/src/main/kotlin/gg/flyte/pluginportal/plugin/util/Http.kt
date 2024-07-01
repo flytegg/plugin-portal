@@ -41,83 +41,36 @@ fun Plugin.download(marketplacePlatform: MarketplacePlatform, targetDirectory: S
     return true
 }
 
-fun download(url: URL, file: File, audience: Audience?): File? {
-    val connection = url.openConnection()
-    connection.setRequestProperty("User-Agent", "Mozilla/5.0")
-    connection.connect()
-    val inputStream = connection.runCatching {
-        getInputStream()
-    }.onFailure {
-        it.printStackTrace()
-        audience?.sendMessage(text("\n").append(
+fun download(url: URL, file: File, audience: Audience?): File? = try {
+    url.openConnection().apply {
+        setRequestProperty("User-Agent", "Mozilla/5.0")
+        connect()
+    }.getInputStream().use { input ->
+        file.parentFile.mkdirs()
+        file.outputStream().use { output -> input.copyTo(output) }
+    }
+    file
+} catch (e: Exception) {
+    e.printStackTrace()
+    audience?.sendMessage(
+        text("\n").append(
             status(Status.FAILURE, "An error occurred while downloading\n")
                 .append(textSecondary("- Please try again, or join our ")
                     .append(SharedComponents.DISCORD_COMPONENT)
                     .appendSecondary(" for support.")
-                ).append(endLine()))
+                ).append(endLine())
         )
-        return null
-    }.getOrNull()!! // Returns above if failure.
-
-    file.parentFile.mkdirs()
-    file.createNewFile()
-    file.outputStream().use { outputStream ->
-        inputStream.copyTo(outputStream)
-    }
-    inputStream.close()
-    return file
+    )
+    null
 }
 
-fun calculateSHA256(file: File): String {
-    val digest = MessageDigest.getInstance("SHA-256")
-    FileInputStream(file).use { fis ->
-        val byteArray = ByteArray(1024)
-        var bytesCount: Int
-
-        while (fis.read(byteArray).also { bytesCount = it } != -1) {
-            digest.update(byteArray, 0, bytesCount)
-        }
-    }
-    val bytes = digest.digest()
-    val sb = StringBuilder()
-    for (byte in bytes) {
-        sb.append(String.format("%02x", byte))
-    }
-    return sb.toString()
+fun hash(data: ByteArray, algo: String = "SHA-256"): String {
+    return MessageDigest
+        .getInstance(algo)
+        .digest(data)
+        .joinToString { "%02x".format(it) }
 }
+fun calculateSHA256(file: File): String = hash(file.readBytes())
+fun calculateSHA1(file: File): String = hash(file.readBytes(), "SHA-1")
 
-fun calculateSHA1(file: File): String {
-    val digest = MessageDigest.getInstance("SHA-1")
-    FileInputStream(file).use { fis ->
-        val byteArray = ByteArray(1024)
-        var bytesCount: Int
-
-        while (fis.read(byteArray).also { bytesCount = it } != -1) {
-            digest.update(byteArray, 0, bytesCount)
-        }
-    }
-    val bytes = digest.digest()
-    val sb = StringBuilder()
-    for (byte in bytes) {
-        sb.append(String.format("%02x", byte))
-    }
-    return sb.toString()
-}
-
-fun calculateSHA512(file: File): String {
-    val digest = MessageDigest.getInstance("SHA-512")
-    FileInputStream(file).use { fis ->
-        val byteArray = ByteArray(1024)
-        var bytesCount: Int
-
-        while (fis.read(byteArray).also { bytesCount = it } != -1) {
-            digest.update(byteArray, 0, bytesCount)
-        }
-    }
-    val bytes = digest.digest()
-    val sb = StringBuilder()
-    for (byte in bytes) {
-        sb.append(String.format("%02x", byte))
-    }
-    return sb.toString()
-}
+fun calculateSHA512(file: File): String = hash(file.readBytes(), "SHA-512")
