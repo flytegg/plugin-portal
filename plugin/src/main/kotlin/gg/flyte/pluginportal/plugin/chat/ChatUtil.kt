@@ -91,11 +91,7 @@ fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plu
         }
 
         val platform = plugin.highestPriorityPlatform
-
-        val additionalPixels = 29 + plugin.totalDownloads.format().pixelLength + plugin.platforms.keys.joinToString(", ").pixelLength
-        val namePixels = plugin.name.pixelLength
-        val name = plugin.name.takeIf { namePixels + additionalPixels <= MAX_LINE_LENGTH }
-            ?: (plugin.name.shortenTo(MAX_LINE_LENGTH - additionalPixels - 3) + "...")
+        val name = plugin.name.shortenToLine(23 + plugin.totalDownloads.format().pixelLength + plugin.platformString.pixelLength)
 
         audience.sendMessage(
             textSecondary(" - ").appendPrimary("$name - ${plugin.totalDownloads.format()}")
@@ -157,10 +153,12 @@ fun getBoldCharacters(input: String) = miniMessage.stripTags(BOLD_TAG_TEXT_REGEX
     .joinToString(""))
     .replace(" ", "")
 
-private fun String.shortenTo(pixels: Int) = AtomicInteger(0).let { i -> takeWhile { i.addAndGet(it.pixelLength) < pixels } }
-
 private val String.withoutTags get() = miniMessage.stripTags(this)
+
+fun String.shortenToLine(pixelsAlreadyInLine: Int) = if (pixelsAlreadyInLine + pixelLength <= MAX_LINE_LENGTH) this
+else AtomicInteger(0).let { i -> takeWhile { i.addAndGet(it.pixelLength) <= MAX_LINE_LENGTH - pixelsAlreadyInLine - 3 } } + "..."
 
 val Char.pixelLength get() = DefaultFontInfo.getDefaultFontInfo(this).length
 val String.pixelLength get() = sumOf { it.pixelLength }
 
+val Plugin.platformString: String get() = platforms.keys.joinToString(", ", "(", ")")

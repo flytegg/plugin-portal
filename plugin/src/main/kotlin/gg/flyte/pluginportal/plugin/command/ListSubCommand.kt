@@ -15,6 +15,8 @@ import revxrsal.commands.bukkit.annotation.CommandPermission
 @Command("pp", "pluginportal", "ppm")
 class ListSubCommand {
 
+    private val BUTTON_PIXEL_LENGTH = "[Update] [Uninstall]".pixelLength
+
     @Subcommand("list",)
     @AutoComplete("@marketplacePluginSearch *")
     @CommandPermission("pluginportal.view")
@@ -28,9 +30,10 @@ class ListSubCommand {
         var message = text("Plugins installed with Plugin Portal", NamedTextColor.GRAY)
 
         plugins.forEach { plugin ->
+            val name = plugin.name.shortenToLine(plugin.platform.toString().pixelLength + 12 + BUTTON_PIXEL_LENGTH)
             message = message.append(text("\n"))
                 .append(text(" - ", NamedTextColor.DARK_GRAY))
-                .append(textPrimary(plugin.name)
+                .append(textPrimary(name)
                     .showOnHover("Click to view this plugin", NamedTextColor.AQUA)
                     .suggestCommand("/pp view ${plugin.platformId} ${plugin.platform} -byId")
                 )
