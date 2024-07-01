@@ -8,9 +8,8 @@ data class Plugin(
     val name: String,
     val platforms: Map<MarketplacePlatform, PlatformPlugin>,
 ) {
-    val highestPriorityPlatform by lazy {
-        MarketplacePlatform.entries.find { platforms.containsKey(it) } ?: platforms.keys.first()
-    }
+    val highestPriorityPlatform = MarketplacePlatform.entries.find { platforms.containsKey(it) } ?: platforms.keys.first()
+
 
     val downloadableName by lazy {
         name.replace(Regex("[/\\\\]"), "")
@@ -35,9 +34,7 @@ data class Plugin(
         }
     }
 
-    val totalDownloads by lazy {
-        platforms.values.sumOf { it.downloads }
-    }
+    val totalDownloads: Int get() = platforms.values.sumOf { platform -> platform.downloads }
 }
 
 data class PlatformPlugin(
