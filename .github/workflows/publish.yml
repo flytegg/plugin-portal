@@ -1,0 +1,27 @@
+name: Publish to Modrinth and Hangar
+on:
+  push:
+    branches:
+      - master
+      - dev
+
+jobs:
+  publish:
+    if: github.repository_owner == 'flytegg'
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          check-latest: true
+      - name: Publish
+        env:
+          HANGAR_API_KEY: ${{ secrets.HANGAR_API_KEY }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: ./gradlew build modrinth publishAllPublicationsToHangar --stacktrace

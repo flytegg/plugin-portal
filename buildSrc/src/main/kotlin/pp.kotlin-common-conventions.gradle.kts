@@ -35,3 +35,20 @@ tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
 }
+
+tasks {
+    processResources {
+        filesMatching(listOf("plugin.yml")) {
+            expand("version" to project.version)
+        }
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+}
+
+java {
+    javaTarget(17)
+    withSourcesJar()
+}
