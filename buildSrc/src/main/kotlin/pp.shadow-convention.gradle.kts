@@ -13,9 +13,8 @@ tasks {
         archiveClassifier.set("")
         archiveFileName.set("PluginPortal-${project.version}.jar")
 
-
         minimize()
-        relocate("com.google.gson", "gg.flyte.pluginportal.libs.gson")
+        exclude("com/google/gson")
         relocate("org.bstats", "gg.flyte.pluginportal.libs.bstats")
     }
     named("build") {
