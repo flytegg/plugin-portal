@@ -25,7 +25,7 @@ class DumpSubCommand {
                         textSecondary(" Join our ")
                             .append(
                                 text("Discord")
-                                    .clickEvent(ClickEvent.openUrl("https://discord.gg/flytegg"))
+                                    .clickEvent(ClickEvent.openUrl("https://discord.gg/flyte"))
                                     .color(TextColor.fromHexString("#5865F2"))
                                     .bold()
                             )

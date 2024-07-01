@@ -7,6 +7,6 @@ id = "5218ae25"
 file = "./plugin/build/libs/plugin-all.jar"
 
 [watch_plugin]
-file_name = "plugin-all.jar"
+file_name = "PluginPortal-2.0.4-SNAPSHOT.jar"
 directory = "./plugin/build/libs"
 post_deploy_command = "reload confirm"

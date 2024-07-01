@@ -1,6 +1,5 @@
 package gg.flyte.pluginportal.plugin.chat
 
-import DefaultFontInfo
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.plugin.util.format
@@ -92,7 +91,6 @@ fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plu
 
         val platform = plugin.highestPriorityPlatform
         val name = plugin.name.shortenToLine(23 + plugin.totalDownloads.format().pixelLength() + plugin.platformString.pixelLength())
-
         audience.sendMessage(
             textSecondary(" - ").appendPrimary("$name - ${plugin.totalDownloads.format()}")
                 .append(text("⬇", AQUA, TextDecoration.UNDERLINED))

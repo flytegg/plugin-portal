@@ -1,3 +1,5 @@
+package gg.flyte.pluginportal.plugin.chat
+
 enum class DefaultFontInfo(val character: Char, val length: Int) {
 
     A('A', 5),

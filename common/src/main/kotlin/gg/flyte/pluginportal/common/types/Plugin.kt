@@ -6,11 +6,13 @@ data class Plugin(
     @SerializedName("_id")
     val id: String,
     val name: String,
-    val platforms: MutableMap<MarketplacePlatform, PlatformPlugin>,
+    val platforms: Map<MarketplacePlatform, PlatformPlugin>,
 ) {
+  
     val highestPriorityPlatform get() = MarketplacePlatform.entries.find(platforms::containsKey) ?: platforms.keys.first()
-    val downloadableName get() = name.replace("/", "")
-        .replace("\\", "")
+
+    val downloadableName = name.replace(Regex("[/\\\\]"), "")
+
 
     fun getFirstPlatform(): PlatformPlugin? = platforms.values.firstOrNull()
 
@@ -31,7 +33,9 @@ data class Plugin(
         }
     }
 
-    val totalDownloads: Int get() = platforms.values.sumOf { platform -> platform.downloads }
+    val totalDownloads by lazy {
+        platforms.values.sumOf { it.downloads }
+    }
 }
 
 data class PlatformPlugin(
