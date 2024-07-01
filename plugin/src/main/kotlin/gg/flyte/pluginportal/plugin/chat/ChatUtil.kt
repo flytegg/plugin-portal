@@ -91,7 +91,7 @@ fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plu
         }
 
         val platform = plugin.highestPriorityPlatform
-        val name = plugin.name.shortenToLine(23 + plugin.totalDownloads.format().pixelLength + plugin.platformString.pixelLength)
+        val name = plugin.name.shortenToLine(23 + plugin.totalDownloads.format().pixelLength() + plugin.platformString.pixelLength())
 
         audience.sendMessage(
             textSecondary(" - ").appendPrimary("$name - ${plugin.totalDownloads.format()}")
@@ -130,13 +130,13 @@ private const val MAX_LINE_LENGTH = 240
 
 fun centerMessage(message: String, maxLength: Int = MAX_LINE_LENGTH): Component {
     val boldCharacters = getBoldCharacters(message)
-    val boldCharactersLength = boldCharacters.sumOf { DefaultFontInfo.getDefaultFontInfo(it).getBoldLength() }
-    val boldCharactersNonBoldLength = boldCharacters.pixelLength
+    val boldCharactersLength = boldCharacters.sumOf { it.pixelLength(true) }
+    val boldCharactersNonBoldLength = boldCharacters.pixelLength()
 
-    val messageWidth = message.withoutTags.pixelLength - boldCharactersNonBoldLength + boldCharactersLength
+    val messageWidth = message.withoutTags.pixelLength() - boldCharactersNonBoldLength + boldCharactersLength
 
     if (messageWidth > maxLength) {
-        // TODO
+        // TODO - Should be handled prior to calling this method.
     }
 
     val paddingWidth = ((maxLength - messageWidth) / 2).coerceAtLeast(0)
@@ -155,10 +155,10 @@ fun getBoldCharacters(input: String) = miniMessage.stripTags(BOLD_TAG_TEXT_REGEX
 
 private val String.withoutTags get() = miniMessage.stripTags(this)
 
-fun String.shortenToLine(pixelsAlreadyInLine: Int) = if (pixelsAlreadyInLine + pixelLength <= MAX_LINE_LENGTH) this
-else AtomicInteger(0).let { i -> takeWhile { i.addAndGet(it.pixelLength) <= MAX_LINE_LENGTH - pixelsAlreadyInLine - 3 } } + "..."
+fun String.shortenToLine(pixelsAlreadyInLine: Int, bold: Boolean = false) = if (pixelsAlreadyInLine + pixelLength(bold) <= MAX_LINE_LENGTH) this
+else AtomicInteger(0).let { i -> takeWhile { i.addAndGet(it.pixelLength(bold)) <= MAX_LINE_LENGTH - pixelsAlreadyInLine - 3 } } + "..."
 
-val Char.pixelLength get() = DefaultFontInfo.getDefaultFontInfo(this).length
-val String.pixelLength get() = sumOf { it.pixelLength }
+fun Char.pixelLength(bold: Boolean = false) = DefaultFontInfo.getDefaultFontInfo(this).let { if (bold) it.getBoldLength() else it.length }
+fun String.pixelLength(bold: Boolean = false) = sumOf { it.pixelLength(bold) }
 
 val Plugin.platformString: String get() = platforms.keys.joinToString(", ", "(", ")")

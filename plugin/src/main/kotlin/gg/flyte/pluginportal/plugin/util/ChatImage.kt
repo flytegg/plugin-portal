@@ -143,7 +143,8 @@ fun Plugin.getImageComponent(): Component {
     val description = splitDescriptionIntoLines(getDescription() ?: "", 35, MAX_DESCRIPTION_LINES)
     val installed = LocalPluginCache.hasPlugin(this)
     val image = ChatImage.ImageTextBuilder(getImageURL() ?: "")
-        .setLine(0, centerComponentLine(textPrimary(name).bold().clickEvent(ClickEvent.openUrl(getPageUrl())), 120))
+        .setLine(0, centerComponentLine(textPrimary(name.shortenToLine(80, true)).bold()
+            .clickEvent(ClickEvent.openUrl(getPageUrl())), 160))
         .apply {
             description.forEachIndexed { index, line ->
                 setLine(index + 2, textSecondary(line).showOnHover(getDescription() ?: ""))
@@ -159,7 +160,7 @@ fun Plugin.getImageComponent(): Component {
                 else it.append(text("    "))
             }.append(
                 SharedComponents.getInstallButton(this, installed)
-            ), 90)
+            ), 160)
         )
         .build()
     return image
