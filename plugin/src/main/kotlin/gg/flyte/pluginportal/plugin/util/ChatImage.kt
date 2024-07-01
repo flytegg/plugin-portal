@@ -140,7 +140,7 @@ fun createImageGrid(image: BufferedImage, rows: Int, cols: Int): Array<Array<Buf
 private const val MAX_DESCRIPTION_LINES = 5
 
 fun Plugin.getImageComponent(): Component {
-    val description = splitDescriptionIntoLines(getDescription() ?: "", 35, MAX_DESCRIPTION_LINES)
+    val description = splitDescriptionIntoLines(getDescription() ?: "", 160, MAX_DESCRIPTION_LINES)
     val installed = LocalPluginCache.hasPlugin(this)
     val image = ChatImage.ImageTextBuilder(getImageURL() ?: "")
         .setLine(0, centerComponentLine(textPrimary(name.shortenToLine(80, true)).bold()
@@ -167,13 +167,13 @@ fun Plugin.getImageComponent(): Component {
 }
 
 
-private fun splitDescriptionIntoLines(description: String, maxLineLength: Int, maxLines: Int): List<String> {
+private fun splitDescriptionIntoLines(description: String, maxLineLengthPixels: Int, maxLines: Int): List<String> {
     val words = description.split(" ")
     val lines = mutableListOf<String>()
     var currentLine = StringBuilder()
 
     for (word in words) {
-        if (currentLine.length + word.length + 1 > maxLineLength) {
+        if (currentLine.toString().pixelLength() + word.pixelLength() >= maxLineLengthPixels) {
             lines.add(currentLine.toString())
 
             if (lines.size == maxLines) { // Enforce max line count.
