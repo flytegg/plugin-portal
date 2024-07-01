@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     id("pp.kotlin-library-conventions")
     id("pp.shadow-convention")
@@ -45,15 +47,6 @@ tasks {
         )
     }
 
-    shadowJar {
-        archiveClassifier.set("")
-        archiveFileName.set("PluginPortal-${project.version}.jar")
-
-
-        minimize()
-        relocate("com.google.gson", "gg.flyte.pluginportal.libs.gson")
-        relocate("org.bstats", "gg.flyte.pluginportal.libs.bstats")
-    }
 }
 
 // Source: https://github.com/ViaVersion/ViaVersion/blob/dc503cd613f5cf00a6f11b78e52b1a76a42acf91/universal/build.gradle.kts
