@@ -19,6 +19,7 @@ class HelpSubCommand {
         HelpEntry("/pp install <plugin>", "Install a plugin"),
         HelpEntry("/pp update <plugin>", "Update a plugin"),
         HelpEntry("/pp delete <plugin>", "Uninstall a plugin"),
+        HelpEntry("/pp dump", "Dump the plugin portal log"),
     )
 
     @Subcommand("help")

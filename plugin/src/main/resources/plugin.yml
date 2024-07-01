@@ -1,7 +1,7 @@
 name: PluginPortal
 main: gg.flyte.pluginportal.plugin.PluginPortal
 author: Flyte
-version: 2.0.2
+version: 2.0.3
 description: A package manager for plugins.
 api-version: 1.13
 folia-supported: true

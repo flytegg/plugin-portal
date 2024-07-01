@@ -118,7 +118,7 @@ fun sendLocalPluginListMessage(audience: Audience, message: String, plugins: Lis
                 .append(platformSuffix)
         )
     }
-    audience.sendMessage(endLine())
+    audience.sendMessage(solidLine("", ""))
 }
 
 val miniMessage = MiniMessage.builder().strict(true).build()

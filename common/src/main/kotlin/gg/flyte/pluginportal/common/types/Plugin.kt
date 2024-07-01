@@ -9,6 +9,8 @@ data class Plugin(
     val platforms: MutableMap<MarketplacePlatform, PlatformPlugin>,
 ) {
     val highestPriorityPlatform get() = MarketplacePlatform.entries.find(platforms::containsKey) ?: platforms.keys.first()
+    val downloadableName get() = name.replace("/", "")
+        .replace("\\", "")
 
     fun getFirstPlatform(): PlatformPlugin? = platforms.values.firstOrNull()
 
@@ -19,8 +21,17 @@ data class Plugin(
 
     fun getDescription(): String? = getFirstPlatform()?.description?.replace("\n", " ")
 
-    val totalDownloads: Int get() = platforms.values.sumOf { platform -> platform.downloads }
+    fun getPageUrl(): String {
+        val currentPlatform = platforms[highestPriorityPlatform] ?: return "https://pluginportal.link"
 
+        return when (highestPriorityPlatform) {
+            MarketplacePlatform.MODRINTH -> "https://modrinth.com/plugin/${currentPlatform.id}"
+            MarketplacePlatform.SPIGOTMC -> "https://www.spigotmc.org/resources/${currentPlatform.id}"
+            MarketplacePlatform.HANGAR -> "https://hangar.papermc.io/${currentPlatform.author}/${currentPlatform.id}"
+        }
+    }
+
+    val totalDownloads: Int get() = platforms.values.sumOf { platform -> platform.downloads }
 }
 
 data class PlatformPlugin(

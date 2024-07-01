@@ -14,7 +14,7 @@ import java.security.MessageDigest
 
 fun Plugin.download(marketplacePlatform: MarketplacePlatform, targetDirectory: String, audience: Audience? = null): Boolean {
 
-    val jarFile = File(targetDirectory, "[PP] $name ($marketplacePlatform).jar")
+    val jarFile = File(targetDirectory, "[PP] $downloadableName ($marketplacePlatform).jar")
 
     val file = download(
         URL(platforms[marketplacePlatform]!!.download?.url),

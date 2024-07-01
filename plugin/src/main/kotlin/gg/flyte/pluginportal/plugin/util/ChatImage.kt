@@ -5,6 +5,7 @@ import gg.flyte.pluginportal.plugin.chat.*
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.minimessage.MiniMessage
 import java.awt.Color
 import java.awt.image.BufferedImage
@@ -142,7 +143,7 @@ fun Plugin.getImageComponent(): Component {
     val description = splitDescriptionIntoLines(getDescription() ?: "", 35, MAX_DESCRIPTION_LINES)
     val installed = LocalPluginCache.hasPlugin(this)
     val image = ChatImage.ImageTextBuilder(getImageURL() ?: "")
-        .setLine(0, centerComponentLine(textPrimary(name).bold(), 120))
+        .setLine(0, centerComponentLine(textPrimary(name).bold().clickEvent(ClickEvent.openUrl(getPageUrl())), 120))
         .apply {
             description.forEachIndexed { index, line ->
                 setLine(index + 2, textSecondary(line).showOnHover(getDescription() ?: ""))

@@ -35,7 +35,8 @@ dependencies {
 
     api("io.papermc:paperlib:1.0.7")
 
-    implementation ("org.bstats:bstats-bukkit:3.0.2")
+    implementation("gs.mclo:api:4.0.3")
+    implementation("org.bstats:bstats-bukkit:3.0.2")
 }
 
 tasks {

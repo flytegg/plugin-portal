@@ -1,0 +1,30 @@
+name: Feature Request
+description: Suggest a feature to be added
+labels: [ Feature Request ]
+
+body:
+  - type: textarea
+    attributes:
+      label: Feature Description
+      description: |
+        Describe the feature you would like to be added.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Why is this feature needed?
+      description: |
+        Describe the problem you are facing. What are you trying to accomplish?
+      placeholder: |
+        I am trying to do [...] but I can't because [...]
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Additional Info
+      description: |
+        Add any other context or screenshots about the feature request here.
+    validations:
+      required: false
