@@ -6,6 +6,7 @@ import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.util.SharedComponents
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import revxrsal.commands.annotation.AutoComplete
 import revxrsal.commands.annotation.Command
@@ -34,7 +35,8 @@ class ListSubCommand {
             message = message.append(text("\n"))
                 .append(text(" - ", NamedTextColor.DARK_GRAY))
                 .append(textPrimary(name)
-                    .showOnHover("Click to view this plugin", NamedTextColor.AQUA)
+                    .hoverEvent(HoverEvent.showText(
+                        text("Click to view ", NamedTextColor.GRAY).appendPrimary(plugin.name)))
                     .suggestCommand("/pp view ${plugin.platformId} ${plugin.platform} -byId")
                 )
                 .append(textDark(" (${plugin.platform.name}) "))
