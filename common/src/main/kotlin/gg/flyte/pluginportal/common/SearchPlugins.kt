@@ -10,24 +10,12 @@ object SearchPlugins {
         .build<String, List<Plugin>>()
 
     fun search(query: String): List<Plugin> {
-        if (searchCache.asMap().containsKey(query)) {
-            return searchCache.getIfPresent(query)!!
-        }
-
-        val response = API.getPlugins(query).also {
-            searchCache.put(query, it)
-        }
-
-        return response
+        return searchCache.get(query) { API.getPlugins(query) }
     }
 
     fun getCachedSearch(query: String): List<Plugin>? {
-        searchCache.asMap().forEach { (key, value) ->
-            if (query.contains(key, ignoreCase = true)) {
-                return value
-            }
-        }
-
-        return null
+        return searchCache.asMap().entries
+            .firstOrNull { (key, _) -> query.contains(key, ignoreCase = true) }
+            ?.value
     }
 }

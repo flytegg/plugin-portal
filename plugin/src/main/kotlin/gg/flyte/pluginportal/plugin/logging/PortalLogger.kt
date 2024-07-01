@@ -10,11 +10,20 @@ import net.kyori.adventure.identity.Identity
 import org.bukkit.command.CommandSender
 import java.io.File
 import java.util.logging.Level
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
 
-// TODO: After 1k entries move this to a zipped archive folder and create a new file
-// TODO: Load & Read & make queryable
 object PortalLogger {
-    private val file = File(PluginPortal.instance.dataFolder, "history.log").createIfNotExists()
+    private const val MAX_ENTRIES = 1000
+    private const val ARCHIVE_FOLDER = "archive"
+    private val dataFolder = PluginPortal.instance.dataFolder
+    private var currentFile = File(dataFolder, "history.log").apply { createNewFile() }
+    private var entryCount = 0
+
+    init {
+        loadExistingEntries()
+    }
 
     fun info(action: Action, message: String) = log(Record(System.currentTimeMillis(), "SYSTEM", action, message))
 
@@ -31,7 +40,73 @@ object PortalLogger {
         writeToFile(record)
     }
 
-    private fun writeToFile(record: Record) = async { file.appendLine(record.description) }
+    private fun writeToFile(record: Record) {
+        currentFile.appendLine(record.description)
+        entryCount++
+
+        if (entryCount >= MAX_ENTRIES) {
+            archiveCurrentFile()
+            createNewFile()
+        }
+    }
+
+    private fun archiveCurrentFile() {
+        val archiveFolder = File(dataFolder, ARCHIVE_FOLDER).apply { mkdirs() }
+        val archiveFile = File(archiveFolder, "history_${System.currentTimeMillis()}.zip")
+
+        ZipOutputStream(archiveFile.outputStream()).use { zipOut ->
+            zipOut.putNextEntry(ZipEntry(currentFile.name))
+            currentFile.inputStream().use { input ->
+                input.copyTo(zipOut)
+            }
+        }
+
+        currentFile.delete()
+    }
+
+    private fun createNewFile() {
+        currentFile = File(dataFolder, "history.log").apply { createNewFile() }
+        entryCount = 0
+    }
+
+    private fun loadExistingEntries() {
+        entryCount = currentFile.readLines().size
+    }
+
+    fun query(filter: (Record) -> Boolean): List<Record> {
+        val records = mutableListOf<Record>()
+
+        // read current
+        currentFile.readLines().mapNotNull { parseRecord(it) }.filter(filter).let { records.addAll(it) }
+
+        // read from archive
+        File(dataFolder, ARCHIVE_FOLDER).listFiles { file -> file.extension == "zip" }?.forEach { zipFile ->
+            ZipFile(zipFile).use { zip ->
+                zip.entries().asSequence().forEach { entry ->
+                    zip.getInputStream(entry).bufferedReader().useLines { lines ->
+                        lines.mapNotNull { parseRecord(it) }.filter(filter).let { records.addAll(it) }
+                    }
+                }
+            }
+        }
+
+        return records
+    }
+
+    private fun parseRecord(line: String): Record? {
+        val parts = line.split("|")
+        if (parts.size != 4) return null
+        return try {
+            Record(
+                parts[0].toLong(),
+                parts[1],
+                Action.valueOf(parts[2]),
+                parts[3]
+            )
+        } catch (e: Exception) {
+            null
+        }
+    }
 
     enum class Action {
         // Actions are queried linearly thus AUTO_UPDATE must precede UPDATE etc.

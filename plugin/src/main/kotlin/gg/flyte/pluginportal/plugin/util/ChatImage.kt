@@ -88,24 +88,15 @@ object ChatImage {
  * @return The average color of the image.
  */
 fun getAverageColor(image: BufferedImage): Color {
-    var sampled = 0
-    var sumR: Long = 0
-    var sumG: Long = 0
-    var sumB: Long = 0
-    for (x in 0 until image.width) {
-        for (y in 0 until image.height) {
-            val pixel = Color(image.getRGB(x, y))
-            sumR += pixel.red.toLong()
-            sumG += pixel.green.toLong()
-            sumB += pixel.blue.toLong()
-            sampled++
+    val (sumR, sumG, sumB) = image.getRGB(0, 0, image.width, image.height, null, 0, image.width)
+        .asSequence()
+        .map { Color(it) }
+        .fold(Triple(0, 0, 0)) { (r, g, b), color ->
+            Triple(r + color.red, g + color.green, b + color.blue)
         }
-    }
-    return Color(
-        (sumR / sampled).toInt(),
-        (sumG / sampled).toInt(),
-        (sumB / sampled).toInt()
-    )
+
+    val pixelCount = image.width * image.height
+    return Color(sumR / pixelCount, sumG / pixelCount, sumB / pixelCount)
 }
 
 

@@ -1,5 +1,8 @@
 package gg.flyte.pluginportal.plugin.manager
 
+import com.google.common.cache.CacheBuilder
+import com.google.common.cache.CacheLoader
+import com.google.common.cache.LoadingCache
 import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.types.Plugin
@@ -12,8 +15,21 @@ import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.newline
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 object MarketplacePluginCache : PluginCache<Plugin>() {
+
+    private val pluginCache: LoadingCache<Pair<MarketplacePlatform, String>, Optional<Plugin>> = CacheBuilder.newBuilder()
+        .maximumSize(1000)
+        .expireAfterWrite(1, TimeUnit.HOURS)
+        .build(
+            object : CacheLoader<Pair<MarketplacePlatform, String>, Optional<Plugin>>() {
+                override fun load(key: Pair<MarketplacePlatform, String>): Optional<Plugin> {
+                    return Optional.ofNullable(API.getPlugin(key.first, key.second))
+                }
+            }
+        )
 
     fun getFilteredPlugins(
         prefix: String,
@@ -24,33 +40,35 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
         return plugins
     }
 
-    fun getPluginById(platform: MarketplacePlatform, platformId: String) = API.getPlugin(platform, platformId) // TODO: Add a caching layer here
+    fun getPluginById(platform: MarketplacePlatform, platformId: String): Plugin? {
+        return pluginCache.get(platform to platformId).orElse(null)
+    }
 
-    fun handlePluginSearchFeedback (
+    fun handlePluginSearchFeedback(
         audience: Audience,
         name: String,
         platform: MarketplacePlatform?,
         nameIsId: Boolean,
-        ifSingle: (Plugin) -> Unit, // Async
-        ifMore: (List<Plugin>) -> Unit // Also Async
-    ) {
-        val prefix = if (nameIsId) null else name
-        val id = if (nameIsId) name else null
-
-        if (id != null) {
-            if (platform == null) return audience.sendFailure("Specify a platform to check the platformId: $id")
-            return async {
-                getPluginById(platform, id)?.let { ifSingle.invoke(it) } ?: audience.sendFailure("No plugin found")
+        ifSingle: (Plugin) -> Unit,
+        ifMore: (List<Plugin>) -> Unit
+    ) = async {
+        when {
+            nameIsId -> {
+                if (platform == null) {
+                    audience.sendFailure("Specify a platform to check the platformId: $name")
+                } else {
+                    getPluginById(platform, name)?.let { ifSingle(it) }
+                        ?: audience.sendFailure("No plugin found")
+                }
             }
-        }
-
-        async {
-            val plugins = getFilteredPlugins(prefix!!, platform) // May not return all results
-
-            if (plugins.isEmpty()) return@async audience.sendFailure("No plugins found")
-
-            if (plugins.size == 1) ifSingle.invoke(plugins.first())
-            else ifMore.invoke(plugins.sortedByRelevance(name))
+            else -> {
+                val plugins = getFilteredPlugins(name, platform)
+                when {
+                    plugins.isEmpty() -> audience.sendFailure("No plugins found")
+                    plugins.size == 1 -> ifSingle(plugins.first())
+                    else -> ifMore(plugins.sortedByRelevance(name))
+                }
+            }
         }
     }
 
