@@ -8,6 +8,7 @@ import gg.flyte.pluginportal.common.util.GSON
 import gg.flyte.pluginportal.plugin.PluginPortal
 import gg.flyte.pluginportal.plugin.PluginPortal.Companion.pluginPortalJarFile
 import gg.flyte.pluginportal.plugin.chat.sendFailure
+import gg.flyte.pluginportal.plugin.config.Config
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.util.*
 import net.kyori.adventure.audience.Audience
@@ -33,6 +34,8 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
             installedAt = System.currentTimeMillis(),
         )
 
+        val pluginsInFolder = File(Config.INSTALL_DIRECTORY).listFiles()?.filter(File::isJarFile)?.associateBy { calculateSHA256(it) }
+
         val text = getPluginsFile().readText()
         if (text.isEmpty()) {
             add(ppLocalPlugin)
@@ -41,7 +44,17 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
 
         try {
             val plugins = GSON.fromJson(text, Array<LocalPlugin>::class.java)
-            plugins.forEach { plugin -> add(plugin) }
+            plugins.forEach { plugin ->
+                if (pluginsInFolder != null && !pluginsInFolder.containsKey(plugin.sha256) && !plugin.isPluginPortal) {
+                    // Plugin no longer present in plugins folder upon opening server
+                    PortalLogger.info(
+                        PortalLogger.Action.NOTICED_DELETE,
+                        "of ${plugin.name} (${plugin.platformId}) while Plugin Portal was Disabled."
+                    )
+                } else {
+                    add(plugin)
+                }
+            }
 
             if (none(LocalPlugin::isPluginPortal)) add(ppLocalPlugin)
 

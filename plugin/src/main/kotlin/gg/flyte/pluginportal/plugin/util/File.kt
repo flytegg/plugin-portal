@@ -1,5 +1,6 @@
 package gg.flyte.pluginportal.plugin.util
 
+import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -20,3 +21,5 @@ fun isJarDownloadUrl(url: String): Boolean {
         it.contains("attachment") && it.contains("filename=") && it.contains(".jar")
     } ?: false
 }
+
+fun File.isJarFile() = isFile && extension == "jar"
