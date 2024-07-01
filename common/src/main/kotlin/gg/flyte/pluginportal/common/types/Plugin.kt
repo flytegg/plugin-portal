@@ -9,8 +9,8 @@ data class Plugin(
     val platforms: MutableMap<MarketplacePlatform, PlatformPlugin>,
 ) {
     val highestPriorityPlatform get() = MarketplacePlatform.entries.find(platforms::containsKey) ?: platforms.keys.first()
-
-    val downloadableName = name.replace(Regex("[/\\\\]"), "")
+    val downloadableName get() = name.replace(Regex("[/\\\\]"), "")
+    val totalDownloads: Int get() = platforms.values.sumOf { platform -> platform.downloads }
 
     fun getFirstPlatform(): PlatformPlugin? = platforms.values.firstOrNull()
 
@@ -30,8 +30,6 @@ data class Plugin(
             MarketplacePlatform.HANGAR -> "https://hangar.papermc.io/${currentPlatform.author}/${currentPlatform.id}"
         }
     }
-
-    val totalDownloads: Int get() = platforms.values.sumOf { platform -> platform.downloads }
 }
 
 data class PlatformPlugin(
