@@ -47,6 +47,8 @@ tasks {
 
     shadowJar {
         archiveClassifier.set("")
+        archiveFileName.set("PluginPortal-${project.version}.jar")
+
 
         minimize()
         relocate("com.google.gson", "gg.flyte.pluginportal.libs.gson")
@@ -92,7 +94,7 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
 //    hangarPublish {
 //        publications.register("plugin") {
 //            version.set(suffixedVersion)
-//            id.set("ViaVersion")
+//            id.set("PluginPortal")
 //            channel.set(if (isRelease) "Release" else if (isMainBranch) "Snapshot" else "Alpha")
 //            changelog.set(changelogContent)
 //            apiKey.set(System.getenv("HANGAR_TOKEN"))
