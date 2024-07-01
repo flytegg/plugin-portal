@@ -1,6 +1,5 @@
 package gg.flyte.pluginportal.plugin.chat
 
-import DefaultFontInfo
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.plugin.util.format

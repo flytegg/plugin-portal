@@ -5,6 +5,7 @@ import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.common.util.GSON
 import gg.flyte.pluginportal.common.util.Http.BASE_URL
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.net.URLEncoder
 
 object API {
@@ -16,14 +17,24 @@ object API {
         client.cache?.close()
     }
 
-    private fun get(url: String, params: HashMap<String, String>): String {
-        val request = okhttp3.Request.Builder()
-            .url("$BASE_URL$url?" + params.map { "${it.key}=${it.value}" }.joinToString("&"))
-            .build()
+    private fun get(url: String, params: Map<String, String>): Pair<String, Int> {
+        val fullUrl = buildString {
+            append(BASE_URL)
+            append(url)
+            if (params.isNotEmpty()) {
+                append("?")
+                append(params.map { (key, value) ->
+                    "${URLEncoder.encode(key, "UTF-8")}=${URLEncoder.encode(value, "UTF-8")}"
+                }.joinToString("&"))
+            }
+        }
 
-        val response = client.newCall(request).execute()
-        return response.body?.string() ?: ""
+        val request = Request.Builder().url(fullUrl).build()
+        return client.newCall(request).execute().use { response ->
+            (response.body?.string() ?: "") to response.code
+        }
     }
+
 
     private class AuthorisationException(code: Int)
         : RuntimeException("Server returned code $code: You do not have permission to access this resource")
@@ -33,41 +44,26 @@ object API {
             "PLEASE REPORT THIS TO THE PLUGIN PORTAL AUTHORS")
 
     fun getPlugin(platform: MarketplacePlatform, id: String): Plugin? {
-        val response = get("/plugins/${platform.toString().lowercase()}/$id", hashMapOf()).ifEmpty {
-            return PluginRequestFailedException(platform, id).printStackTrace().let { null }
-        }
-        val statusCode: Int = response.substringAfter("\"statusCode\":", "200").slice(0..2).toInt()
-        when (statusCode) {
-            200 -> return GSON.fromJson(response, Plugin::class.java)
-            404 -> return null // not found
-            401,403 -> { // not authorised
-                AuthorisationException(statusCode).printStackTrace()
-                return null
-            }
-            400 -> { // bad request
-                IllegalArgumentException("Server returned code 400: The request for $id on $platform PLEASE REPORT THIS TO THE PLUGIN PORTAL AUTHORS")
-                    .printStackTrace()
-                return null
-            }
-            else -> {
-                PluginRequestFailedException(platform, id).printStackTrace()
-                return null
-            }
-        }
+        val (response, code) = get("/plugins/${platform.toString().lowercase()}/$id", emptyMap())
+        return when (code) {
+            200 -> GSON.fromJson(response, Plugin::class.java)
+            404 -> null // not found
+            401, 403 -> null.also { AuthorisationException(code).printStackTrace() } // not authorised
+            400 -> null.also {
+                IllegalArgumentException("Server returned code 400: The request for $id on $platform PLEASE REPORT THIS TO THE PLUGIN PORTAL AUTHORS").printStackTrace()
+            } // bad request
+            else -> null.also { PluginRequestFailedException(platform, id).printStackTrace() }
+        }.takeIf { response.isNotEmpty() }
     }
 
     fun getPlugins(prefix: String? = null, limit: Int? = 50): List<Plugin> {
-        val params = hashMapOf<String, String>()
+        val params = buildMap {
+            prefix?.let { put("prefix", it) }
+            limit?.let { put("limit", it.toString()) }
+        }
 
-        if (prefix != null) params["prefix"] = URLEncoder.encode(prefix, "UTF-8")
-        if (limit != null) params["limit"] = limit.toString()
-
-        return GSON.fromJson(
-            get(
-                "/plugins",
-                params
-            ), Array<Plugin>::class.java
-        ).toList()
+        val (response, _) = get("/plugins", params)
+        return GSON.fromJson(response, Array<Plugin>::class.java).toList()
     }
 
 }
