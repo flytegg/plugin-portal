@@ -6,6 +6,7 @@ plugins {
 
     id("xyz.jpenilla.run-paper") version "2.3.0"
     id("com.modrinth.minotaur") version "2.+"
+    id("io.papermc.hangar-publish-plugin") version "0.1.2"
 }
 
 repositories {
@@ -84,23 +85,19 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
         detectLoaders.set(false)
     }
 
-//    hangarPublish {
-//        publications.register("plugin") {
-//            version.set(suffixedVersion)
-//            id.set("PluginPortal")
-//            channel.set(if (isRelease) "Release" else if (isMainBranch) "Snapshot" else "Alpha")
-//            changelog.set(changelogContent)
-//            apiKey.set(System.getenv("HANGAR_TOKEN"))
-//            platforms {
-//                paper {
-//                    jar.set(tasks.shadowJar.flatMap { it.archiveFile })
-//                    platformVersions.set(listOf(property("mcVersionRange") as String))
-//                }
-//                velocity {
-//                    jar.set(tasks.shadowJar.flatMap { it.archiveFile })
-//                    platformVersions.set(listOf(property("velocityVersion") as String))
-//                }
-//            }
-//        }
-//    }
+    hangarPublish {
+        publications.register("plugin") {
+            version.set(suffixedVersion)
+            id.set("PluginPortal")
+            channel.set(if (isRelease) "Release" else if (isMainBranch) "Snapshot" else "Alpha")
+            changelog.set(changelogContent)
+            apiKey.set(System.getenv("HANGAR_API_KEY"))
+            platforms {
+                paper {
+                    jar.set(tasks.shadowJar.flatMap { it.archiveFile })
+                    platformVersions.set(listOf(property("mcVersionRange") as String))
+                }
+            }
+        }
+    }
 }
