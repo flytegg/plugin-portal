@@ -6,14 +6,12 @@ data class Plugin(
     @SerializedName("_id")
     val id: String,
     val name: String,
-    val platforms: Map<MarketplacePlatform, PlatformPlugin>,
+    val platforms: MutableMap<MarketplacePlatform, PlatformPlugin>,
 ) {
-    val highestPriorityPlatform = MarketplacePlatform.entries.find { platforms.containsKey(it) } ?: platforms.keys.first()
+    val highestPriorityPlatform get() = MarketplacePlatform.entries.find(platforms::containsKey) ?: platforms.keys.first()
 
+    val downloadableName = name.replace(Regex("[/\\\\]"), "")
 
-    val downloadableName by lazy {
-        name.replace(Regex("[/\\\\]"), "")
-    }
 
     fun getFirstPlatform(): PlatformPlugin? = platforms.values.firstOrNull()
 
