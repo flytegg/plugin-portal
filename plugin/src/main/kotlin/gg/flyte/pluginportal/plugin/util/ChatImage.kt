@@ -152,7 +152,9 @@ fun Plugin.getImageComponent(): Component {
         .setLine(description.size + 4, textSecondary("Platforms: ${platforms.keys.joinToString()}"))
         .setLine(
             11, centerComponentLine(text("").let {
-                if (installed) it.append(SharedComponents.getUpdateButton(name)).append(text(" "))
+                if (installed) it
+                    .append(SharedComponents.getUpdateButton(name, LocalPluginCache.fromPlugin(this)?.platformId))
+                    .append(text(" "))
                 else it.append(text("    "))
             }.append(
                 SharedComponents.getInstallButton(this, installed)

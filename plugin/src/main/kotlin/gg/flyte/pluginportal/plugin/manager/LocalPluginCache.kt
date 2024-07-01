@@ -20,6 +20,8 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
     fun hasPlugin(platformId: String, platform: MarketplacePlatform) =
         any { it.platform == platform && it.platformId == platformId }
 
+    fun fromPlugin(plugin: Plugin) = find { plugin.platforms.values.any { mp -> mp.id == it.platformId } }
+
     fun load() {
         val ppLocalPlugin = LocalPlugin(
             platformId = "5qkQnnWO",

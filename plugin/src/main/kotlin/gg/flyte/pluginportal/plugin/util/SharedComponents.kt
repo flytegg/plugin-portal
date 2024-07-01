@@ -36,10 +36,10 @@ object SharedComponents {
         getInstallButton(plugin.name, plugin.platforms[plugin.highestPriorityPlatform]!!.id, plugin.highestPriorityPlatform, installed)
 
     // TODO: Grey out button if is up to date, but only if this info is already in the cache
-    fun getUpdateButton(name: String) = button(
+    fun getUpdateButton(name: String, id: String?) = button(
         "Update",
         "Click here to update $name",
-        "/pp update $name",
+        "/pp update ${if (id != null) "\"$id\" -byId" else "\"$name\"" }",
         NamedTextColor.AQUA)
 
     private fun button(buttonName: String, hoverText: String, clickSuggest: String, color: NamedTextColor) =
