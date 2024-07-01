@@ -14,7 +14,7 @@ tasks {
         archiveFileName.set("PluginPortal-${project.version}.jar")
 
         minimize()
-        exclude("com/google/gson")
+        exclude("com/google/common/")
         relocate("org.bstats", "gg.flyte.pluginportal.libs.bstats")
     }
     named("build") {
