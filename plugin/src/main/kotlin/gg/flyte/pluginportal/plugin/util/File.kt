@@ -25,7 +25,7 @@ fun isJarDownloadUrl(url: String): Boolean {
 
 fun File.isJarFile() = isFile && extension == "jar"
 
-fun hash(data: ByteArray, algo: String = "SHA-256"): String {
+private fun hash(data: ByteArray, algo: String = "SHA-256"): String {
     return MessageDigest
         .getInstance(algo)
         .digest(data)
