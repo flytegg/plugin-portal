@@ -29,12 +29,12 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
             name = "PluginPortal",
             version = PluginPortal.instance.description.version,
             platform = MarketplacePlatform.MODRINTH,
-            sha256 = calculateSHA256(pluginPortalJarFile),
-            sha512 = calculateSHA512(pluginPortalJarFile),
+            sha256 = HashType.SHA256.hash(pluginPortalJarFile),
+            sha512 = HashType.SHA512.hash(pluginPortalJarFile),
             installedAt = System.currentTimeMillis(),
         )
 
-        val pluginsInFolder = File(Config.INSTALL_DIRECTORY).listFiles()?.filter(File::isJarFile)?.associateBy { calculateSHA256(it) }
+        val pluginsInFolder = File(Config.INSTALL_DIRECTORY).listFiles()?.filter(File::isJarFile)?.associateBy { HashType.SHA256.hash(it) }
 
         val text = getPluginsFile().readText()
         if (text.isEmpty()) {
@@ -96,12 +96,11 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
 
         return files.filter { file -> file.isFile }
             .filter { file -> file.name.endsWith(".jar") }
-            .firstOrNull { file -> calculateSHA256(file) == sha256 }
+            .firstOrNull { file -> HashType.SHA256.hash(file) == sha256 }
     }
 
 
     private fun getPluginsFile() = File(PluginPortal.instance.dataFolder, "plugins.json").createIfNotExists()
-
 
     fun searchPluginsWithFeedback(
         audience: Audience,

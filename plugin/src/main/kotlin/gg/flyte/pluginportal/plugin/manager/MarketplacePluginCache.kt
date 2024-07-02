@@ -110,7 +110,6 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
                 .appendPrimary(platform.name).appendSecondary("...")
         )
 
-
         val targetMessage = "${plugin.name} from ${platform.name} with ID ${plugin.id}"
         PortalLogger.log(audience, PortalLogger.Action.INITIATED_INSTALL, targetMessage)
 
@@ -128,7 +127,7 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
     }
 
     /**
-     * Sorts the plugins by relevance to the query, this also takes downloads etc. into accoutnt
+     * Sorts the plugins by relevance to the query, this also takes downloads etc. into account
      */
     fun List<Plugin>.sortedByRelevance(query: String): List<Plugin> = sortedByDescending {
         it.totalDownloads * if (query.equals(it.name, true)) 50 else 1 // Arbitrary bias to exact matches

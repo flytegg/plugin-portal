@@ -30,8 +30,8 @@ fun Plugin.download(marketplacePlatform: MarketplacePlatform, targetDirectory: S
             name = name,
             version = platforms[marketplacePlatform]?.download!!.version,
             platform = marketplacePlatform,
-            sha256 = calculateSHA256(file),
-            sha512 = calculateSHA512(file),
+            sha256 = HashType.SHA256.hash(file),
+            sha512 = HashType.SHA512.hash(file),
             installedAt = System.currentTimeMillis(),
         )
     )
@@ -41,7 +41,7 @@ fun Plugin.download(marketplacePlatform: MarketplacePlatform, targetDirectory: S
     return true
 }
 
-fun download(url: URL, file: File, audience: Audience?): File? = try {
+fun download(url: URL, file: File, audience: Audience?): File? = runCatching {
     url.openConnection().apply {
         setRequestProperty("User-Agent", "Mozilla/5.0")
         connect()
@@ -50,8 +50,8 @@ fun download(url: URL, file: File, audience: Audience?): File? = try {
         file.outputStream().use { output -> input.copyTo(output) }
     }
     file
-} catch (e: Exception) {
-    e.printStackTrace()
+}.onFailure {
+    it.printStackTrace()
     audience?.sendMessage(
         text("\n").append(
             status(Status.FAILURE, "An error occurred while downloading\n")
@@ -61,16 +61,4 @@ fun download(url: URL, file: File, audience: Audience?): File? = try {
                 ).append(endLine())
         )
     )
-    null
-}
-
-fun hash(data: ByteArray, algo: String = "SHA-256"): String {
-    return MessageDigest
-        .getInstance(algo)
-        .digest(data)
-        .joinToString { "%02x".format(it) }
-}
-fun calculateSHA256(file: File): String = hash(file.readBytes())
-fun calculateSHA1(file: File): String = hash(file.readBytes(), "SHA-1")
-
-fun calculateSHA512(file: File): String = hash(file.readBytes(), "SHA-512")
+}.getOrNull()
