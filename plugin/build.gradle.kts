@@ -1,5 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 plugins {
     id("pp.kotlin-library-conventions")
     id("pp.shadow-convention")
@@ -12,7 +10,7 @@ plugins {
 repositories {
     mavenCentral()
     maven("https://oss.sonatype.org/content/repositories/central")
-    maven("https://jitpack.io")
+    maven("https://repo.flyte.gg/releases")
     maven("https://repo.papermc.io/repository/maven-public/")
 }
 
@@ -25,9 +23,9 @@ dependencies {
     implementation("net.kyori:adventure-text-minimessage:4.17.0")
     implementation("net.kyori:adventure-platform-bukkit:4.3.3")
 
-    implementation("com.github.Revxrsal.Lamp:common:3.2.1")
-    implementation("com.github.Revxrsal.Lamp:bukkit:3.2.1")
-    implementation("com.github.Revxrsal.Lamp:brigadier:3.2.1")
+    implementation("gg.flyte.pluginportal-lamp:common:3.2.1")
+    implementation("gg.flyte.pluginportal-lamp:bukkit:3.2.1")
+    implementation("gg.flyte.pluginportal-lamp:brigadier:3.2.1")
 
     implementation("dev.masecla:Modrinth4J:2.0.0")
 

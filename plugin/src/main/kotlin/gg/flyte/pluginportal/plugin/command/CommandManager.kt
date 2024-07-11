@@ -48,9 +48,13 @@ object CommandManager {
                 if (searchName.length == 2) async { SearchPlugins.search(searchName) }
 
                 if (searchName.length <= 2)
-                    listOf("$searchName${if (searchName.isEmpty()) "" else " ~ "}Keep typing...")
+                    listOf("Keep typing...")
                 else {
-                    SearchPlugins.getCachedSearch(searchName)?.map(Plugin::name) ?: listOf("$searchName ~ Loading")
+                    SearchPlugins.getCachedSearch(searchName)
+                        ?.map(Plugin::name)
+                        ?.filter { it.startsWith(searchName, true) }
+                        ?.map { "\"$it\"" }
+                        ?: listOf("Loading...")
                 }
 
             }
