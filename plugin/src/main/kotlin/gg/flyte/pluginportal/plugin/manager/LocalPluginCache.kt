@@ -56,6 +56,8 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
                 }
             }
 
+            save()
+
             if (none(LocalPlugin::isPluginPortal)) add(ppLocalPlugin)
 
             PortalLogger.info(PortalLogger.Action.LOAD_PLUGINS, "Loaded ${plugins.size} plugins from local cache")
