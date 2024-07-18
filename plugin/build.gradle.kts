@@ -55,6 +55,7 @@ tasks {
         exclude("com/google/common/")
 
         relocate("org.bstats", "gg.flyte.pluginportal.lib.bstats")
+        relocate("net.kyori", "gg.flyte.pluginportal.lib.kyori")
     }
 
 
