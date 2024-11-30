@@ -35,7 +35,7 @@ class ListSubCommand {
                 .append(textPrimary(name)
                     .hoverEvent(HoverEvent.showText(
                         text("Click to view ", NamedTextColor.GRAY).appendPrimary(plugin.name)))
-                    .suggestCommand("/pp view \"${plugin.platformId}\" ${plugin.platform} -byId")
+                    .suggestCommand("/pp view \"${plugin.platformId}\" ${plugin.platform} --byId")
                 )
                 .append(textDark(" (${plugin.platform.name}) "))
                 .append(SharedComponents.getUpdateButton(plugin.name, plugin.platformId))

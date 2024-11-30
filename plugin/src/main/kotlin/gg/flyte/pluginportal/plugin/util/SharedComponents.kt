@@ -24,7 +24,7 @@ object SharedComponents {
 
         return button(install.capitaliseFirst(),
             "",
-            "/pp $install \"$id\"${if (installed) "" else " $platform"} -byId", // no platform for uninstall
+            "/pp $install \"$id\"${if (installed) "" else " $platform"} --byId", // no platform for uninstall
             color)
             .showOnHover("Click here to $install $name", color)
     }
@@ -39,7 +39,7 @@ object SharedComponents {
     fun getUpdateButton(name: String, id: String?) = button(
         "Update",
         "Click here to update $name",
-        "/pp update ${if (id != null) "\"$id\" -byId" else "\"$name\"" }",
+        "/pp update ${if (id != null) "\"$id\" --byId" else "\"$name\"" }",
         NamedTextColor.AQUA)
 
     private fun button(buttonName: String, hoverText: String, clickSuggest: String, color: NamedTextColor) =
