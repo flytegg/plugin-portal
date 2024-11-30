@@ -8,7 +8,6 @@ import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
-import revxrsal.commands.annotation.AutoComplete
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Subcommand
 import revxrsal.commands.bukkit.annotation.CommandPermission
@@ -19,7 +18,6 @@ class ListSubCommand {
     private val BUTTON_PIXEL_LENGTH = "[Update] [Uninstall]".pixelLength()
 
     @Subcommand("list",)
-    @AutoComplete("@marketplacePluginSearch *")
     @CommandPermission("pluginportal.view")
     fun listCommand(audience: Audience) {
         val plugins = LocalPluginCache

@@ -2,6 +2,7 @@ package gg.flyte.pluginportal.plugin.command
 
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.plugin.chat.*
+import gg.flyte.pluginportal.plugin.command.lamp.InstalledPluginNotPortalSuggestionProvider
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache.findFile
@@ -16,11 +17,10 @@ import revxrsal.commands.bukkit.annotation.CommandPermission
 class DeleteSubCommand {
 
     @Subcommand("delete", "uninstall")
-    @AutoComplete("@installedPluginSearchWithoutSelf *")
     @CommandPermission("pluginportal.manage.uninstall")
     fun deleteCommand(
         audience: Audience,
-        @Named("name") name: String,
+        @Named("name") @SuggestWith(InstalledPluginNotPortalSuggestionProvider::class) name: String,
         @Switch("byId") byId: Boolean = false,
     ) {
         LocalPluginCache.searchPluginsWithFeedback(
