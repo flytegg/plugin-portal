@@ -4,7 +4,7 @@ import gg.flyte.pluginportal.plugin.chat.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.text
 import revxrsal.commands.annotation.Command
-import revxrsal.commands.annotation.DefaultFor
+import revxrsal.commands.annotation.CommandPlaceholder
 import revxrsal.commands.annotation.Subcommand
 import revxrsal.commands.bukkit.annotation.CommandPermission
 
@@ -21,6 +21,9 @@ class HelpSubCommand {
         HelpEntry("/pp delete <plugin>", "Uninstall a plugin"),
         HelpEntry("/pp dump", "Dump the plugin portal log"),
     )
+
+    @CommandPlaceholder
+    fun help(audience: Audience) = helpCommand(audience)
 
     @Subcommand("help")
     @CommandPermission("pluginportal.view")
@@ -49,9 +52,6 @@ class HelpSubCommand {
                 .boxed()
         )
     }
-
-    @DefaultFor("~")
-    fun help(audience: Audience) = helpCommand(audience)
 
     data class HelpEntry(val command: String, val description: String) {
         fun toComponent() = text(command)
