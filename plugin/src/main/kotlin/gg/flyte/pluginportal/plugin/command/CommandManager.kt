@@ -1,6 +1,7 @@
 package gg.flyte.pluginportal.plugin.command
 
 import gg.flyte.pluginportal.plugin.PluginPortal.Companion.instance
+import gg.flyte.pluginportal.plugin.command.lamp.AudienceResolver
 import gg.flyte.pluginportal.plugin.command.lamp.LampExceptionHandler
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import revxrsal.commands.Lamp
@@ -15,6 +16,7 @@ object CommandManager {
         val lamp: Lamp<BukkitCommandActor> = BukkitLamp
             .builder(instance)
             .exceptionHandler(LampExceptionHandler(audiences))
+            .senderResolver(AudienceResolver(audiences))
             .build()
             .apply {
                 registerCommands()
