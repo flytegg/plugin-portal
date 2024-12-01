@@ -1,6 +1,7 @@
 package gg.flyte.pluginportal.plugin.command.lamp
 
-import gg.flyte.pluginportal.plugin.chat.sendFailureMessage
+import gg.flyte.pluginportal.common.types.MarketplacePlatform
+import gg.flyte.pluginportal.plugin.chat.*
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
 import revxrsal.commands.bukkit.exception.BukkitExceptionHandler
@@ -13,26 +14,29 @@ class LampExceptionHandler(private val audiences: BukkitAudiences): BukkitExcept
     private val BukkitCommandActor.audience get() = audiences.sender(sender())
 
     override fun onMissingArgument(ex: MissingArgumentException, actor: BukkitCommandActor, parameter: ParameterNode<BukkitCommandActor, *>) {
-        // TODO: Test
-        sendFailureMessage(actor.audience, "No value provided for ${parameter.name()}")
+        sendFailureMessage(actor.audience, "No value provided for ${parameter.name()}") // Doesn't actually run in v4 with @CommandPlaceholder
+    }
+
+    @HandleException
+    fun handleMarketplaceException(ex: InvalidMarketplaceException, actor: BukkitCommandActor) {
+        var comp = status(Status.FAILURE, "Invalid Marketplace Platform: ${ex.input()}")
+            .appendSecondary("\n\n- Acceptable values are: ${MarketplacePlatform.entries.joinToString()}")
+
+        actor.audience.sendMessage(comp.boxed())
     }
 
     override fun onEnumNotFound(ex: EnumNotFoundException, actor: BukkitCommandActor) {
-        // TODO: Parameter name not available in v4
-//        var comp = status(Status.FAILURE, "Invalid ${ex.}: ${ex.input()}")
+        var comp = status(Status.FAILURE, "${ex.input()} is not recognised}") // Generic because they removed parameters
+        actor.audience.sendMessage(comp.boxed())
+    }
+
+//    override fun invalidEnumValue(actor: CommandActor, exception: EnumNotFoundException) {
+//        var comp = status(Status.FAILURE, "Invalid ${exception.parameter.name}: ${exception.input}")
+//        TODO: Parameter name not available in v4
 //
 //        if (MarketplacePlatform::class.java == exception.parameter.type)
 //            comp = comp.appendSecondary("\n\n- Acceptable values are: ${MarketplacePlatform.entries.joinToString()}")
 //
 //        audiences.sender(actor.sender).sendMessage(comp.boxed())
-    }
-
-/*    override fun invalidEnumValue(actor: CommandActor, exception: EnumNotFoundException) {
-        var comp = status(Status.FAILURE, "Invalid ${exception.parameter.name}: ${exception.input}")
-
-        if (MarketplacePlatform::class.java == exception.parameter.type)
-            comp = comp.appendSecondary("\n\n- Acceptable values are: ${MarketplacePlatform.entries.joinToString()}")
-
-        audiences.sender(actor.sender).sendMessage(comp.boxed())
-    }*/
+//    }
 }

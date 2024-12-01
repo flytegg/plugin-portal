@@ -1,8 +1,10 @@
 package gg.flyte.pluginportal.plugin.command
 
+import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.plugin.PluginPortal.Companion.instance
 import gg.flyte.pluginportal.plugin.command.lamp.AudienceResolver
 import gg.flyte.pluginportal.plugin.command.lamp.LampExceptionHandler
+import gg.flyte.pluginportal.plugin.command.lamp.MarketplacePlatformType
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import revxrsal.commands.Lamp
 import revxrsal.commands.bukkit.BukkitLamp
@@ -17,19 +19,13 @@ object CommandManager {
             .builder(instance)
             .exceptionHandler(LampExceptionHandler(audiences))
             .senderResolver(AudienceResolver(audiences))
+            .parameterTypes {
+                it.addParameterType(MarketplacePlatform::class.java, MarketplacePlatformType())
+            }
             .build()
             .apply {
                 registerCommands()
             }
-
-/*        BukkitCommandHandler.create(instance).apply {
-            flagPrefix = "--"
-
-            val audiences = BukkitAudiences.create(instance)
-
-            enableAdventure(audiences)
-            registerBrigadier()
-        }*/
     }
 
     private fun Lamp<BukkitCommandActor>.registerCommands() {
