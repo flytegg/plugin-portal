@@ -6,6 +6,7 @@ import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.plugin.PluginPortal.Companion.instance
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.util.async
+import gg.flyte.pluginportal.plugin.util.isJarFile
 import revxrsal.commands.autocomplete.SuggestionProvider
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
 import revxrsal.commands.node.ExecutionContext
@@ -38,7 +39,5 @@ class InstalledPluginNotPortalSuggestionProvider: CustomSuggestionProvider({
 })
 
 class PluginJarFilesSuggestionProvider: CustomSuggestionProvider({
-    File("plugins").listFiles()!!
-        .filter { file -> file.isFile && file.name.endsWith(".jar") }
-        .map { file -> file.name }
+    File("plugins").listFiles()!!.filter(File::isJarFile).map(File::getName)
 })
