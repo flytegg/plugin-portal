@@ -3,12 +3,12 @@ package gg.flyte.pluginportal.plugin.command.lamp
 import gg.flyte.pluginportal.common.SearchPlugins
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.Plugin
+import gg.flyte.pluginportal.plugin.PluginPortal.Companion.instance
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.util.async
 import revxrsal.commands.autocomplete.SuggestionProvider
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
 import revxrsal.commands.node.ExecutionContext
-import gg.flyte.pluginportal.plugin.PluginPortal.Companion.instance
 import java.io.File
 
 abstract class CustomSuggestionProvider(val suggestions: (ExecutionContext<BukkitCommandActor>) -> List<String>): SuggestionProvider<BukkitCommandActor> {
@@ -16,7 +16,7 @@ abstract class CustomSuggestionProvider(val suggestions: (ExecutionContext<Bukki
 }
 
 class MarketplacePluginSuggestionProvider: CustomSuggestionProvider({
-    val searchName = it.input().peekString() // TODO: Maybe??
+    val searchName = it.input().peekRemaining() //  it.input().source().split(" ").last() // TODO: Not quote aware
     if (searchName.length == 2) async { SearchPlugins.search(searchName) }
     if (searchName.length <= 2)
         listOf("Keep typing...")
@@ -30,7 +30,7 @@ class MarketplacePluginSuggestionProvider: CustomSuggestionProvider({
 })
 
 class InstalledPluginSuggestionProvider: CustomSuggestionProvider({
-    LocalPluginCache.map(LocalPlugin::name) // TODO: Filter?
+    LocalPluginCache.map(LocalPlugin::name)
 })
 
 class InstalledPluginNotPortalSuggestionProvider: CustomSuggestionProvider({

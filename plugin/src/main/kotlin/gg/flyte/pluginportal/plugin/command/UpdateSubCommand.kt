@@ -20,8 +20,8 @@ class UpdateSubCommand {
     fun updateCommand(
         audience: Audience,
         @Named("name") @SuggestWith(InstalledPluginSuggestionProvider::class) name: String,
-        @Switch("byId") byId: Boolean = false,
-        @Switch("ignoreOutdated") ignoreOutdated: Boolean = false,
+        @Switch("byId") byId: Boolean = false, // @Suggest("--byId", "--ignoreOutdated", "-b", "-i", "-bi")
+        @Switch("ignoreOutdated") @Suggest() ignoreOutdated: Boolean = false,
     ) {
         LocalPluginCache.searchPluginsWithFeedback(
             audience,
