@@ -3,6 +3,7 @@ package gg.flyte.pluginportal.plugin.command
 import gg.flyte.pluginportal.plugin.PluginPortal
 import gg.flyte.pluginportal.plugin.chat.*
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
+import gg.flyte.pluginportal.plugin.manager.MarketplacePluginCache.isUpToDate
 import gg.flyte.pluginportal.plugin.util.SharedComponents
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.text
@@ -16,6 +17,7 @@ import revxrsal.commands.bukkit.annotation.CommandPermission
 class ListSubCommand {
 
     private val BUTTON_PIXEL_LENGTH = "[Update] [Uninstall]".pixelLength()
+    private val UPTODATE_BUTTON_PIXEL_LENGTH = "[Up to date] [Uninstall]".pixelLength()
 
     @Subcommand("list",)
     @CommandPermission("pluginportal.view")
@@ -29,7 +31,8 @@ class ListSubCommand {
         var message = text("Plugins installed with Plugin Portal", NamedTextColor.GRAY)
 
         plugins.forEach { plugin ->
-            val name = plugin.name.shortenToLine(plugin.platform.toString().pixelLength() + 12 + BUTTON_PIXEL_LENGTH)
+            val buttonLength = if (plugin.isUpToDate) UPTODATE_BUTTON_PIXEL_LENGTH else BUTTON_PIXEL_LENGTH
+            val name = plugin.name.shortenToLine(plugin.platform.toString().pixelLength() + 12 + buttonLength)
             message = message.append(text("\n"))
                 .append(text(" - ", NamedTextColor.DARK_GRAY))
                 .append(textPrimary(name)

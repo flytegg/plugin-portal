@@ -43,7 +43,7 @@ object SharedComponents {
 
     private fun getUpToDateButton(plugin: LocalPlugin) = button(
         "Up to date",
-        "This plugin is already up to date. Click here to force an update.",
+        "This plugin is already up to date. Click here to force an update anyway.",
         "/pp update \"${plugin.platformId}\" --byId --ignoreOutdated",
         NamedTextColor.GRAY)
 
