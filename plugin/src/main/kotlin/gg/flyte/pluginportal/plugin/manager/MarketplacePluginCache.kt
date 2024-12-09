@@ -4,6 +4,7 @@ import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
 import com.google.common.cache.LoadingCache
 import gg.flyte.pluginportal.common.API
+import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.plugin.chat.*
@@ -22,8 +23,8 @@ import java.util.concurrent.TimeUnit
 object MarketplacePluginCache : PluginCache<Plugin>() {
 
     private val pluginCache: LoadingCache<Pair<MarketplacePlatform, String>, Optional<Plugin>> = CacheBuilder.newBuilder()
-        .maximumSize(1000)
-        .expireAfterWrite(1, TimeUnit.HOURS)
+        .maximumSize(5000)
+        .expireAfterWrite(3, TimeUnit.HOURS)
         .build(
             object : CacheLoader<Pair<MarketplacePlatform, String>, Optional<Plugin>>() {
                 override fun load(key: Pair<MarketplacePlatform, String>): Optional<Plugin> {
@@ -31,6 +32,8 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
                 }
             }
         )
+
+    val LocalPlugin.isUpToDate get() = version == getPluginById(platform, platformId)?.platforms?.get(platform)?.download?.version
 
     fun getFilteredPlugins(
         prefix: String,
