@@ -15,6 +15,7 @@ import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.newline
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
+import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -76,7 +77,7 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
         audience: Audience,
         plugin: Plugin,
         platform: MarketplacePlatform,
-        targetDirectory: String,
+        targetDirectory: File,
     ) {
         val platformPlugin =
             plugin.platforms[platform] ?: return sendFailureMessage(audience, "No platform plugin found")

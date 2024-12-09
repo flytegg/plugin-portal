@@ -1,13 +1,14 @@
 package gg.flyte.pluginportal.plugin.config
 
 import gg.flyte.pluginportal.plugin.PluginPortal
+import org.bukkit.Bukkit
 import org.bukkit.configuration.file.FileConfiguration
 
 object Config {
     private var config: FileConfiguration
 
-    val INSTALL_DIRECTORY get() = config.getString("install-directory")!!
-    val UPDATE_DIRECTORY get() = config.getString("update-directory")!!
+    val INSTALL_DIRECTORY get() = PluginPortal.instance.dataFolder.parentFile
+    val UPDATE_DIRECTORY get() = Bukkit.getUpdateFolderFile()
 
     init {
         PluginPortal.instance.apply {

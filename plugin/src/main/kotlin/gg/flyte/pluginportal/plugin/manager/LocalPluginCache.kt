@@ -34,7 +34,7 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
             installedAt = System.currentTimeMillis(),
         )
 
-        val pluginsInFolder: Map<String, File> = File(Config.INSTALL_DIRECTORY)
+        val pluginsInFolder: Map<String, File> = Config.INSTALL_DIRECTORY
             .listFiles()
             ?.filter(File::isJarFile)
             ?.associateBy { HashType.SHA256.hash(it) }
