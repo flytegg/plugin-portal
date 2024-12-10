@@ -64,11 +64,11 @@ enum class Status(val color: NamedTextColor) {
     INFO(GRAY),
 }
 
-fun sendFailureMessage(audience: Audience, message: String) {
-    audience.sendMessage(status(Status.FAILURE, message).boxed())
-}
+fun Audience.sendFailure(msg: String) = send(Status.FAILURE, msg)
+fun Audience.sendInfo(msg: String) = send(Status.INFO, msg)
+fun Audience.sendSuccess(msg: String) = send(Status.SUCCESS, msg)
 
-fun Audience.sendFailure(message: String) = sendFailureMessage(this, message)
+private fun Audience.send(status: Status, msg: String) = sendMessage(status(status, msg).boxed())
 
 fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plugin>, command: String) {
     audience.sendMessage(startLine().appendSecondary(message).appendNewline())

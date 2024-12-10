@@ -39,7 +39,7 @@ class DeleteSubCommand {
         val targetMessage = "${localPlugin.name} from $targetPlatform with ID ${localPlugin.platformId}"
 
         if (localPlugin.isPluginPortal) {
-            return audience.sendMessage(status(Status.FAILURE, "You cannot delete Plugin Portal").boxed())
+            return audience.sendFailure("You cannot delete Plugin Portal")
         }
 
         val file = localPlugin.findFile()
@@ -48,7 +48,7 @@ class DeleteSubCommand {
 
         if (file == null && otherFile == null) {
             LocalPluginCache.deletePlugin(localPlugin, files)
-            return audience.sendMessage(status(Status.FAILURE, "Could not find plugin jar to delete").boxed())
+            return audience.sendFailure("Could not find plugin jar to delete")
         }
 
         LocalPluginCache.deletePlugin(localPlugin, files)

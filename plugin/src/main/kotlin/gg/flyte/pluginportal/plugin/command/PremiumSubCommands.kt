@@ -1,8 +1,6 @@
 package gg.flyte.pluginportal.plugin.command
 
-import gg.flyte.pluginportal.plugin.chat.Status
-import gg.flyte.pluginportal.plugin.chat.boxed
-import gg.flyte.pluginportal.plugin.chat.status
+import gg.flyte.pluginportal.plugin.chat.sendFailure
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Subcommand
@@ -28,6 +26,6 @@ class PremiumSubCommands {
     fun exportCommand(audience: Audience) = premiumCommand(audience)
 
     fun premiumCommand(audience: Audience) {
-        audience.sendMessage(status(Status.FAILURE, "This command is only available for Plugin Portal Premium.").boxed())
+        audience.sendFailure("This command is only available for Plugin Portal Premium.")
     }
 }

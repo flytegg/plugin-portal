@@ -13,7 +13,7 @@ import java.io.File
 class PluginPortal : JavaPlugin() {
 
     companion object {
-        lateinit var instance: JavaPlugin
+        lateinit var instance: PluginPortal
         lateinit var pluginPortalJarFile: File
         val isFreeVersion = true
     }

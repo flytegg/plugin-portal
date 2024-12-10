@@ -83,7 +83,7 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
         targetDirectory: File,
     ) {
         val platformPlugin =
-            plugin.platforms[platform] ?: return sendFailureMessage(audience, "No platform plugin found")
+            plugin.platforms[platform] ?: return audience.sendFailure("No platform plugin found")
 
         val downloadURL = platformPlugin.download?.url
             ?: return audience.sendMessage(

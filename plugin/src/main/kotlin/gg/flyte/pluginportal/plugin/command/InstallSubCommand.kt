@@ -41,7 +41,7 @@ class InstallSubCommand {
 
     private fun handleSinglePlugin(audience: Audience, plugin: Plugin, platformFlag: MarketplacePlatform?) {
         if (LocalPluginCache.hasPlugin(plugin)) {
-            return sendFailureMessage(audience, "Plugin already installed, use the update command instead")
+            return audience.sendFailure("Plugin already installed, use the update command instead")
         }
 
         audience.sendMessage(

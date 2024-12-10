@@ -14,7 +14,7 @@ class LampExceptionHandler(private val audiences: BukkitAudiences): BukkitExcept
     private val BukkitCommandActor.audience get() = audiences.sender(sender())
 
     override fun onMissingArgument(ex: MissingArgumentException, actor: BukkitCommandActor, parameter: ParameterNode<BukkitCommandActor, *>) {
-        sendFailureMessage(actor.audience, "No value provided for ${parameter.name()}") // Doesn't actually run in v4 with @CommandPlaceholder
+        actor.audience.sendFailure("No value provided for ${parameter.name()}") // Doesn't actually run in v4 with @CommandPlaceholder
     }
 
     @HandleException
@@ -26,8 +26,7 @@ class LampExceptionHandler(private val audiences: BukkitAudiences): BukkitExcept
     }
 
     override fun onEnumNotFound(ex: EnumNotFoundException, actor: BukkitCommandActor) {
-        var comp = status(Status.FAILURE, "${ex.input()} is not recognised}") // Generic because they removed parameters
-        actor.audience.sendMessage(comp.boxed())
+        actor.audience.sendFailure("${ex.input()} is not recognised}")  // Generic because they removed parameters
     }
 
 //    override fun invalidEnumValue(actor: CommandActor, exception: EnumNotFoundException) {
