@@ -4,6 +4,7 @@ import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.plugin.util.format
 import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.TextComponent
@@ -14,6 +15,9 @@ import net.kyori.adventure.text.format.NamedTextColor.*
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.jvm.optionals.getOrDefault
+import kotlin.jvm.optionals.getOrElse
+import kotlin.jvm.optionals.getOrNull
 
 fun solidLine(prefix: String = "", suffix: String = "\n") = text(
     "$prefix                                                                                $suffix",
@@ -70,6 +74,8 @@ fun Audience.sendSuccess(msg: String) = send(Status.SUCCESS, msg)
 
 private fun Audience.send(status: Status, msg: String) = sendMessage(status(status, msg).boxed())
 
+
+private fun Audience.isConsole() = get(Identity.UUID).isEmpty && "CONSOLE" == get(Identity.NAME).getOrDefault("")
 fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plugin>, command: String) {
     audience.sendMessage(startLine().appendSecondary(message).appendNewline())
     plugins.take(16).forEach { plugin ->
@@ -83,6 +89,8 @@ fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plu
                         "/pp $command \"${plugin.platforms[platform]!!.id}\" $platform --byId"
                     )
             )
+
+            if (audience.isConsole()) platformSuffix = platformSuffix.appendDark(":${plugin.platforms[platform]!!.id}")
 
             if (index != plugin.platforms.size - 1) {
                 platformSuffix = platformSuffix.appendDark(", ")
