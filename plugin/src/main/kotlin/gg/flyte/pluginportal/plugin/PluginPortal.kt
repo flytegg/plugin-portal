@@ -4,6 +4,8 @@ import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.plugin.command.CommandManager
 import gg.flyte.pluginportal.plugin.config.Config
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
+import gg.flyte.pluginportal.plugin.manager.MarketplacePluginCache
+import gg.flyte.pluginportal.plugin.util.async
 import io.papermc.lib.PaperLib
 import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.java.JavaPlugin
@@ -23,10 +25,11 @@ class PluginPortal : JavaPlugin() {
         instance = this
         pluginPortalJarFile = this.file
 
-        CommandManager
         Config
+        CommandManager
 
         LocalPluginCache.load()
+        async { MarketplacePluginCache.loadLocalPluginData() }
 
         PaperLib.suggestPaper(this)
         Metrics(this, 18005)

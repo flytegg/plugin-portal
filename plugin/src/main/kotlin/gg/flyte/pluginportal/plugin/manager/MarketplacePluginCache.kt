@@ -4,6 +4,7 @@ import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
 import com.google.common.cache.LoadingCache
 import gg.flyte.pluginportal.common.API
+import gg.flyte.pluginportal.common.PlatformId
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.types.Plugin
@@ -34,6 +35,15 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
         )
 
     val LocalPlugin.isUpToDate get() = version == getPluginById(platform, platformId)?.platforms?.get(platform)?.download?.version
+
+    fun loadLocalPluginData() {
+        // 'XX plugins need an update' message would go here
+        API.getAllPluginsByPlatformIds(LocalPluginCache.map { PlatformId(it.platform, it.platformId) })?.forEach {
+            val platform = it.highestPriorityPlatform
+            val pplugin = it.platforms[platform] ?: return@forEach
+            pluginCache.put(platform to pplugin.id, Optional.of(it))
+        }
+    }
 
     fun getFilteredPlugins(
         prefix: String,
