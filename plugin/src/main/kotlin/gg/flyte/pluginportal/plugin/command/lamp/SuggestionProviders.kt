@@ -10,6 +10,7 @@ import gg.flyte.pluginportal.plugin.util.isJarFile
 import revxrsal.commands.autocomplete.SuggestionProvider
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
 import revxrsal.commands.node.ExecutionContext
+import revxrsal.commands.stream.StringStream
 import java.io.File
 
 abstract class CustomSuggestionProvider(val suggestions: (ExecutionContext<BukkitCommandActor>) -> List<String>): SuggestionProvider<BukkitCommandActor> {
@@ -17,7 +18,7 @@ abstract class CustomSuggestionProvider(val suggestions: (ExecutionContext<Bukki
 }
 
 class MarketplacePluginSuggestionProvider: CustomSuggestionProvider({
-    val searchName = it.input().peekRemaining() //  it.input().source().split(" ").last() // TODO: Not quote aware
+    val searchName = it.input().toArgs().last()
     if (searchName.length == 2) async { SearchPlugins.search(searchName) }
     if (searchName.length <= 2)
         listOf("Keep typing...")
@@ -41,3 +42,33 @@ class InstalledPluginNotPortalSuggestionProvider: CustomSuggestionProvider({
 class PluginJarFilesSuggestionProvider: CustomSuggestionProvider({
     File("plugins").listFiles()!!.filter(File::isJarFile).map(File::getName)
 })
+
+
+private fun StringStream.toArgs(): List<String> {
+    var args = mutableListOf<String>()
+    var c = ""
+    val words = source().split(" ")
+    for (word in words) {
+        if (c.isEmpty()) {
+            if (!word.startsWith("\"")) args += word
+            else {
+                c += word.substringAfter("\"")
+                if (c.contains("\"")) {
+                    args.add(c.substringBefore("\""))
+                    c = ""
+                }
+            }
+        } else {
+            if (word.contains("\"")) {
+                args.add("$c ${word.substringBefore("\"")}")
+                c = ""
+            } else {
+                c += " $word"
+            }
+        }
+    }
+
+    if (c.isNotEmpty()) args.add(c.substringBefore("\""))
+    if (words.last() == "\"" && source().count { it == '"' } % 2 != 0) args += ""
+    return args
+}

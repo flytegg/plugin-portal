@@ -24,9 +24,9 @@ dependencies {
     implementation("net.kyori:adventure-text-minimessage:4.17.0")
     implementation("net.kyori:adventure-platform-bukkit:4.3.3")
 
-    implementation("io.github.revxrsal:lamp.common:4.0.0-beta.20")
-    implementation("io.github.revxrsal:lamp.bukkit:4.0.0-beta.20")
-    implementation("io.github.revxrsal:lamp.brigadier:4.0.0-beta.20")
+    implementation("io.github.revxrsal:lamp.common:4.0.0-beta.21")
+    implementation("io.github.revxrsal:lamp.bukkit:4.0.0-beta.21")
+    implementation("io.github.revxrsal:lamp.brigadier:4.0.0-beta.21")
 
     implementation("dev.masecla:Modrinth4J:2.0.0")
 
