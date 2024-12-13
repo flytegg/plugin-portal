@@ -2,7 +2,7 @@ plugins {
     id("pp.kotlin-library-conventions")
     id("pp.shadow-convention")
 
-    id("xyz.jpenilla.run-paper") version "2.3.0"
+    id("xyz.jpenilla.run-paper") version "2.3.1"
     id("com.modrinth.minotaur") version "2.+"
     id("io.papermc.hangar-publish-plugin") version "0.1.2"
 }
@@ -18,7 +18,8 @@ repositories {
 dependencies {
     implementation(project(":common"))
 
-    compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
+    // TOOD: Convert to papermc for hard fork
+    compileOnly("org.spigotmc:spigot-api:1.21.3-R0.1-SNAPSHOT")
 
     implementation("net.kyori:adventure-api:4.17.0")
     implementation("net.kyori:adventure-text-minimessage:4.17.0")
@@ -40,7 +41,7 @@ dependencies {
 
 tasks {
     runServer {
-        minecraftVersion("1.20.6")
+        minecraftVersion("1.21.3")
         runDirectory(file("run/latest"))
         javaLauncher.set(
             project.javaToolchains.launcherFor {
