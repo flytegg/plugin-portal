@@ -23,7 +23,7 @@ dependencies {
 
     implementation("net.kyori:adventure-api:4.17.0")
     implementation("net.kyori:adventure-text-minimessage:4.17.0")
-    implementation("net.kyori:adventure-platform-bukkit:4.3.3")
+    implementation("net.kyori:adventure-platform-bukkit:4.3.4")
 
     implementation("io.github.revxrsal:lamp.common:4.0.0-beta.21")
     implementation("io.github.revxrsal:lamp.bukkit:4.0.0-beta.21")
@@ -34,9 +34,9 @@ dependencies {
     api("io.papermc:paperlib:1.0.7")
 
     implementation("gs.mclo:api:4.0.3")
-    implementation("org.bstats:bstats-bukkit:3.0.2")
+    implementation("org.bstats:bstats-bukkit:3.1.0")
 
-    implementation("com.github.HangarMC:HangarJarScanner:906710dc36")
+    implementation("com.github.HangarMC:HangarJarScanner:cac44ae253")
 }
 
 tasks {
