@@ -66,4 +66,21 @@ object API {
         return GSON.fromJson(response, Array<Plugin>::class.java).toList()
     }
 
+    fun getAllPluginsByPlatformIds(platformIds: List<PlatformId>): Array<Plugin>? {
+        val (response, code) = get("/plugins", mapOf(
+            "platformIds" to GSON.toJson(platformIds)
+        ))
+
+        return when (code) {
+            200 -> GSON.fromJson<Array<Plugin>>(response, Array<Plugin>::class.java)
+            404 -> null // not found
+            401, 403 -> null.also { AuthorisationException(code).printStackTrace() } // not authorised
+            else -> null
+        }.takeIf { response.isNotEmpty() }
+    }
 }
+
+data class PlatformId(
+    val platform: MarketplacePlatform,
+    val id: String
+)

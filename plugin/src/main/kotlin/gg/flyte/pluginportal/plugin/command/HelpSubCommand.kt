@@ -3,60 +3,52 @@ package gg.flyte.pluginportal.plugin.command
 import gg.flyte.pluginportal.plugin.chat.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.text
-import revxrsal.commands.annotation.Command
-import revxrsal.commands.annotation.DefaultFor
-import revxrsal.commands.annotation.Subcommand
+import revxrsal.commands.annotation.*
+import revxrsal.commands.bukkit.actor.BukkitCommandActor
 import revxrsal.commands.bukkit.annotation.CommandPermission
+import revxrsal.commands.help.Help
+import kotlin.math.min
+
+private const val ENTRIES_PER_PAGE = 10
 
 @Command("pp", "pluginportal", "ppm")
 @CommandPermission("pluginportal.view")
 class HelpSubCommand {
 
-    val helpEntries = listOf(
-        HelpEntry("/pp help", "Displays this help message"),
-        HelpEntry("/pp list", "List installed plugins"),
-        HelpEntry("/pp view <plugin>", "Search and view a plugin"),
-        HelpEntry("/pp install <plugin>", "Install a plugin"),
-        HelpEntry("/pp update <plugin>", "Update a plugin"),
-        HelpEntry("/pp delete <plugin>", "Uninstall a plugin"),
-        HelpEntry("/pp dump", "Dump the plugin portal log"),
-    )
-
     @Subcommand("help")
     @CommandPermission("pluginportal.view")
-    fun helpCommand(audience: Audience) {
-        var message = centerComponentLine(
-            textPrimary("Plugin Portal").bold()
-        )
-            .appendNewline()
-            .append(
-                centerComponentLine(
-                    textSecondary("by Flyte")
-                )
-            )
-            .appendNewline()
-            .appendNewline()
+    fun helpCommand(
+        audience: Audience,
 
-        helpEntries.forEachIndexed { index, entry ->
-            if (index > 0) {
-                message = message.append(text("\n"))
-            }
-            message = message.append(entry.toComponent())
+        @Named("page") @Range(min = 1.0) @Default("1") @Optional page: Int = 1,
+
+        commands: Help.RelatedCommands<BukkitCommandActor>
+    ) {
+        val filteredCommands = commands.all().filter { it.usage().startsWith("pp ") }
+
+        val totalPages = (filteredCommands.size + ENTRIES_PER_PAGE - 1) / ENTRIES_PER_PAGE
+        val safePage = page.coerceIn(1, totalPages)
+        val startIndex = (safePage - 1) * ENTRIES_PER_PAGE
+        val endIndex = min(startIndex + ENTRIES_PER_PAGE, filteredCommands.size)
+
+        val paginatedEntries = filteredCommands.subList(startIndex, endIndex)
+
+        var message = centerComponentLine(
+            textPrimary("Plugin Portal - Page $safePage/$totalPages").bold()
+        ).appendNewline().append(
+            centerComponentLine(
+                textSecondary("by Flyte")
+            )
+        ).appendNewline().appendNewline()
+
+        paginatedEntries.forEach { entry ->
+            message = message.append(
+                textSecondary(" - ").appendPrimary(entry.usage())
+            ).appendNewline()
         }
 
         audience.sendMessage(
-            message
-                .boxed()
+            message.boxed()
         )
-    }
-
-    @DefaultFor("~")
-    fun help(audience: Audience) = helpCommand(audience)
-
-    data class HelpEntry(val command: String, val description: String) {
-        fun toComponent() = text(command)
-            .colorPrimary()
-            .appendDark(" - ")
-            .appendSecondary(description)
     }
 }

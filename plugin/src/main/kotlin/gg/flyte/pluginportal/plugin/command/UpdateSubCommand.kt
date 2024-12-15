@@ -2,6 +2,7 @@ package gg.flyte.pluginportal.plugin.command
 
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.plugin.chat.*
+import gg.flyte.pluginportal.plugin.command.lamp.InstalledPluginSuggestionProvider
 import gg.flyte.pluginportal.plugin.config.Config
 import gg.flyte.pluginportal.plugin.logging.PortalLogger
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
@@ -15,13 +16,12 @@ import revxrsal.commands.bukkit.annotation.CommandPermission
 class UpdateSubCommand {
 
     @Subcommand("update")
-    @AutoComplete("@installedPluginSearch *")
     @CommandPermission("pluginportal.maintain.update")
     fun updateCommand(
         audience: Audience,
-        @Named("name") name: String,
-        @Switch("byId") byId: Boolean = false,
-        @Switch("ignoreOutdated") ignoreOutdated: Boolean = false,
+        @Named("name") @SuggestWith(InstalledPluginSuggestionProvider::class) name: String,
+        @Switch("byId") byId: Boolean = false, // @Suggest("--byId", "--ignoreOutdated", "-b", "-i", "-bi")
+        @Switch("ignoreOutdated") @Suggest() ignoreOutdated: Boolean = false,
     ) {
         LocalPluginCache.searchPluginsWithFeedback(
             audience,

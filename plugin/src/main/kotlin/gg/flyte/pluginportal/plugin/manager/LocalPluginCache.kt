@@ -34,7 +34,11 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
             installedAt = System.currentTimeMillis(),
         )
 
-        val pluginsInFolder = File(Config.INSTALL_DIRECTORY).listFiles()?.filter(File::isJarFile)?.associateBy { HashType.SHA256.hash(it) }
+        val pluginsInFolder: Map<String, File> = Config.INSTALL_DIRECTORY
+            .listFiles()
+            ?.filter(File::isJarFile)
+            ?.associateBy { HashType.SHA256.hash(it) }
+            ?: mapOf()
 
         val text = getPluginsFile().readText()
         if (text.isEmpty()) {
@@ -45,7 +49,9 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
         try {
             val plugins = GSON.fromJson(text, Array<LocalPlugin>::class.java)
             plugins.forEach { plugin ->
-                if (pluginsInFolder != null && !pluginsInFolder.containsKey(plugin.sha256) && !plugin.isPluginPortal) {
+                if (plugin.isPluginPortal) {
+                    add(ppLocalPlugin) // Update PP
+                } else if (!pluginsInFolder.containsKey(plugin.sha256)) {
                     // Plugin no longer present in plugins folder upon opening server
                     PortalLogger.info(
                         PortalLogger.Action.NOTICED_DELETE,
@@ -56,9 +62,9 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
                 }
             }
 
-            save()
-
             if (none(LocalPlugin::isPluginPortal)) add(ppLocalPlugin)
+
+            save()
 
             PortalLogger.info(PortalLogger.Action.LOAD_PLUGINS, "Loaded ${plugins.size} plugins from local cache")
         } catch (_: JsonSyntaxException) {

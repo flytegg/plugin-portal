@@ -2,7 +2,7 @@ plugins {
     id("pp.kotlin-library-conventions")
     id("pp.shadow-convention")
 
-    id("xyz.jpenilla.run-paper") version "2.3.0"
+    id("xyz.jpenilla.run-paper") version "2.3.1"
     id("com.modrinth.minotaur") version "2.+"
     id("io.papermc.hangar-publish-plugin") version "0.1.2"
 }
@@ -11,33 +11,37 @@ repositories {
     mavenCentral()
     maven("https://oss.sonatype.org/content/repositories/central")
     maven("https://repo.flyte.gg/releases")
+    maven("https://jitpack.io")
     maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
     implementation(project(":common"))
 
-    compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
+    // TOOD: Convert to papermc for hard fork
+    compileOnly("org.spigotmc:spigot-api:1.21.3-R0.1-SNAPSHOT")
 
     implementation("net.kyori:adventure-api:4.17.0")
     implementation("net.kyori:adventure-text-minimessage:4.17.0")
-    implementation("net.kyori:adventure-platform-bukkit:4.3.3")
+    implementation("net.kyori:adventure-platform-bukkit:4.3.4")
 
-    implementation("gg.flyte.pluginportal-lamp:common:3.2.1")
-    implementation("gg.flyte.pluginportal-lamp:bukkit:3.2.1")
-    implementation("gg.flyte.pluginportal-lamp:brigadier:3.2.1")
+    implementation("io.github.revxrsal:lamp.common:4.0.0-beta.21")
+    implementation("io.github.revxrsal:lamp.bukkit:4.0.0-beta.21")
+    implementation("io.github.revxrsal:lamp.brigadier:4.0.0-beta.21")
 
     implementation("dev.masecla:Modrinth4J:2.0.0")
 
     api("io.papermc:paperlib:1.0.7")
 
     implementation("gs.mclo:api:4.0.3")
-    implementation("org.bstats:bstats-bukkit:3.0.2")
+    implementation("org.bstats:bstats-bukkit:3.1.0")
+
+    implementation("com.github.HangarMC:HangarJarScanner:cac44ae253")
 }
 
 tasks {
     runServer {
-        minecraftVersion("1.21")
+        minecraftVersion("1.21.3")
         runDirectory(file("run/latest"))
         javaLauncher.set(
             project.javaToolchains.launcherFor {
@@ -98,4 +102,3 @@ hangarPublish {
         }
     }
 }
-//}

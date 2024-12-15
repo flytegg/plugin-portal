@@ -4,6 +4,7 @@ import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.plugin.util.format
 import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.TextComponent
@@ -14,6 +15,9 @@ import net.kyori.adventure.text.format.NamedTextColor.*
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.jvm.optionals.getOrDefault
+import kotlin.jvm.optionals.getOrElse
+import kotlin.jvm.optionals.getOrNull
 
 fun solidLine(prefix: String = "", suffix: String = "\n") = text(
     "$prefix                                                                                $suffix",
@@ -64,12 +68,14 @@ enum class Status(val color: NamedTextColor) {
     INFO(GRAY),
 }
 
-fun sendFailureMessage(audience: Audience, message: String) {
-    audience.sendMessage(status(Status.FAILURE, message).boxed())
-}
+fun Audience.sendFailure(msg: String) = send(Status.FAILURE, msg)
+fun Audience.sendInfo(msg: String) = send(Status.INFO, msg)
+fun Audience.sendSuccess(msg: String) = send(Status.SUCCESS, msg)
 
-fun Audience.sendFailure(message: String) = sendFailureMessage(this, message)
+private fun Audience.send(status: Status, msg: String) = sendMessage(status(status, msg).boxed())
 
+
+private fun Audience.isConsole() = get(Identity.UUID).isEmpty && "CONSOLE" == get(Identity.NAME).getOrDefault("")
 fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plugin>, command: String) {
     audience.sendMessage(startLine().appendSecondary(message).appendNewline())
     plugins.take(16).forEach { plugin ->
@@ -80,9 +86,11 @@ fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plu
                 textDark(platform.name)
                     .hoverEvent(text("Click to $command with ${platform.name}"))
                     .suggestCommand(
-                        "/pp $command \"${plugin.platforms[platform]!!.id}\" $platform -byId"
+                        "/pp $command \"${plugin.platforms[platform]!!.id}\" $platform --byId"
                     )
             )
+
+            if (audience.isConsole()) platformSuffix = platformSuffix.appendDark(":${plugin.platforms[platform]!!.id}")
 
             if (index != plugin.platforms.size - 1) {
                 platformSuffix = platformSuffix.appendDark(", ")
@@ -97,7 +105,7 @@ fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plu
                 .hoverEvent(
                     text("Click to $command ${plugin.name}", AQUA).appendNewline()
                         .append(text(plugin.getDescription() ?: "", GRAY))
-                ).suggestCommand("/pp $command \"${plugin.platforms[platform]!!.id}\" $platform -byId")
+                ).suggestCommand("/pp $command \"${plugin.platforms[platform]!!.id}\" $platform --byId")
                 .append(platformSuffix.appendDark(")"))
         )
     }
@@ -112,7 +120,7 @@ fun sendLocalPluginListMessage(audience: Audience, message: String, plugins: Lis
         audience.sendMessage(
             textSecondary(" - ").appendPrimary(plugin.name)
                 .hoverEvent(text("Click to $command ${plugin.name} from ${plugin.platform.name}"))
-                .suggestCommand("/pp $command ${plugin.platformId} ${plugin.platform} -byId")
+                .suggestCommand("/pp $command ${plugin.platformId} ${plugin.platform} --byId")
                 .append(platformSuffix)
         )
     }

@@ -8,11 +8,9 @@ import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.text
 import java.io.File
-import java.io.FileInputStream
 import java.net.URL
-import java.security.MessageDigest
 
-fun Plugin.download(marketplacePlatform: MarketplacePlatform, targetDirectory: String, audience: Audience? = null): Boolean {
+fun Plugin.download(marketplacePlatform: MarketplacePlatform, targetDirectory: File, audience: Audience? = null): Boolean {
 
     val jarFile = File(targetDirectory, "[PP] $downloadableName ($marketplacePlatform).jar")
 

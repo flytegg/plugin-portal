@@ -146,7 +146,7 @@ fun Plugin.getImageComponent(): Component {
         .setLine(
             11, centerComponentLine(text("").let {
                 if (installed) it
-                    .append(SharedComponents.getUpdateButton(name, LocalPluginCache.fromPlugin(this)?.platformId))
+                    .append(SharedComponents.getUpdateButton(LocalPluginCache.fromPlugin(this)!!))
                     .append(text(" "))
                 else it.append(text("    "))
             }.append(

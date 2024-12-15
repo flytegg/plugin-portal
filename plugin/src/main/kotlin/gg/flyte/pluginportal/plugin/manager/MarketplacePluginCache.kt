@@ -4,6 +4,8 @@ import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
 import com.google.common.cache.LoadingCache
 import gg.flyte.pluginportal.common.API
+import gg.flyte.pluginportal.common.PlatformId
+import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.plugin.chat.*
@@ -15,14 +17,15 @@ import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.newline
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
+import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 object MarketplacePluginCache : PluginCache<Plugin>() {
 
     private val pluginCache: LoadingCache<Pair<MarketplacePlatform, String>, Optional<Plugin>> = CacheBuilder.newBuilder()
-        .maximumSize(1000)
-        .expireAfterWrite(1, TimeUnit.HOURS)
+        .maximumSize(5000)
+        .expireAfterWrite(3, TimeUnit.HOURS)
         .build(
             object : CacheLoader<Pair<MarketplacePlatform, String>, Optional<Plugin>>() {
                 override fun load(key: Pair<MarketplacePlatform, String>): Optional<Plugin> {
@@ -30,6 +33,17 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
                 }
             }
         )
+
+    val LocalPlugin.isUpToDate get() = version == getPluginById(platform, platformId)?.platforms?.get(platform)?.download?.version
+
+    fun loadLocalPluginData() {
+        // 'XX plugins need an update' message would go here
+        API.getAllPluginsByPlatformIds(LocalPluginCache.map { PlatformId(it.platform, it.platformId) })?.forEach {
+            val platform = it.highestPriorityPlatform
+            val pplugin = it.platforms[platform] ?: return@forEach
+            pluginCache.put(platform to pplugin.id, Optional.of(it))
+        }
+    }
 
     fun getFilteredPlugins(
         prefix: String,
@@ -76,10 +90,10 @@ object MarketplacePluginCache : PluginCache<Plugin>() {
         audience: Audience,
         plugin: Plugin,
         platform: MarketplacePlatform,
-        targetDirectory: String,
+        targetDirectory: File,
     ) {
         val platformPlugin =
-            plugin.platforms[platform] ?: return sendFailureMessage(audience, "No platform plugin found")
+            plugin.platforms[platform] ?: return audience.sendFailure("No platform plugin found")
 
         val downloadURL = platformPlugin.download?.url
             ?: return audience.sendMessage(

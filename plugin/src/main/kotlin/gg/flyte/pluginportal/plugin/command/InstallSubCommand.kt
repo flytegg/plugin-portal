@@ -3,6 +3,7 @@ package gg.flyte.pluginportal.plugin.command
 import gg.flyte.pluginportal.common.types.MarketplacePlatform
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.plugin.chat.*
+import gg.flyte.pluginportal.plugin.command.lamp.MarketplacePluginSuggestionProvider
 import gg.flyte.pluginportal.plugin.config.Config
 import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
 import gg.flyte.pluginportal.plugin.manager.MarketplacePluginCache
@@ -14,11 +15,10 @@ import revxrsal.commands.bukkit.annotation.CommandPermission
 class InstallSubCommand {
 
     @Subcommand("install")
-    @AutoComplete("@marketplacePluginSearch *")
     @CommandPermission("pluginportal.manage.install")
     fun installCommand(
         audience: Audience,
-        @Named("name") name: String,
+        @Named("name") @SuggestWith(MarketplacePluginSuggestionProvider ::class) name: String,
         @Optional @Named("platform") platform: MarketplacePlatform? = null,
         @Switch("byId") byId: Boolean = false,
     ) {
@@ -41,7 +41,7 @@ class InstallSubCommand {
 
     private fun handleSinglePlugin(audience: Audience, plugin: Plugin, platformFlag: MarketplacePlatform?) {
         if (LocalPluginCache.hasPlugin(plugin)) {
-            return sendFailureMessage(audience, "Plugin already installed, use the update command instead")
+            return audience.sendFailure("Plugin already installed, use the update command instead")
         }
 
         audience.sendMessage(

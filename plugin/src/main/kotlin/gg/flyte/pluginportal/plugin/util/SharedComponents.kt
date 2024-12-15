@@ -7,6 +7,7 @@ import gg.flyte.pluginportal.plugin.chat.appendDark
 import gg.flyte.pluginportal.plugin.chat.showOnHover
 import gg.flyte.pluginportal.plugin.chat.suggestCommand
 import gg.flyte.pluginportal.plugin.chat.textDark
+import gg.flyte.pluginportal.plugin.manager.MarketplacePluginCache.isUpToDate
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.event.ClickEvent
@@ -24,7 +25,7 @@ object SharedComponents {
 
         return button(install.capitaliseFirst(),
             "",
-            "/pp $install \"$id\"${if (installed) "" else " $platform"} -byId", // no platform for uninstall
+            "/pp $install \"$id\"${if (installed) "" else " $platform"} --byId", // no platform for uninstall
             color)
             .showOnHover("Click here to $install $name", color)
     }
@@ -35,17 +36,20 @@ object SharedComponents {
     fun getInstallButton(plugin: Plugin, installed: Boolean) =
         getInstallButton(plugin.name, plugin.platforms[plugin.highestPriorityPlatform]!!.id, plugin.highestPriorityPlatform, installed)
 
-    // TODO: Grey out button if is up to date, but only if this info is already in the cache
-    fun getUpdateButton(name: String, id: String?) = button(
-        "Update",
-        "Click here to update $name",
-        "/pp update ${if (id != null) "\"$id\" -byId" else "\"$name\"" }",
-        NamedTextColor.AQUA)
+    fun getUpdateButton(plugin: LocalPlugin) = if (!plugin.isUpToDate) button("Update",
+        "Click here to update ${plugin.name}",
+        "/pp update \"${plugin.platformId}\" --byId",
+        NamedTextColor.AQUA) else getUpToDateButton(plugin)
+
+    private fun getUpToDateButton(plugin: LocalPlugin) = button(
+        "Up to date",
+        "This plugin is already up to date. Click here to force an update anyway.",
+        "/pp update \"${plugin.platformId}\" --byId --ignoreOutdated",
+        NamedTextColor.GRAY)
 
     private fun button(buttonName: String, hoverText: String, clickSuggest: String, color: NamedTextColor) =
         textDark("[").append(text(buttonName, color)).appendDark("]")
-            .showOnHover(hoverText, NamedTextColor.AQUA)
+            .showOnHover(hoverText, color)
             .suggestCommand(clickSuggest)
-
 
 }
