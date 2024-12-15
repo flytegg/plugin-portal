@@ -35,8 +35,6 @@ dependencies {
 
     implementation("gs.mclo:api:4.0.3")
     implementation("org.bstats:bstats-bukkit:3.1.0")
-
-    implementation("com.github.HangarMC:HangarJarScanner:cac44ae253")
 }
 
 tasks {
@@ -55,10 +53,13 @@ tasks {
 // Source: https://github.com/ViaVersion/ViaVersion/blob/dc503cd613f5cf00a6f11b78e52b1a76a42acf91/universal/build.gradle.kts
 val branch = rootProject.branchName()
 val baseVersion = project.version as String
+println("Base version: $baseVersion")
 val isRelease = !baseVersion.contains('-')
+println("Is release: $isRelease")
+val suffixedVersion = if (isRelease) baseVersion else baseVersion + "+" + System.getenv("GITHUB_RUN_NUMBER")
+println("Suffixed version: $suffixedVersion")
 //val isMainBranch = branch == "master"
 //if (!isRelease || isMainBranch) { // Only publish releases from the main branch
-val suffixedVersion = if (isRelease) baseVersion else baseVersion + "+" + System.getenv("GITHUB_RUN_NUMBER")
 val changelogContent = if (isRelease) {
     "See [GitHub](https://github.com/flytegg/plugin-portal) for release notes."
 } else {

@@ -11,6 +11,9 @@ plugins {
 tasks {
     val shadowJar = named<ShadowJar>("shadowJar") {
         archiveClassifier.set("")
+        println(project.version)
+        // print the location
+        println(project.buildDir)
         archiveFileName.set("PluginPortal-${project.version}.jar")
 
         minimize()

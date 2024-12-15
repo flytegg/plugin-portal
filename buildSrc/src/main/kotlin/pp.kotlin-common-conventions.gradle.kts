@@ -38,8 +38,19 @@ tasks.named<Test>("test") {
 
 tasks {
     processResources {
+        println("Processing resources")
+        // print out the files that are being processed
+        sourceSets.main.get().resources.srcDirs.forEach {
+            println("Processing resources from $it")
+            println("Child files: ${it.listFiles()?.map { it.name }}")
+        }
+
         filesMatching(listOf("plugin.yml")) {
+            println("Processing plugin.yml")
+            println("Project version before expansion: ${project.version}")
+            println("Replacing version in ${project.version}")
             expand("version" to project.version)
+            println("Project version after expansion: ${project.version}")
         }
     }
 
