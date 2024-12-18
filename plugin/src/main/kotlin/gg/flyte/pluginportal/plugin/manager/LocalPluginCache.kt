@@ -25,7 +25,7 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
 
     fun load() {
         val ppLocalPlugin = LocalPlugin(
-            platformId = "",
+            platformId = "6974",
             name = "PluginPortalPremium",
             version = PluginPortal.instance.description.version,
             platform = MarketplacePlatform.POLYMART,
