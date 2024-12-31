@@ -38,7 +38,6 @@ dependencies {
 
     // Unit Tests
     testImplementation(kotlin("test"))
-//    testImplementation("com.github.MockBukkit:MockBukkit:v1.21-SNAPSHOT")
     testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.0.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
 }

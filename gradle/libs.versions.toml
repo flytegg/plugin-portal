@@ -3,7 +3,7 @@
 
 [versions]
 kotlin-gradle-plugin = "1.9.20"
-shadow-plugin = "8.1.1"
+shadow-plugin = "8.3.0"
 
 [libraries]
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin-gradle-plugin" }

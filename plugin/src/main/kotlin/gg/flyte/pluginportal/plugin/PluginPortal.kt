@@ -30,8 +30,15 @@ open class PluginPortal : JavaPlugin() {
         LocalPluginCache.load()
         async { MarketplacePluginCache.loadLocalPluginData() }
 
-        PaperLib.suggestPaper(this)
-//        Metrics(this, 18005)
+        if (this::class.java.classLoader?.javaClass?.`package`?.name?.startsWith("org.mockbukkit.mockbukkit") == false) {
+            Metrics(this, 18005).apply {
+                addCustomChart(org.bstats.charts.SimplePie("is_premium") {
+                    "false"
+                })
+            }
+        } else {
+            println("Running in test environment, not sending bStats data")
+        }
 
         API // LOAD FOR ONDISABLE
     }
