@@ -15,5 +15,5 @@ repositories {
 dependencies {
     implementation(libs.kotlin.gradle.plugin)
 
-    implementation("com.github.johnrengelman", "shadow", "8.1.1")
+    implementation("com.gradleup", "shadow", "9.0.0-beta4")
 }

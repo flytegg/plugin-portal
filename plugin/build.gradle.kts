@@ -35,9 +35,19 @@ dependencies {
 
     implementation("gs.mclo:api:4.0.3")
     implementation("org.bstats:bstats-bukkit:3.1.0")
+
+    // Unit Tests
+    testImplementation(kotlin("test"))
+//    testImplementation("com.github.MockBukkit:MockBukkit:v1.21-SNAPSHOT")
+    testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.0.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
 }
 
 tasks {
+    test {
+        useJUnitPlatform()
+    }
+
     runServer {
         minecraftVersion("1.21.3")
         runDirectory(file("run/latest"))

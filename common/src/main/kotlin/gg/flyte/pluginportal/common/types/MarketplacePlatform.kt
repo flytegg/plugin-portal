@@ -4,7 +4,6 @@ enum class MarketplacePlatform {
     MODRINTH,
     HANGAR,
     SPIGOTMC,
-    POLYMART,
     ;
 
     companion object {

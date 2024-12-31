@@ -11,8 +11,7 @@ import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
-
-class PluginPortal : JavaPlugin() {
+open class PluginPortal : JavaPlugin() {
 
     companion object {
         lateinit var instance: PluginPortal
@@ -32,7 +31,7 @@ class PluginPortal : JavaPlugin() {
         async { MarketplacePluginCache.loadLocalPluginData() }
 
         PaperLib.suggestPaper(this)
-        Metrics(this, 18005)
+//        Metrics(this, 18005)
 
         API // LOAD FOR ONDISABLE
     }
