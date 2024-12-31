@@ -30,7 +30,6 @@ open class PluginPortal : JavaPlugin() {
         LocalPluginCache.load()
         async { MarketplacePluginCache.loadLocalPluginData() }
 
-        PaperLib.suggestPaper(this)
 //        Metrics(this, 18005)
 
         API // LOAD FOR ONDISABLE
