@@ -40,7 +40,7 @@ class PluginPortalTest {
 
     @Test
     fun testCanFetchPluginPortal() {
-        val plugin = API.getPlugins("PluginPortaal")
+        val plugin = API.getPlugins("PluginPortal")
         assertNotNull(plugin.find { it.id == "667c45a7e4fff17899284030" })
     }
 }
