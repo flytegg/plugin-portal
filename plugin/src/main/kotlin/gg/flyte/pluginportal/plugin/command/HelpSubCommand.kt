@@ -5,19 +5,23 @@ import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
 import revxrsal.commands.annotation.*
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
 import revxrsal.commands.bukkit.annotation.CommandPermission
+import revxrsal.commands.command.ExecutableCommand
 import revxrsal.commands.help.Help
 import kotlin.math.min
-
-private const val ENTRIES_PER_PAGE = 10
 
 @Command("pp", "pluginportal", "ppm")
 @CommandPermission("pluginportal.view")
 class HelpSubCommand {
 
+    // Does not need to contain all commands, will pull commands containing these phrases to the top
+    private val HELP_SORT_ORDER = listOf("update", "pp install", "uninstall", "view", "list")
+
     @Subcommand("help")
+    @CommandPlaceholder
     @CommandPermission("pluginportal.view")
     fun helpCommand(
         audience: Audience,
@@ -26,27 +30,30 @@ class HelpSubCommand {
 
         commands: Help.RelatedCommands<BukkitCommandActor>
     ) {
-        val filteredCommands = commands.all().filter { it.usage().startsWith("pp ") }
+        val filteredCommands = commands.all()
+            .filter { it.usage().startsWith("pp ") }
+            .filter { !it.usage().contains("delete") }
 
-        val totalPages = (filteredCommands.size + ENTRIES_PER_PAGE - 1) / ENTRIES_PER_PAGE
-        val safePage = page.coerceIn(1, totalPages)
-        val startIndex = (safePage - 1) * ENTRIES_PER_PAGE
-        val endIndex = min(startIndex + ENTRIES_PER_PAGE, filteredCommands.size)
+        val sortedCommands = mutableSetOf<ExecutableCommand<BukkitCommandActor>>()
 
-        val paginatedEntries = filteredCommands.subList(startIndex, endIndex)
+        HELP_SORT_ORDER.forEach { order ->
+            sortedCommands.add(filteredCommands.find { it.usage().contains(order) }!!)
+        }
+
+        sortedCommands.addAll(filteredCommands) // Add the rest
 
         var message = centerComponentLine(
-            textPrimary("Plugin Portal - Page $safePage/$totalPages").bold()
+            textPrimary("Plugin Portal").bold()
         ).appendNewline().append(
             centerComponentLine(
-                textSecondary("by ").append(text("Flyte", NamedTextColor.AQUA)
+                textSecondary("by ").append(text("Flyte", NamedTextColor.AQUA, TextDecoration.UNDERLINED)
                     .showOnHover("Click here to join our Discord", NamedTextColor.AQUA)
                     .clickEvent(ClickEvent.openUrl("https://discord.gg/flyte"))
                 )
             )
         ).appendNewline().appendNewline()
 
-        paginatedEntries.forEach { entry ->
+        sortedCommands.forEach { entry ->
             message = message.append(
                 textSecondary(" - ").appendPrimary(entry.usage())
             ).appendNewline()
