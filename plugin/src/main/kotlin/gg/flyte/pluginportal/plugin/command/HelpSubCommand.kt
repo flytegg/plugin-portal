@@ -11,7 +11,6 @@ import revxrsal.commands.bukkit.actor.BukkitCommandActor
 import revxrsal.commands.bukkit.annotation.CommandPermission
 import revxrsal.commands.command.ExecutableCommand
 import revxrsal.commands.help.Help
-import kotlin.math.min
 
 @Command("pp", "pluginportal", "ppm")
 @CommandPermission("pluginportal.view")
@@ -56,7 +55,7 @@ class HelpSubCommand {
         sortedCommands.forEachIndexed { index, entry ->
             message = message.append(
                 textSecondary(" - ").appendPrimary(entry.usage())
-            ).let { if (index != sortedCommands.size - 1) it.appendNewLine() else it }
+            ).let { if (index != sortedCommands.size - 1) it.appendNewline() else it }
         }
 
         audience.sendMessage(
