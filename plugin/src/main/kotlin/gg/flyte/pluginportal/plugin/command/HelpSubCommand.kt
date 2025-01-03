@@ -53,10 +53,10 @@ class HelpSubCommand {
             )
         ).appendNewline().appendNewline()
 
-        sortedCommands.forEach { entry ->
+        sortedCommands.forEachIndexed { index, entry ->
             message = message.append(
                 textSecondary(" - ").appendPrimary(entry.usage())
-            ).appendNewline()
+            ).let { if (index != sortedCommands.size - 1) it.appendNewLine() else it }
         }
 
         audience.sendMessage(
