@@ -24,11 +24,9 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-// Apply a specific Java toolchain to ease working on different environments.
 java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
-    }
+    javaTarget(17)
+    withSourcesJar()
 }
 
 tasks.named<Test>("test") {
@@ -57,9 +55,4 @@ tasks {
     test {
         useJUnitPlatform()
     }
-}
-
-java {
-    javaTarget(21)
-    withSourcesJar()
 }
