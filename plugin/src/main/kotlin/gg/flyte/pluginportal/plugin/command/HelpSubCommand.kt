@@ -3,6 +3,8 @@ package gg.flyte.pluginportal.plugin.command
 import gg.flyte.pluginportal.plugin.chat.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.format.NamedTextColor
 import revxrsal.commands.annotation.*
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
 import revxrsal.commands.bukkit.annotation.CommandPermission
@@ -37,7 +39,10 @@ class HelpSubCommand {
             textPrimary("Plugin Portal - Page $safePage/$totalPages").bold()
         ).appendNewline().append(
             centerComponentLine(
-                textSecondary("by Flyte")
+                textSecondary("by ").append(text("Flyte", NamedTextColor.AQUA)
+                    .showOnHover("Click here to join our Discord", NamedTextColor.AQUA)
+                    .clickEvent(ClickEvent.openUrl("https://discord.gg/flyte"))
+                )
             )
         ).appendNewline().appendNewline()
 
