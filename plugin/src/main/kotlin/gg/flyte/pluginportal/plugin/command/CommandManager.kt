@@ -38,6 +38,7 @@ object CommandManager {
             ListSubCommand(),
             PremiumSubCommands(),
             DumpSubCommand(),
+            ConfigSubCommand()
         )
     }
 

@@ -23,6 +23,19 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
 
     fun fromPlugin(plugin: Plugin) = find { plugin.platforms.values.any { mp -> mp.id == it.platformId } }
 
+    fun reloadCache() {
+        val text = getPluginsFile().readText()
+        if (text.isEmpty()) return
+
+        try {
+            clear()
+            val plugins = GSON.fromJson(text, Array<LocalPlugin>::class.java)
+            addAll(plugins)
+
+        } catch (_: JsonSyntaxException) {
+        }
+    }
+
     fun load() {
         val ppLocalPlugin = LocalPlugin(
             platformId = "5qkQnnWO",
