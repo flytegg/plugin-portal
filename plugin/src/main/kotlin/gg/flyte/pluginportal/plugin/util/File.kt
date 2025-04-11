@@ -13,14 +13,17 @@ fun isJarDownloadUrl(url: String): Boolean {
     if (url.endsWith(".jar")) return true
 
     val connection = runCatching { URL(url).openConnection() as HttpURLConnection }.getOrNull() ?: return false
-    val fileName = connection.getHeaderField("x-bz-file-name") ?: return false
-    if (fileName.endsWith(".jar")) return true
+
+    connection.getHeaderField("x-bz-file-name")?.let {
+        return it.endsWith(".jar")
+    }
 
     connection.instanceFollowRedirects = false
-    val contentDisposition = connection.getHeaderField("Content-Disposition")
-    return contentDisposition?.let {
-        it.contains("attachment") && it.contains("filename=") && it.contains(".jar")
-    } ?: false
+    connection.getHeaderField("Content-Disposition")?.let {
+        return it.contains("attachment") && it.contains("filename=") && it.contains(".jar")
+    }
+
+    return false
 }
 
 fun File.isJarFile() = isFile && extension == "jar"
