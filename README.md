@@ -12,4 +12,4 @@ Get support, suggest changes or chat about the project in our Discord: https://d
 
 ## Carbon CLI (for developers)
 - Ensure you have built the file already
-- `carbon deploy ./plugin/build/libs/PluginPortal-2.2.1.jar /plugins --star 92puvy2K0caL9akj -wr"`
+- `carbon deploy ./plugin/build/libs/PluginPortal-2.2.1.jar /plugins --star <Carbon Star ID> -wr"`
