@@ -70,7 +70,7 @@ Upgrade to **Premium** for powerful features designed for serious server owners:
 
 Need help or want to share feedback?
 
-🧠 Join our Discord community: [https://discord.gg/flyte](https://discord.gg/flyte)
+🧠 Join our Discord community: [Discord](https://discord.gg/cmhmZszx3p)
 
 We have an active, friendly community of developers ready to assist you. ❤️
 
