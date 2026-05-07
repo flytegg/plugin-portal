@@ -70,7 +70,7 @@ Upgrade to **Premium** for powerful features designed for serious server owners:
 
 Need help or want to share feedback?
 
-🧠 Join our Discord community: [Discord](https://discord.gg/cmhmZszx3p)
+🧠 Join our Discord community: [Discord](https://flyte.gg/discord)
 
 We have an active, friendly community of developers ready to assist you. ❤️
 
@@ -85,6 +85,6 @@ GitHub: [https://github.com/flytegg/plugin-portal](https://github.com/flytegg/pl
 
 * 🧑‍💻 Open a PR to fix bugs or add features
 * 🐛 Report issues you encounter
-* 💡 Suggest features in our [Discord server](https://discord.gg/flyte) our via GitHub Issues
+* 💡 Suggest features in our [Discord server](https://flyte.gg/discord) our via GitHub Issues
 
 Thanks for using Plugin Portal! We hope it makes your server management easier than ever. ❤️
