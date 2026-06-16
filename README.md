@@ -76,15 +76,19 @@ We have an active, friendly community of developers ready to assist you. ❤️
 
 ---
 
-## 🛠️ Contribute
+## 🛠️ Source Availability
 
-Plugin Portal is open source and community-driven!
-GitHub: [https://github.com/flytegg/plugin-portal](https://github.com/flytegg/plugin-portal)
+Plugin Portal started as an open source project, and the public GitHub repository remains available here:
+[https://github.com/flytegg/plugin-portal](https://github.com/flytegg/plugin-portal)
 
-### Ways to Contribute:
+The current release line is temporarily developed in a private repository while Premium support is being finished. The code in this public repository is still close to how the plugin works today, but it may not include the newest updates yet.
 
-* 🧑‍💻 Open a PR to fix bugs or add features
+The plan is to reopen the plugin codebase, including the free and Premium plugin code, once the remaining cleanup work is complete. The hosted API that powers marketplace/search features will remain closed source.
+
+### Ways to Help:
+
 * 🐛 Report issues you encounter
-* 💡 Suggest features in our [Discord server](https://flyte.gg/discord) our via GitHub Issues
+* 💡 Suggest features in our [Discord server](https://flyte.gg/discord) or via GitHub Issues
+* 🧑‍💻 Watch this repository for updates when source contributions reopen
 
 Thanks for using Plugin Portal! We hope it makes your server management easier than ever. ❤️
