@@ -1,0 +1,20 @@
+adapters:
+  ViaVersion:
+    platform: GitHub
+    trigger: auto # auto, manual (TODO), none
+    githubRepo: ViaVersion/ViaVersion # owner/repo, also support the full url?
+    githubPre-release: false
+    githubNameFilter: '^ViaVersion.*\.jar$'
+    githubAPIKey: "" # Optional, for private repos
+  WorldEdit:
+    platform: Modrinth
+    trigger: auto
+    modrinthSlug: 1u6JkXh5 # Could also be "worldedit" but this can be changed
+    modrinthFeatured: true # Download from featured files
+    modrinthPrimary: true # Use the primary file
+    modrinthChannels:
+      - RELEASE
+    modrinthLoaders:
+      - bukkit
+      - spigot
+      - paper

@@ -1,0 +1,16 @@
+DownloadPlatforms:
+  # Platforms listed here will be ignored for plugin downloads.
+  # Example:
+  # Disabled:
+  #   - SPIGOTMC
+  #   - HANGAR
+  Disabled: []
+
+Telemetry:
+  # Sends minimal Plugin Portal startup telemetry to help track compatibility and update health.
+  # Includes Plugin Portal version, server software/version, managed plugin count, and a hashed/masked license key when configured.
+  Enabled: true
+
+DiscordWebhook:
+  # Optional Discord webhook URL for install, update, platform-switch, and PluginPortal update notifications.
+  Url: ""

@@ -146,3 +146,28 @@ gradle-app.setting
 
 # all run folders no matter the parent
 run/
+bin
+
+.kotlin/
+.wrangler/
+.cache/
+.crafty/
+
+# Local environment and server state
+.env
+.env.*
+!.env.example
+eula.txt
+server.properties
+ops.json
+whitelist.json
+banned-ips.json
+banned-players.json
+usercache.json
+world/
+world_nether/
+world_the_end/
+
+# Local release and test artifacts
+out/
+*.hprof

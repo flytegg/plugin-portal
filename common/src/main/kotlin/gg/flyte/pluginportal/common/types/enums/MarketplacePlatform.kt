@@ -1,0 +1,13 @@
+package gg.flyte.pluginportal.common.types.enums
+
+enum class MarketplacePlatform {
+    MODRINTH,
+    HANGAR,
+    SPIGOTMC,
+    POLYMART,
+    ;
+
+    companion object {
+        fun of(name: String): MarketplacePlatform? = runCatching { valueOf(name.uppercase()) }.getOrNull()
+    }
+}
