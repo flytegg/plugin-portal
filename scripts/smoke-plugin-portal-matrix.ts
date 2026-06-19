@@ -96,6 +96,7 @@ if (args.scenarios.includes("beta-upgrade") || args.scenarios.includes("release-
 
 const localSha = await sha256(pluginJar);
 const public381Jar = await downloadPublicModrinthJar("3.8.1");
+const targetVersionPattern = escapeRegExp(args.version);
 
 for (const runtime of selectedRuntimes) {
   const serverJar = await resolveServerJar(runtime);
@@ -200,20 +201,24 @@ function parseScenario(value: string): ScenarioId {
   fail(`Unknown scenario: ${value}`);
 }
 
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 async function freshNoAuth(runtime: Runtime, serverJar: string) {
   const run = await startServer(runtime, serverJar, [pluginJar], {});
   try {
     await expect(run, /Premium:\s+Locked|Premium features are locked/i, "premium locked output");
     run.write("pp version");
-    await expect(run, /Version:\s+3\.8\.2[\s\S]*Premium:\s+Locked/i, "locked /pp version");
+    await expect(run, new RegExp(`Version:\\s+${targetVersionPattern}[\\s\\S]*Premium:\\s+Locked`, "i"), "locked /pp version");
     if (runtime.type === "spigot") {
-      pass(runtime, "fresh-noauth", "3.8.2 starts locked and reports version; install fixture skipped for Spigot compatibility.", run.dir);
+      pass(runtime, "fresh-noauth", `${args.version} starts locked and reports version; install fixture skipped for Spigot compatibility.`, run.dir);
       return;
     }
     run.write("pp install ViaVersion MODRINTH --exact");
     await expect(run, /Downloaded ViaVersion from MODRINTH|Successfully installed ViaVersion/i, "ViaVersion install");
     await assertFileExists(join(run.dir, "plugins", "[PP] ViaVersion (MODRINTH).jar"));
-    pass(runtime, "fresh-noauth", "3.8.2 starts locked and can install public Modrinth plugins.", run.dir);
+    pass(runtime, "fresh-noauth", `${args.version} starts locked and can install public Modrinth plugins.`, run.dir);
   } finally {
     await cleanup(run);
   }
@@ -230,8 +235,8 @@ async function freshAuth(runtime: Runtime, serverJar: string) {
   try {
     await expect(run, /Premium entitlement verified|Enabled authenticated API requests/i, "authenticated startup");
     run.write("pp version");
-    await expect(run, /Version:\s+3\.8\.2[\s\S]*Premium:\s+Unlocked/i, "unlocked /pp version");
-    pass(runtime, "fresh-auth", "3.8.2 starts with existing key and premium unlocked.", run.dir);
+    await expect(run, new RegExp(`Version:\\s+${targetVersionPattern}[\\s\\S]*Premium:\\s+Unlocked`, "i"), "unlocked /pp version");
+    pass(runtime, "fresh-auth", `${args.version} starts with existing key and premium unlocked.`, run.dir);
   } finally {
     await cleanup(run);
   }
@@ -244,9 +249,9 @@ async function marketplaceUpgrade(runtime: Runtime, serverJar: string, channel: 
   const run = await startServer(runtime, serverJar, [patchedPreviousJar], {});
   try {
     run.write(channel === "release" ? "pp upgrade" : "pp upgrade --channel beta");
-    await expect(run, new RegExp(`3\\.8\\.2[\\s\\S]*${channel.toUpperCase()}`, "i"), `${channel} update available`);
+    await expect(run, new RegExp(`${targetVersionPattern}[\\s\\S]*${channel.toUpperCase()}`, "i"), `${channel} update available`);
     run.write(channel === "release" ? "pp upgrade --yes" : "pp upgrade --yes --channel beta");
-    await expect(run, /Successfully downloaded Plugin Portal v3\.8\.2|Plugin Portal has been upgraded to\s+3\.8\.2/i, "upgrade download");
+    await expect(run, new RegExp(`Successfully downloaded Plugin Portal v${targetVersionPattern}|Plugin Portal has been upgraded to\\s+${targetVersionPattern}`, "i"), "upgrade download");
     const updateJar = await findJar(join(run.dir, "plugins", "update"));
     await assertJarVersion(updateJar, args.version);
     const stagedSha = await sha256(updateJar);
@@ -266,12 +271,12 @@ async function legacyUpgrade(runtime: Runtime, serverJar: string, type: "free" |
   const run = await startServer(runtime, serverJar, [public381Jar], type === "premium" && key ? { apiKey: key } : {});
   try {
     run.write("pp upgrade");
-    await expect(run, /3\.8\.2/i, "legacy update available");
+    await expect(run, new RegExp(targetVersionPattern, "i"), "legacy update available");
     run.write("pp upgrade --yes");
-    await expect(run, /Successfully downloaded Plugin Portal v3\.8\.2|Plugin Portal has been upgraded to\s+3\.8\.2/i, "legacy upgrade download");
+    await expect(run, new RegExp(`Successfully downloaded Plugin Portal v${targetVersionPattern}|Plugin Portal has been upgraded to\\s+${targetVersionPattern}`, "i"), "legacy upgrade download");
     const updateJar = await findJar(join(run.dir, "plugins", "update"));
     await assertJarVersion(updateJar, args.version);
-    pass(runtime, scenario, `Legacy ${type} update API stages a 3.8.2 jar.`, run.dir);
+    pass(runtime, scenario, `Legacy ${type} update API stages a ${args.version} jar.`, run.dir);
   } finally {
     await cleanup(run);
   }
