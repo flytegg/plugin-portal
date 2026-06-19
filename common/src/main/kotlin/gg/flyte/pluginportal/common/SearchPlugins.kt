@@ -10,7 +10,7 @@ object SearchPlugins {
         .build<String, List<Plugin>>()
 
     fun search(query: String): List<Plugin> {
-        return searchCache.get(query) { API.getPlugins(query) }
+        return searchCache.get(query) { API.getPlugins(query)?.toList() ?: listOf() }
     }
 
     fun getCachedSearch(query: String): List<Plugin>? {

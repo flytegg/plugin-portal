@@ -1,9 +1,8 @@
-name: Publish to Modrinth and Hangar
-
+name: Build and Test
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - master
 
 jobs:
   publish:
@@ -20,8 +19,5 @@ jobs:
           distribution: 'temurin'
           java-version: 21
           check-latest: true
-      - name: Publish
-        env:
-          HANGAR_API_KEY: ${{ secrets.HANGAR_API_KEY }}
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-        run: ./gradlew build test modrinth publishAllPublicationsToHangar --stacktrace
+      - name: Build
+        run: ./gradlew build --stacktrace

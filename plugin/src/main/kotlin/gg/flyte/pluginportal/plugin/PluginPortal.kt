@@ -1,50 +1,80 @@
 package gg.flyte.pluginportal.plugin
 
-import gg.flyte.pluginportal.common.API
-import gg.flyte.pluginportal.plugin.command.CommandManager
-import gg.flyte.pluginportal.plugin.config.Config
-import gg.flyte.pluginportal.plugin.manager.LocalPluginCache
-import gg.flyte.pluginportal.plugin.manager.MarketplacePluginCache
-import gg.flyte.pluginportal.plugin.util.async
-import io.papermc.lib.PaperLib
-import org.bstats.bukkit.Metrics
+import gg.flyte.pluginportal.common.Config
+import gg.flyte.pluginportal.common.PluginPortalBase
+import gg.flyte.pluginportal.plugin.adapters.AdapterPluginCache
+import gg.flyte.pluginportal.plugin.commands.ImportSubCommand
+import gg.flyte.pluginportal.plugin.commands.ExportSubCommand
+import gg.flyte.pluginportal.plugin.commands.UpdateAllSubCommand
+import gg.flyte.pluginportal.plugin.commands.ScanSubCommand
+import gg.flyte.pluginportal.plugin.commands.recognize.RecognizeSubCommand
+import gg.flyte.pluginportal.plugin.commands.recognize.RecognizeAllSubCommand
+import gg.flyte.pluginportal.plugin.commands.EditorSubCommand
+import gg.flyte.pluginportal.plugin.commands.lamp.RequiresAuthValidator
+import gg.flyte.pluginportal.plugin.commands.lamp.SafeFileNameValidator
+import gg.flyte.pluginportal.plugin.websocket.TypedSocketManager
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
-open class PluginPortal : JavaPlugin() {
+class PluginPortal : JavaPlugin() {
 
     companion object {
         lateinit var instance: PluginPortal
         lateinit var pluginPortalJarFile: File
-        val isFreeVersion = true
     }
 
+    private lateinit var entitlementManager: EntitlementManager
 
     override fun onEnable() {
         instance = this
         pluginPortalJarFile = this.file
 
-        Config
-        CommandManager
+        Config.init(this)
+        entitlementManager = EntitlementManager(this)
+        
+        entitlementManager.loadConfiguredKey()
+        entitlementManager.refresh()
 
-        LocalPluginCache.load()
-        async { MarketplacePluginCache.loadLocalPluginData() }
-
-        if (this::class.java.classLoader?.javaClass?.`package`?.name?.startsWith("org.mockbukkit.mockbukkit") == false) {
-            Metrics(this, 18005).apply {
-                addCustomChart(org.bstats.charts.SimplePie("is_premium") {
-                    "false"
-                })
-            }
-        } else {
-            println("Running in test environment, not sending bStats data")
+        if (!isAuthed()) {
+            logger.info("Premium features are locked until a valid Plugin Portal key is configured.")
         }
 
-        API // LOAD FOR ONDISABLE
+        val commands: Array<Any> = arrayOf(
+            ImportSubCommand(),
+            ExportSubCommand(),
+            UpdateAllSubCommand(),
+            ScanSubCommand(),
+            RecognizeSubCommand(),
+            RecognizeAllSubCommand(),
+            EditorSubCommand(),
+        )
+
+        PluginPortalBase.load(
+            this,
+            PluginPortalBase.PluginPortalInfo(
+                pluginJarFile = pluginPortalJarFile,
+                hasPremiumEntitlement = { isAuthed() },
+                refreshPremiumEntitlement = { refreshEntitlement() },
+            ),
+            commands
+        ) {
+            it  .commandCondition(RequiresAuthValidator())
+                .parameterValidator(String::class.java, SafeFileNameValidator())
+        }
+
+
+        AdapterPluginCache.load()
     }
 
+    fun refreshEntitlement() = entitlementManager.refresh() is EntitlementState.Valid
+
+    fun isAuthed() = entitlementManager.hasPremiumAccess()
+
+    fun lockedPremiumMessage() = entitlementManager.lockedMessage()
+
     override fun onDisable() {
-        API.closeClient()
+        TypedSocketManager.stop()
+        PluginPortalBase.onDisable()
     }
 
 }

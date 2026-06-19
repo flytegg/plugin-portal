@@ -27,3 +27,6 @@ fun Project.runGitCommand(args: List<String>): String {
 fun JavaPluginExtension.javaTarget(version: Int) {
     toolchain.languageVersion.set(JavaLanguageVersion.of(version))
 }
+
+fun getJarName(): String = "PluginPortal"
+fun pluginVersion(version: String): String = version

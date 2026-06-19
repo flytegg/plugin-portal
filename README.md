@@ -1,24 +1,47 @@
 # 🌐 Plugin Portal
 
-**Plugin Portal** is the ultimate in-game plugin downloader and updater for Minecraft servers, integrating directly with the **Polymart**, **SpigotMC**, **Modrinth**, and **Hangar** marketplaces. Browse, preview, install, and update plugins — all from the comfort of your Minecraft chatbar.
+**Plugin Portal** is an in-game plugin downloader, updater, and manager for
+Bukkit-compatible Minecraft servers. It integrates with **Modrinth**,
+**Hangar**, **SpigotMC**, and **Polymart** so you can browse, preview, install,
+recognize, update, and remove plugins — all from the comfort of your Minecraft
+chatbar.
 
-> **Premium version available:** Unlock auto-updates, malware scanning, external source support, and more!
+> **Premium features available:** automatic updates, plugin recognition,
+> version/channel selection, web editor workflows, custom sources, Discord
+> webhooks, and more.
 > [🔗 View Plugin Portal Premium](https://polymart.org/product/6974/plugin-portal-premium)
 
----
+This repository contains the Minecraft plugin only. The hosted Plugin Portal
+API, dashboard, release storage, and entitlement services are separate
+closed-source infrastructure.
+
+Plugin Portal now builds one public JAR:
+
+```text
+PluginPortal-<version>.jar
+```
+
+Premium features are controlled by runtime entitlement and server-side API
+enforcement, not by a separate premium artifact.
 
 ## ✨ Features
 
-* 🚀 **Direct Install**: Install plugins directly from **Polymart**, **Spigot**, **Modrinth**, and **Hangar** with a single command.
-* 📚 **Massive Plugin Directory**: Instantly search and install from **100,000+ plugins** — no browser required.
-* 🔍 **Plugin Previewing**: View icons, descriptions, stats, and ratings in-game with `/pp view`.
-* 🔄 **Self-Updating**: Plugin Portal keeps itself up-to-date, automatically.
-* 🧭 **Cross-Version Compatible**: Works with **1.8+** and supports all major server jars — including **Folia**.
-* 🧹 **No Junk Plugins**: Automatically filters out inactive, deprecated, and abandoned plugins.
+- 🚀 **Direct Install**: Install plugins from Modrinth, Hangar, SpigotMC, Polymart,
+  and supported custom sources.
+- 📚 **Marketplace Search**: Search and preview plugin metadata in game with
+  `/pp view`.
+- 🕰️ **Version Selection**: Install or update to specific compatible versions and
+  marketplace release channels when available.
+- 🧰 **Plugin Management**: Update, remove, recognize, import, export, and scan
+  managed plugins.
+- 🔄 **Self-Updating**: Plugin Portal can check for and install Plugin Portal
+  updates.
+- 🧭 **Cross-Version Support**: Supports Bukkit-compatible servers from 1.8 through
+  current Paper/Folia-style runtimes, including Leaf 26.x.
+- 💎 **Premium Workflows**: Use premium commands from the same JAR after configuring
+  a valid Plugin Portal key.
 
 > Want even more? Scroll down to see what **Plugin Portal Premium** has to offer!
-
----
 
 ## 🖼️ Screenshots
 
@@ -34,37 +57,41 @@
 
 ![Plugin Update](https://i.imgur.com/SzQFXqj.png)
 
----
+## 💻 Commands
 
-## 💻 Commands & Permissions
+| Command | Permission | Description |
+| --- | --- | --- |
+| `/pp view <name\|id> [platform] [--byId] [--exact]` | `pluginportal.view` | View marketplace plugin details. |
+| `/pp install <name\|id> [platform] [channel] [--byId] [--exact] [--version <version>]` | `pluginportal.manage.install` | Install a plugin from a marketplace. |
+| `/pp update <name\|id> [--byId] [--channel <name>] [--version <version>]` | `pluginportal.maintain.update` | Update a tracked plugin. |
+| `/pp updateAll` | `pluginportal.maintain.update` | Update all tracked plugins with available updates. |
+| `/pp delete <name>` or `/pp uninstall <name>` | `pluginportal.manage.uninstall` | Remove a tracked plugin. |
+| `/pp recognize <file>` / `/pp recognizeAll` | `pluginportal.manage.recognize` | Track manually installed plugin JARs. |
+| `/pp upgrade [--yes]` | `pluginportal.admin` | Check for and install Plugin Portal updates. |
+| `/pp dump` | `pluginportal.dump` | Upload sanitized diagnostics to MCLogs. |
+| `/pp help` | `pluginportal.view` | Show command help. |
 
-| Command                                            | Permission                      | Description                                                               |
-| -------------------------------------------------- | ------------------------------- | ------------------------------------------------------------------------- |
-| `/pp view <name\|id> [platform] [-byId]`           | `pluginportal.view`             | View plugin preview including image, description, stats, and ratings.     |
-| `/pp install <name\|id> [platform] [-byId]`        | `pluginportal.manage.install`   | Install a plugin from a marketplace using its name or ID.                 |
-| `/pp update <name\|id> [-byId]`                    | `pluginportal.maintain.update`  | Update a plugin to its latest version from the original source.           |
-| `/pp uninstall` or `/pp delete <name\|id> [-byId]` | `pluginportal.manage.uninstall` | Remove a plugin installed by Plugin Portal.                               |
-| `/pp list`                                         | `pluginportal.view`             | List all plugins installed through Plugin Portal.                         |
-| `/pp help`                                         | `pluginportal.view`             | Display the help menu with all commands.                                  |
-| `/pp dump`                                         | `pluginportal.dump`             | Dump Plugin Portal's internal logs to [https://mclo.gs](https://mclo.gs). |
-
----
+See `COMMANDS.md` for the detailed command and troubleshooting reference.
 
 ## 💎 Plugin Portal Premium
 
-Upgrade to **Premium** for powerful features designed for serious server owners:
+Upgrade to **Premium** for powerful features designed for serious server owners.
+Premium features are included in the same JAR and unlock after a valid Plugin
+Portal key is configured.
 
-* 🔍 **Plugin Recognition**: Auto-detect and manage existing plugins not installed via Plugin Portal.
-* 🛡️ **Malware Detection**: Each download is scanned for safety using a Minecraft-specific scanner.
-* 🔄 **Automatic Updates**: Keep every plugin up to date automatically — no commands required.
-* 🌐 **Custom Adapters**: Install from GitHub, Jenkins, or other external sources.
-* 🕰️ **Install Specific Versions**: Need a particular version of a plugin? No problem.
-* 🧯 **Plugin Backups**: Roll back to earlier plugin versions if something breaks.
-* 🚀 **Priority Releases & Support**: Get updates and help faster than everyone else.
+- 🔍 **Plugin Recognition**: Auto-detect and manage existing plugins not installed
+  through Plugin Portal.
+- 🔄 **Bulk Updates**: Keep tracked plugins up to date with `/pp updateAll`.
+- 🌐 **Custom Sources**: Install from supported external adapters such as GitHub
+  releases and Modrinth direct flows.
+- 🕰️ **Version and Channel Selection**: Pin exact versions or follow marketplace
+  beta/release channels.
+- 🧑‍💻 **Web Editor Workflows**: Connect the running server to hosted Plugin Portal
+  tooling.
+- 📣 **Discord Webhooks**: Send install, update, platform-switch, and self-update
+  notifications.
 
 🔗 [**Get Plugin Portal Premium** on Polymart](https://polymart.org/product/6974/plugin-portal-premium)
-
----
 
 ## 🤝 Support
 
@@ -72,23 +99,32 @@ Need help or want to share feedback?
 
 🧠 Join our Discord community: [Discord](https://flyte.gg/discord)
 
-We have an active, friendly community of developers ready to assist you. ❤️
+We have an active community of server owners and developers ready to help. ❤️
 
----
+## 📝 Notes
+- Premium features are controlled by runtime entitlement, not by a separate artifact.
+- "Plugin Portal" in this repository and license includes the merged free and premium plugin code. Historical names like "Plugin Portal Premium" and `PluginPortalPremium` are covered by the same license and trademark terms.
+- Developers and contributors should read `CONTRIBUTING.md` for build, test, local server, endpoint, and release workflow notes.
+- See `SECURITY.md` for security reporting.
+- This repository is source-available under `LICENSE.md`. It is not an OSI-approved open-source license.
+- Plugin Portal branding is covered separately in `TRADEMARKS.md`.
 
-## 🛠️ Source Availability
+## 🛠️ Source Code
 
-Plugin Portal started as an open source project, and the public GitHub repository remains available here:
-[https://github.com/flytegg/plugin-portal](https://github.com/flytegg/plugin-portal)
+This repository contains the current Plugin Portal plugin source, including the
+merged free and premium command code.
 
-The current release line is temporarily developed in a private repository while Premium support is being finished. The code in this public repository is still close to how the plugin works today, but it may not include the newest updates yet.
+The hosted Plugin Portal API, dashboard, release storage, entitlement checks,
+and related infrastructure remain closed source.
 
-The plan is to reopen the plugin codebase, including the free and Premium plugin code, once the remaining cleanup work is complete. The hosted API that powers marketplace/search features will remain closed source.
+The plugin is licensed under the Plugin Portal Source Available License in
+`LICENSE.md`. It is available for viewing, private use, forks, and contributions
+under that license, but it is not an OSI-approved open-source license.
 
-### Ways to Help:
+Ways to help:
 
-* 🐛 Report issues you encounter
-* 💡 Suggest features in our [Discord server](https://flyte.gg/discord) or via GitHub Issues
-* 🧑‍💻 Watch this repository for updates when source contributions reopen
+- 🐛 Report issues you encounter.
+- 💡 Suggest features in our [Discord server](https://flyte.gg/discord) or via GitHub Issues.
+- 🧑‍💻 Open pull requests for focused plugin fixes or docs improvements.
 
 Thanks for using Plugin Portal! We hope it makes your server management easier than ever. ❤️

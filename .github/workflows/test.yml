@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - master
-      - master-premium
 
 jobs:
   publish:
