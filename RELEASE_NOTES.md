@@ -57,6 +57,6 @@ The release script should eventually copy the section for the released version i
 
 ### Notes
 
-- This beta is published through GitHub prerelease and marketplace beta channels.
+- This beta is published through GitHub prerelease, Modrinth beta, and Hangar Snapshot channels.
 - This beta is not uploaded to Plugin Portal's stable admin release API, so stable auto-updater users should not receive it unless they explicitly use the beta channel.
 - Premium features are included in the same JAR and remain controlled by runtime entitlement.

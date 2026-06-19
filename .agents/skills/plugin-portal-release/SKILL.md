@@ -13,7 +13,7 @@ Plugin Portal uses normal `x.y.z` versions in `gradle.properties`, `plugin.yml`,
 Git tags, GitHub releases, and marketplace version numbers. Channel is release
 metadata, not part of the JAR filename.
 
-- `beta`: GitHub prerelease, Modrinth `beta`, Hangar `Beta`, no admin release API upload.
+- `beta`: GitHub prerelease, Modrinth `beta`, Hangar `Beta` when that channel exists, no admin release API upload.
 - `release`: GitHub full release, Modrinth `release`, Hangar `Release`, admin release API upload only when stable auto-updates should offer the version.
 - `alpha`: GitHub prerelease, Modrinth `alpha`, Hangar `Alpha`, no admin release API upload unless explicitly requested.
 
@@ -54,10 +54,12 @@ This updates `gradle.properties`, runs `./gradlew clean test build`, verifies
 the built JAR metadata, starts a local Paper smoke server, and runs a Plugin
 Portal install smoke command.
 
-Run marketplace publish dry-run:
+Run marketplace publish dry-run. If Hangar does not have a configured `Beta`
+channel, use its existing non-release `Snapshot` channel explicitly:
 
 ```bash
 bun scripts/publish-plugin-portal-marketplaces.ts --version <x.y.z> --all --channel <release|beta|alpha> --changelog-file <notes.md> --dry-run --skip-build
+bun scripts/publish-plugin-portal-marketplaces.ts --version <x.y.z> --all --channel beta --hangar-channel Snapshot --changelog-file <notes.md> --dry-run --skip-build
 ```
 
 ## GitHub Release
@@ -95,6 +97,7 @@ The script publishes through Gradle:
 - Modrinth task: `:plugin:modrinth`, token `MODRINTH_TOKEN`.
 - Hangar task: `:plugin:publishPluginPublicationToHangar`, token `HANGAR_API_TOKEN`.
 - Hangar has no dry-run upload mode, so the wrapper skips Hangar during `--dry-run`.
+- Use `--hangar-channel Snapshot` when publishing a beta before a true Hangar `Beta` channel has been configured with a color on the project.
 
 Verify public API results:
 

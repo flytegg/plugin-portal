@@ -13,6 +13,7 @@ type Args = {
   hangar: boolean;
   skipBuild: boolean;
   channel: "release" | "beta" | "alpha";
+  hangarChannel?: string;
 };
 
 const root = process.cwd();
@@ -41,7 +42,7 @@ await publishMarketplaces(args, publishTasks, pluginJar);
 
 async function parseArgs(values: string[]): Promise<Args> {
   if (values.includes("--help") || values.includes("-h")) {
-    console.log(`Usage: bun scripts/publish-plugin-portal-marketplaces.ts --version <x.y.z> [--all|--modrinth|--hangar] [--channel release|beta|alpha] [--changelog <text>|--changelog-file <path>] [--dry-run] [--skip-build]
+    console.log(`Usage: bun scripts/publish-plugin-portal-marketplaces.ts --version <x.y.z> [--all|--modrinth|--hangar] [--channel release|beta|alpha] [--hangar-channel <name>] [--changelog <text>|--changelog-file <path>] [--dry-run] [--skip-build]
 
 Environment:
   MODRINTH_TOKEN      Required for --modrinth
@@ -51,6 +52,7 @@ Environment:
 Examples:
   bun scripts/publish-plugin-portal-marketplaces.ts --version 3.8.0 --all --dry-run
   bun scripts/publish-plugin-portal-marketplaces.ts --version 3.8.2 --modrinth --channel beta --dry-run --skip-build
+  bun scripts/publish-plugin-portal-marketplaces.ts --version 3.8.3 --all --channel beta --hangar-channel Snapshot --dry-run --skip-build
   MODRINTH_TOKEN=... HANGAR_API_TOKEN=... bun scripts/publish-plugin-portal-marketplaces.ts --version 3.8.0 --all --changelog-file CHANGELOG.md`);
     process.exit(0);
   }
@@ -71,6 +73,7 @@ Examples:
     else if (value === "--changelog") parsed.changelog = values[++i] ?? "";
     else if (value === "--changelog-file") parsed.changelogFile = values[++i] ?? "";
     else if (value === "--channel") parsed.channel = parseChannel(values[++i] ?? "");
+    else if (value === "--hangar-channel") parsed.hangarChannel = parseRequiredValue("--hangar-channel", values[++i] ?? "");
     else if (value === "--dry-run") parsed.dryRun = true;
     else if (value === "--modrinth") parsed.modrinth = true;
     else if (value === "--hangar") parsed.hangar = true;
@@ -97,7 +100,7 @@ async function publishMarketplaces(args: Args, tasks: string[], jarPath: string)
     ...tasks,
     `-PmarketplaceChangelog=${args.changelog}`,
     `-PmodrinthVersionType=${args.channel}`,
-    `-PhangarChannel=${toHangarChannel(args.channel)}`,
+    `-PhangarChannel=${args.hangarChannel ?? toHangarChannel(args.channel)}`,
   ];
 
   if (process.env.HANGAR_PROJECT_ID) command.push(`-PhangarProjectId=${process.env.HANGAR_PROJECT_ID}`);
@@ -133,6 +136,11 @@ function parseChannel(value: string): Args["channel"] {
   if (value === "stable") return "release";
   if (value === "release" || value === "beta" || value === "alpha") return value;
   fail("--channel must be release, beta, or alpha.");
+}
+
+function parseRequiredValue(name: string, value: string) {
+  if (!value.trim()) fail(`${name} requires a value.`);
+  return value;
 }
 
 function toHangarChannel(channel: Args["channel"]) {
