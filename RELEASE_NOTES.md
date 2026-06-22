@@ -36,6 +36,30 @@ Add one section per shipped plugin version:
 
 The release script should eventually copy the section for the released version into release metadata stored beside the jars. Until then, plugin webhooks should only include release notes when the API already returns a changelog for the update response.
 
+## 3.8.4
+
+- Release commit: see GitHub tag `v3.8.4`
+- Built artifacts:
+  - `PluginPortal-3.8.4.jar`
+- Date: `2026-06-22`
+
+### Fixed
+
+- Fixed startup compatibility with Paper and Leaf 26.x server version strings.
+- Improved install and update version selection so Bukkit/Paper servers avoid proxy-only artifacts.
+- Improved Plugin Portal self-upgrade behavior through the canonical marketplace and API release path.
+
+### Changed
+
+- Shipped one Plugin Portal JAR for both free and premium installs.
+- Premium features remain controlled by runtime entitlement instead of a separate premium build.
+- Added stable marketplace and auto-update release support for the unified JAR.
+
+### Notes
+
+- Server owners on older Plugin Portal versions can update through `/pp upgrade`.
+- Historical premium updater compatibility is preserved with a `PluginPortalPremium` alias in the auto-update API.
+
 ## 3.8.3 Beta
 
 - Release commit: see GitHub tag `v3.8.3`
