@@ -176,7 +176,7 @@ fun Plugin.buildMoreTooltip(): Component {
             .append(text(platform.lastModified?.toString() ?: "Unknown"))
 
         // Add version info with Folia support
-        platform.newestCompatibleVersion(null, currentServerTypePreference())?.let { version ->
+        platform.newestCompatibleVersion(null, currentServerTypePreference(), currentMinecraftVersion())?.let { version ->
             tooltip = tooltip.append(Component.newline()).appendSecondary("Latest Version: ").append(text(version.versionNumber))
 
             tooltip = tooltip.append(Component.newline()).appendSecondary("Supports Folia: ")
@@ -196,7 +196,7 @@ fun Plugin.getImageComponent(): Component {
     val localPlugin = LocalPluginCache.fromPlugin(this)
     val installed = localPlugin != null
     val supportedVersions = platforms.best
-        ?.newestCompatibleVersion(null, currentServerTypePreference())
+        ?.newestCompatibleVersion(null, currentServerTypePreference(), currentMinecraftVersion())
         ?.supportLabel
         ?: "Unknown"
 
@@ -229,7 +229,7 @@ fun Plugin.getImageComponent(): Component {
 }
 
 private val Version.supportLabel: String
-    get() = supportedVersions?.takeIf { it.isNotBlank() }
+    get() = supportedMinecraftVersions.takeIf { it.isNotEmpty() }?.joinToString(", ")
         ?: serverTypes.joinToString(", ") { it.name.lowercase() }.takeIf { it.isNotBlank() }
         ?: "Unknown"
 

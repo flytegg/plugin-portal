@@ -91,13 +91,16 @@ abstract class PlatformPlugin(
     val platformWithId get() = PlatformId(platformId, platform)
 
     fun compatibleVersions(serverTypePreference: List<ServerType>): List<Version> =
-        versions.filter { version -> version.isCompatibleWith(serverTypePreference) }
+        versions.compatibleVersions(serverTypePreference)
 
-    fun newestCompatibleVersion(channel: String?, serverTypePreference: List<ServerType>): Version? =
-        versions.newestCompatibleVersion(channel, serverTypePreference)
+    fun compatibleVersions(serverTypePreference: List<ServerType>, minecraftVersion: String?): List<Version> =
+        versions.compatibleVersions(serverTypePreference, minecraftVersion)
 
-    fun exactCompatibleVersion(versionNumber: String, channel: String?, serverTypePreference: List<ServerType>): ExactVersionSelection {
-        return versions.exactCompatibleVersion(versionNumber, channel, serverTypePreference)
+    fun newestCompatibleVersion(channel: String?, serverTypePreference: List<ServerType>, minecraftVersion: String? = null): Version? =
+        versions.newestCompatibleVersion(channel, serverTypePreference, minecraftVersion)
+
+    fun exactCompatibleVersion(versionNumber: String, channel: String?, serverTypePreference: List<ServerType>, minecraftVersion: String? = null): ExactVersionSelection {
+        return versions.exactCompatibleVersion(versionNumber, channel, serverTypePreference, minecraftVersion)
     }
 
     fun newestBukkitPaperVersion(channel: String?): Version? =
@@ -115,10 +118,15 @@ sealed class ExactVersionSelection {
     object NotFound : ExactVersionSelection()
 }
 
-fun List<Version>.exactCompatibleVersion(versionNumber: String, channel: String?, serverTypePreference: List<ServerType>): ExactVersionSelection {
+fun List<Version>.compatibleVersions(serverTypePreference: List<ServerType>, minecraftVersion: String? = null): List<Version> =
+    filter { version -> version.isCompatibleWith(serverTypePreference) }
+        .preferMinecraftVersion(minecraftVersion)
+
+fun List<Version>.exactCompatibleVersion(versionNumber: String, channel: String?, serverTypePreference: List<ServerType>, minecraftVersion: String? = null): ExactVersionSelection {
     val matches = filter { version -> version.isCompatibleWith(serverTypePreference) }
         .filter { version -> version.versionNumber == versionNumber }
         .filter { version -> channel == null || version.releaseChannel.equals(channel, ignoreCase = true) }
+        .preferMinecraftVersion(minecraftVersion)
 
     if (matches.isEmpty()) return ExactVersionSelection.NotFound
 
@@ -141,10 +149,55 @@ private fun List<Version>.bestCompatibleVersion(serverTypePreference: List<Serve
         }
     )
 
-fun List<Version>.newestCompatibleVersion(channel: String?, serverTypePreference: List<ServerType>): Version? =
+fun List<Version>.newestCompatibleVersion(channel: String?, serverTypePreference: List<ServerType>, minecraftVersion: String? = null): Version? =
     filter { version -> version.isCompatibleWith(serverTypePreference) }
         .filter { version -> channel == null || version.releaseChannel.equals(channel, ignoreCase = true) }
+        .preferMinecraftVersion(minecraftVersion)
         .bestCompatibleVersion(serverTypePreference)
+
+fun PlatformPlugin.newestCompatibleVersionWithFallback(
+    channel: String?,
+    serverTypePreference: List<ServerType>,
+    minecraftVersion: String? = null,
+    fetchVersions: () -> List<Version>?
+): Version? =
+    newestCompatibleVersion(channel, serverTypePreference, minecraftVersion)
+        ?.takeIf { version -> version.isSpecificMatch(serverTypePreference, minecraftVersion) }
+        ?: fetchVersions()?.newestCompatibleVersion(channel, serverTypePreference, minecraftVersion)
+        ?: newestCompatibleVersion(channel, serverTypePreference, minecraftVersion)
+
+fun PlatformPlugin.exactCompatibleVersionWithFallback(
+    versionNumber: String,
+    channel: String?,
+    serverTypePreference: List<ServerType>,
+    minecraftVersion: String? = null,
+    fetchVersions: () -> List<Version>?
+): ExactVersionSelection {
+    val cached = exactCompatibleVersion(versionNumber, channel, serverTypePreference, minecraftVersion)
+    if (cached is ExactVersionSelection.Found && cached.version.isSpecificMatch(serverTypePreference, minecraftVersion)) {
+        return cached
+    }
+
+    return when (val full = fetchVersions()?.exactCompatibleVersion(versionNumber, channel, serverTypePreference, minecraftVersion)) {
+        null, ExactVersionSelection.NotFound -> cached
+        else -> full
+    }
+}
+
+private fun List<Version>.preferMinecraftVersion(minecraftVersion: String?): List<Version> {
+    val normalized = normalizeMinecraftVersion(minecraftVersion) ?: return this
+    val explicitMatches = filter { version -> version.explicitlySupportsMinecraftVersion(normalized) }
+    if (explicitMatches.isNotEmpty()) return explicitMatches
+
+    val unknownCompatibility = filter { version -> version.supportedMinecraftVersions.isEmpty() }
+    return unknownCompatibility.ifEmpty { this }
+}
+
+private fun Version.isSpecificMatch(serverTypePreference: List<ServerType>, minecraftVersion: String?): Boolean {
+    val exactServerType = bestServerTypeRank(serverTypePreference) == 0
+    val normalizedMinecraftVersion = normalizeMinecraftVersion(minecraftVersion)
+    return exactServerType && (normalizedMinecraftVersion == null || explicitlySupportsMinecraftVersion(normalizedMinecraftVersion))
+}
 
 // Detailed entry for a plugin on Modrinth
 class ModrinthPlatformEntry(
@@ -231,14 +284,25 @@ data class Version(
     val releaseChannel: String?,
     val downloadURL: String?,
     val supportedVersions: String?,
+    @SerializedName("mcVersions")
+    val mcVersions: List<String>? = null,
     val serverTypes: Array<ServerType>,
     val sha256: String?,
 ) {
+    val supportedMinecraftVersions: List<String>
+        get() = (extractMinecraftVersions(supportedVersions) + mcVersions.orEmpty().mapNotNull(::normalizeMinecraftVersion))
+            .distinct()
+
     val serverPlatforms: Set<ServerPlatform> get() = serverTypes?.map { it.platform }?.toSet() ?: throw NullPointerException("serverTypes array is null!")
     val isBukkitPaper get() = serverPlatforms.let { it.contains(ServerPlatform.BUKKIT) || it.contains(ServerPlatform.PAPER) }
 
     fun isCompatibleWith(serverTypePreference: List<ServerType>): Boolean =
         bestServerTypeRank(serverTypePreference) != Int.MAX_VALUE
+
+    fun explicitlySupportsMinecraftVersion(minecraftVersion: String?): Boolean {
+        val normalized = normalizeMinecraftVersion(minecraftVersion) ?: return false
+        return supportedMinecraftVersions.any { supported -> minecraftVersionsMatch(supported, normalized) }
+    }
 
     fun bestServerTypeRank(serverTypePreference: List<ServerType>): Int {
         val availableTypes = serverTypes.toSet()
@@ -257,6 +321,32 @@ data class Version(
 
         return Int.MAX_VALUE
     }
+}
+
+private val minecraftVersionPattern = Regex("""\b\d+\.\d+(?:\.\d+)?\b""")
+
+private fun extractMinecraftVersions(value: String?): List<String> =
+    value
+        ?.let { minecraftVersionPattern.findAll(it).mapNotNull { match -> normalizeMinecraftVersion(match.value) }.toList() }
+        ?: emptyList()
+
+private fun normalizeMinecraftVersion(value: String?): String? =
+    value
+        ?.let { minecraftVersionPattern.find(it)?.value }
+        ?.trim()
+        ?.takeIf { it.isNotEmpty() }
+
+private fun minecraftVersionsMatch(supported: String, target: String): Boolean {
+    if (supported == target) return true
+    val supportedParts = supported.split(".")
+    val targetParts = target.split(".")
+    if (supportedParts.size == 2 && targetParts.size >= 2) {
+        return supportedParts[0] == targetParts[0] && supportedParts[1] == targetParts[1]
+    }
+    if (targetParts.size == 2 && supportedParts.size >= 2) {
+        return supportedParts[0] == targetParts[0] && supportedParts[1] == targetParts[1]
+    }
+    return false
 }
 
 // Represents the file hashes for a version
