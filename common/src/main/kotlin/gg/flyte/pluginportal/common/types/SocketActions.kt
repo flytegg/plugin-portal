@@ -11,6 +11,7 @@ import gg.flyte.pluginportal.common.managers.PluginModificationManager
 import gg.flyte.pluginportal.common.notifications.DiscordWebhookNotifier
 import gg.flyte.pluginportal.common.types.enums.MarketplacePlatform
 import gg.flyte.pluginportal.common.util.ActionResponseString
+import gg.flyte.pluginportal.common.util.currentMinecraftVersion
 import gg.flyte.pluginportal.common.util.currentServerTypePreference
 import gg.flyte.pluginportal.common.util.download
 import net.kyori.adventure.audience.Audience
@@ -34,15 +35,11 @@ class SocketActions {
         val platformPlugin = plugin.platform(marketplacePlatform)
             ?: return@SocketAction PluginActionResponse(false, "Plugin not found on $marketplacePlatform")
         val serverTypes = currentServerTypePreference()
+        val minecraftVersion = currentMinecraftVersion()
         val version = if (versionNumber != null) {
-            val selection = platformPlugin.exactCompatibleVersion(versionNumber, channel, serverTypes)
-                .let { initial ->
-                    if (initial != ExactVersionSelection.NotFound) initial
-                    else API.getPluginVersions(platformPlugin.platformWithId)
-                        ?.toList()
-                        ?.exactCompatibleVersion(versionNumber, channel, serverTypes)
-                        ?: initial
-                }
+            val selection = platformPlugin.exactCompatibleVersionWithFallback(versionNumber, channel, serverTypes, minecraftVersion) {
+                API.getPluginVersions(platformPlugin.platformWithId)?.toList()
+            }
 
             when (selection) {
                 is ExactVersionSelection.Found -> selection.version
@@ -52,7 +49,7 @@ class SocketActions {
                     return@SocketAction PluginActionResponse(false, "No compatible version found for $versionNumber")
             }
         } else {
-            platformPlugin.newestCompatibleVersionWithFallback(channel, serverTypes) {
+            platformPlugin.newestCompatibleVersionWithFallback(channel, serverTypes, minecraftVersion) {
                 API.getPluginVersions(platformPlugin.platformWithId)?.toList()
             }
                 ?: return@SocketAction PluginActionResponse(false, "No compatible version found")
@@ -148,7 +145,8 @@ class SocketActions {
         val platformPlugin = marketplacePlugin.platform(targetPlatform)
             ?: return@SocketAction PluginActionResponse(false, "${marketplacePlugin.name} is not available on $targetPlatform")
         val serverTypes = currentServerTypePreference()
-        val version = platformPlugin.newestCompatibleVersionWithFallback(localPlugin.preferredChannel, serverTypes) {
+        val minecraftVersion = currentMinecraftVersion()
+        val version = platformPlugin.newestCompatibleVersionWithFallback(localPlugin.preferredChannel, serverTypes, minecraftVersion) {
             API.getPluginVersions(platformPlugin.platformWithId)?.toList()
         }
             ?: return@SocketAction PluginActionResponse(false, "No compatible version found")

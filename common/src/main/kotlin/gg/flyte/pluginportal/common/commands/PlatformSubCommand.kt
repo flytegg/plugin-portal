@@ -13,6 +13,7 @@ import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.newestCompatibleVersionWithFallback
 import gg.flyte.pluginportal.common.types.enums.MarketplacePlatform
 import gg.flyte.pluginportal.common.util.async
+import gg.flyte.pluginportal.common.util.currentMinecraftVersion
 import gg.flyte.pluginportal.common.util.currentServerTypePreference
 import gg.flyte.pluginportal.common.util.download
 import net.kyori.adventure.audience.Audience
@@ -71,7 +72,8 @@ class PlatformSubCommand {
                 ?: return audience.sendFailure("${marketplacePlugin.name} is not available on ${targetPlatform.name}.")
 
             val serverTypes = currentServerTypePreference()
-            val targetVersion = platformPlugin.newestCompatibleVersionWithFallback(localPlugin.preferredChannel, serverTypes) {
+            val minecraftVersion = currentMinecraftVersion()
+            val targetVersion = platformPlugin.newestCompatibleVersionWithFallback(localPlugin.preferredChannel, serverTypes, minecraftVersion) {
                 API.getPluginVersions(platformPlugin.platformWithId)?.toList()
             }
                 ?: return audience.sendFailure("No compatible version found on ${targetPlatform.name} for ${localPlugin.preferredChannel ?: "the default channel"}.")

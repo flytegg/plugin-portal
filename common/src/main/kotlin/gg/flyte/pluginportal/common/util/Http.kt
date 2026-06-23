@@ -61,7 +61,7 @@ fun Plugin.download(
     val targetDir = if (update) Constants.UPDATE_DIRECTORY else Constants.INSTALL_DIRECTORY
     val jarFile = File(targetDir, getFullDownloadedName(platform))
     val version = version
-        ?: platformPlugin.newestCompatibleVersion(preferredChannel, currentServerTypePreference())
+        ?: platformPlugin.newestCompatibleVersion(preferredChannel, currentServerTypePreference(), currentMinecraftVersion())
         ?: run {
             audience.logFailure(
                 "No compatible version found for ${preferredChannel ?: "the default channel"}",

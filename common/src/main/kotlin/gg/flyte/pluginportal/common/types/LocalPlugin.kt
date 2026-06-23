@@ -5,6 +5,7 @@ import gg.flyte.pluginportal.common.PlatformId
 import gg.flyte.pluginportal.common.PluginPortalBase
 import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
 import gg.flyte.pluginportal.common.types.enums.MarketplacePlatform
+import gg.flyte.pluginportal.common.util.currentMinecraftVersion
 import gg.flyte.pluginportal.common.util.currentServerTypePreference
 
 /** Represents a plugin that is installed on the local server. */
@@ -27,28 +28,31 @@ data class LocalPlugin(
         ?: MarketplacePluginCache.getOrFetchPluginById(platform, platformId)
         ?: throw LocalPluginException(1, "Could not retrieve plugin")
 
-    private val serverPlatform get() = marketplacePlugin.platform(platform) ?: throw LocalPluginException(2, "Could not retrieve platform/versions")
-    private val serverTypedVersions get() = serverPlatform.compatibleVersions(currentServerTypePreference())
-
     val isUpToDate: Boolean get() {
-        if (serverTypedVersions.isEmpty()) {
+        val target = targetUpdateVersion()
+        if (target == null) {
             PluginPortalBase.plugin.logger.warning("No compatible versions for $name ($platform $platformId)")
             return false
         }
-        val target = targetUpdateVersion() ?: return false
         return matchesVersion(target)
     }
 
     fun targetUpdateVersion(plugin: Plugin = marketplacePlugin): Version? {
         val platformPlugin = plugin.platform(platform) ?: return null
         val serverTypes = currentServerTypePreference()
-        val cachedTarget = platformPlugin.newestCompatibleVersion(preferredChannel, serverTypes)
+        val minecraftVersion = currentMinecraftVersion()
+        val cachedTarget = platformPlugin.newestCompatibleVersion(preferredChannel, serverTypes, minecraftVersion)
 
-        if (cachedTarget != null && !matchesVersion(cachedTarget)) return cachedTarget
+        if (
+            cachedTarget != null
+            && !matchesVersion(cachedTarget)
+            && cachedTarget.bestServerTypeRank(serverTypes) == 0
+            && (minecraftVersion == null || cachedTarget.explicitlySupportsMinecraftVersion(minecraftVersion))
+        ) return cachedTarget
 
         val fullTarget = API.getPluginVersions(platformPlugin.platformWithId)
             ?.toList()
-            ?.newestCompatibleVersion(preferredChannel, serverTypes)
+            ?.newestCompatibleVersion(preferredChannel, serverTypes, minecraftVersion)
 
         return fullTarget ?: cachedTarget
     }
