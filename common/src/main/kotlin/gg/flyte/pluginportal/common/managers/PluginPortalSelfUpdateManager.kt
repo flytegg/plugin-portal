@@ -3,6 +3,7 @@ package gg.flyte.pluginportal.common.managers
 import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.common.types.Version
+import gg.flyte.pluginportal.common.types.newestCompatibleVersionWithFallback
 import gg.flyte.pluginportal.common.util.PP_PLUGIN_ID
 import gg.flyte.pluginportal.common.util.currentMinecraftVersion
 import gg.flyte.pluginportal.common.util.currentServerTypePreference
@@ -29,7 +30,11 @@ object PluginPortalSelfUpdateManager {
     fun findMarketplaceTarget(channel: String? = null): AvailableUpdate? {
         val plugin = fetchCanonicalPlugin() ?: return null
         val platform = plugin.platforms.bestDownloadable ?: return null
-        val targetVersion = platform.newestCompatibleVersion(normalizeChannel(channel), currentServerTypePreference(), currentMinecraftVersion()) ?: return null
+        val serverTypes = currentServerTypePreference()
+        val minecraftVersion = currentMinecraftVersion()
+        val targetVersion = platform.newestCompatibleVersionWithFallback(normalizeChannel(channel), serverTypes, minecraftVersion) {
+            API.getPluginVersions(platform.platformWithId)?.toList()
+        } ?: return null
         return AvailableUpdate(plugin, targetVersion)
     }
 
