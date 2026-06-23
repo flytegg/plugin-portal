@@ -91,6 +91,19 @@ class VersionSelectionTest {
     }
 
     @Test
+    fun `falls back to full version list when cached marketplace slice is empty`() {
+        val platform = platformEntry(versions = emptyList())
+
+        val selected = platform.newestCompatibleVersionWithFallback("release", listOf(ServerType.PAPER, ServerType.SPIGOT, ServerType.BUKKIT)) {
+            listOf(
+                version("1.0.0-paper", "2026-06-01T00:00:00Z", ServerType.PAPER)
+            )
+        }
+
+        assertEquals("1.0.0-paper", selected?.versionNumber)
+    }
+
+    @Test
     fun `prefers current minecraft version over newer wrong-version builds`() {
         val versions = listOf(
             version("2.0.0", "2026-06-02T00:00:00Z", ServerType.PAPER, minecraftVersions = listOf("1.20.6")),

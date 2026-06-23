@@ -1,6 +1,7 @@
 package gg.flyte.pluginportal.common.util
 
 import gg.flyte.pluginportal.common.AuthCreds
+import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.Config
 import gg.flyte.pluginportal.common.Constants
 import gg.flyte.pluginportal.common.PluginPortalBase
@@ -12,6 +13,7 @@ import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.common.types.PolymartPlatformEntry
 import gg.flyte.pluginportal.common.types.Version
+import gg.flyte.pluginportal.common.types.newestCompatibleVersionWithFallback
 import gg.flyte.pluginportal.common.types.enums.MarketplacePlatform
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.text
@@ -60,8 +62,12 @@ fun Plugin.download(
     }
     val targetDir = if (update) Constants.UPDATE_DIRECTORY else Constants.INSTALL_DIRECTORY
     val jarFile = File(targetDir, getFullDownloadedName(platform))
+    val serverTypes = currentServerTypePreference()
+    val minecraftVersion = currentMinecraftVersion()
     val version = version
-        ?: platformPlugin.newestCompatibleVersion(preferredChannel, currentServerTypePreference(), currentMinecraftVersion())
+        ?: platformPlugin.newestCompatibleVersionWithFallback(preferredChannel, serverTypes, minecraftVersion) {
+            API.getPluginVersions(platformPlugin.platformWithId)?.toList()
+        }
         ?: run {
             audience.logFailure(
                 "No compatible version found for ${preferredChannel ?: "the default channel"}",

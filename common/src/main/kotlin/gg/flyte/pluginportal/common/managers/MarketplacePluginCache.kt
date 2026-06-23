@@ -10,6 +10,7 @@ import gg.flyte.pluginportal.common.chat.sendFailure
 import gg.flyte.pluginportal.common.logging.PortalLogger
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.Plugin
+import gg.flyte.pluginportal.common.types.newestCompatibleVersionWithFallback
 import gg.flyte.pluginportal.common.types.enums.MarketplacePlatform
 import gg.flyte.pluginportal.common.util.*
 import net.kyori.adventure.audience.Audience
@@ -137,12 +138,19 @@ object MarketplacePluginCache: PluginCache<Plugin>() {
         }
 
         val platformPlugin = plugin.platform(platform) ?: return ActionResponseString(false, "No platform plugin found")
-        val latestVersion = platformPlugin.newestCompatibleVersion(null, currentServerTypePreference(), currentMinecraftVersion())
+        val serverTypes = currentServerTypePreference()
+        val minecraftVersion = currentMinecraftVersion()
+        val latestVersion = platformPlugin.newestCompatibleVersionWithFallback(null, serverTypes, minecraftVersion) {
+            API.getPluginVersions(platformPlugin.platformWithId)?.toList()
+        }
             ?: return ActionResponseString(false, "No compatible version found for platform ${platform.name}")
 
-        val downloadURL = latestVersion.downloadURL ?: return ActionResponseString(false, "No download URL found for platform ${platform.name}")
+        val downloadURL = latestVersion.downloadURL
+        if (downloadURL == null && platform != MarketplacePlatform.POLYMART) {
+            return ActionResponseString(false, "No download URL found for platform ${platform.name}")
+        }
 
-        if (!isValidDownload(downloadURL)) {
+        if (downloadURL != null && !isValidDownload(downloadURL)) {
             val errorMsg = when {
                 downloadURL.contains("/versions") || downloadURL.contains("/releases") ->
                     "This plugin uses an external download page instead of a direct download. Please download it manually from: $downloadURL"
@@ -159,7 +167,13 @@ object MarketplacePluginCache: PluginCache<Plugin>() {
         val targetMessage = "${plugin.name} from ${platform.name} with ID ${plugin.id}"
         PortalLogger.log(audience, PortalLogger.Action.INITIATED_INSTALL, targetMessage)
 
-        val newPlugin = plugin.download(false, platform, audience)
+        val newPlugin = plugin.download(
+            false,
+            platform,
+            audience,
+            version = latestVersion,
+            preferredChannel = latestVersion.releaseChannel,
+        )
         return if (newPlugin != null) {
             PortalLogger.log(audience, PortalLogger.Action.INSTALL, targetMessage)
             ActionResponseString(true, "Downloaded ${plugin.name} from ${platform.name}.", newPlugin)
