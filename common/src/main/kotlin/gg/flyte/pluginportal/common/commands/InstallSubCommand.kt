@@ -13,6 +13,8 @@ import gg.flyte.pluginportal.common.commands.lamp.ReleaseChannelSuggestionProvid
 import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
 import gg.flyte.pluginportal.common.types.ExactVersionSelection
 import gg.flyte.pluginportal.common.types.exactCompatibleVersion
+import gg.flyte.pluginportal.common.types.newestCompatibleVersion
+import gg.flyte.pluginportal.common.types.newestCompatibleVersionWithFallback
 import gg.flyte.pluginportal.common.types.enums.MarketplacePlatform
 import gg.flyte.pluginportal.common.util.SharedComponents
 import gg.flyte.pluginportal.common.util.async
@@ -68,14 +70,15 @@ class InstallSubCommand {
                         return@async
                     }
 
+                    val serverTypes = currentServerTypePreference()
                     val exactVersionNumber = versionNumber?.takeIf { it.isNotBlank() }
                     val targetVersion = if (exactVersionNumber != null) {
-                        val selection = targetPlatform.exactCompatibleVersion(exactVersionNumber, targetChannel, currentServerTypePreference())
+                        val selection = targetPlatform.exactCompatibleVersion(exactVersionNumber, targetChannel, serverTypes)
                             .let { initial ->
                                 if (initial != ExactVersionSelection.NotFound) initial
                                 else API.getPluginVersions(targetPlatform.platformWithId)
                                     ?.toList()
-                                    ?.exactCompatibleVersion(exactVersionNumber, targetChannel, currentServerTypePreference())
+                                    ?.exactCompatibleVersion(exactVersionNumber, targetChannel, serverTypes)
                                     ?: initial
                             }
 
@@ -91,7 +94,9 @@ class InstallSubCommand {
                             }
                         }
                     } else {
-                        targetPlatform.newestCompatibleVersion(targetChannel, currentServerTypePreference())
+                        targetPlatform.newestCompatibleVersionWithFallback(targetChannel, serverTypes) {
+                            API.getPluginVersions(targetPlatform.platformWithId)?.toList()
+                        }
                     }
 
                     if (targetVersion == null) {

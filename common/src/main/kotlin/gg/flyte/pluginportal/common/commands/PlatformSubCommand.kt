@@ -1,5 +1,6 @@
 package gg.flyte.pluginportal.common.commands
 
+import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.Config
 import gg.flyte.pluginportal.common.chat.*
 import gg.flyte.pluginportal.common.commands.lamp.EnabledCommand
@@ -9,6 +10,7 @@ import gg.flyte.pluginportal.common.managers.LocalPluginCache
 import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
 import gg.flyte.pluginportal.common.notifications.DiscordWebhookNotifier
 import gg.flyte.pluginportal.common.types.LocalPlugin
+import gg.flyte.pluginportal.common.types.newestCompatibleVersionWithFallback
 import gg.flyte.pluginportal.common.types.enums.MarketplacePlatform
 import gg.flyte.pluginportal.common.util.async
 import gg.flyte.pluginportal.common.util.currentServerTypePreference
@@ -68,7 +70,10 @@ class PlatformSubCommand {
             val platformPlugin = marketplacePlugin.platform(targetPlatform)
                 ?: return audience.sendFailure("${marketplacePlugin.name} is not available on ${targetPlatform.name}.")
 
-            val targetVersion = platformPlugin.newestCompatibleVersion(localPlugin.preferredChannel, currentServerTypePreference())
+            val serverTypes = currentServerTypePreference()
+            val targetVersion = platformPlugin.newestCompatibleVersionWithFallback(localPlugin.preferredChannel, serverTypes) {
+                API.getPluginVersions(platformPlugin.platformWithId)?.toList()
+            }
                 ?: return audience.sendFailure("No compatible version found on ${targetPlatform.name} for ${localPlugin.preferredChannel ?: "the default channel"}.")
 
             audience.sendInfo("Switching ${localPlugin.name} from ${localPlugin.platform.name} to ${targetPlatform.name}...")

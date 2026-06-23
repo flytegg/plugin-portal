@@ -70,6 +70,26 @@ class VersionSelectionTest {
         assertEquals("1.0.0-paper", selected?.versionNumber)
     }
 
+    @Test
+    fun `falls back to full version list when cached marketplace slice has no compatible version`() {
+        val platform = platformEntry(
+            versions = listOf(
+                version("v5.5.57-neoforge", "2026-06-18T21:16:30Z", ServerType.NEOFORGE),
+                version("v5.5.57-fabric", "2026-06-18T21:16:14Z", ServerType.FABRIC),
+                version("v5.5.57-forge", "2026-06-18T21:15:58Z", ServerType.FORGE),
+                version("v5.5.53-velocity", "2026-05-27T07:14:53Z", ServerType.VELOCITY),
+            )
+        )
+
+        val selected = platform.newestCompatibleVersionWithFallback("release", listOf(ServerType.PAPER, ServerType.SPIGOT, ServerType.BUKKIT)) {
+            listOf(
+                version("v5.5.53-bukkit", "2026-05-27T07:14:37Z", ServerType.BUKKIT, ServerType.SPIGOT, ServerType.PAPER)
+            )
+        }
+
+        assertEquals("v5.5.53-bukkit", selected?.versionNumber)
+    }
+
     private fun version(
         versionNumber: String,
         releasedAt: String,
@@ -83,5 +103,19 @@ class VersionSelectionTest {
         supportedVersions = null,
         serverTypes = arrayOf(*serverTypes),
         sha256 = null,
+    )
+
+    private fun platformEntry(versions: List<Version>) = ModrinthPlatformEntry(
+        entryId = "entry",
+        platform = gg.flyte.pluginportal.common.types.enums.MarketplacePlatform.MODRINTH,
+        platformId = "luckperms",
+        author = "lucko",
+        description = null,
+        iconURL = null,
+        downloads = 0,
+        lastModified = null,
+        versions = versions,
+        followers = 0,
+        lastSynced = Date.from(Instant.parse("2026-06-18T21:16:30Z")),
     )
 }
