@@ -146,6 +146,14 @@ fun List<Version>.newestCompatibleVersion(channel: String?, serverTypePreference
         .filter { version -> channel == null || version.releaseChannel.equals(channel, ignoreCase = true) }
         .bestCompatibleVersion(serverTypePreference)
 
+fun PlatformPlugin.newestCompatibleVersionWithFallback(
+    channel: String?,
+    serverTypePreference: List<ServerType>,
+    fetchVersions: () -> List<Version>?
+): Version? =
+    newestCompatibleVersion(channel, serverTypePreference)
+        ?: fetchVersions()?.newestCompatibleVersion(channel, serverTypePreference)
+
 // Detailed entry for a plugin on Modrinth
 class ModrinthPlatformEntry(
     entryId: String,
