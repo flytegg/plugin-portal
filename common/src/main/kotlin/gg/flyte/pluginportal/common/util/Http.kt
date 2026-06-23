@@ -10,9 +10,9 @@ import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
 import gg.flyte.pluginportal.common.notifications.DiscordWebhookNotifier
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.Plugin
+import gg.flyte.pluginportal.common.types.PolymartPlatformEntry
 import gg.flyte.pluginportal.common.types.Version
 import gg.flyte.pluginportal.common.types.enums.MarketplacePlatform
-import gg.flyte.pluginportal.common.util.currentServerTypePreference
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.text
 import java.io.File
@@ -75,7 +75,19 @@ fun Plugin.download(
         return null
     }
 
-    val downloadUrl = version.downloadURL
+    val downloadUrl = version.downloadURL ?: if (platform == MarketplacePlatform.POLYMART) {
+        val polymart = platformPlugin as? PolymartPlatformEntry
+        if (polymart?.premium != null) {
+            audience.logFailure(
+                "Downloading premium Polymart plugins is currently not supported.",
+                "Unable to download premium Polymart plugin $name (${platformPlugin.platformId})"
+            )
+            return null
+        }
+        getPolymartDownloadUrl(platformPlugin.platformId)
+    } else {
+        null
+    }
 
     if (downloadUrl == null) {
         audience.logFailure("""
@@ -86,7 +98,7 @@ fun Plugin.download(
     }
 
     val file = download(
-        URL(version.downloadURL),
+        URL(downloadUrl),
         jarFile,
         audience
     ) ?: return null
