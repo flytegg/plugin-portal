@@ -137,7 +137,7 @@ object MarketplacePluginCache: PluginCache<Plugin>() {
         }
 
         val platformPlugin = plugin.platform(platform) ?: return ActionResponseString(false, "No platform plugin found")
-        val latestVersion = platformPlugin.newestCompatibleVersion(null, currentServerTypePreference())
+        val latestVersion = platformPlugin.newestCompatibleVersion(null, currentServerTypePreference(), currentMinecraftVersion())
             ?: return ActionResponseString(false, "No compatible version found for platform ${platform.name}")
 
         val downloadURL = latestVersion.downloadURL ?: return ActionResponseString(false, "No download URL found for platform ${platform.name}")

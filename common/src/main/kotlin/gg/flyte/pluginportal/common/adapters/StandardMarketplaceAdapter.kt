@@ -1,11 +1,13 @@
 package gg.flyte.pluginportal.common.adapters
 
 import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
+import gg.flyte.pluginportal.common.types.compatibleVersions
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.common.types.Version
 import gg.flyte.pluginportal.common.types.PlatformPlugin
 import gg.flyte.pluginportal.common.util.ActionResponseString
 import gg.flyte.pluginportal.common.util.HashType
+import gg.flyte.pluginportal.common.util.currentMinecraftVersion
 import gg.flyte.pluginportal.common.util.currentServerTypePreference
 import java.io.File
 
@@ -18,6 +20,8 @@ class StandardMarketplaceAdapter : DownloadAdapter {
     
     override fun download(request: DownloadRequest): DownloadResult {
         val plugin = request.plugin ?: return DownloadResult(false, error = "No plugin provided")
+        val serverTypes = currentServerTypePreference()
+        val minecraftVersion = currentMinecraftVersion()
         
         // Find the right version based on versionFilter (channel)
         val platformVersion = if (request.versionFilter != null) { // TODO: Pass this work onto the endpoint
@@ -26,14 +30,15 @@ class StandardMarketplaceAdapter : DownloadAdapter {
                 .filter { gg.flyte.pluginportal.common.Config.isDownloadPlatformEnabled(it.platform) }
                 .flatMap { platform -> 
                     platform.versions
-                        .filter { version -> version.releaseChannel.equals(request.versionFilter, ignoreCase = true) && version.isCompatibleWith(currentServerTypePreference()) } // TODO: Probably pass this to the endpoint as well
+                        .compatibleVersions(serverTypes, minecraftVersion)
+                        .filter { version -> version.releaseChannel.equals(request.versionFilter, ignoreCase = true) } // TODO: Probably pass this to the endpoint as well
                         .map { version -> platform to version }
                 }
                 .firstOrNull() // Get the first (newest) version matching the channel
         } else {
             // Default to latest version from best platform
             plugin.platforms.bestDownloadable?.let { platform ->
-                platform.newestCompatibleVersion(null, currentServerTypePreference())?.let { version -> platform to version }
+                platform.newestCompatibleVersion(null, serverTypes, minecraftVersion)?.let { version -> platform to version }
             }
         }
         

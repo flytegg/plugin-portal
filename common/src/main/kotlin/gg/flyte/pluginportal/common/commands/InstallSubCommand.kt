@@ -12,12 +12,12 @@ import gg.flyte.pluginportal.common.commands.lamp.MarketplacePluginSuggestionPro
 import gg.flyte.pluginportal.common.commands.lamp.ReleaseChannelSuggestionProvider
 import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
 import gg.flyte.pluginportal.common.types.ExactVersionSelection
-import gg.flyte.pluginportal.common.types.exactCompatibleVersion
-import gg.flyte.pluginportal.common.types.newestCompatibleVersion
+import gg.flyte.pluginportal.common.types.exactCompatibleVersionWithFallback
 import gg.flyte.pluginportal.common.types.newestCompatibleVersionWithFallback
 import gg.flyte.pluginportal.common.types.enums.MarketplacePlatform
 import gg.flyte.pluginportal.common.util.SharedComponents
 import gg.flyte.pluginportal.common.util.async
+import gg.flyte.pluginportal.common.util.currentMinecraftVersion
 import gg.flyte.pluginportal.common.util.currentServerTypePreference
 import gg.flyte.pluginportal.common.util.download
 import net.kyori.adventure.audience.Audience
@@ -71,16 +71,12 @@ class InstallSubCommand {
                     }
 
                     val serverTypes = currentServerTypePreference()
+                    val minecraftVersion = currentMinecraftVersion()
                     val exactVersionNumber = versionNumber?.takeIf { it.isNotBlank() }
                     val targetVersion = if (exactVersionNumber != null) {
-                        val selection = targetPlatform.exactCompatibleVersion(exactVersionNumber, targetChannel, serverTypes)
-                            .let { initial ->
-                                if (initial != ExactVersionSelection.NotFound) initial
-                                else API.getPluginVersions(targetPlatform.platformWithId)
-                                    ?.toList()
-                                    ?.exactCompatibleVersion(exactVersionNumber, targetChannel, serverTypes)
-                                    ?: initial
-                            }
+                        val selection = targetPlatform.exactCompatibleVersionWithFallback(exactVersionNumber, targetChannel, serverTypes, minecraftVersion) {
+                            API.getPluginVersions(targetPlatform.platformWithId)?.toList()
+                        }
 
                         when (selection) {
                             is ExactVersionSelection.Found -> selection.version
@@ -94,7 +90,7 @@ class InstallSubCommand {
                             }
                         }
                     } else {
-                        targetPlatform.newestCompatibleVersionWithFallback(targetChannel, serverTypes) {
+                        targetPlatform.newestCompatibleVersionWithFallback(targetChannel, serverTypes, minecraftVersion) {
                             API.getPluginVersions(targetPlatform.platformWithId)?.toList()
                         }
                     }

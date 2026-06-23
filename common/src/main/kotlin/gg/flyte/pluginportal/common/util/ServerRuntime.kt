@@ -19,9 +19,21 @@ fun currentServerTypePreference(): List<ServerType> {
     }
 }
 
+fun currentMinecraftVersion(): String? =
+    normalizeMinecraftVersion(runCatching { Bukkit.getServer().bukkitVersion }.getOrNull())
+        ?: normalizeMinecraftVersion(runCatching { Bukkit.getServer().version }.getOrNull())
+
 private fun isPaperServer(descriptor: String): Boolean =
     "paper" in descriptor || runCatching {
         Class.forName("com.destroystokyo.paper.PaperConfig")
     }.isSuccess || runCatching {
         Class.forName("io.papermc.paper.configuration.Configuration")
     }.isSuccess
+
+private val minecraftVersionPattern = Regex("""\b\d+\.\d+(?:\.\d+)?\b""")
+
+private fun normalizeMinecraftVersion(value: String?): String? =
+    value
+        ?.let { minecraftVersionPattern.find(it)?.value }
+        ?.trim()
+        ?.takeIf { it.isNotEmpty() }
