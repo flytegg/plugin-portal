@@ -8,6 +8,7 @@ import { spawn } from "node:child_process";
 import { pipeline } from "node:stream/promises";
 
 type RuntimeId =
+  | "paper-26.2-java26"
   | "paper-1.21.11-java21"
   | "paper-1.21.11-java25"
   | "leaf-26.2-java25"
@@ -39,7 +40,7 @@ type Runtime = {
   id: RuntimeId;
   type: string;
   version: string;
-  java: 21 | 25;
+  java: 21 | 25 | 26;
   build?: number;
   required: boolean;
 };
@@ -62,6 +63,7 @@ type Result = {
 const root = process.cwd();
 const cacheDir = join(root, ".cache", "mcjars");
 const runtimes: Runtime[] = [
+  { id: "paper-26.2-java26", type: "paper", version: "26.2", java: 26, build: 34, required: true },
   { id: "paper-1.21.11-java21", type: "paper", version: "1.21.11", java: 21, required: true },
   { id: "paper-1.21.11-java25", type: "paper", version: "1.21.11", java: 25, required: true },
   { id: "leaf-26.2-java25", type: "leaf", version: "26.2", java: 25, build: 2, required: true },
@@ -295,7 +297,7 @@ async function startServer(runtime: Runtime, serverJar: string, plugins: string[
     await writeFile(join(dir, "plugins", "PluginPortal", "config.yml"), `Authentication:\n  ApiKey: "${options.apiKey}"\n`);
   }
 
-  const image = runtime.java === 25 ? "eclipse-temurin:25-jre" : "eclipse-temurin:21-jre";
+  const image = runtime.java === 26 ? "eclipse-temurin:26-jre" : runtime.java === 25 ? "eclipse-temurin:25-jre" : "eclipse-temurin:21-jre";
   const child = spawn("docker", [
     "run",
     "--rm",
