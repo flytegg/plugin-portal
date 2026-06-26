@@ -439,9 +439,15 @@ async function assertNoPluginPortalCrash(run: ServerRun) {
 }
 
 async function assertJarVersion(path: string, version: string) {
-  const output = await capture(["unzip", "-p", path, "plugin.yml"]);
-  if (!new RegExp(`^version:\\s*${escapeRegExp(version)}\\s*$`, "m").test(output)) {
-    throw new Error(`${path} does not contain plugin.yml version ${version}`);
+  const dir = await mkdtemp(join(tmpdir(), "pp-jar-"));
+  try {
+    await capture(["jar", "xf", path, "plugin.yml"], dir);
+    const output = await readFile(join(dir, "plugin.yml"), "utf8");
+    if (!new RegExp(`^version:\\s*${escapeRegExp(version)}\\s*$`, "m").test(output)) {
+      throw new Error(`${path} does not contain plugin.yml version ${version}`);
+    }
+  } finally {
+    await rm(dir, { recursive: true, force: true });
   }
 }
 
@@ -479,8 +485,8 @@ async function fetchJson<T>(url: string): Promise<T> {
   return response.json() as Promise<T>;
 }
 
-async function capture(command: string[]) {
-  const proc = spawn(command[0], command.slice(1), { cwd: root, stdio: ["ignore", "pipe", "pipe"] });
+async function capture(command: string[], cwd = root) {
+  const proc = spawn(command[0], command.slice(1), { cwd, stdio: ["ignore", "pipe", "pipe"] });
   let output = "";
   proc.stdout.on("data", (chunk) => (output += chunk.toString()));
   proc.stderr.on("data", (chunk) => (output += chunk.toString()));
