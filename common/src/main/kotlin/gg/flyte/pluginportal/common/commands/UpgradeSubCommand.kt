@@ -10,6 +10,7 @@ import gg.flyte.pluginportal.common.managers.PluginPortalSelfUpdateManager.Avail
 import gg.flyte.pluginportal.common.notifications.DiscordWebhookNotifier
 import gg.flyte.pluginportal.common.types.Version
 import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
@@ -102,38 +103,37 @@ class UpgradeSubCommand {
         requestedChannel: String,
         versions: List<LatestVersion>
     ) {
-        val messageBuilder = text()
+        var message = Component.empty()
         
         // Header
-        messageBuilder.append(startLine())
-        messageBuilder.append(
+        message = message.append(startLine())
+        message = message.append(
             centerComponentLine(
                 text("Plugin Portal Upgrade", AQUA, TextDecoration.BOLD)
             )
         )
-        messageBuilder.appendNewline()
+        message = message.appendNewline()
         
         // Current version
-        messageBuilder.append(
+        message = message.append(
             centerComponentLine(
-                text()
+                Component.empty()
                     .append(text("Current Version: ", GRAY))
                     .append(text(currentVersion.substringBefore("-"), WHITE))
                     .append(text(" (", DARK_GRAY))
                     .append(text(currentChannel.uppercase(), getChannelColor(currentChannel)))
                     .append(text(")", DARK_GRAY))
-                    .build()
             )
         )
-        messageBuilder.appendNewline()
+        message = message.appendNewline()
         
         // Available updates header
-        messageBuilder.append(
+        message = message.append(
             centerComponentLine(
                 text("Available Updates:", YELLOW)
             )
         )
-        messageBuilder.appendNewline()
+        message = message.appendNewline()
         
         // List each available version
         versions.sortedByDescending { getChannelPriority(it.channel) }.forEach { version ->
@@ -144,24 +144,24 @@ class UpgradeSubCommand {
             }
             
             // Version header with arrow
-            messageBuilder.append(text("  ", DARK_GRAY))
-            messageBuilder.append(text("→ ", GOLD))
-            messageBuilder.append(text(version.version, WHITE, TextDecoration.BOLD))
-            messageBuilder.append(text(" (", DARK_GRAY))
-            messageBuilder.append(text(version.channel.uppercase(), getChannelColor(version.channel)))
-            messageBuilder.append(text(")", DARK_GRAY))
-            messageBuilder.appendNewline()
+            message = message.append(text("  ", DARK_GRAY))
+            message = message.append(text("→ ", GOLD))
+            message = message.append(text(version.version, WHITE, TextDecoration.BOLD))
+            message = message.append(text(" (", DARK_GRAY))
+            message = message.append(text(version.channel.uppercase(), getChannelColor(version.channel)))
+            message = message.append(text(")", DARK_GRAY))
+            message = message.appendNewline()
             
             // Changelog if available
             val changelog = version.changelog
             if (changelog != null) {
                 changelog.split("\n").forEach { line ->
-                    messageBuilder.append(text("    ", DARK_GRAY))
-                    messageBuilder.append(text(line, GRAY))
-                    messageBuilder.appendNewline()
+                    message = message.append(text("    ", DARK_GRAY))
+                    message = message.append(text(line, GRAY))
+                    message = message.appendNewline()
                 }
             }
-            messageBuilder.appendNewline()
+            message = message.appendNewline()
         }
         
         // Upgrade button for the latest stable or specified channel
@@ -171,19 +171,18 @@ class UpgradeSubCommand {
         
         if (audience.isConsole()) {
             // For console, show the command to run
-            messageBuilder.append(
+            message = message.append(
                 centerComponentLine(
-                    text()
+                    Component.empty()
                         .append(text("To upgrade, run: ", GRAY))
                         .append(text(upgradeCommand, GREEN, TextDecoration.BOLD))
-                        .build()
                 )
             )
         } else {
             // For players, show clickable button
-            messageBuilder.append(
+            message = message.append(
                 centerComponentLine(
-                    text()
+                    Component.empty()
                         .append(text("[", DARK_GRAY))
                         .append(
                             text("CLICK TO UPGRADE TO ${recommendedVersion.version}", GREEN, TextDecoration.UNDERLINED)
@@ -191,22 +190,21 @@ class UpgradeSubCommand {
                                 .hoverEvent(HoverEvent.showText(text("Run $upgradeCommand", GREEN)))
                         )
                         .append(text("]", DARK_GRAY))
-                        .build()
                 )
             )
         }
-        messageBuilder.appendNewline()
+        message = message.appendNewline()
         
-        messageBuilder.append(endLine())
+        message = message.append(endLine())
         
-        audience.sendMessage(messageBuilder.build())
+        audience.sendMessage(message)
     }
     
     private fun performMarketplaceUpgrade(audience: Audience, update: AvailableUpdate) {
         val versionString = update.versionString
         
         audience.sendMessage(
-            text()
+            Component.empty()
                 .append(startLine())
                 .append(text("[PluginPortal] ", DARK_GRAY))
                 .append(text("Starting upgrade to ", GRAY))
@@ -214,7 +212,6 @@ class UpgradeSubCommand {
                 .append(text("...", GRAY))
                 .appendNewline()
                 .append(endLine())
-                .build()
         )
         
         try {
@@ -258,7 +255,7 @@ class UpgradeSubCommand {
 
     private fun sendUpgradeSuccess(audience: Audience, versionString: String) {
         audience.sendMessage(
-            text()
+            Component.empty()
                 .append(startLine())
                 .append(text("[SUCCESS] ", GREEN, TextDecoration.BOLD))
                 .append(text("Plugin Portal has been upgraded to ", GRAY))
@@ -269,7 +266,6 @@ class UpgradeSubCommand {
                 .append(text("Please restart your server to apply the update.", YELLOW))
                 .appendNewline()
                 .append(endLine())
-                .build()
         )
     }
     
