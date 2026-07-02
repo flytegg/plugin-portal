@@ -31,10 +31,10 @@ fun endLine() = solidLine(prefix = "\n", suffix = "")
 fun TextComponent.Builder.appendStartLine() = append(startLine())
 fun TextComponent.Builder.appendEndLine() = append(endLine())
 
-fun Component.boxed() = text()
-    .appendStartLine()
+fun Component.boxed(): Component = Component.empty()
+    .append(startLine())
     .append(this)
-    .appendEndLine()
+    .append(endLine())
 
 
 fun status(status: Status, text: String): TextComponent = text("[${status.name}]: ", status.color)

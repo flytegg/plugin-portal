@@ -8,6 +8,7 @@ import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Subcommand
 import revxrsal.commands.bukkit.annotation.CommandPermission
 import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
@@ -43,11 +44,12 @@ class VersionSubCommand {
             try {
                 val updateCheck = API.checkForPPUpdate(currentVersion)
             
-                // Build the message
-                val messageBuilder = text()
+                // Build the message without TextComponent.Builder.build(), whose JVM
+                // signature differs between Adventure 4 and 5.
+                var message = Component.empty()
                 
                 // Header
-                messageBuilder.append(
+                message = message.append(
                     centerComponentLine(
                         text("Plugin Portal Info", AQUA, TextDecoration.BOLD)
                     )
@@ -65,9 +67,9 @@ class VersionSubCommand {
                         else -> GRAY
                     }
                     
-                    messageBuilder.append(
+                    message = message.append(
                         centerComponentLine(
-                            text()
+                            Component.empty()
                                 .append(text("Current: ", GRAY))
                                 .append(text(baseVersion, WHITE))
                                 .append(text(" (", DARK_GRAY))
@@ -79,28 +81,26 @@ class VersionSubCommand {
                                 .append(text(" (", DARK_GRAY))
                                 .append(text(latest.channel.uppercase(), latestChannelColor))
                                 .append(text(")", DARK_GRAY))
-                                .build()
                         )
                     )
                 } else {
-                    messageBuilder.append(
+                    message = message.append(
                         centerComponentLine(
-                            text()
+                            Component.empty()
                                 .append(text("Version: ", GRAY))
                                 .append(text(baseVersion, WHITE))
                                 .append(text(" (", DARK_GRAY))
                                 .append(text(currentChannel.uppercase(), channelColor))
                                 .append(text(")", DARK_GRAY))
-                                .build()
                         )
                     )
                 }
-                .appendNewline()
+                message = message.appendNewline()
                 
                 // Artifact and entitlement on same line
-                messageBuilder.append(
+                message = message.append(
                     centerComponentLine(
-                        text()
+                        Component.empty()
                             .append(text("Artifact: ", GRAY))
                             .append(text("PluginPortal", WHITE))
                             .append(text("  |  ", DARK_GRAY))
@@ -109,7 +109,6 @@ class VersionSubCommand {
                                 if (PluginPortalBase.info.hasPremiumEntitlement()) "Unlocked" else "Locked",
                                 if (PluginPortalBase.info.hasPremiumEntitlement()) GREEN else RED
                             ))
-                            .build()
                     )
                 )
                 
@@ -117,10 +116,10 @@ class VersionSubCommand {
                 if (updateCheck != null) {
                     if (updateCheck.updateAvailable && updateCheck.latest != null) {
                         if (!Features.AUTOMATICALLY_UPDATE_PPP.isEnabled()) {
-                            messageBuilder.appendNewline()
+                            message = message.appendNewline()
                             .append(
                                 centerComponentLine(
-                                    text()
+                                    Component.empty()
                                         .append(text("[", DARK_GRAY))
                                         .append(
                                             text("CLICK TO UPDATE", GREEN, TextDecoration.UNDERLINED)
@@ -128,7 +127,6 @@ class VersionSubCommand {
                                                 .hoverEvent(HoverEvent.showText(text("Run /pp update", GREEN)))
                                         )
                                         .append(text("]", DARK_GRAY))
-                                        .build()
                                 )
                             )
                         }
@@ -136,7 +134,7 @@ class VersionSubCommand {
                 }
                 
                 // Send the message
-                audience.sendMessage(messageBuilder.build().boxed())
+                audience.sendMessage(message.boxed())
                 
             } catch (e: Exception) {
                 // Silent fail

@@ -128,7 +128,7 @@ class HelpSubCommand {
             .append(textSecondary(" - $description"))
 
     private fun premiumHelp(gold: TextColor): Component =
-        Component.text()
+        Component.empty()
             .appendNewline()
             .appendNewline()
             .append(section("Premium", gold))
@@ -157,7 +157,6 @@ class HelpSubCommand {
             .append(helpLine("/pp scan <plugin>", "Scan", gold, listOf(
                 "Example: /pp scan SomePlugin.jar"
             )))
-            .build()
 
     private fun helpHover(command: String, description: String, details: List<String>): Component {
         var hover = text(command, NamedTextColor.AQUA)

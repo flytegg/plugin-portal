@@ -14,7 +14,7 @@ class LampExceptionHandler(private val audiences: BukkitAudiences): BukkitExcept
 
     class PortalCommandException(val msg: String): CommandErrorException()
 
-    private val BukkitCommandActor.audience get() = audiences.sender(sender())
+    private val BukkitCommandActor.audience get() = CommandSenderAudience(sender(), audiences)
 
     override fun onMissingArgument(ex: MissingArgumentException, actor: BukkitCommandActor, parameter: ParameterNode<BukkitCommandActor, *>) {
         actor.audience.sendFailure("No value provided for ${parameter.name()}") // Doesn't actually run in v4 with @CommandPlaceholder

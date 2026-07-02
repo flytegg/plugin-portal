@@ -14,5 +14,5 @@ class AudienceResolver(val audiences: BukkitAudiences): SenderResolver<BukkitCom
         customSenderType: Class<*>,
         actor: BukkitCommandActor,
         command: ExecutableCommand<BukkitCommandActor>
-    ) = audiences.sender(actor.sender())
+    ) = CommandSenderAudience(actor.sender(), audiences)
 }
