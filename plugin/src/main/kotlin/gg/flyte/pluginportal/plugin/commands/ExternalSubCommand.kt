@@ -12,7 +12,6 @@ import gg.flyte.pluginportal.common.chat.textSecondary
 import gg.flyte.pluginportal.common.commands.lamp.ExternalPluginSuggestionProvider
 import gg.flyte.pluginportal.common.managers.ExternalPluginManager
 import gg.flyte.pluginportal.common.managers.ExternalPluginResult
-import gg.flyte.pluginportal.common.util.async
 import gg.flyte.pluginportal.plugin.commands.lamp.RequiresAuth
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
@@ -28,18 +27,24 @@ class ExternalSubCommand {
     @RequiresAuth
     @Subcommand("external list")
     fun list(audience: Audience) {
-        val plugins = ExternalPluginManager.configuredPlugins()
-        if (plugins.isEmpty()) return audience.sendInfo("No external plugins are configured")
+        executeAsync(audience) {
+            val plugins = ExternalPluginManager.configuredPlugins()
+            if (plugins.isEmpty()) return@executeAsync audience.sendInfo("No external plugins are configured")
 
-        var message = status(Status.INFO, "Configured external plugins:")
-        plugins.forEach { (config, state) ->
-            val version = state?.version ?: "not installed"
-            message = message.append(Component.newline())
-                .append(textSecondary(" - "))
-                .append(textPrimary(config.id))
-                .append(textDark(" (${config.provider}, $version, ${config.updates.name.lowercase()})"))
+            var message = status(Status.INFO, "Configured external plugins:")
+            plugins.forEach { (config, state) ->
+                val version = when {
+                    state?.version == null -> "not installed"
+                    state.invalidated -> "${state.version}, invalidated"
+                    else -> state.version
+                }
+                message = message.append(Component.newline())
+                    .append(textSecondary(" - "))
+                    .append(textPrimary(config.id))
+                    .append(textDark(" (${config.provider}, $version, ${config.updates.name.lowercase()})"))
+            }
+            audience.sendMessage(message.boxed())
         }
-        audience.sendMessage(message.boxed())
     }
 
     @RequiresAuth
@@ -73,9 +78,9 @@ class ExternalSubCommand {
     @RequiresAuth
     @Subcommand("external updateAll")
     fun updateAll(audience: Audience) {
-        async {
+        executeAsync(audience) {
             val results = ExternalPluginManager.updateAll(includeManual = true)
-            if (results.isEmpty()) return@async audience.sendInfo("No installed external plugins are eligible for updates")
+            if (results.isEmpty()) return@executeAsync audience.sendInfo("No installed external plugins are eligible for updates")
 
             results.forEach { result ->
                 if (result.success) audience.sendSuccess(result.message) else audience.sendFailure(result.message)
@@ -89,11 +94,13 @@ class ExternalSubCommand {
     @RequiresAuth
     @Subcommand("external reload")
     fun reload(audience: Audience) {
-        val errors = ExternalPluginManager.reload()
-        if (errors.isEmpty()) {
-            audience.sendSuccess("Reloaded external-plugins.yml")
-        } else {
-            audience.sendFailure("Reloaded external-plugins.yml with errors: ${errors.joinToString("; ")}")
+        executeAsync(audience) {
+            val errors = ExternalPluginManager.reload()
+            if (errors.isEmpty()) {
+                audience.sendSuccess("Reloaded external-plugins.yml")
+            } else {
+                audience.sendFailure("Reloaded external-plugins.yml with errors: ${errors.joinToString("; ")}")
+            }
         }
     }
 
@@ -101,9 +108,18 @@ class ExternalSubCommand {
         audience: Audience,
         operation: () -> ExternalPluginResult
     ) {
-        async {
+        executeAsync(audience) {
             val result = operation()
             if (result.success) audience.sendSuccess(result.message) else audience.sendFailure(result.message)
+        }
+    }
+
+    private fun executeAsync(audience: Audience, operation: () -> Unit) {
+        ExternalPluginManager.executeAsync {
+            runCatching(operation).onFailure { throwable ->
+                val message = throwable.message ?: throwable::class.simpleName ?: "Unknown error"
+                audience.sendFailure("External plugin operation failed: $message")
+            }
         }
     }
 }

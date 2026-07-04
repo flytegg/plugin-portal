@@ -145,6 +145,11 @@ External plugins are declared in `external-plugins.yml`. GitHub sources require 
 asset regex that matches exactly one release asset. GeyserMC sources require an
 artifact name such as `spigot`, `bungee`, or `velocity`.
 
+External plugin IDs may contain letters, numbers, underscores, and hyphens. Each
+entry must use a unique target filename. GitHub releases with no matching asset are
+skipped, while multiple matching assets in the newest applicable release are
+reported as an ambiguity instead of falling back to an older release.
+
 ```yaml
 plugins:
   floodgate:

@@ -21,8 +21,15 @@ internal class GeyserExternalPluginProvider(
         if (!response.isJsonObject) throw ExternalPluginException("GeyserMC returned an unexpected build response")
 
         val build = response.asJsonObject
-        val download = build.getAsJsonObject("downloads")?.getAsJsonObject(artifactId)
+        val downloads = build.get("downloads")
+            ?: throw ExternalPluginException("GeyserMC response is missing 'downloads'")
+        if (!downloads.isJsonObject) throw ExternalPluginException("GeyserMC returned an invalid downloads response")
+        val downloadElement = downloads.asJsonObject.get(artifactId)
             ?: throw ExternalPluginException("GeyserMC build has no '$artifactId' artifact")
+        if (!downloadElement.isJsonObject) {
+            throw ExternalPluginException("GeyserMC returned an invalid '$artifactId' artifact")
+        }
+        val download = downloadElement.asJsonObject
         val sha256 = download.get("sha256")?.takeUnless { it.isJsonNull }?.asString
             ?.takeIf(String::isNotBlank)
             ?: throw ExternalPluginException("GeyserMC artifact does not provide a SHA-256 hash")

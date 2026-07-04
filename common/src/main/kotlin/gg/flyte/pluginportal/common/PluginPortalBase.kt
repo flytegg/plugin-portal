@@ -69,11 +69,20 @@ object PluginPortalBase {
         ExternalPluginManager.load().forEach { plugin.logger.warning("Invalid external plugin config: $it") }
         async { MarketplacePluginCache.startCacheLoader() }
         async { ServerTelemetryManager.recordStartup() }
+        ExternalPluginManager.executeAsync {
+            runCatching { ExternalPluginManager.verifyInstalledPluginStates() }.onFailure {
+                plugin.logger.warning("Could not verify external plugin state: ${it.message ?: it::class.simpleName}")
+            }
+        }
         if (info.hasPremiumEntitlement()) {
-            async {
-                ExternalPluginManager.updateAll(includeManual = false).forEach { result ->
-                    if (result.success) plugin.logger.info(result.message)
-                    else plugin.logger.warning(result.message)
+            ExternalPluginManager.executeAsync {
+                runCatching { ExternalPluginManager.updateAll(includeManual = false) }.onSuccess { results ->
+                    results.forEach { result ->
+                        if (result.success) plugin.logger.info(result.message)
+                        else plugin.logger.warning(result.message)
+                    }
+                }.onFailure {
+                    plugin.logger.warning("Could not update external plugins: ${it.message ?: it::class.simpleName}")
                 }
             }
         }
@@ -167,6 +176,7 @@ object PluginPortalBase {
     }
 
     fun onDisable() {
+        ExternalPluginManager.close()
         MarketplacePluginCache.stopCacheLoader()
         DiscordWebhookNotifier.close()
         API.closeClient()
