@@ -35,7 +35,7 @@ data class LocalPlugin(
             PluginPortalBase.plugin.logger.warning("No compatible versions for $name ($platform $platformId)")
             return false
         }
-        val target = targetUpdateVersion() ?: return false
+        val target = targetUpdateVersion() ?: return true
         return matchesVersion(target)
     }
 
@@ -44,17 +44,47 @@ data class LocalPlugin(
         val serverTypes = currentServerTypePreference()
         val cachedTarget = platformPlugin.newestCompatibleVersion(preferredChannel, serverTypes)
 
-        if (cachedTarget != null && !matchesVersion(cachedTarget)) return cachedTarget
+        if (cachedTarget != null && isNewerThanInstalled(cachedTarget)) return cachedTarget
 
         val fullTarget = API.getPluginVersions(platformPlugin.platformWithId)
             ?.toList()
             ?.newestCompatibleVersion(preferredChannel, serverTypes)
 
-        return fullTarget ?: cachedTarget
+        return fullTarget?.takeIf(::isNewerThanInstalled)
+            ?: cachedTarget?.takeIf(::isNewerThanInstalled)
     }
 
     fun matchesVersion(target: Version): Boolean =
         if (!target.sha256.isNullOrBlank()) sha256.equals(target.sha256, ignoreCase = true)
         else version == target.versionNumber
+
+    private fun isNewerThanInstalled(target: Version): Boolean {
+        if (matchesVersion(target)) return false
+        val comparison = compareCoreVersions(target.versionNumber, version)
+        return comparison == null || comparison > 0
+    }
+
+    private fun comparableVersionParts(version: String): List<Int> {
+        val coreVersion = version.substringBefore('+').substringBefore('-')
+        val match = Regex("""\d+(?:\.\d+)*""").find(coreVersion) ?: return emptyList()
+        return match.value
+            .split(".")
+            .mapNotNull { it.toIntOrNull() }
+    }
+
+    private fun compareCoreVersions(left: String, right: String): Int? {
+        val leftParts = comparableVersionParts(left)
+        val rightParts = comparableVersionParts(right)
+        if (leftParts.isEmpty() || rightParts.isEmpty()) return null
+
+        val length = maxOf(leftParts.size, rightParts.size)
+        for (index in 0 until length) {
+            val leftPart = leftParts.getOrElse(index) { 0 }
+            val rightPart = rightParts.getOrElse(index) { 0 }
+            if (leftPart != rightPart) return leftPart.compareTo(rightPart)
+        }
+
+        return 0
+    }
 
 }
