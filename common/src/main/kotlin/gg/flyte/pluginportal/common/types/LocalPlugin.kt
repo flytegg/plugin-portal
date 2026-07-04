@@ -2,7 +2,6 @@ package gg.flyte.pluginportal.common.types
 
 import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.PlatformId
-import gg.flyte.pluginportal.common.PluginPortalBase
 import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
 import gg.flyte.pluginportal.common.types.enums.MarketplacePlatform
 import gg.flyte.pluginportal.common.util.currentMinecraftVersion
@@ -29,12 +28,7 @@ data class LocalPlugin(
         ?: throw LocalPluginException(1, "Could not retrieve plugin")
 
     val isUpToDate: Boolean get() {
-        val target = targetUpdateVersion()
-        if (target == null) {
-            PluginPortalBase.plugin.logger.warning("No compatible versions for $name ($platform $platformId)")
-            return false
-        }
-        return matchesVersion(target)
+        return targetUpdateVersion() == null
     }
 
     fun targetUpdateVersion(plugin: Plugin = marketplacePlugin): Version? {
@@ -45,7 +39,7 @@ data class LocalPlugin(
 
         if (
             cachedTarget != null
-            && !matchesVersion(cachedTarget)
+            && isNewerThanInstalled(cachedTarget)
             && cachedTarget.bestServerTypeRank(serverTypes) == 0
             && (minecraftVersion == null || cachedTarget.explicitlySupportsMinecraftVersion(minecraftVersion))
         ) return cachedTarget
@@ -54,11 +48,41 @@ data class LocalPlugin(
             ?.toList()
             ?.newestCompatibleVersion(preferredChannel, serverTypes, minecraftVersion)
 
-        return fullTarget ?: cachedTarget
+        return fullTarget?.takeIf(::isNewerThanInstalled)
+            ?: cachedTarget?.takeIf(::isNewerThanInstalled)
     }
 
     fun matchesVersion(target: Version): Boolean =
         if (!target.sha256.isNullOrBlank()) sha256.equals(target.sha256, ignoreCase = true)
         else version == target.versionNumber
+
+    private fun isNewerThanInstalled(target: Version): Boolean {
+        if (matchesVersion(target)) return false
+        val comparison = compareCoreVersions(target.versionNumber, version)
+        return comparison == null || comparison > 0
+    }
+
+    private fun comparableVersionParts(version: String): List<Int> {
+        val coreVersion = version.substringBefore('+').substringBefore('-')
+        val match = Regex("""\d+(?:\.\d+)*""").find(coreVersion) ?: return emptyList()
+        return match.value
+            .split(".")
+            .mapNotNull { it.toIntOrNull() }
+    }
+
+    private fun compareCoreVersions(left: String, right: String): Int? {
+        val leftParts = comparableVersionParts(left)
+        val rightParts = comparableVersionParts(right)
+        if (leftParts.isEmpty() || rightParts.isEmpty()) return null
+
+        val length = maxOf(leftParts.size, rightParts.size)
+        for (index in 0 until length) {
+            val leftPart = leftParts.getOrElse(index) { 0 }
+            val rightPart = rightParts.getOrElse(index) { 0 }
+            if (leftPart != rightPart) return leftPart.compareTo(rightPart)
+        }
+
+        return 0
+    }
 
 }
