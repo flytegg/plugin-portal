@@ -23,27 +23,29 @@ internal class GitHubExternalPluginProvider(
         val assetRegex = runCatching { assetPattern.toRegex() }
             .getOrElse { throw ExternalPluginException("Invalid GitHub asset regex: ${it.message}") }
 
-        val releases = client.get("https://api.github.com/repos/${config.sourceId}/releases")
+        val releases = client.get("https://api.github.com/repos/${config.sourceId}/releases?per_page=100")
         if (!releases.isJsonArray) throw ExternalPluginException("GitHub returned an unexpected releases response")
 
-        val release = releases.asJsonArray
+        val eligibleReleases = releases.asJsonArray
             .filter { it.isJsonObject }
             .map { it.asJsonObject }
-            .firstOrNull {
+            .filter {
                 !it.boolean("draft") && (config.prereleases || !it.boolean("prerelease"))
             }
-            ?: throw ExternalPluginException("GitHub has no matching release for ${config.sourceId}")
+        if (eligibleReleases.isEmpty()) {
+            throw ExternalPluginException("GitHub has no matching release for ${config.sourceId}")
+        }
 
-        val matches = release.getAsJsonArray("assets")
-            ?.filter { it.isJsonObject }
-            ?.map { it.asJsonObject }
-            ?.filter { assetRegex.matches(it.string("name")) }
-            .orEmpty()
+        val releaseWithAsset = eligibleReleases.firstNotNullOfOrNull { release ->
+            val matches = release.matchingAssets(assetRegex)
+            if (matches.size == 1) release to matches.single() else null
+        } ?: run {
+            val hasAmbiguousRelease = eligibleReleases.any { it.matchingAssets(assetRegex).size > 1 }
+            val reason = if (hasAmbiguousRelease) "No release has exactly one asset matching" else "No release asset matches"
+            throw ExternalPluginException("$reason '$assetPattern'")
+        }
 
-        if (matches.isEmpty()) throw ExternalPluginException("No release asset matches '$assetPattern'")
-        if (matches.size > 1) throw ExternalPluginException("Multiple release assets match '$assetPattern'")
-
-        val asset = matches.single()
+        val (release, asset) = releaseWithAsset
         val downloadUrl = asset.string("browser_download_url")
         if (!downloadUrl.startsWith("https://")) throw ExternalPluginException("GitHub returned an invalid asset URL")
 
@@ -69,6 +71,13 @@ internal class GitHubExternalPluginProvider(
 
     private fun JsonObject.boolean(name: String): Boolean =
         get(name)?.takeUnless { it.isJsonNull }?.asBoolean == true
+
+    private fun JsonObject.matchingAssets(assetRegex: Regex): List<JsonObject> =
+        getAsJsonArray("assets")
+            ?.filter { it.isJsonObject }
+            ?.map { it.asJsonObject }
+            ?.filter { assetRegex.matches(it.string("name")) }
+            .orEmpty()
 
     private companion object {
         val REPOSITORY = Regex("[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+")

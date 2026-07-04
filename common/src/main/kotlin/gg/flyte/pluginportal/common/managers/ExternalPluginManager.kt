@@ -18,7 +18,6 @@ import java.net.URL
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.time.Instant
-import java.util.concurrent.ConcurrentHashMap
 import java.util.zip.ZipFile
 
 object ExternalPluginManager {
@@ -34,22 +33,19 @@ object ExternalPluginManager {
     @Volatile
     private var configs: Map<String, ExternalPluginConfig> = emptyMap()
     private val states = mutableMapOf<String, ExternalPluginState>()
-    private val stateLock = Any()
-    private val operationLocks = ConcurrentHashMap<String, Any>()
 
     val ids: List<String> get() = configs.keys.sorted()
 
+    @Synchronized
     fun load(): List<String> {
         if (!configFile.exists()) PluginPortalBase.plugin.saveResource("external-plugins.yml", false)
-        val persistedStates = readState()
-        synchronized(stateLock) {
-            states.clear()
-            states.putAll(persistedStates)
-            if (!stateFile.exists()) saveStateLocked()
-        }
+        states.clear()
+        states.putAll(readState())
+        if (!stateFile.exists()) saveState()
         return reload()
     }
 
+    @Synchronized
     fun reload(): List<String> {
         val errors = mutableListOf<String>()
         val yaml = YamlConfiguration()
@@ -106,18 +102,19 @@ object ExternalPluginManager {
         return errors
     }
 
-    fun configuredPlugins(): List<Pair<ExternalPluginConfig, ExternalPluginState?>> {
-        val stateSnapshot = synchronized(stateLock) { states.toMap() }
-        return configs.values.sortedBy(ExternalPluginConfig::id).map { it to stateSnapshot[it.id] }
-    }
+    @Synchronized
+    fun configuredPlugins(): List<Pair<ExternalPluginConfig, ExternalPluginState?>> =
+        configs.values.sortedBy(ExternalPluginConfig::id).map { it to states[it.id] }
 
-    fun check(id: String): ExternalPluginResult = withPluginLock(id) {
+    @Synchronized
+    fun check(id: String): ExternalPluginResult {
         val config = configs[id] ?: return failure("External plugin '$id' is not configured")
         val now = Instant.now().toString()
         return runCatching {
             val artifact = providers.getValue(config.provider).resolve(config)
-            val previous = state(id)
-            updateState(id, (previous ?: emptyState(config)).copy(lastCheckedAt = now, lastError = null))
+            val previous = states[id]
+            states[id] = (previous ?: emptyState(config)).copy(lastCheckedAt = now, lastError = null)
+            saveState()
             ExternalPluginResult(
                 success = true,
                 message = if (previous?.version == null) {
@@ -132,18 +129,17 @@ object ExternalPluginManager {
             )
         }.getOrElse { throwable ->
             val message = throwable.message ?: throwable::class.simpleName ?: "Unknown provider error"
-            updateState(
-                id,
-                (state(id) ?: emptyState(config)).copy(lastCheckedAt = now, lastError = message)
-            )
+            states[id] = (states[id] ?: emptyState(config)).copy(lastCheckedAt = now, lastError = message)
+            saveState()
             failure("Could not check ${config.id}: $message")
         }
     }
 
-    fun install(id: String): ExternalPluginResult = withPluginLock(id) {
+    @Synchronized
+    fun install(id: String): ExternalPluginResult {
         val config = configs[id] ?: return failure("External plugin '$id' is not configured")
         val destination = File(Constants.INSTALL_DIRECTORY, config.file)
-        if (state(id)?.version != null) {
+        if (states[id]?.version != null) {
             if (destination.exists()) return failure("${config.id} is already installed; use external update")
             removeState(id)
         }
@@ -151,10 +147,11 @@ object ExternalPluginManager {
         return download(config, destination)
     }
 
-    fun update(id: String): ExternalPluginResult = withPluginLock(id) {
+    @Synchronized
+    fun update(id: String): ExternalPluginResult {
         val config = configs[id] ?: return failure("External plugin '$id' is not configured")
         if (config.updates == ExternalUpdatePolicy.DISABLED) return failure("${config.id} has updates disabled")
-        if (state(id)?.version == null) return failure("${config.id} is not installed; use external install")
+        if (states[id]?.version == null) return failure("${config.id} is not installed; use external install")
 
         val check = check(id)
         if (!check.success) return check
@@ -162,22 +159,25 @@ object ExternalPluginManager {
         return download(config, File(Constants.UPDATE_DIRECTORY, config.file), check.artifact)
     }
 
-    fun invalidate(id: String): ExternalPluginResult = withPluginLock(id) {
+    @Synchronized
+    fun invalidate(id: String): ExternalPluginResult {
         val config = configs[id] ?: return failure("External plugin '$id' is not configured")
         if (config.updates == ExternalUpdatePolicy.DISABLED) return failure("${config.id} has updates disabled")
-        val state = state(id)?.takeIf { it.version != null }
+        val state = states[id]?.takeIf { it.version != null }
             ?: return failure("${config.id} is not installed")
 
-        updateState(id, state.copy(invalidated = true))
+        states[id] = state.copy(invalidated = true)
+        saveState()
         return ExternalPluginResult(
             success = true,
             message = "${config.id} was invalidated and will be downloaded by its next eligible update"
         )
     }
 
+    @Synchronized
     fun updateAll(includeManual: Boolean): List<ExternalPluginResult> = configs.values
         .filter { it.updates == ExternalUpdatePolicy.AUTO || (includeManual && it.updates == ExternalUpdatePolicy.MANUAL) }
-        .filter { state(it.id)?.version != null }
+        .filter { states[it.id]?.version != null }
         .map { update(it.id) }
 
     private fun download(
@@ -204,7 +204,7 @@ object ExternalPluginManager {
             destination.parentFile.mkdirs()
             moveReplacing(downloaded, destination)
             val now = Instant.now().toString()
-            updateState(config.id, ExternalPluginState(
+            states[config.id] = ExternalPluginState(
                 provider = artifact.provider,
                 source = artifact.sourceId,
                 artifact = artifact.artifactId,
@@ -215,7 +215,8 @@ object ExternalPluginManager {
                 installedAt = now,
                 lastCheckedAt = now,
                 lastError = null
-            ))
+            )
+            saveState()
             return ExternalPluginResult(
                 success = true,
                 message = "${config.id} ${artifact.version} was downloaded to ${relativePath(destination)}",
@@ -230,13 +231,11 @@ object ExternalPluginManager {
     }
 
     private fun recordFailure(config: ExternalPluginConfig, message: String): ExternalPluginResult {
-        updateState(
-            config.id,
-            (state(config.id) ?: emptyState(config)).copy(
-                lastCheckedAt = Instant.now().toString(),
-                lastError = message
-            )
+        states[config.id] = (states[config.id] ?: emptyState(config)).copy(
+            lastCheckedAt = Instant.now().toString(),
+            lastError = message
         )
+        saveState()
         return failure("Could not download ${config.id}: $message")
     }
 
@@ -252,31 +251,17 @@ object ExternalPluginManager {
         }
     }
 
-    private fun state(id: String): ExternalPluginState? = synchronized(stateLock) { states[id] }
-
-    private fun updateState(id: String, state: ExternalPluginState) {
-        synchronized(stateLock) {
-            states[id] = state
-            saveStateLocked()
-        }
-    }
-
     private fun removeState(id: String) {
-        synchronized(stateLock) {
-            states.remove(id)
-            saveStateLocked()
-        }
+        states.remove(id)
+        saveState()
     }
 
-    private fun saveStateLocked() {
+    private fun saveState() {
         stateFile.parentFile.mkdirs()
         val temporaryFile = File(stateFile.parentFile, "${stateFile.name}.tmp")
         temporaryFile.writeText(GSON.toJson(ExternalPluginStateFile(states.toSortedMap())))
         moveReplacing(temporaryFile, stateFile)
     }
-
-    private inline fun <T> withPluginLock(id: String, action: () -> T): T =
-        synchronized(operationLocks.computeIfAbsent(id) { Any() }, action)
 
     private fun emptyState(config: ExternalPluginConfig) = ExternalPluginState(
         provider = config.provider,
