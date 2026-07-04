@@ -9,6 +9,8 @@ Concise support-agent memory for Plugin Portal commands, dashboard behavior, upd
 - Plugin folder: `plugins/`
 - Plugin Portal data folder: `plugins/PluginPortal/`
 - Tracked local plugin cache: `plugins/PluginPortal/plugins.json`
+- External plugin config: `plugins/PluginPortal/external-plugins.yml`
+- External plugin state: `plugins/PluginPortal/external-plugins-state.json`
 - Bukkit/Paper update folder: `plugins/update/`
 - Plugin Portal API used by plugin code: `https://v3.pluginportal.link`
 - Web dashboard/editor URL: `https://pluginportal.link/rooms/<room-or-server-id>`
@@ -27,10 +29,12 @@ Supported marketplace/platform concepts in code:
 - SpigotMC
 - Polymart
 - Custom direct JAR URLs for `/pp install-url`
+- GitHub Releases and GeyserMC downloads configured as external plugins
 
 Important distinction:
 
 - Plugin Portal only fully manages plugins it has in `plugins.json`.
+- External plugins are managed separately and never written to `plugins.json`.
 - Manually installed JARs are not tracked until recognized with `/pp recognize <file>` or `/pp recognizeAll`.
 - The dashboard's installed/update views are based on the local tracked cache plus marketplace API enrichment.
 
@@ -134,6 +138,48 @@ Download adapters:
 - Polymart adapter has highest priority.
 - Standard marketplace adapter handles non-Polymart marketplace plugins.
 - Custom URL adapter handles direct JAR URLs.
+
+## External Plugins
+
+External plugins are declared in `external-plugins.yml`. GitHub sources require an
+asset regex that matches exactly one release asset. GeyserMC sources require an
+artifact name such as `spigot`, `bungee`, or `velocity`.
+
+```yaml
+plugins:
+  floodgate:
+    source: geysermc:floodgate
+    artifact: spigot
+    file: floodgate-spigot.jar
+    updates: manual
+
+  viaversion:
+    source: github:ViaVersion/ViaVersion
+    asset: "^ViaVersion.*\\.jar$"
+    file: ViaVersion.jar
+    prereleases: false
+    updates: manual
+```
+
+| Command | Purpose |
+| --- | --- |
+| `/pp external list` | List configured external plugins and installed versions. |
+| `/pp external check <id>` | Resolve the latest matching provider artifact without downloading it. |
+| `/pp external install <id>` | Install a configured external plugin into `plugins/`. |
+| `/pp external update <id>` | Stage an installed external plugin update in `plugins/update/`. |
+| `/pp external invalidate <id>` | Force the next eligible update to download the latest artifact again. |
+| `/pp external updateAll` | Explicitly update installed `manual` and `auto` entries. |
+| `/pp external reload` | Reload user intent from `external-plugins.yml`. |
+
+Update policies:
+
+- `manual`: updated only by explicit external update commands.
+- `auto`: also checked and updated during startup.
+- `disabled`: tracked but never updated.
+
+Provider versions, hashes, check timestamps, target paths, and errors are stored in
+`external-plugins-state.json`. GeyserMC downloads are rejected when their SHA-256
+does not match the provider response.
 
 Install failure patterns:
 

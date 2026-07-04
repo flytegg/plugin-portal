@@ -6,6 +6,7 @@ import gg.flyte.pluginportal.common.commands.lamp.CommandEnabledConditionValidat
 import gg.flyte.pluginportal.common.commands.lamp.Features
 import gg.flyte.pluginportal.common.commands.lamp.LampExceptionHandler
 import gg.flyte.pluginportal.common.commands.lamp.MarketplacePlatformType
+import gg.flyte.pluginportal.common.managers.ExternalPluginManager
 import gg.flyte.pluginportal.common.managers.LocalPluginCache
 import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
 import gg.flyte.pluginportal.common.managers.PluginPortalSelfUpdateManager
@@ -65,8 +66,17 @@ object PluginPortalBase {
         }
         
         LocalPluginCache.load()
+        ExternalPluginManager.load().forEach { plugin.logger.warning("Invalid external plugin config: $it") }
         async { MarketplacePluginCache.startCacheLoader() }
         async { ServerTelemetryManager.recordStartup() }
+        if (info.hasPremiumEntitlement()) {
+            async {
+                ExternalPluginManager.updateAll(includeManual = false).forEach { result ->
+                    if (result.success) plugin.logger.info(result.message)
+                    else plugin.logger.warning(result.message)
+                }
+            }
+        }
 
         Bukkit.getPluginManager().registerEvents(UpdateNotificationListener(), plugin)
 

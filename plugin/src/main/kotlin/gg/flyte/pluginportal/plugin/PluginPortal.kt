@@ -3,6 +3,7 @@ package gg.flyte.pluginportal.plugin
 import gg.flyte.pluginportal.common.Config
 import gg.flyte.pluginportal.common.PluginPortalBase
 import gg.flyte.pluginportal.plugin.adapters.AdapterPluginCache
+import gg.flyte.pluginportal.plugin.commands.ExternalSubCommand
 import gg.flyte.pluginportal.plugin.commands.ImportSubCommand
 import gg.flyte.pluginportal.plugin.commands.ExportSubCommand
 import gg.flyte.pluginportal.plugin.commands.UpdateAllSubCommand
@@ -47,6 +48,7 @@ class PluginPortal : JavaPlugin() {
             RecognizeSubCommand(),
             RecognizeAllSubCommand(),
             EditorSubCommand(),
+            ExternalSubCommand(),
         )
 
         PluginPortalBase.load(

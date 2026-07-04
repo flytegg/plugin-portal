@@ -65,6 +65,7 @@ enforcement, not by a separate premium artifact.
 | `/pp install <name\|id> [platform] [channel] [--byId] [--exact] [--version <version>]` | `pluginportal.manage.install` | Install a plugin from a marketplace. |
 | `/pp update <name\|id> [--byId] [--channel <name>] [--version <version>]` | `pluginportal.maintain.update` | Update a tracked plugin. |
 | `/pp updateAll` | `pluginportal.maintain.update` | Update all tracked plugins with available updates. |
+| `/pp external <list\|check\|install\|update\|invalidate\|updateAll\|reload>` | `pluginportal.manage.external` | Manage external plugins configured in `external-plugins.yml`. |
 | `/pp delete <name>` or `/pp uninstall <name>` | `pluginportal.manage.uninstall` | Remove a tracked plugin. |
 | `/pp recognize <file>` / `/pp recognizeAll` | `pluginportal.manage.recognize` | Track manually installed plugin JARs. |
 | `/pp upgrade [--yes]` | `pluginportal.admin` | Check for and install Plugin Portal updates. |
@@ -82,8 +83,8 @@ Portal key is configured.
 - 🔍 **Plugin Recognition**: Auto-detect and manage existing plugins not installed
   through Plugin Portal.
 - 🔄 **Bulk Updates**: Keep tracked plugins up to date with `/pp updateAll`.
-- 🌐 **Custom Sources**: Install from supported external adapters such as GitHub
-  releases and Modrinth direct flows.
+- 🌐 **External Sources**: Track GitHub Releases and GeyserMC downloads separately
+  from marketplace-managed plugins.
 - 🕰️ **Version and Channel Selection**: Pin exact versions or follow marketplace
   beta/release channels.
 - 🧑‍💻 **Web Editor Workflows**: Connect the running server to hosted Plugin Portal
