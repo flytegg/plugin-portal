@@ -142,9 +142,11 @@ object ExternalPluginManager {
 
     fun install(id: String): ExternalPluginResult = withPluginLock(id) {
         val config = configs[id] ?: return failure("External plugin '$id' is not configured")
-        if (state(id)?.version != null) return failure("${config.id} is already installed; use external update")
-
         val destination = File(Constants.INSTALL_DIRECTORY, config.file)
+        if (state(id)?.version != null) {
+            if (destination.exists()) return failure("${config.id} is already installed; use external update")
+            removeState(id)
+        }
         if (destination.exists()) return failure("${destination.path} already exists and is not tracked as an external plugin")
         return download(config, destination)
     }
@@ -255,6 +257,13 @@ object ExternalPluginManager {
     private fun updateState(id: String, state: ExternalPluginState) {
         synchronized(stateLock) {
             states[id] = state
+            saveStateLocked()
+        }
+    }
+
+    private fun removeState(id: String) {
+        synchronized(stateLock) {
+            states.remove(id)
             saveStateLocked()
         }
     }

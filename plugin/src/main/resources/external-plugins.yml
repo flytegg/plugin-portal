@@ -1,4 +1,6 @@
-plugins:
+plugins: {}
+
+# Replace the empty map above with `plugins:` before uncommenting an example.
   # floodgate:
   #   source: geysermc:floodgate
   #   artifact: spigot
