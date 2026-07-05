@@ -36,23 +36,31 @@ enum class ExternalUpdatePolicy {
     }
 }
 
-data class ExternalPluginState(
-    val provider: String,
-    val source: String,
-    val artifact: String,
-    val version: String? = null,
+data class ExternalArtifactState(
+    val artifactId: String,
+    val version: String,
     val build: String? = null,
-    val sha256: String? = null,
-    val file: String? = null,
-    val installedAt: String? = null,
+    val sha256: String,
+    val recordedAt: String
+) {
+    fun matches(artifact: ExternalArtifact): Boolean {
+        if (artifactId != artifact.artifactId || version != artifact.version || build != artifact.build) return false
+        return artifact.sha256 == null || sha256.equals(artifact.sha256, ignoreCase = true)
+    }
+}
+
+data class ExternalPluginState(
+    val configFingerprint: String? = null,
+    val installed: ExternalArtifactState? = null,
+    val staged: ExternalArtifactState? = null,
     val lastCheckedAt: String? = null,
     val lastError: String? = null,
     val invalidated: Boolean = false
 ) {
     fun matches(artifact: ExternalArtifact): Boolean {
         if (invalidated) return false
-        if (provider != artifact.provider || source != artifact.sourceId || this.artifact != artifact.artifactId) return false
-        if (version != artifact.version || build != artifact.build) return false
-        return sha256 == null || artifact.sha256 == null || sha256.equals(artifact.sha256, ignoreCase = true)
+        return installed?.matches(artifact) == true
     }
+
+    fun stagedMatches(artifact: ExternalArtifact): Boolean = !invalidated && staged?.matches(artifact) == true
 }

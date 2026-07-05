@@ -2,6 +2,8 @@ package gg.flyte.pluginportal.common.notifications
 
 import gg.flyte.pluginportal.common.Config
 import gg.flyte.pluginportal.common.PluginPortalBase
+import gg.flyte.pluginportal.common.adapters.external.ExternalArtifact
+import gg.flyte.pluginportal.common.adapters.external.ExternalPluginConfig
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.Version
 import gg.flyte.pluginportal.common.util.GSON
@@ -78,6 +80,31 @@ object DiscordWebhookNotifier {
                 "Platform ID" to current.platformId,
                 "Channel" to (current.preferredChannel ?: "default"),
             ).withOptional("Link", link)
+        )
+    }
+
+    fun externalPluginInstalled(config: ExternalPluginConfig, artifact: ExternalArtifact) {
+        send(
+            title = "External plugin installed",
+            description = "${config.id} ${artifact.version} was installed from ${config.provider}.",
+            color = INSTALL_COLOR,
+            fields = externalPluginFields(config, artifact.version)
+                .withOptional("Artifact", artifact.filename)
+        )
+    }
+
+    fun externalPluginUpdated(
+        config: ExternalPluginConfig,
+        previousVersion: String?,
+        artifact: ExternalArtifact
+    ) {
+        val version = previousVersion?.let { "$it -> ${artifact.version}" } ?: artifact.version
+        send(
+            title = "External plugin update staged",
+            description = "${config.id} $version was downloaded and will apply after restart.",
+            color = UPDATE_COLOR,
+            fields = externalPluginFields(config, version)
+                .withOptional("Artifact", artifact.filename)
         )
     }
 
@@ -161,6 +188,17 @@ object DiscordWebhookNotifier {
         }
         return platformUrl
     }
+
+    private fun externalPluginFields(
+        config: ExternalPluginConfig,
+        version: String
+    ): List<Pair<String, String>> = listOf(
+        "Plugin" to config.id,
+        "Version" to version,
+        "Provider" to config.provider.uppercase(),
+        "Source" to config.sourceId,
+        "Update policy" to config.updates.name.lowercase(),
+    )
 
     private fun List<Pair<String, String>>.withOptional(name: String, value: String?): List<Pair<String, String>> =
         if (value.isNullOrBlank()) this else plus(name to value)

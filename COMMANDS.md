@@ -168,7 +168,6 @@ plugins:
 
 | Command | Purpose |
 | --- | --- |
-| `/pp external list` | List configured external plugins and installed versions. |
 | `/pp external check <id>` | Resolve the latest matching provider artifact without downloading it. |
 | `/pp external install <id>` | Install a configured external plugin into `plugins/`. |
 | `/pp external update <id>` | Stage an installed external plugin update in `plugins/update/`. |
@@ -182,9 +181,11 @@ Update policies:
 - `auto`: also checked and updated during startup.
 - `disabled`: tracked but never updated.
 
-Provider versions, hashes, check timestamps, target paths, and errors are stored in
-`external-plugins-state.json`. GeyserMC downloads are rejected when their SHA-256
-does not match the provider response.
+Installed and staged artifact IDs, versions, hashes, check timestamps, and errors are
+stored in `external-plugins-state.json`. Provider, source, target filename, and update
+policy remain only in `external-plugins.yml`. Downloads are rejected when their SHA-256
+does not match a digest supplied by the provider; GitHub assets without a digest remain
+supported for compatibility with older releases.
 
 Install failure patterns:
 
@@ -286,7 +287,7 @@ Export/import:
 | `/pp help` | `pluginportal.view` | Show command help. | Also works by running `/pp`. |
 | `/pp info` | `pluginportal.view` | Show Plugin Portal version, edition, license state, and update info. | Alias: `/pp version`. |
 | `/pp version` | `pluginportal.view` | Same as `/pp info`. | Shows Licensed: Yes/No. |
-| `/pp list` | `pluginportal.view` | List plugins installed/tracked by Plugin Portal. | Includes update/uninstall buttons in player chat. |
+| `/pp list` | `pluginportal.view` | List marketplace and external plugins managed by Plugin Portal. | Checks and displays update status; marketplace entries include update/uninstall buttons in player chat. |
 | `/pp dump` | `pluginportal.dump` | Upload logs/support dump to MCLogs and return a support URL. | Use for diagnostics. |
 | `/pluginportal config refresh` | `pluginportal.manage.config` | Reload local plugin cache/config state. | Command root is `pluginportal config`, not `/pp config`. |
 

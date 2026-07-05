@@ -1,20 +1,13 @@
 package gg.flyte.pluginportal.plugin.commands
 
-import gg.flyte.pluginportal.common.chat.Status
-import gg.flyte.pluginportal.common.chat.boxed
 import gg.flyte.pluginportal.common.chat.sendFailure
 import gg.flyte.pluginportal.common.chat.sendInfo
 import gg.flyte.pluginportal.common.chat.sendSuccess
-import gg.flyte.pluginportal.common.chat.status
-import gg.flyte.pluginportal.common.chat.textDark
-import gg.flyte.pluginportal.common.chat.textPrimary
-import gg.flyte.pluginportal.common.chat.textSecondary
 import gg.flyte.pluginportal.common.commands.lamp.ExternalPluginSuggestionProvider
 import gg.flyte.pluginportal.common.managers.ExternalPluginManager
 import gg.flyte.pluginportal.common.managers.ExternalPluginResult
 import gg.flyte.pluginportal.plugin.commands.lamp.RequiresAuth
 import net.kyori.adventure.audience.Audience
-import net.kyori.adventure.text.Component
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Named
 import revxrsal.commands.annotation.Subcommand
@@ -24,29 +17,6 @@ import revxrsal.commands.bukkit.annotation.CommandPermission
 @Command("pp", "pluginportal", "ppm")
 @CommandPermission("pluginportal.manage.external")
 class ExternalSubCommand {
-    @RequiresAuth
-    @Subcommand("external list")
-    fun list(audience: Audience) {
-        executeAsync(audience) {
-            val plugins = ExternalPluginManager.configuredPlugins()
-            if (plugins.isEmpty()) return@executeAsync audience.sendInfo("No external plugins are configured")
-
-            var message = status(Status.INFO, "Configured external plugins:")
-            plugins.forEach { (config, state) ->
-                val version = when {
-                    state?.version == null -> "not installed"
-                    state.invalidated -> "${state.version}, invalidated"
-                    else -> state.version
-                }
-                message = message.append(Component.newline())
-                    .append(textSecondary(" - "))
-                    .append(textPrimary(config.id))
-                    .append(textDark(" (${config.provider}, $version, ${config.updates.name.lowercase()})"))
-            }
-            audience.sendMessage(message.boxed())
-        }
-    }
-
     @RequiresAuth
     @Subcommand("external check")
     fun check(

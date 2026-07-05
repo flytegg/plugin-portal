@@ -1,9 +1,13 @@
 package gg.flyte.pluginportal.common.commands
 
 import gg.flyte.pluginportal.common.PluginPortalBase
+import gg.flyte.pluginportal.common.adapters.external.ExternalPluginConfig
+import gg.flyte.pluginportal.common.adapters.external.ExternalPluginState
 import gg.flyte.pluginportal.common.chat.*
 import gg.flyte.pluginportal.common.commands.lamp.EnabledCommand
 import gg.flyte.pluginportal.common.commands.lamp.Features
+import gg.flyte.pluginportal.common.managers.ExternalPluginManager
+import gg.flyte.pluginportal.common.managers.ExternalPluginResult
 import gg.flyte.pluginportal.common.managers.LocalPluginCache
 import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
 import gg.flyte.pluginportal.common.types.LocalPlugin
@@ -35,11 +39,14 @@ class ListSubCommand {
             val plugins = LocalPluginCache
                 .sortedBy { plugin -> plugin.name }
                 .filter { plugin -> plugin.name != PluginPortalBase.plugin.name }
+            val externalPlugins = ExternalPluginManager.configuredPlugins().map { (config, state) ->
+                ExternalListEntry(config, state, ExternalPluginManager.check(config.id))
+            }
 
-            if (plugins.isEmpty()) return@async audience.sendMessage(
+            if (plugins.isEmpty() && externalPlugins.isEmpty()) return@async audience.sendMessage(
                 Component.text("No plugins found", NamedTextColor.GRAY).boxed())
 
-            var message = Component.text("Plugins installed with Plugin Portal", NamedTextColor.GRAY)
+            var message = Component.text("Plugins managed by Plugin Portal", NamedTextColor.GRAY)
             val console = audience.isConsole()
             val showDetails = detailed || console
 
@@ -48,9 +55,65 @@ class ListSubCommand {
                     .append(if (showDetails) getDetailedPluginLine(plugin) else getCompactPluginLine(plugin, console))
             }
 
+            externalPlugins.forEach { plugin ->
+                message = message.append(Component.text("\n"))
+                    .append(if (showDetails) getDetailedExternalPluginLine(plugin) else getCompactExternalPluginLine(plugin))
+            }
+
             audience.sendMessage(message.boxed())
         }
     }
+
+    private fun getCompactExternalPluginLine(entry: ExternalListEntry): Component {
+        val installed = entry.state?.installed?.version ?: "not installed"
+        val summary = listOfNotNull(installed, entry.status()).joinToString(" — ")
+        return Component.text(" - ", NamedTextColor.DARK_GRAY)
+            .append(
+                textPrimary(entry.config.id)
+                    .hoverEvent(HoverEvent.showText(textSecondary("External plugin: ${entry.config.sourceId}")))
+                    .suggestCommand("/pp external check ${entry.config.id}")
+            )
+            .append(textDark(" (EXTERNAL/${entry.config.provider.uppercase()}) "))
+            .append(textSecondary(summary))
+    }
+
+    private fun getDetailedExternalPluginLine(entry: ExternalListEntry): Component {
+        val installed = entry.state?.installed?.version ?: "not installed"
+        val latest = entry.check.artifact?.version
+        var line = Component.text(" - ", NamedTextColor.DARK_GRAY)
+            .append(textPrimary(entry.config.id).suggestCommand("/pp external check ${entry.config.id}"))
+            .append(textDark(" (EXTERNAL/${entry.config.provider.uppercase()}) "))
+            .append(textSecondary("source="))
+            .append(textPrimary(entry.config.sourceId))
+            .append(textDark(" installed="))
+            .append(Component.text(installed, entry.installedColor()))
+
+        if (latest != null && latest != installed) {
+            line = line.append(textDark(" latest=")).append(Component.text(latest, NamedTextColor.GREEN))
+        }
+
+        return entry.status()?.let { line.append(textDark(" status=")).append(textSecondary(it)) } ?: line
+    }
+
+    private fun ExternalListEntry.status(): String? = when {
+        !check.success -> "check failed"
+        state?.staged != null -> "${state.staged.version} staged"
+        check.updateAvailable -> "update available"
+        state?.installed != null -> "up to date"
+        else -> null
+    }
+
+    private fun ExternalListEntry.installedColor(): NamedTextColor = when {
+        state?.installed == null -> NamedTextColor.GRAY
+        check.updateAvailable -> NamedTextColor.RED
+        else -> NamedTextColor.GREEN
+    }
+
+    private data class ExternalListEntry(
+        val config: ExternalPluginConfig,
+        val state: ExternalPluginState?,
+        val check: ExternalPluginResult
+    )
 
     private fun getCompactPluginLine(plugin: LocalPlugin, console: Boolean): Component {
         val buttonLength = if (plugin.isUpToDate) UPTODATE_BUTTON_PIXEL_LENGTH else BUTTON_PIXEL_LENGTH

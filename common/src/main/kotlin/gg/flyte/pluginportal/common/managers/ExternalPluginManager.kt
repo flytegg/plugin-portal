@@ -3,20 +3,27 @@ package gg.flyte.pluginportal.common.managers
 import gg.flyte.pluginportal.common.Constants
 import gg.flyte.pluginportal.common.PluginPortalBase
 import gg.flyte.pluginportal.common.adapters.external.ExternalArtifact
+import gg.flyte.pluginportal.common.adapters.external.ExternalArtifactState
 import gg.flyte.pluginportal.common.adapters.external.ExternalPluginConfig
 import gg.flyte.pluginportal.common.adapters.external.ExternalPluginProvider
 import gg.flyte.pluginportal.common.adapters.external.ExternalPluginState
 import gg.flyte.pluginportal.common.adapters.external.ExternalUpdatePolicy
 import gg.flyte.pluginportal.common.adapters.external.providers.GeyserExternalPluginProvider
 import gg.flyte.pluginportal.common.adapters.external.providers.GitHubExternalPluginProvider
+import gg.flyte.pluginportal.common.notifications.DiscordWebhookNotifier
 import gg.flyte.pluginportal.common.util.GSON
 import gg.flyte.pluginportal.common.util.HashType
 import gg.flyte.pluginportal.common.util.download
 import org.bukkit.configuration.file.YamlConfiguration
+import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.nodes.MappingNode
+import org.yaml.snakeyaml.nodes.ScalarNode
 import java.io.File
+import java.io.StringReader
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import java.security.MessageDigest
 import java.time.Instant
 import java.util.Locale
 import java.util.concurrent.Executors
@@ -58,7 +65,13 @@ object ExternalPluginManager {
     fun reload(): List<String> {
         val errors = mutableListOf<String>()
         val yaml = YamlConfiguration().apply { options().pathSeparator('/') }
-        runCatching { yaml.load(configFile) }.onFailure {
+        val contents = runCatching { configFile.readText() }.getOrElse {
+            configs = emptyMap()
+            return listOf("Could not read external-plugins.yml: ${it.message}")
+        }
+        val duplicateIds = runCatching { duplicateExternalPluginIds(contents) }.getOrElse { emptySet() }
+        duplicateIds.sorted().forEach { errors += "$it: plugin ID is specified more than once" }
+        runCatching { yaml.loadFromString(contents) }.onFailure {
             configs = emptyMap()
             return listOf("Could not read external-plugins.yml: ${it.message}")
         }
@@ -70,6 +83,7 @@ object ExternalPluginManager {
         }
 
         val parsedConfigs = plugins.getKeys(false).mapNotNull { id ->
+            if (id in duplicateIds) return@mapNotNull null
             if (!pluginIdPattern.matches(id)) {
                 errors += "$id: plugin ID may only contain letters, numbers, underscores, and hyphens"
                 return@mapNotNull null
@@ -132,6 +146,7 @@ object ExternalPluginManager {
             .toSet()
 
         configs = parsedConfigs.filterKeys { it !in duplicateFileIds }
+        validateStateOwnership()
         removeMissingPluginStates()
 
         return errors
@@ -143,13 +158,10 @@ object ExternalPluginManager {
 
     @Synchronized
     fun verifyInstalledPluginStates() {
+        var stateChanged = false
         val mismatchedIds = configs.values
-            .filter { it.updates != ExternalUpdatePolicy.DISABLED }
             .mapNotNull { config ->
-                val state = states[config.id]?.takeIf {
-                    it.version != null && it.sha256 != null && !it.invalidated
-                }
-                    ?: return@mapNotNull null
+                val state = states[config.id] ?: return@mapNotNull null
                 val pluginFile = File(Constants.INSTALL_DIRECTORY, config.file)
                 if (!pluginFile.isFile) return@mapNotNull null
 
@@ -162,17 +174,44 @@ object ExternalPluginManager {
                     .getOrNull()
                     ?: return@mapNotNull null
 
-                config.id.takeUnless { actualHash.equals(state.sha256, ignoreCase = true) }
+                when {
+                    state.staged?.sha256.equals(actualHash, ignoreCase = true) -> {
+                        states[config.id] = state.copy(
+                            installed = state.staged,
+                            staged = null,
+                            invalidated = false
+                        )
+                        stateChanged = true
+                        PluginPortalBase.plugin.logger.info(
+                            "Applied staged external plugin update for '${config.id}'"
+                        )
+                        null
+                    }
+                    state.installed == null -> null
+                    actualHash.equals(state.installed.sha256, ignoreCase = true) -> {
+                        val stagedFile = File(Constants.UPDATE_DIRECTORY, config.file)
+                        if (state.staged != null && !stagedFile.isFile) {
+                            states[config.id] = state.copy(staged = null)
+                            stateChanged = true
+                            PluginPortalBase.plugin.logger.warning(
+                                "Cleared missing staged external plugin update for '${config.id}'"
+                            )
+                        }
+                        null
+                    }
+                    config.updates == ExternalUpdatePolicy.DISABLED -> null
+                    else -> config.id
+                }
             }
-        if (mismatchedIds.isEmpty()) return
 
         mismatchedIds.forEach { id ->
             states[id] = states.getValue(id).copy(invalidated = true)
+            stateChanged = true
             PluginPortalBase.plugin.logger.warning(
                 "Invalidated external plugin state for '$id' because its configured JAR has changed"
             )
         }
-        saveState()
+        if (stateChanged) saveState()
     }
 
     @Synchronized
@@ -182,19 +221,23 @@ object ExternalPluginManager {
         return runCatching {
             val artifact = providers.getValue(config.provider).resolve(config)
             val previous = currentState(config)
+            val installedMatches = previous?.matches(artifact) == true
+            val stagedMatches = previous?.stagedMatches(artifact) == true
             states[id] = (previous ?: emptyState(config)).copy(lastCheckedAt = now, lastError = null)
             saveState()
             ExternalPluginResult(
                 success = true,
-                message = if (previous?.version == null) {
+                message = if (previous?.installed == null) {
                     "${config.id} is not installed; latest version is ${artifact.version}"
-                } else if (previous.matches(artifact)) {
+                } else if (stagedMatches) {
+                    "${config.id} ${artifact.version} is staged and will be applied after restart"
+                } else if (installedMatches) {
                     "${config.id} is up to date (${artifact.version})"
                 } else {
-                    "${config.id} has an update available: ${previous.version} -> ${artifact.version}"
+                    "${config.id} has an update available: ${previous.installed.version} -> ${artifact.version}"
                 },
                 artifact = artifact,
-                updateAvailable = previous?.version != null && !previous.matches(artifact)
+                updateAvailable = previous?.installed != null && !installedMatches && !stagedMatches
             )
         }.getOrElse { throwable ->
             val message = throwable.message ?: throwable::class.simpleName ?: "Unknown provider error"
@@ -209,7 +252,7 @@ object ExternalPluginManager {
     fun install(id: String): ExternalPluginResult {
         val config = configs[id] ?: return failure("External plugin '$id' is not configured")
         val destination = File(Constants.INSTALL_DIRECTORY, config.file)
-        if (currentState(config)?.version != null) {
+        if (currentState(config)?.installed != null) {
             if (destination.exists()) return failure("${config.id} is already installed; use external update")
             removeState(id)
         }
@@ -221,19 +264,23 @@ object ExternalPluginManager {
     fun update(id: String): ExternalPluginResult {
         val config = configs[id] ?: return failure("External plugin '$id' is not configured")
         if (config.updates == ExternalUpdatePolicy.DISABLED) return failure("${config.id} has updates disabled")
-        if (currentState(config)?.version == null) return failure("${config.id} is not installed; use external install")
+        if (currentState(config)?.installed == null) return failure("${config.id} is not installed; use external install")
 
         val check = check(id)
         if (!check.success) return check
         if (!check.updateAvailable) return check
-        return download(config, File(Constants.UPDATE_DIRECTORY, config.file), check.artifact)
+        val updateDirectory = Constants.UPDATE_DIRECTORY
+        if (updateDirectory.canonicalFile == Constants.INSTALL_DIRECTORY.canonicalFile) {
+            return failure("Bukkit's update folder resolves to the plugins folder; refusing to replace the loaded plugin")
+        }
+        return download(config, File(updateDirectory, config.file), check.artifact)
     }
 
     @Synchronized
     fun invalidate(id: String): ExternalPluginResult {
         val config = configs[id] ?: return failure("External plugin '$id' is not configured")
         if (config.updates == ExternalUpdatePolicy.DISABLED) return failure("${config.id} has updates disabled")
-        val state = currentState(config)?.takeIf { it.version != null }
+        val state = currentState(config)?.takeIf { it.installed != null }
             ?: return failure("${config.id} is not installed")
 
         states[id] = state.copy(invalidated = true)
@@ -247,7 +294,7 @@ object ExternalPluginManager {
     @Synchronized
     fun updateAll(includeManual: Boolean): List<ExternalPluginResult> = configs.values
         .filter { it.updates == ExternalUpdatePolicy.AUTO || (includeManual && it.updates == ExternalUpdatePolicy.MANUAL) }
-        .filter { currentState(it)?.version != null }
+        .filter { currentState(it)?.installed != null }
         .map { update(it.id) }
 
     private fun download(
@@ -275,28 +322,37 @@ object ExternalPluginManager {
             moveReplacing(downloaded, destination)
             val now = Instant.now().toString()
             val previousState = states[config.id]
-            states[config.id] = ExternalPluginState(
-                provider = artifact.provider,
-                source = artifact.sourceId,
-                artifact = artifact.artifactId,
+            val artifactState = ExternalArtifactState(
+                artifactId = artifact.artifactId,
                 version = artifact.version,
                 build = artifact.build,
                 sha256 = actualHash,
-                file = relativePath(File(Constants.INSTALL_DIRECTORY, config.file)),
-                installedAt = now,
+                recordedAt = now
+            )
+            val staged = destination.parentFile.canonicalFile == Constants.UPDATE_DIRECTORY.canonicalFile
+            states[config.id] = (previousState ?: emptyState(config)).copy(
+                configFingerprint = config.fingerprint(),
+                installed = if (staged) previousState?.installed else artifactState,
+                staged = if (staged) artifactState else null,
                 lastCheckedAt = now,
-                lastError = null
+                lastError = null,
+                invalidated = false
             )
             try {
                 saveState()
             } catch (exception: Exception) {
                 if (previousState == null) states.remove(config.id) else states[config.id] = previousState
-                if (destination.parentFile.canonicalFile == Constants.INSTALL_DIRECTORY.canonicalFile && !destination.delete()) {
+                if (!destination.delete()) {
                     PluginPortalBase.plugin.logger.warning(
                         "Could not remove untracked external plugin file ${destination.path} after state persistence failed"
                     )
                 }
                 throw exception
+            }
+            if (staged) {
+                DiscordWebhookNotifier.externalPluginUpdated(config, previousState?.installed?.version, artifact)
+            } else {
+                DiscordWebhookNotifier.externalPluginInstalled(config, artifact)
             }
             return ExternalPluginResult(
                 success = true,
@@ -345,7 +401,7 @@ object ExternalPluginManager {
 
     private fun currentState(config: ExternalPluginConfig): ExternalPluginState? {
         val state = states[config.id] ?: return null
-        if (state.version == null || File(Constants.INSTALL_DIRECTORY, config.file).isFile) return state
+        if (state.installed == null || File(Constants.INSTALL_DIRECTORY, config.file).isFile) return state
 
         states.remove(config.id)
         PluginPortalBase.plugin.logger.warning(
@@ -357,7 +413,7 @@ object ExternalPluginManager {
 
     private fun removeMissingPluginStates() {
         val staleIds = configs.values.mapNotNull { config ->
-            val installed = states[config.id]?.version != null
+            val installed = states[config.id]?.installed != null
             val pluginFile = File(Constants.INSTALL_DIRECTORY, config.file)
             config.id.takeIf { installed && !pluginFile.isFile }
         }
@@ -380,10 +436,32 @@ object ExternalPluginManager {
     }
 
     private fun emptyState(config: ExternalPluginConfig) = ExternalPluginState(
-        provider = config.provider,
-        source = config.sourceId,
-        artifact = config.artifact.orEmpty()
+        configFingerprint = config.fingerprint()
     )
+
+    private fun validateStateOwnership() {
+        val invalidIds = configs.values.mapNotNull { config ->
+            val state = states[config.id] ?: return@mapNotNull null
+            config.id.takeUnless { state.configFingerprint == config.fingerprint() }
+        }
+        if (invalidIds.isEmpty()) return
+
+        invalidIds.forEach { id ->
+            states.remove(id)
+            PluginPortalBase.plugin.logger.warning(
+                "Removed external plugin state for '$id' because its configuration changed"
+            )
+        }
+        saveState()
+    }
+
+    private fun ExternalPluginConfig.fingerprint(): String {
+        val input = listOf(provider, sourceId, artifact, asset, file, prereleases.toString())
+            .joinToString("\u0000") { it.orEmpty() }
+        return MessageDigest.getInstance("SHA-256")
+            .digest(input.toByteArray(Charsets.UTF_8))
+            .joinToString("") { "%02x".format(it) }
+    }
 
     private fun isSafeJarName(name: String): Boolean = name.isNotBlank() &&
         name.endsWith(".jar", ignoreCase = true) &&
@@ -427,3 +505,18 @@ data class ExternalPluginResult(
     val updateAvailable: Boolean = false,
     val changed: Boolean = false
 )
+
+internal fun duplicateExternalPluginIds(contents: String): Set<String> {
+    val root = Yaml().compose(StringReader(contents)) as? MappingNode ?: return emptySet()
+    val plugins = root.value
+        .firstOrNull { (it.keyNode as? ScalarNode)?.value == "plugins" }
+        ?.valueNode as? MappingNode
+        ?: return emptySet()
+
+    return plugins.value
+        .mapNotNull { (it.keyNode as? ScalarNode)?.value }
+        .groupingBy { it }
+        .eachCount()
+        .filterValues { it > 1 }
+        .keys
+}

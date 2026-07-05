@@ -35,7 +35,7 @@ internal class GitHubExternalPluginProvider(
             build = null,
             filename = asset.string("name"),
             downloadUrl = downloadUrl,
-            sha256 = null,
+            sha256 = asset.sha256Digest(),
             publishedAt = release.stringOrNull("published_at")?.let { runCatching { Instant.parse(it) }.getOrNull() },
             changelog = release.stringOrNull("body")
         )
@@ -100,6 +100,13 @@ internal class GitHubExternalPluginProvider(
         get(name)?.takeUnless { it.isJsonNull }?.asBoolean
             ?: throw ExternalPluginException("GitHub response is missing '$name'")
 
+    private fun JsonObject.sha256Digest(): String? {
+        val digest = stringOrNull("digest") ?: return null
+        val match = SHA256_DIGEST.matchEntire(digest)
+            ?: throw ExternalPluginException("GitHub returned an invalid release asset digest")
+        return match.groupValues[1]
+    }
+
     private fun JsonObject.matchingAssets(assetRegex: Regex): List<JsonObject> {
         val assets = get("assets")
             ?: throw ExternalPluginException("GitHub response is missing 'assets'")
@@ -114,5 +121,6 @@ internal class GitHubExternalPluginProvider(
     private companion object {
         const val PAGE_SIZE = 100
         val REPOSITORY = Regex("[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+")
+        val SHA256_DIGEST = Regex("sha256:([0-9a-fA-F]{64})")
     }
 }
