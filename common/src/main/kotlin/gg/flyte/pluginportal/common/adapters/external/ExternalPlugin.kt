@@ -63,4 +63,12 @@ data class ExternalPluginState(
     }
 
     fun stagedMatches(artifact: ExternalArtifact): Boolean = !invalidated && staged?.matches(artifact) == true
+
+    fun withConfigFingerprint(fingerprint: String, installedFileSha256: String?): ExternalPluginState? {
+        if (configFingerprint == fingerprint) return this
+        if (installed != null && installed.sha256.equals(installedFileSha256, ignoreCase = true)) {
+            return copy(configFingerprint = fingerprint)
+        }
+        return null
+    }
 }

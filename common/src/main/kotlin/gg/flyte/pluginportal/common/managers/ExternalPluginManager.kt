@@ -440,19 +440,43 @@ object ExternalPluginManager {
     )
 
     private fun validateStateOwnership() {
-        val invalidIds = configs.values.mapNotNull { config ->
-            val state = states[config.id] ?: return@mapNotNull null
-            config.id.takeUnless { state.configFingerprint == config.fingerprint() }
-        }
-        if (invalidIds.isEmpty()) return
+        var stateChanged = false
 
-        invalidIds.forEach { id ->
-            states.remove(id)
+        configs.values.forEach { config ->
+            val state = states[config.id] ?: return@forEach
+            val fingerprint = config.fingerprint()
+            if (state.configFingerprint == fingerprint) return@forEach
+
+            val preservedState = state.withConfigFingerprint(fingerprint, installedFileHash(config))
+            if (preservedState != null) {
+                states[config.id] = preservedState
+                stateChanged = true
+                PluginPortalBase.plugin.logger.info(
+                    "Preserved external plugin state for '${config.id}' after configuration changed"
+                )
+                return@forEach
+            }
+
+            states.remove(config.id)
+            stateChanged = true
             PluginPortalBase.plugin.logger.warning(
-                "Removed external plugin state for '$id' because its configuration changed"
+                "Removed external plugin state for '${config.id}' because its configuration changed and the configured JAR does not match the saved installation"
             )
         }
-        saveState()
+
+        if (stateChanged) saveState()
+    }
+
+    private fun installedFileHash(config: ExternalPluginConfig): String? {
+        val pluginFile = File(Constants.INSTALL_DIRECTORY, config.file)
+        if (!pluginFile.isFile) return null
+        return runCatching { HashType.SHA256.hash(pluginFile) }
+            .onFailure {
+                PluginPortalBase.plugin.logger.warning(
+                    "Could not verify external plugin '${config.id}' after configuration changed: ${it.message ?: it::class.simpleName}"
+                )
+            }
+            .getOrNull()
     }
 
     private fun ExternalPluginConfig.fingerprint(): String {
