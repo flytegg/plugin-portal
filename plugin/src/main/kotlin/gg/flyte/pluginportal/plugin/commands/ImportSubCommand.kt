@@ -58,7 +58,9 @@ class ImportSubCommand {
 
                 // Get plugin details from API
                 val pluginMap: Map<MarketplacePlatform, Map<String, Plugin?>> = API.getAllPluginsByPlatformIds(platformIds.toList()) ?: return@async audience.sendFailure("Failed to fetch plugin details")
-                val plugins = pluginMap.values.flatMap { it.entries }
+                val plugins = platformIds.map { platformId ->
+                    platformId to pluginMap[platformId.platform]?.get(platformId.platformId)
+                }
 
                 // Build initial message
                 var messageComponent: TextComponent = text("")
@@ -67,11 +69,11 @@ class ImportSubCommand {
                     .append(newline())
 
                 // List all plugins to be installed
-                plugins.forEach { (id, plugin) ->
-                    val platform = plugin?.bestPlatform
+                plugins.forEach { (platformId, plugin) ->
+                    val platform = plugin?.platform(platformId.platform)?.platform
                     messageComponent = messageComponent
                         .append(textSecondary(" • "))
-                        .append(textPrimary(plugin?.name ?: id))
+                        .append(textPrimary(plugin?.name ?: platformId.platformId))
                         .append(text(" from ", NamedTextColor.DARK_GRAY))
                         .append(text(platform?.name ?: "NOT FOUND", NamedTextColor.AQUA))
                         .append(newline())
@@ -86,7 +88,7 @@ class ImportSubCommand {
                 var skipCount = 0
                 var failCount = 0
 
-                for (plugin in plugins.mapNotNull { it.value }) {
+                for ((platformId, plugin) in plugins.mapNotNull { (platformId, plugin) -> plugin?.let { platformId to it } }) {
                     if (LocalPluginCache.hasPlugin(plugin)) {
                         skipCount++
                         audience.sendMessage(status(Status.WARNING, "Skipping ${plugin.name} (already installed)").append(newline()))
@@ -94,7 +96,7 @@ class ImportSubCommand {
                     }
 
                     try {
-                        val platform = plugin.bestPlatform
+                        val platform = plugin.platform(platformId.platform)?.platform
 
                         audience.sendMessage(
                             startLine()
@@ -106,7 +108,11 @@ class ImportSubCommand {
                                 .append(endLine())
                         )
 
-                        if (platform == null) return@async audience.sendFailure("Could not find an available platform")
+                        if (platform == null) {
+                            audience.sendFailure("Could not find ${platformId.platform.name} data for ${plugin.name}")
+                            failCount++
+                            continue
+                        }
 
                         val response = MarketplacePluginCache.installPlugin(
                             audience,

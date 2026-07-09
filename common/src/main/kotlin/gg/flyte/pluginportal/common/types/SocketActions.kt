@@ -1,6 +1,7 @@
 package gg.flyte.pluginportal.common.types
 
 import com.google.gson.JsonObject
+import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.Config
 import gg.flyte.pluginportal.common.logging.PortalLogger
 import gg.flyte.pluginportal.common.managers.LocalPluginCache
@@ -10,6 +11,7 @@ import gg.flyte.pluginportal.common.managers.PluginModificationManager
 import gg.flyte.pluginportal.common.notifications.DiscordWebhookNotifier
 import gg.flyte.pluginportal.common.types.enums.MarketplacePlatform
 import gg.flyte.pluginportal.common.util.ActionResponseString
+import gg.flyte.pluginportal.common.util.currentMinecraftVersion
 import gg.flyte.pluginportal.common.util.currentServerTypePreference
 import gg.flyte.pluginportal.common.util.download
 import net.kyori.adventure.audience.Audience
@@ -32,8 +34,14 @@ class SocketActions {
 
         val platformPlugin = plugin.platform(marketplacePlatform)
             ?: return@SocketAction PluginActionResponse(false, "Plugin not found on $marketplacePlatform")
+        val serverTypes = currentServerTypePreference()
+        val minecraftVersion = currentMinecraftVersion()
         val version = if (versionNumber != null) {
-            when (val selection = platformPlugin.exactCompatibleVersion(versionNumber, channel, currentServerTypePreference())) {
+            val selection = platformPlugin.exactCompatibleVersionWithFallback(versionNumber, channel, serverTypes, minecraftVersion) {
+                API.getPluginVersions(platformPlugin.platformWithId)?.toList()
+            }
+
+            when (selection) {
                 is ExactVersionSelection.Found -> selection.version
                 is ExactVersionSelection.Ambiguous ->
                     return@SocketAction PluginActionResponse(false, "Multiple compatible versions named $versionNumber exist. Select a release channel.")
@@ -41,7 +49,9 @@ class SocketActions {
                     return@SocketAction PluginActionResponse(false, "No compatible version found for $versionNumber")
             }
         } else {
-            platformPlugin.newestCompatibleVersion(channel, currentServerTypePreference())
+            platformPlugin.newestCompatibleVersionWithFallback(channel, serverTypes, minecraftVersion) {
+                API.getPluginVersions(platformPlugin.platformWithId)?.toList()
+            }
                 ?: return@SocketAction PluginActionResponse(false, "No compatible version found")
         }
 
@@ -134,7 +144,11 @@ class SocketActions {
             ?: return@SocketAction PluginActionResponse(false, "Plugin not found")
         val platformPlugin = marketplacePlugin.platform(targetPlatform)
             ?: return@SocketAction PluginActionResponse(false, "${marketplacePlugin.name} is not available on $targetPlatform")
-        val version = platformPlugin.newestCompatibleVersion(localPlugin.preferredChannel, currentServerTypePreference())
+        val serverTypes = currentServerTypePreference()
+        val minecraftVersion = currentMinecraftVersion()
+        val version = platformPlugin.newestCompatibleVersionWithFallback(localPlugin.preferredChannel, serverTypes, minecraftVersion) {
+            API.getPluginVersions(platformPlugin.platformWithId)?.toList()
+        }
             ?: return@SocketAction PluginActionResponse(false, "No compatible version found")
 
         val newPlugin = marketplacePlugin.download(

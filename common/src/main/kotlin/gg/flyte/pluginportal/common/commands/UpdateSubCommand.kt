@@ -14,9 +14,10 @@ import gg.flyte.pluginportal.common.types.ExactVersionSelection
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.common.types.Version
-import gg.flyte.pluginportal.common.types.exactCompatibleVersion
+import gg.flyte.pluginportal.common.types.exactCompatibleVersionWithFallback
 import gg.flyte.pluginportal.common.util.SharedComponents
 import gg.flyte.pluginportal.common.util.async
+import gg.flyte.pluginportal.common.util.currentMinecraftVersion
 import gg.flyte.pluginportal.common.util.currentServerTypePreference
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.*
@@ -66,15 +67,12 @@ class UpdateSubCommand {
                 ?: return audience.sendFailure("Could not find plugin in marketplace (${localPlugin.name} with ID ${localPlugin.platformId} on ${localPlugin.platform})")
             val platformPlugin = marketplacePlugin.platform(localPlugin.platform)
                 ?: return audience.sendFailure("${localPlugin.name} is not available on ${localPlugin.platform}")
+            val serverTypes = currentServerTypePreference()
+            val minecraftVersion = currentMinecraftVersion()
 
-            val selection = platformPlugin.exactCompatibleVersion(exactVersionNumber, targetChannel, currentServerTypePreference())
-                .let { initial ->
-                    if (initial != ExactVersionSelection.NotFound) initial
-                    else API.getPluginVersions(platformPlugin.platformWithId)
-                        ?.toList()
-                        ?.exactCompatibleVersion(exactVersionNumber, targetChannel, currentServerTypePreference())
-                        ?: initial
-                }
+            val selection = platformPlugin.exactCompatibleVersionWithFallback(exactVersionNumber, targetChannel, serverTypes, minecraftVersion) {
+                API.getPluginVersions(platformPlugin.platformWithId)?.toList()
+            }
 
             targetVersionOverride = when (selection) {
                 is ExactVersionSelection.Found -> selection.version
