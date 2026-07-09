@@ -6,6 +6,7 @@ import gg.flyte.pluginportal.common.commands.lamp.CommandEnabledConditionValidat
 import gg.flyte.pluginportal.common.commands.lamp.Features
 import gg.flyte.pluginportal.common.commands.lamp.LampExceptionHandler
 import gg.flyte.pluginportal.common.commands.lamp.MarketplacePlatformType
+import gg.flyte.pluginportal.common.managers.ExternalPluginManager
 import gg.flyte.pluginportal.common.managers.LocalPluginCache
 import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
 import gg.flyte.pluginportal.common.managers.PluginPortalSelfUpdateManager
@@ -65,8 +66,26 @@ object PluginPortalBase {
         }
         
         LocalPluginCache.load()
+        ExternalPluginManager.load().forEach { plugin.logger.warning("Invalid external plugin config: $it") }
         async { MarketplacePluginCache.startCacheLoader() }
         async { ServerTelemetryManager.recordStartup() }
+        ExternalPluginManager.executeAsync {
+            runCatching { ExternalPluginManager.verifyInstalledPluginStates() }.onFailure {
+                plugin.logger.warning("Could not verify external plugin state: ${it.message ?: it::class.simpleName}")
+            }
+        }
+        if (info.hasPremiumEntitlement()) {
+            ExternalPluginManager.executeAsync {
+                runCatching { ExternalPluginManager.updateAll(includeManual = false) }.onSuccess { results ->
+                    results.forEach { result ->
+                        if (result.success) plugin.logger.info(result.message)
+                        else plugin.logger.warning(result.message)
+                    }
+                }.onFailure {
+                    plugin.logger.warning("Could not update external plugins: ${it.message ?: it::class.simpleName}")
+                }
+            }
+        }
 
         Bukkit.getPluginManager().registerEvents(UpdateNotificationListener(), plugin)
 
@@ -157,6 +176,7 @@ object PluginPortalBase {
     }
 
     fun onDisable() {
+        ExternalPluginManager.close()
         MarketplacePluginCache.stopCacheLoader()
         DiscordWebhookNotifier.close()
         API.closeClient()

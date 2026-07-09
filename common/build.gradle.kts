@@ -12,6 +12,7 @@ repositories {
 
 dependencies {
     compileOnly(libs.spigot.api)
+    testImplementation("org.yaml:snakeyaml:2.2")
 
     api(libs.bundles.lamp)
     

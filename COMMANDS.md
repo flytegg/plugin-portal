@@ -9,6 +9,8 @@ Concise support-agent memory for Plugin Portal commands, dashboard behavior, upd
 - Plugin folder: `plugins/`
 - Plugin Portal data folder: `plugins/PluginPortal/`
 - Tracked local plugin cache: `plugins/PluginPortal/plugins.json`
+- External plugin config: `plugins/PluginPortal/external-plugins.yml`
+- External plugin state: `plugins/PluginPortal/external-plugins-state.json`
 - Bukkit/Paper update folder: `plugins/update/`
 - Plugin Portal API used by plugin code: `https://v3.pluginportal.link`
 - Web dashboard/editor URL: `https://pluginportal.link/rooms/<room-or-server-id>`
@@ -27,10 +29,12 @@ Supported marketplace/platform concepts in code:
 - SpigotMC
 - Polymart
 - Custom direct JAR URLs for `/pp install-url`
+- GitHub Releases and GeyserMC downloads configured as external plugins
 
 Important distinction:
 
 - Plugin Portal only fully manages plugins it has in `plugins.json`.
+- External plugins are managed separately and never written to `plugins.json`.
 - Manually installed JARs are not tracked until recognized with `/pp recognize <file>` or `/pp recognizeAll`.
 - The dashboard's installed/update views are based on the local tracked cache plus marketplace API enrichment.
 
@@ -135,6 +139,54 @@ Download adapters:
 - Standard marketplace adapter handles non-Polymart marketplace plugins.
 - Custom URL adapter handles direct JAR URLs.
 
+## External Plugins
+
+External plugins are declared in `external-plugins.yml`. GitHub sources require an
+asset regex that matches exactly one release asset. GeyserMC sources require an
+artifact name such as `spigot`, `bungee`, or `velocity`.
+
+External plugin IDs may contain letters, numbers, underscores, and hyphens. Each
+entry must use a unique target filename. GitHub releases with no matching asset are
+skipped, while multiple matching assets in the newest applicable release are
+reported as an ambiguity instead of falling back to an older release.
+
+```yaml
+plugins:
+  floodgate:
+    source: geysermc:floodgate
+    artifact: spigot
+    file: floodgate-spigot.jar
+    updates: manual
+
+  viaversion:
+    source: github:ViaVersion/ViaVersion
+    asset: "^ViaVersion.*\\.jar$"
+    file: ViaVersion.jar
+    prereleases: false
+    updates: manual
+```
+
+| Command | Purpose |
+| --- | --- |
+| `/pp external check <id>` | Resolve the latest matching provider artifact without downloading it. |
+| `/pp external install <id>` | Install a configured external plugin into `plugins/`. |
+| `/pp external update <id>` | Stage an installed external plugin update in `plugins/update/`. |
+| `/pp external invalidate <id>` | Force the next eligible update to download the latest artifact again. |
+| `/pp external updateAll` | Explicitly update installed `manual` and `auto` entries. |
+| `/pp external reload` | Reload user intent from `external-plugins.yml`. |
+
+Update policies:
+
+- `manual`: updated only by explicit external update commands.
+- `auto`: also checked and updated during startup.
+- `disabled`: tracked but never updated.
+
+Installed and staged artifact IDs, versions, hashes, check timestamps, and errors are
+stored in `external-plugins-state.json`. Provider, source, target filename, and update
+policy remain only in `external-plugins.yml`. Downloads are rejected when their SHA-256
+does not match a digest supplied by the provider; GitHub assets without a digest remain
+supported for compatibility with older releases.
+
 Install failure patterns:
 
 - Already installed: use update instead.
@@ -235,7 +287,7 @@ Export/import:
 | `/pp help` | `pluginportal.view` | Show command help. | Also works by running `/pp`. |
 | `/pp info` | `pluginportal.view` | Show Plugin Portal version, edition, license state, and update info. | Alias: `/pp version`. |
 | `/pp version` | `pluginportal.view` | Same as `/pp info`. | Shows Licensed: Yes/No. |
-| `/pp list` | `pluginportal.view` | List plugins installed/tracked by Plugin Portal. | Includes update/uninstall buttons in player chat. |
+| `/pp list` | `pluginportal.view` | List marketplace and external plugins managed by Plugin Portal. | Checks and displays update status; marketplace entries include update/uninstall buttons in player chat. |
 | `/pp dump` | `pluginportal.dump` | Upload logs/support dump to MCLogs and return a support URL. | Use for diagnostics. |
 | `/pluginportal config refresh` | `pluginportal.manage.config` | Reload local plugin cache/config state. | Command root is `pluginportal config`, not `/pp config`. |
 

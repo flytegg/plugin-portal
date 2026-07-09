@@ -2,6 +2,7 @@ package gg.flyte.pluginportal.common.commands.lamp
 
 import gg.flyte.pluginportal.common.PluginPortalBase
 import gg.flyte.pluginportal.common.SearchPlugins
+import gg.flyte.pluginportal.common.managers.ExternalPluginManager
 import gg.flyte.pluginportal.common.managers.LocalPluginCache
 import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
 import gg.flyte.pluginportal.common.types.LocalPlugin
@@ -37,6 +38,10 @@ class InstalledPluginSuggestionProvider: CustomSuggestionProvider({
 
 class InstalledPluginNotPortalSuggestionProvider: CustomSuggestionProvider({
     LocalPluginCache.map(LocalPlugin::name).filter { it != PluginPortalBase.plugin.description.name }
+})
+
+class ExternalPluginSuggestionProvider: CustomSuggestionProvider({
+    ExternalPluginManager.ids
 })
 
 class KeyActionSuggestionProvider: CustomSuggestionProvider({
