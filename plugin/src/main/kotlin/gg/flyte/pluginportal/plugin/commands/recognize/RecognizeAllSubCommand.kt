@@ -45,12 +45,14 @@ class RecognizeAllSubCommand {
     fun recognizeAllCommand(audience: Audience) {
         async {
             val externalHashes = ExternalPluginManager.managedHashes()
+            val externalFileNames = ExternalPluginManager.managedFileNames()
             val jars = Constants.INSTALL_DIRECTORY.listFiles()
                 ?.filter(File::isJarFile)
                 ?.associateBy(HashType.SHA256.hash)
                 ?.filter {
                     !LocalPluginCache.hasPluginByHash(it.key) &&
                         it.key.lowercase() !in externalHashes &&
+                        it.value.name.lowercase() !in externalFileNames &&
                         !it.value.isPluginPortal &&
                         !LocalPluginCache.hasManagedDownloadedFile(it.value)
                 }

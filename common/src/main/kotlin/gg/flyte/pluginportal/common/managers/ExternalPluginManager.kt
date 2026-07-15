@@ -160,9 +160,15 @@ object ExternalPluginManager {
         configs.values.sortedBy(ExternalPluginConfig::id).map { it to currentState(it) }
 
     @Synchronized
-    fun managedHashes(): Set<String> = states.values
+    fun managedHashes(): Set<String> = configs.keys
+        .mapNotNull(states::get)
         .flatMap { state -> listOfNotNull(state.installed?.sha256, state.staged?.sha256) }
         .map(String::lowercase)
+        .toSet()
+
+    @Synchronized
+    fun managedFileNames(): Set<String> = configs.values
+        .map { it.file.lowercase(Locale.ROOT) }
         .toSet()
 
     @Synchronized

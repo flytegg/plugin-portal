@@ -206,11 +206,14 @@ class ListSubCommand {
             addAll(adapterManagedHashes())
             add(HashType.SHA256.hash(PluginPortalBase.info.pluginJarFile).lowercase())
         }
+        val externalFileNames = ExternalPluginManager.managedFileNames()
 
         return Constants.INSTALL_DIRECTORY
             .listFiles()
             .orEmpty()
             .filter(File::isJarFile)
+            .filterNot(LocalPluginCache::hasManagedDownloadedFile)
+            .filterNot { it.name.lowercase() in externalFileNames }
             .mapNotNull { file ->
                 val hash = runCatching { HashType.SHA256.hash(file) }.getOrNull() ?: return@mapNotNull null
                 file.takeUnless { hash.lowercase() in managedHashes }?.let { UnrecognizedJar(it, hash) }

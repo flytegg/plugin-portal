@@ -69,7 +69,10 @@ class RecognizeSubCommand {
                 return@async audience.sendInfo("Plugin already installed")
             }
 
-            if (sha256.lowercase() in ExternalPluginManager.managedHashes()) {
+            if (
+                sha256.lowercase() in ExternalPluginManager.managedHashes() ||
+                pluginFile.name.lowercase() in ExternalPluginManager.managedFileNames()
+            ) {
                 return@async audience.sendInfo("Plugin is already managed as an external plugin")
             }
 
