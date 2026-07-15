@@ -9,6 +9,7 @@ import gg.flyte.pluginportal.common.chat.sendInfo
 import gg.flyte.pluginportal.common.chat.sendSuccess
 import gg.flyte.pluginportal.common.commands.lamp.EnabledCommand
 import gg.flyte.pluginportal.common.commands.lamp.Features
+import gg.flyte.pluginportal.common.managers.ExternalPluginManager
 import gg.flyte.pluginportal.common.managers.LocalPluginCache
 import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
 import gg.flyte.pluginportal.common.types.LocalPlugin
@@ -66,6 +67,10 @@ class RecognizeSubCommand {
             // Check if already installed
             if (LocalPluginCache.hasPluginByHash(sha256)) {
                 return@async audience.sendInfo("Plugin already installed")
+            }
+
+            if (sha256.lowercase() in ExternalPluginManager.managedHashes()) {
+                return@async audience.sendInfo("Plugin is already managed as an external plugin")
             }
 
             // Check for polymart.yml file in the jar

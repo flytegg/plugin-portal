@@ -7,6 +7,7 @@ import gg.flyte.pluginportal.common.PlatformId
 import gg.flyte.pluginportal.common.chat.*
 import gg.flyte.pluginportal.common.commands.lamp.EnabledCommand
 import gg.flyte.pluginportal.common.commands.lamp.Features
+import gg.flyte.pluginportal.common.managers.ExternalPluginManager
 import gg.flyte.pluginportal.common.managers.LocalPluginCache
 import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
 import gg.flyte.pluginportal.common.types.LocalPlugin
@@ -43,10 +44,16 @@ class RecognizeAllSubCommand {
     @CommandPermission("pluginportal.manage.recognize")
     fun recognizeAllCommand(audience: Audience) {
         async {
+            val externalHashes = ExternalPluginManager.managedHashes()
             val jars = Constants.INSTALL_DIRECTORY.listFiles()
                 ?.filter(File::isJarFile)
                 ?.associateBy(HashType.SHA256.hash)
-                ?.filter { !LocalPluginCache.hasPluginByHash(it.key) && !it.value.isPluginPortal && !LocalPluginCache.hasManagedDownloadedFile(it.value) }
+                ?.filter {
+                    !LocalPluginCache.hasPluginByHash(it.key) &&
+                        it.key.lowercase() !in externalHashes &&
+                        !it.value.isPluginPortal &&
+                        !LocalPluginCache.hasManagedDownloadedFile(it.value)
+                }
                 ?.map { RecognitionInfo(it.value, Recognize.getPolymartData(it.value)) }
                 ?.ifEmpty { return@async audience.sendSuccess("No plugins are unrecognized") }
                 ?: return@async audience.sendFailure("Could not determine a plugin directory")

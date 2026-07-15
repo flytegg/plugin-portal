@@ -235,13 +235,13 @@ class ListSubCommand {
     private fun getCompactUnrecognizedJarLine(jar: UnrecognizedJar): Component =
         Component.text(" - ", NamedTextColor.DARK_GRAY)
             .append(textPrimary(jar.file.name).suggestCommand("/pp recognize \"${jar.file.name}\""))
-            .append(textDark(" (UNRECOGNIZED) "))
+            .append(Component.text(" "))
             .append(recognizeButton(jar.file))
 
     private fun getDetailedUnrecognizedJarLine(jar: UnrecognizedJar): Component =
         Component.text(" - ", NamedTextColor.DARK_GRAY)
             .append(textPrimary(jar.file.name).suggestCommand("/pp recognize \"${jar.file.name}\""))
-            .append(textDark(" (UNRECOGNIZED) "))
+            .append(Component.text(" "))
             .append(textSecondary("sha256="))
             .append(textPrimary(jar.sha256.take(12)))
             .append(Component.text(" "))
