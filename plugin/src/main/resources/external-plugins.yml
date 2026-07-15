@@ -4,12 +4,12 @@ plugins: {}
   # floodgate:
   #   source: geysermc:floodgate
   #   artifact: spigot
-  #   file: floodgate-spigot.jar
+  #   file: "[PP] floodgate [GEYSERMC].jar"
   #   updates: manual
 
   # viaversion:
   #   source: github:ViaVersion/ViaVersion
   #   asset: "^ViaVersion.*\\.jar$"
-  #   file: ViaVersion.jar
+  #   file: "[PP] viaversion [GITHUB].jar"
   #   prereleases: false
   #   updates: manual

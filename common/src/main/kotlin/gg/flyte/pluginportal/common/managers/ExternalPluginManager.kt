@@ -35,6 +35,8 @@ object ExternalPluginManager {
         GeyserExternalPluginProvider()
     ).associateBy(ExternalPluginProvider::id)
     private val pluginIdPattern = Regex("[A-Za-z0-9_-]+")
+    private val githubRepositoryPattern = Regex("[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+")
+    private val geyserIdentifierPattern = Regex("[A-Za-z0-9_-]+")
     private val executor = Executors.newSingleThreadExecutor { runnable ->
         Thread(runnable, "PluginPortal-External").apply { isDaemon = true }
     }
@@ -98,7 +100,8 @@ object ExternalPluginManager {
             val source = section.getString("source").orEmpty().trim()
             val provider = source.substringBefore(':').lowercase()
             val sourceId = source.substringAfter(':', "").trim()
-            val file = section.getString("file").orEmpty().trim()
+            val file = section.getString("file")?.trim()?.takeIf(String::isNotEmpty)
+                ?: managedFileName(id, provider)
             val updatesValue = section.getString("updates", "manual").orEmpty()
             val updates = ExternalUpdatePolicy.from(updatesValue)
             val artifact = section.getString("artifact")?.trim()?.takeIf(String::isNotEmpty)
@@ -297,6 +300,38 @@ object ExternalPluginManager {
         .filter { currentState(it)?.installed != null }
         .map { update(it.id) }
 
+    @Synchronized
+    fun addGitHub(
+        id: String,
+        repository: String,
+        asset: String,
+        prereleases: Boolean
+    ): ExternalPluginResult = addConfig(gitHubConfig(id, repository, asset, managedFileName(id, "github"), prereleases))
+
+    @Synchronized
+    fun addGeyser(
+        id: String,
+        project: String,
+        artifact: String
+    ): ExternalPluginResult = addConfig(geyserConfig(id, project, artifact, managedFileName(id, "geysermc")))
+
+    @Synchronized
+    fun importGitHub(
+        id: String,
+        repository: String,
+        asset: String,
+        file: String,
+        prereleases: Boolean
+    ): ExternalPluginResult = importInstalled(gitHubConfig(id, repository, asset, file, prereleases))
+
+    @Synchronized
+    fun importGeyser(
+        id: String,
+        project: String,
+        artifact: String,
+        file: String
+    ): ExternalPluginResult = importInstalled(geyserConfig(id, project, artifact, file))
+
     private fun download(
         config: ExternalPluginConfig,
         destination: File,
@@ -382,6 +417,97 @@ object ExternalPluginManager {
         return failure("Could not download ${config.id}: $message$suffix")
     }
 
+    private fun addConfig(config: ExternalPluginConfig): ExternalPluginResult {
+        val validationError = validateConfig(config) ?: duplicateConfigError(config)
+        if (validationError != null) return failure(validationError)
+
+        writeConfig(config)
+        val errors = reload()
+        if (errors.isNotEmpty()) return failure("Configured ${config.id}, but external-plugins.yml has errors: ${errors.joinToString("; ")}")
+        return ExternalPluginResult(
+            success = true,
+            message = "Configured ${config.id} in external-plugins.yml as ${config.file}; run /pp external install ${config.id} to download it"
+        )
+    }
+
+    private fun gitHubConfig(
+        id: String,
+        repository: String,
+        asset: String,
+        file: String,
+        prereleases: Boolean
+    ) = ExternalPluginConfig(
+        id = id,
+        provider = "github",
+        sourceId = repository,
+        artifact = null,
+        asset = normalizeGitHubAssetPattern(asset),
+        file = file,
+        prereleases = prereleases,
+        updates = ExternalUpdatePolicy.MANUAL
+    )
+
+    private fun geyserConfig(
+        id: String,
+        project: String,
+        artifact: String,
+        file: String
+    ) = ExternalPluginConfig(
+        id = id,
+        provider = "geysermc",
+        sourceId = project,
+        artifact = artifact,
+        asset = null,
+        file = file,
+        prereleases = false,
+        updates = ExternalUpdatePolicy.MANUAL
+    )
+
+    private fun importInstalled(config: ExternalPluginConfig): ExternalPluginResult {
+        val validationError = validateConfig(config) ?: duplicateConfigError(config)
+        if (validationError != null) return failure(validationError)
+
+        val pluginFile = File(Constants.INSTALL_DIRECTORY, config.file)
+        if (!pluginFile.isFile) return failure("${config.file} does not exist in ${relativePath(Constants.INSTALL_DIRECTORY)}")
+        if (!isJar(pluginFile)) return failure("${config.file} is not a valid JAR")
+
+        val hash = HashType.SHA256.hash(pluginFile)
+        val resolvedArtifact = runCatching { providers.getValue(config.provider).resolve(config) }.getOrNull()
+        val installed = if (resolvedArtifact?.sha256?.equals(hash, ignoreCase = true) == true) {
+            ExternalArtifactState(
+                artifactId = resolvedArtifact.artifactId,
+                version = resolvedArtifact.version,
+                build = resolvedArtifact.build,
+                sha256 = hash,
+                recordedAt = Instant.now().toString()
+            )
+        } else {
+            ExternalArtifactState(
+                artifactId = "imported:${hash.take(12)}",
+                version = readPluginVersion(pluginFile) ?: "imported",
+                build = null,
+                sha256 = hash,
+                recordedAt = Instant.now().toString()
+            )
+        }
+
+        writeConfig(config)
+        val errors = reload()
+        if (errors.isNotEmpty()) return failure("Imported ${config.id}, but external-plugins.yml has errors: ${errors.joinToString("; ")}")
+
+        states[config.id] = emptyState(config).copy(
+            installed = installed,
+            lastCheckedAt = Instant.now().toString(),
+            lastError = null,
+            invalidated = false
+        )
+        saveState()
+        return ExternalPluginResult(
+            success = true,
+            message = "Imported ${config.id} from ${config.file}"
+        )
+    }
+
     private fun readState(): Map<String, ExternalPluginState> {
         if (!stateFile.exists()) return emptyMap()
         return try {
@@ -439,6 +565,45 @@ object ExternalPluginManager {
         configFingerprint = config.fingerprint()
     )
 
+    private fun validateConfig(config: ExternalPluginConfig): String? {
+        val invalidAssetRegex = config.provider == "github" &&
+            config.asset != null &&
+            runCatching { config.asset.toRegex() }.isFailure
+
+        return when {
+            !pluginIdPattern.matches(config.id) -> "${config.id}: plugin ID may only contain letters, numbers, underscores, and hyphens"
+            config.provider !in providers -> "${config.id}: unsupported source provider '${config.provider}'"
+            config.sourceId.isBlank() -> "${config.id}: source must not be blank"
+            config.provider == "github" && !githubRepositoryPattern.matches(config.sourceId) -> "${config.id}: GitHub source must use the owner/repository format"
+            config.provider == "geysermc" && !geyserIdentifierPattern.matches(config.sourceId) -> "${config.id}: invalid GeyserMC project name"
+            !isSafeJarName(config.file) -> "${config.id}: file must be a single .jar filename"
+            config.provider == "github" && config.asset.isNullOrBlank() -> "${config.id}: GitHub source requires an asset regex"
+            invalidAssetRegex -> "${config.id}: GitHub asset must be a valid regex"
+            config.provider == "geysermc" && config.artifact.isNullOrBlank() -> "${config.id}: GeyserMC source requires an artifact"
+            config.provider == "geysermc" && !geyserIdentifierPattern.matches(config.artifact.orEmpty()) -> "${config.id}: invalid GeyserMC artifact name"
+            else -> null
+        }
+    }
+
+    private fun duplicateConfigError(config: ExternalPluginConfig): String? {
+        if (config.id in configs) return "${config.id} is already configured"
+        val duplicateFile = configs.values.firstOrNull { it.file.equals(config.file, ignoreCase = true) }
+        return duplicateFile?.let { "${config.file} is already used by ${it.id}" }
+    }
+
+    private fun writeConfig(config: ExternalPluginConfig) {
+        if (!configFile.exists()) PluginPortalBase.plugin.saveResource("external-plugins.yml", false)
+        val yaml = YamlConfiguration.loadConfiguration(configFile).apply { options().pathSeparator('/') }
+        val path = "plugins/${config.id}"
+        yaml.set("$path/source", "${config.provider}:${config.sourceId}")
+        yaml.set("$path/artifact", config.artifact)
+        yaml.set("$path/asset", config.asset)
+        yaml.set("$path/file", config.file)
+        yaml.set("$path/prereleases", config.prereleases.takeIf { config.provider == "github" })
+        yaml.set("$path/updates", config.updates.name.lowercase())
+        yaml.save(configFile)
+    }
+
     private fun validateStateOwnership() {
         var stateChanged = false
 
@@ -495,6 +660,14 @@ object ExternalPluginManager {
         ZipFile(file).use { it.entries().hasMoreElements() }
     }.getOrDefault(false)
 
+    private fun readPluginVersion(file: File): String? = runCatching {
+        ZipFile(file).use { zip ->
+            val pluginYml = zip.getEntry("plugin.yml") ?: return@use null
+            val contents = zip.getInputStream(pluginYml).bufferedReader().use { it.readText() }
+            YamlConfiguration().apply { loadFromString(contents) }.getString("version")
+        }
+    }.getOrNull()
+
     private fun moveReplacing(source: File, destination: File) {
         runCatching {
             Files.move(
@@ -512,6 +685,19 @@ object ExternalPluginManager {
         val root = File(".").canonicalFile.toPath()
         val path = file.canonicalFile.toPath()
         return if (path.startsWith(root)) root.relativize(path).toString().replace(File.separatorChar, '/') else file.path
+    }
+
+    private fun managedFileName(id: String, provider: String): String {
+        val name = id.replace(Regex("[^A-Za-z0-9_.-]+"), "-").trim('-', '.', '_')
+            .takeIf(String::isNotBlank)
+            ?: "external"
+        return "[PP] $name [${provider.uppercase(Locale.ROOT)}].jar"
+    }
+
+    private fun normalizeGitHubAssetPattern(asset: String): String {
+        val trimmed = asset.trim()
+        val hasRegexSyntax = trimmed.any { it in "^$.*+?[](){}|\\" }
+        return if (hasRegexSyntax) trimmed else ".*${Regex.escape(trimmed)}.*\\.jar"
     }
 
     private fun failure(message: String) = ExternalPluginResult(false, message)

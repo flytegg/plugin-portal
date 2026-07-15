@@ -7,11 +7,14 @@ import gg.flyte.pluginportal.common.commands.lamp.ExternalPluginSuggestionProvid
 import gg.flyte.pluginportal.common.managers.ExternalPluginManager
 import gg.flyte.pluginportal.common.managers.ExternalPluginResult
 import gg.flyte.pluginportal.plugin.commands.lamp.RequiresAuth
+import gg.flyte.pluginportal.plugin.commands.lamp.SafeFileName
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Named
+import revxrsal.commands.annotation.Optional
 import revxrsal.commands.annotation.Subcommand
 import revxrsal.commands.annotation.SuggestWith
+import revxrsal.commands.annotation.Switch
 import revxrsal.commands.bukkit.annotation.CommandPermission
 
 @Command("pp", "pluginportal", "ppm")
@@ -30,6 +33,48 @@ class ExternalSubCommand {
         audience: Audience,
         @Named("id") @SuggestWith(ExternalPluginSuggestionProvider::class) id: String
     ) = runAsync(audience) { ExternalPluginManager.install(id) }
+
+    @RequiresAuth
+    @Subcommand("external add github")
+    fun addGitHub(
+        audience: Audience,
+        @Named("id") id: String,
+        @Named("owner") owner: String,
+        @Named("repository") repository: String,
+        @Named("asset") asset: String,
+        @Optional @Switch("prereleases") prereleases: Boolean = false
+    ) = runAsync(audience) { ExternalPluginManager.addGitHub(id, "$owner/$repository", asset, prereleases) }
+
+    @RequiresAuth
+    @Subcommand("external add geysermc")
+    fun addGeyser(
+        audience: Audience,
+        @Named("id") id: String,
+        @Named("project") project: String,
+        @Named("artifact") artifact: String
+    ) = runAsync(audience) { ExternalPluginManager.addGeyser(id, project, artifact) }
+
+    @RequiresAuth
+    @Subcommand("external import github")
+    fun importGitHub(
+        audience: Audience,
+        @Named("id") id: String,
+        @Named("owner") owner: String,
+        @Named("repository") repository: String,
+        @Named("asset") asset: String,
+        @Named("file") @SafeFileName file: String,
+        @Optional @Switch("prereleases") prereleases: Boolean = false
+    ) = runAsync(audience) { ExternalPluginManager.importGitHub(id, "$owner/$repository", asset, file, prereleases) }
+
+    @RequiresAuth
+    @Subcommand("external import geysermc")
+    fun importGeyser(
+        audience: Audience,
+        @Named("id") id: String,
+        @Named("project") project: String,
+        @Named("artifact") artifact: String,
+        @Named("file") @SafeFileName file: String
+    ) = runAsync(audience) { ExternalPluginManager.importGeyser(id, project, artifact, file) }
 
     @RequiresAuth
     @Subcommand("external update")
