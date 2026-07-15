@@ -293,7 +293,7 @@ Export/import:
 | `/pp help` | `pluginportal.view` | Show command help. | Also works by running `/pp`. |
 | `/pp info` | `pluginportal.view` | Show Plugin Portal version, edition, license state, and update info. | Alias: `/pp version`. |
 | `/pp version` | `pluginportal.view` | Same as `/pp info`. | Shows Licensed: Yes/No. |
-| `/pp list` | `pluginportal.view` | List marketplace and external plugins managed by Plugin Portal. | Checks and displays update status; marketplace entries include update/uninstall buttons in player chat. |
+| `/pp list [--all]` | `pluginportal.view` | List marketplace and external plugins managed by Plugin Portal. | Checks and displays update status; `--all` also shows unrecognized JARs in `plugins/`. |
 | `/pp dump` | `pluginportal.dump` | Upload logs/support dump to MCLogs and return a support URL. | Use for diagnostics. |
 | `/pluginportal config refresh` | `pluginportal.manage.config` | Reload local plugin cache/config state. | Command root is `pluginportal config`, not `/pp config`. |
 

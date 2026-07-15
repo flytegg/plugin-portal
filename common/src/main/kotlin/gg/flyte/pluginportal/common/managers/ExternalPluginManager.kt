@@ -160,6 +160,12 @@ object ExternalPluginManager {
         configs.values.sortedBy(ExternalPluginConfig::id).map { it to currentState(it) }
 
     @Synchronized
+    fun managedHashes(): Set<String> = states.values
+        .flatMap { state -> listOfNotNull(state.installed?.sha256, state.staged?.sha256) }
+        .map(String::lowercase)
+        .toSet()
+
+    @Synchronized
     fun verifyInstalledPluginStates() {
         var stateChanged = false
         val mismatchedIds = configs.values
