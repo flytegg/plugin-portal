@@ -271,7 +271,7 @@ object ExternalPluginManager {
             if (destination.exists()) return failure("${config.id} is already installed; use external update")
             removeState(id)
         }
-        if (destination.exists()) return adoptInstalled(config, destination)
+        if (destination.exists()) return adoptMatchingInstalled(config, destination)
         return download(config, destination)
     }
 
@@ -493,14 +493,15 @@ object ExternalPluginManager {
     private fun adoptInstalled(
         config: ExternalPluginConfig,
         pluginFile: File,
-        successMessage: String = "Imported existing ${config.id} from ${relativePath(pluginFile)}"
+        successMessage: String = "Imported existing ${config.id} from ${relativePath(pluginFile)}",
+        resolvedArtifact: ExternalArtifact? = null
     ): ExternalPluginResult {
         if (!pluginFile.isFile) return failure("${config.file} does not exist in ${relativePath(Constants.INSTALL_DIRECTORY)}")
         if (!isJar(pluginFile)) return failure("${config.file} is not a valid JAR")
 
         val hash = HashType.SHA256.hash(pluginFile)
-        val resolvedArtifact = runCatching { providers.getValue(config.provider).resolve(config) }.getOrNull()
-        val installed = artifactStateForInstalledFile(config, pluginFile, hash, resolvedArtifact)
+        val artifact = resolvedArtifact ?: runCatching { providers.getValue(config.provider).resolve(config) }.getOrNull()
+        val installed = artifactStateForInstalledFile(pluginFile, hash, artifact)
 
         states[config.id] = emptyState(config).copy(
             installed = installed,
@@ -515,8 +516,29 @@ object ExternalPluginManager {
         )
     }
 
+    private fun adoptMatchingInstalled(config: ExternalPluginConfig, pluginFile: File): ExternalPluginResult {
+        if (!pluginFile.isFile) return failure("${config.file} does not exist in ${relativePath(Constants.INSTALL_DIRECTORY)}")
+        if (!isJar(pluginFile)) return failure("${config.file} is not a valid JAR")
+
+        val artifact = runCatching { providers.getValue(config.provider).resolve(config) }.getOrElse { throwable ->
+            return failure("Could not verify existing ${config.id}: ${throwable.message ?: throwable::class.simpleName}")
+        }
+        val expectedHash = artifact.sha256
+            ?: return failure("${relativePath(pluginFile)} already exists; provider did not supply a SHA-256 digest, so use /pp external import to track it explicitly")
+        val actualHash = HashType.SHA256.hash(pluginFile)
+        if (!actualHash.equals(expectedHash, ignoreCase = true)) {
+            return failure("${relativePath(pluginFile)} already exists but does not match the latest provider artifact; remove it or use /pp external import to track the existing JAR")
+        }
+
+        return adoptInstalled(
+            config,
+            pluginFile,
+            "Imported existing ${config.id} from ${relativePath(pluginFile)}",
+            artifact
+        )
+    }
+
     private fun artifactStateForInstalledFile(
-        config: ExternalPluginConfig,
         pluginFile: File,
         hash: String,
         resolvedArtifact: ExternalArtifact?
