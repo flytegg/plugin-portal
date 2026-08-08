@@ -45,8 +45,8 @@ val File.declaredPluginName: String?
         ?.takeIf(String::isNotEmpty)
 
 /**
- * Matches against the declared plugin name first, then the file name. Plugin Portal renames the jars it
- * installs to "[PP] Name (PLATFORM).jar", so the file name alone is not something users can rely on.
+ * Matches against the file name first (cheap), then the declared plugin name. Plugin Portal renames installed jars to
+ * "[PP] Name (PLATFORM).jar", so the declared name is the reliable fallback when file names don't line up.
  */
 val File.isBlacklistedPlugin: Boolean
     get() = Config.isPluginNameBlacklisted(nameWithoutExtension) ||
