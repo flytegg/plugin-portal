@@ -10,6 +10,7 @@ object Config {
     private const val DISABLED_DOWNLOAD_PLATFORMS_PATH = "DownloadPlatforms.Disabled"
     private const val DISCORD_WEBHOOK_URL_PATH = "DiscordWebhook.Url"
     private const val TELEMETRY_ENABLED_PATH = "Telemetry.Enabled"
+    private const val BLACKLISTED_PLUGIN_NAMES_PATH = "PluginBlacklist.Names"
     private val initialized get() = ::plugin.isInitialized
     
     fun init(plugin: JavaPlugin) {
@@ -18,6 +19,14 @@ object Config {
         initDiscordWebhook(plugin)
         initPrivacyDefaults(plugin)
         initFeatures(plugin)
+        initPluginBlacklist(plugin)
+    }
+
+    private fun initPluginBlacklist(plugin: JavaPlugin) {
+        if (plugin.config.contains(BLACKLISTED_PLUGIN_NAMES_PATH)) return
+
+        plugin.config.set(BLACKLISTED_PLUGIN_NAMES_PATH, emptyList<String>())
+        plugin.saveConfig()
     }
 
     private fun initDiscordWebhook(plugin: JavaPlugin) {
@@ -91,6 +100,9 @@ object Config {
         settings["Telemetry"] = mapOf(
             "Enabled" to isTelemetryEnabled()
         )
+        settings["PluginBlacklist"] = mapOf(
+            "Names" to getBlacklistedPluginNames()
+        )
         
         return settings
     }
@@ -137,6 +149,13 @@ object Config {
                     item?.toString()?.let(MarketplacePlatform::of)?.name
                 }
                 plugin.config.set(path, platforms)
+                plugin.saveConfig()
+                return true
+            }
+
+            if (path == BLACKLISTED_PLUGIN_NAMES_PATH && value is List<*>) {
+                val names = value.mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
+                plugin.config.set(path, names)
                 plugin.saveConfig()
                 return true
             }
@@ -190,6 +209,10 @@ object Config {
             }
         }
 
+        if (path == BLACKLISTED_PLUGIN_NAMES_PATH) {
+            return value is List<*> && value.all { it is String }
+        }
+
         if (path in setOf(
                 TELEMETRY_ENABLED_PATH
             )
@@ -209,6 +232,20 @@ object Config {
 
     fun isDownloadPlatformEnabled(platform: MarketplacePlatform): Boolean =
         platform !in getDisabledDownloadPlatforms()
+
+    fun getBlacklistedPluginNames(): List<String> =
+        if (!initialized) emptyList() else
+        plugin.config.getStringList(BLACKLISTED_PLUGIN_NAMES_PATH)
+            .mapNotNull { it?.trim()?.takeIf(String::isNotEmpty) }
+
+    fun isPluginNameBlacklisted(name: String): Boolean =
+        getBlacklistedPluginNames().any { matchesBlacklistEntry(name, it) }
+
+    fun matchesBlacklistEntry(name: String, entry: String): Boolean {
+        if ('*' !in entry) return name.equals(entry, ignoreCase = true)
+        val pattern = entry.split('*').joinToString(".*") { Regex.escape(it) }
+        return Regex("^$pattern$", RegexOption.IGNORE_CASE).matches(name)
+    }
 
     fun getDiscordWebhookUrl(): String? =
         getString(DISCORD_WEBHOOK_URL_PATH)?.trim()?.takeIf { it.isNotEmpty() }
