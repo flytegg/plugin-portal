@@ -1,5 +1,6 @@
 package gg.flyte.pluginportal.common.util
 
+import gg.flyte.pluginportal.common.Config
 import gg.flyte.pluginportal.common.PluginPortalBase
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.enums.MarketplacePlatform
@@ -27,6 +28,29 @@ fun File.getPluginYML() = runCatching {
 }.getOrNull()
 /** @return true if the plugin.yml name is a Plugin Portal artifact. */
 val File.isPluginPortal: Boolean get() = (getPluginYML()?.get("name") as? String)?.contains("PluginPortal") == true
+
+private fun File.readJarYml(entryName: String): Map<String, Any>? = runCatching {
+    JarFile(this).use { jar ->
+        val entry: JarEntry = jar.getJarEntry(entryName) ?: return@runCatching null
+        jar.getInputStream(entry).use { stream ->
+            Yaml().load<Map<String, Any>>(stream.reader())
+        }
+    }
+}.getOrNull()
+
+/** @return the name declared in plugin.yml or paper-plugin.yml, which is what users see in /pp list. */
+val File.declaredPluginName: String?
+    get() = ((readJarYml("plugin.yml") ?: readJarYml("paper-plugin.yml"))?.get("name") as? String)
+        ?.trim()
+        ?.takeIf(String::isNotEmpty)
+
+/**
+ * Matches against the declared plugin name first, then the file name. Plugin Portal renames the jars it
+ * installs to "[PP] Name (PLATFORM).jar", so the file name alone is not something users can rely on.
+ */
+val File.isBlacklistedPlugin: Boolean
+    get() = Config.isPluginNameBlacklisted(nameWithoutExtension) ||
+        declaredPluginName?.let(Config::isPluginNameBlacklisted) == true
 
 
 fun String.capitaliseFirst() = lowercase().replaceFirstChar(Char::uppercaseChar)

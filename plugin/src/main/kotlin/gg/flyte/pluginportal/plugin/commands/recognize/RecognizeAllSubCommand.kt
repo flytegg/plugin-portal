@@ -1,7 +1,6 @@
 package gg.flyte.pluginportal.plugin.commands.recognize
 
 import gg.flyte.pluginportal.common.API
-import gg.flyte.pluginportal.common.Config
 import gg.flyte.pluginportal.common.Constants
 import gg.flyte.pluginportal.common.Hash
 import gg.flyte.pluginportal.common.PlatformId
@@ -14,6 +13,7 @@ import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.enums.MarketplacePlatform
 import gg.flyte.pluginportal.common.util.HashType
 import gg.flyte.pluginportal.common.util.async
+import gg.flyte.pluginportal.common.util.isBlacklistedPlugin
 import gg.flyte.pluginportal.common.util.isJarFile
 import gg.flyte.pluginportal.common.util.isPluginPortal
 import gg.flyte.pluginportal.plugin.PluginPortal
@@ -46,9 +46,9 @@ class RecognizeAllSubCommand {
         async {
             val jars = Constants.INSTALL_DIRECTORY.listFiles()
                 ?.filter(File::isJarFile)
+                ?.filterNot(File::isBlacklistedPlugin)
                 ?.associateBy(HashType.SHA256.hash)
                 ?.filter { !LocalPluginCache.hasPluginByHash(it.key) && !it.value.isPluginPortal && !LocalPluginCache.hasManagedDownloadedFile(it.value) }
-                ?.filterNot { Config.isPluginNameBlacklisted(it.value.nameWithoutExtension) }
                 ?.map { RecognitionInfo(it.value, Recognize.getPolymartData(it.value)) }
                 ?.ifEmpty { return@async audience.sendSuccess("No plugins are unrecognized") }
                 ?: return@async audience.sendFailure("Could not determine a plugin directory")
