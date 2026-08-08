@@ -1,5 +1,6 @@
 package gg.flyte.pluginportal.common.commands
 
+import gg.flyte.pluginportal.common.Config
 import gg.flyte.pluginportal.common.PluginPortalBase
 import gg.flyte.pluginportal.common.chat.*
 import gg.flyte.pluginportal.common.commands.lamp.EnabledCommand
@@ -36,7 +37,9 @@ class BlacklistSubCommand {
                     .filter { it.excludedFromUpdates && it.name != PluginPortalBase.plugin.description.name }
                     .sortedBy { it.name }
 
-                if (blacklisted.isEmpty()) return@async audience.sendInfo("No plugins are blacklisted from updateAll.")
+                val configNames = Config.getBlacklistedPluginNames()
+                if (blacklisted.isEmpty() && configNames.isEmpty())
+                    return@async audience.sendInfo("No plugins are blacklisted from updateAll.")
 
                 var message = Component.text("Plugins blacklisted from updateAll", NamedTextColor.GRAY)
                 blacklisted.forEach { plugin ->
@@ -44,6 +47,15 @@ class BlacklistSubCommand {
                         .append(textDark(" - "))
                         .appendPrimary(plugin.name)
                         .append(textDark(" (${plugin.platform.name})"))
+                }
+                if (configNames.isNotEmpty()) {
+                    message = message.append(Component.newline())
+                        .append(Component.text("Blacklisted via config.yml (PluginBlacklist.Names)", NamedTextColor.GRAY))
+                    configNames.forEach { name ->
+                        message = message.append(Component.newline())
+                            .append(textDark(" - "))
+                            .appendPrimary(name)
+                    }
                 }
                 audience.sendMessage(message.boxed())
             }

@@ -1,6 +1,7 @@
 package gg.flyte.pluginportal.plugin.commands.recognize
 
 import gg.flyte.pluginportal.common.API
+import gg.flyte.pluginportal.common.Config
 import gg.flyte.pluginportal.common.Constants
 import gg.flyte.pluginportal.common.Hash
 import gg.flyte.pluginportal.common.PlatformId
@@ -47,6 +48,7 @@ class RecognizeAllSubCommand {
                 ?.filter(File::isJarFile)
                 ?.associateBy(HashType.SHA256.hash)
                 ?.filter { !LocalPluginCache.hasPluginByHash(it.key) && !it.value.isPluginPortal && !LocalPluginCache.hasManagedDownloadedFile(it.value) }
+                ?.filterNot { Config.isPluginNameBlacklisted(it.value.nameWithoutExtension) }
                 ?.map { RecognitionInfo(it.value, Recognize.getPolymartData(it.value)) }
                 ?.ifEmpty { return@async audience.sendSuccess("No plugins are unrecognized") }
                 ?: return@async audience.sendFailure("Could not determine a plugin directory")

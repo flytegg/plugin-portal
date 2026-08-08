@@ -1,6 +1,7 @@
 package gg.flyte.pluginportal.plugin.commands
 
 import gg.flyte.pluginportal.common.API
+import gg.flyte.pluginportal.common.Config
 import gg.flyte.pluginportal.common.chat.*
 import gg.flyte.pluginportal.common.commands.lamp.EnabledCommand
 import gg.flyte.pluginportal.common.commands.lamp.Features
@@ -61,7 +62,7 @@ class UpdateAllSubCommand {
                         ignoreOutdated || !lcl.matchesVersion(target)
                     }
                     // Excluded from auto-updates
-                    .filter { (lcl, _) -> !lcl.excludedFromUpdates}
+                    .filter { (lcl, _) -> !lcl.excludedFromUpdates && !Config.isPluginNameBlacklisted(lcl.name) }
                     .ifEmpty { return@async audience.sendSuccess("All plugins are up to date!") }
                     .mapNotNull { (localPlugin, marketplacePlugin) ->
                         marketplacePlugin?.let { localPlugin to it }

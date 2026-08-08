@@ -298,7 +298,7 @@ Export/import:
 | `/pp view <name> [platform] [--byId] [--exact]` | `pluginportal.view` | View marketplace plugin details. | `--exact` also has shorthand `-e`. |
 | `/pp install <name> [platform] [channel] [--byId] [--exact] [--version <version>]` | `pluginportal.manage.install` | Install a plugin from marketplace search/API. | `channel` is positional and saved for future updates. `--exact` also has shorthand `-e`. `--version` installs an exact compatible version and excludes it from `updateAll`. |
 | `/pp update <name> [--byId] [--ignoreOutdated] [--channel <name>] [--version <version>]` | `pluginportal.maintain.update` | Update one tracked local plugin. | `--channel` changes the saved channel before updating. `--version` installs an exact compatible version and excludes it from `updateAll`. Without `--ignoreOutdated`, skips if already up to date. |
-| `/pp blacklist [name] [--byId]` | `pluginportal.maintain.update` | Toggle whether a plugin is skipped by `/pp updateAll`. | With no name, lists blacklisted plugins. Manual `/pp update` still works. |
+| `/pp blacklist [name] [--byId]` | `pluginportal.maintain.update` | Toggle whether a plugin is skipped by `/pp updateAll`. | With no name, lists blacklisted plugins including `PluginBlacklist.Names` config entries. Manual `/pp update` still works. |
 | `/pp platform <name> <platform> [--byId]` | `pluginportal.maintain.update` | Switch a tracked plugin to another available marketplace platform. | Downloads the latest compatible jar from the target platform. Restart required. |
 | `/pp delete <name> [--byId]` | `pluginportal.manage.uninstall` | Delete/uninstall a tracked local plugin. | Alias: `/pp uninstall`. Restart required. |
 | `/pp uninstall <name> [--byId]` | `pluginportal.manage.uninstall` | Same as `/pp delete`. | Restart required. |
@@ -319,9 +319,9 @@ These require valid Plugin Portal entitlement unless noted. The same JAR contain
 
 | Command | Permission | Purpose | Notes |
 | --- | --- | --- | --- |
-| `/pp updateAll [--ignoreOutdated]` | `pluginportal.maintain.update` | Bulk update all tracked plugins. | Skips blacklisted plugins and uses each plugin's saved channel. |
+| `/pp updateAll [--ignoreOutdated]` | `pluginportal.maintain.update` | Bulk update all tracked plugins. | Skips blacklisted plugins (command toggle and `PluginBlacklist.Names` config patterns) and uses each plugin's saved channel. |
 | `/pp recognize <file>` | `pluginportal.manage.recognize` | Recognize one untracked plugin JAR in the plugins folder by hash/metadata. | May rename the file to Plugin Portal format. |
-| `/pp recognizeAll` | `pluginportal.manage.recognize` | Recognize all untracked plugin JARs in the plugins folder. | Skips Plugin Portal itself and already tracked hashes. |
+| `/pp recognizeAll` | `pluginportal.manage.recognize` | Recognize all untracked plugin JARs in the plugins folder. | Skips Plugin Portal itself, already tracked hashes, and file names matching `PluginBlacklist.Names` config patterns. |
 | `/pp export` | `pluginportal.manage.export` | Export tracked plugin platform IDs to an MCLogs URL. | Used for migration/import. |
 | `/pp import <mclogs-url>` | `pluginportal.manage.import` | Import and install plugins from an export URL. | URL must contain `mclo.gs`. |
 | `/pp scan <file>` | `pluginportal.manage.scan` | Scan a plugin JAR for Hangar scanner alerts. | Findings are warnings, not automatic proof of malware. |
