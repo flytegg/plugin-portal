@@ -35,5 +35,7 @@ jobs:
           check-latest: true
       - name: Set up Bun
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
-      - name: Unit and Paper smoke tests
-        run: ./gradlew test :plugin:paperSmoke
+      - name: Unit tests
+        run: ./gradlew test
+      - name: Paper smoke test
+        run: ./gradlew :plugin:paperSmoke
