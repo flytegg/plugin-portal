@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
@@ -35,6 +35,14 @@ try {
 
   child.stdin.write("pluginportal\n");
   await expectOccurrences(/\/pp install/g, 2, "the pluginportal command alias");
+
+  child.stdin.write("pp install ViaVersion MODRINTH --exact\n");
+  await expectOutput(
+    /Downloaded ViaVersion from MODRINTH|Successfully installed ViaVersion/i,
+    "a ViaVersion install from the public API",
+    75_000,
+  );
+  await assertInstalled("ViaVersion");
 
   child.stdin.write("stop\n");
   const exitCode = await waitForExit(45_000);
@@ -87,6 +95,15 @@ async function includeLatestLog() {
   const path = join(runDirectory, "logs", "latest.log");
   const log = await readFile(path, "utf8").catch(() => "");
   output += `\n${log}`;
+}
+
+async function assertInstalled(pluginName: string) {
+  const pluginsDirectory = join(runDirectory, "plugins");
+  const files = await readdir(pluginsDirectory);
+  const installed = files.some((file) => file.endsWith(".jar") && file.toLowerCase().includes(pluginName.toLowerCase()));
+  if (!installed) {
+    throw new Error(`The install command succeeded but no ${pluginName} JAR exists in ${pluginsDirectory}.`);
+  }
 }
 
 function waitForExit(timeoutMs: number) {
