@@ -9,8 +9,17 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.bukkit.plugin.java.JavaPlugin
+import org.mclicense.library.MCLicense
 
 class EntitlementManager(private val plugin: JavaPlugin) {
+    private companion object {
+        const val MC_LICENSE_PLUGIN_ID = "676ff1b14cf2cdb257c4ee2d"
+        const val PLACEHOLDER_PREFIX = "%%__"
+        const val POLYMART_MARKER = "%%__POLYMART__%%"
+        const val POLYMART_LICENSE = "%%__LICENSE__%%"
+        const val BUILT_BY_BIT_LICENSE = "%%__BBB_LICENSE__%%"
+    }
+
     private var state: EntitlementState = EntitlementState.MissingKey
 
     private data class PremiumValidationResponse(val valid: Boolean, val message: String?)
@@ -41,13 +50,14 @@ class EntitlementManager(private val plugin: JavaPlugin) {
         // Fall back to keys embedded by supported marketplace delivery flows.
         val embeddedKey = loadEmbeddedKey()
         if (embeddedKey != null) {
-            if (!plugin.dataFolder.exists()) plugin.dataFolder.mkdirs()
-            val target = if (embeddedKey.startsWith("pp_")) pluginPortalPath else mcLicensePath
-            target.writeText(embeddedKey)
-            Config.setApiKey(embeddedKey)
-            plugin.logger.info("Embedded premium key was migrated into plugin configuration.")
+            persistKey(embeddedKey, pluginPortalPath, mcLicensePath)
+            return embeddedKey
         }
-        return embeddedKey
+
+        return loadMarketplaceKey(mcLicensePath)?.also {
+            Config.setApiKey(it)
+            plugin.logger.info("Marketplace premium key was imported into plugin configuration.")
+        }
     }
 
     fun refresh(): EntitlementState {
@@ -104,15 +114,24 @@ class EntitlementManager(private val plugin: JavaPlugin) {
         val entry = plugin.javaClass.classLoader.getResource("mclicense.txt") ?: return null
         val content = entry.readText().trim()
         if (content.isBlank()) return null
+        return content.takeUnless { it.startsWith(PLACEHOLDER_PREFIX) }
+    }
 
-        if (!content.contains("%%__LICENSE__%%")) return content
+    private fun loadMarketplaceKey(mcLicensePath: java.io.File): String? {
+        val hasBuiltByBitKey = !BUILT_BY_BIT_LICENSE.startsWith(PLACEHOLDER_PREFIX)
+        val hasPolymartKey = POLYMART_MARKER == "1" && !POLYMART_LICENSE.startsWith(PLACEHOLDER_PREFIX)
+        if (!hasBuiltByBitKey && !hasPolymartKey) return null
 
-        val polymartLicense = "%%__LICENSE__%%"
-        return if (!polymartLicense.startsWith("%%__")) {
-            content.replace("%%__LICENSE__%%", polymartLicense)
-        } else {
-            null
-        }
+        MCLicense.validateKey(plugin, MC_LICENSE_PLUGIN_ID)
+        return mcLicensePath.readNonBlankText()
+    }
+
+    private fun persistKey(key: String, pluginPortalPath: java.io.File, mcLicensePath: java.io.File) {
+        if (!plugin.dataFolder.exists()) plugin.dataFolder.mkdirs()
+        val target = if (key.startsWith("pp_")) pluginPortalPath else mcLicensePath
+        target.writeText(key)
+        Config.setApiKey(key)
+        plugin.logger.info("Embedded premium key was migrated into plugin configuration.")
     }
 
     private fun java.io.File.readNonBlankText(): String? {

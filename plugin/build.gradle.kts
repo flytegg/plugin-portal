@@ -10,8 +10,8 @@ repositories {
 }
 
 dependencies {
-    // MCLicense library removed - using unified API authentication instead
-    
+    implementation("org.mclicense:library:1.5.1")
+
     implementation("com.github.HangarMC:HangarJarScanner:906710dc36")
 
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
