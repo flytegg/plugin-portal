@@ -1,0 +1,3 @@
+display_name: Plugin Portal Release
+short_description: Release Plugin Portal JARs safely
+default_prompt: "Use this skill to release Plugin Portal: build the canonical JAR, smoke-test it on a real Paper server, publish it through the intended channel, and verify update and download behavior."
