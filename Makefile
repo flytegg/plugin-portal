@@ -11,7 +11,7 @@ help:
 	@echo "  make check  Run tests and build the plugin"
 	@echo "  make smoke  Test a real disposable Paper server and plugin install"
 	@echo "  make paper  Start a reusable Paper server against the local API"
-	@echo "  make mc-pilot-up     Build and start the isolated MC Pilot container"
+	@echo "  make mc-pilot-up     Start the isolated MC Pilot test environment"
 	@echo "  make mc-pilot-shell  Open a shell in the MC Pilot container"
 	@echo "  make mc-pilot-down   Stop the MC Pilot container"
 
@@ -36,9 +36,11 @@ mc-pilot-plugin:
 mc-pilot-up: mc-pilot-plugin
 	$(MC_PILOT_COMPOSE) up -d --build
 	$(MC_PILOT_COMPOSE) exec -T mc-pilot mc-pilot-bootstrap
+	$(MC_PILOT_COMPOSE) exec -T mc-pilot sh -c 'mct down >/dev/null 2>&1 || true; mct up --eula'
 
 mc-pilot-shell:
 	$(MC_PILOT_COMPOSE) exec mc-pilot sh
 
 mc-pilot-down:
+	-$(MC_PILOT_COMPOSE) exec -T mc-pilot mct down
 	$(MC_PILOT_COMPOSE) down

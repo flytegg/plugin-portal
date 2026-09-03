@@ -33,4 +33,4 @@ project.screenshot.outputDir = "/output";
 fs.writeFileSync(path, `${JSON.stringify(project, null, 2)}\n`);
 '
 
-echo "MC Pilot is ready. Run 'make mc-pilot-shell', then 'mct up --eula'."
+echo "MC Pilot is configured."
