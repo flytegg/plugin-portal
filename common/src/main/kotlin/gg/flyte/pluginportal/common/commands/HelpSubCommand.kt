@@ -46,8 +46,10 @@ class HelpSubCommand {
         message = if (pageNumber == 1) {
             message.append(section("Plugins"))
                 .appendNewline()
-                .append(helpLine("/pp list [--outdated]", "Installed", details = listOf(
-                    "--outdated shows marketplace and external updates."
+                .append(helpLine("/pp list [--outdated] [--external]", "Installed", details = listOf(
+                    "--outdated shows marketplace and external updates.",
+                    "--external shows only configured external plugins.",
+                    "--detailed includes versions, IDs, and sources."
                 )))
                 .appendNewline()
                 .append(helpLine("/pp search <query> [platform]", "Search marketplace"))
