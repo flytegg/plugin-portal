@@ -29,7 +29,7 @@ class ViewSubCommand {
             byId,
             exact = exact,
             ifSingle = { audience.sendMessage(it.getImageComponent().boxed()) },
-            ifMore = { sendPluginListMessage(audience, "Multiple plugins found, click one to view more information", it, "view") }
+            ifMore = { sendPluginListMessage(audience, "Choose a plugin to view", it, "view") }
         )
     }
 }

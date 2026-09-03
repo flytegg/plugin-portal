@@ -23,6 +23,13 @@ import java.time.temporal.ChronoUnit
 
 object MarketplacePluginCache: PluginCache<Plugin>() {
 
+    internal sealed interface SearchResolution {
+        data object NotFound : SearchResolution
+        data class Exact(val plugin: Plugin) : SearchResolution
+        data class AmbiguousExact(val plugins: List<Plugin>) : SearchResolution
+        data class Results(val plugins: List<Plugin>) : SearchResolution
+    }
+
     private val pp: JavaPlugin get() = PluginPortalBase.plugin
 
     private val pluginCache: Cache<PlatformId, Plugin> = CacheBuilder.newBuilder().maximumSize(10_000).expireAfterWrite(Duration.of(2, ChronoUnit.HOURS)).build()
@@ -62,6 +69,13 @@ object MarketplacePluginCache: PluginCache<Plugin>() {
             pp.logger.warning("MarketplaceCache failed to fetch ($platform $platformId)")
             return null
         }
+        putPlugin(remote, lookupId)
+        return remote
+    }
+
+    fun refreshPluginById(platform: MarketplacePlatform, platformId: String): Plugin? {
+        val lookupId = PlatformId(platformId, platform)
+        val remote = API.getPluginByPlatformId(lookupId) ?: return null
         putPlugin(remote, lookupId)
         return remote
     }
@@ -114,18 +128,29 @@ object MarketplacePluginCache: PluginCache<Plugin>() {
             }
 
             else -> {
-                var plugins = getFilteredPlugins(name, platform)
-                if (exact) {
-                    plugins = plugins.filter { it.name.equals(name, true) }
-                } else {
-                    plugins = plugins.preferUniqueExactName(name)
-                }
-                when {
-                    plugins.isEmpty() -> audience.sendFailure("No plugins found")
-                    plugins.size == 1 -> ifSingle(plugins.first())
-                    else -> ifMore(plugins.sortedByRelevance(name))
+                when (val resolution = resolvePluginSearch(name, getFilteredPlugins(name, platform), exact)) {
+                    SearchResolution.NotFound -> audience.sendFailure("No plugins found")
+                    is SearchResolution.Exact -> ifSingle(resolution.plugin)
+                    is SearchResolution.AmbiguousExact -> ifMore(resolution.plugins)
+                    is SearchResolution.Results -> ifMore(resolution.plugins)
                 }
             }
+        }
+    }
+
+    internal fun resolvePluginSearch(
+        query: String,
+        plugins: List<Plugin>,
+        exactOnly: Boolean = false,
+    ): SearchResolution {
+        val ranked = plugins.sortedByRelevance(query)
+        val exactMatches = ranked.filter { it.name.equals(query, ignoreCase = true) }
+
+        return when {
+            exactMatches.size == 1 -> SearchResolution.Exact(exactMatches.first())
+            exactMatches.size > 1 -> SearchResolution.AmbiguousExact(exactMatches)
+            exactOnly || ranked.isEmpty() -> SearchResolution.NotFound
+            else -> SearchResolution.Results(ranked)
         }
     }
 
@@ -190,11 +215,6 @@ object MarketplacePluginCache: PluginCache<Plugin>() {
      */
     fun List<Plugin>.sortedByRelevance(query: String): List<Plugin> = sortedByDescending {
         it.totalDownloads * if (query.equals(it.name, true)) 50 else 1 // Arbitrary bias to exact matches
-    }
-
-    internal fun List<Plugin>.preferUniqueExactName(query: String): List<Plugin> {
-        val exactMatches = filter { it.name.equals(query, ignoreCase = true) }
-        return if (exactMatches.size == 1) exactMatches else this
     }
 
     private fun String.normalizedLookup(): String =

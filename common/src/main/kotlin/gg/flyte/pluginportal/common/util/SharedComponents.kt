@@ -18,10 +18,22 @@ object SharedComponents {
         .clickEvent(ClickEvent.openUrl("https://flyte.gg/discord"))
         .hyperlink()
 
-    fun successfullyInstalledPlugin(pluginName: String, platform: MarketplacePlatform, plsrestart: Boolean = true) =
-        status(Status.SUCCESS, "Downloaded $pluginName from ${platform.name}.")
-            .also { if (plsrestart) it.appendSecondary("\n- Please restart your server to enable this plugin") }
-            .boxed()
+    fun successfullyInstalledPlugin(pluginName: String, platform: MarketplacePlatform, plsrestart: Boolean = true): Component {
+        var message = status(Status.SUCCESS, "Downloaded $pluginName from ${platform.name}.")
+        if (plsrestart) message = message.appendSecondary("\n- Please restart your server to enable this plugin")
+        return message.boxed()
+    }
+
+    fun successfullyUpdatedPlugin(
+        pluginName: String,
+        previousVersion: String,
+        installedVersion: String,
+        platform: MarketplacePlatform,
+    ) = status(Status.SUCCESS, "Updated ")
+        .appendPrimary(pluginName)
+        .appendSecondary(": $previousVersion → $installedVersion from ${platform.name}.")
+        .appendSecondary("\n- Please restart your server to apply this update")
+        .boxed()
 
     fun getUpdateBeforeAndAfterComponent(plugin: LocalPlugin, new: Plugin) = Component.text(
         "(",

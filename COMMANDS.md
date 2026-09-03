@@ -152,6 +152,10 @@ such as `[PP] viaversion [GITHUB].jar`. GitHub releases with no matching asset
 are skipped, while multiple matching assets in the newest applicable release are
 reported as an ambiguity instead of falling back to an older release.
 
+This replaces the old startup-only adapter workflow. New GitHub and GeyserMC
+plugins should use `/pp external` and `external-plugins.yml`; do not add new
+entries to the legacy `adapters.yml` file.
+
 ```yaml
 plugins:
   floodgate:
@@ -204,10 +208,10 @@ Install failure patterns:
 
 Single plugin update:
 
-1. `/pp update <name> [--byId] [--ignoreOutdated] [--channel <name>] [--version <version>]` finds a tracked local plugin in `plugins.json`.
+1. `/pp update <name> [--byId] [--ignoreOutdated] [--refresh] [--channel <name>] [--version <version>]` finds a tracked local plugin in `plugins.json`.
 2. If `--channel <name>` is used, Plugin Portal saves that channel before updating.
 3. If `--version <version>` is used, Plugin Portal selects that exact compatible version and marks the plugin excluded from `updateAll`.
-4. Without `--version`, it compares local version to marketplace latest version.
+4. Without `--version`, it compares local version to marketplace latest version. `--refresh` first bypasses the plugin's two-hour marketplace cache.
 5. If already current, it exits unless `--ignoreOutdated` is used.
 6. It downloads the new JAR into `plugins/update/`.
 7. It removes the old local cache entry, adds the new one, and saves `plugins.json`.
@@ -293,7 +297,7 @@ Export/import:
 | `/pp help` | `pluginportal.view` | Show command help. | Also works by running `/pp`. |
 | `/pp info` | `pluginportal.view` | Show Plugin Portal version, edition, license state, and update info. | Alias: `/pp version`. |
 | `/pp version` | `pluginportal.view` | Same as `/pp info`. | Shows Licensed: Yes/No. |
-| `/pp list [--all]` | `pluginportal.view` | List marketplace and external plugins managed by Plugin Portal. | Checks and displays update status; `--all` also shows unrecognized JARs in `plugins/`. |
+| `/pp list [--all] [--outdated]` | `pluginportal.view` | List marketplace and external plugins managed by Plugin Portal. | `--outdated` shows available marketplace and external updates. `--all` also shows unrecognized JARs; the two flags cannot be combined. |
 | `/pp dump` | `pluginportal.dump` | Upload logs/support dump to MCLogs and return a support URL. | Use for diagnostics. |
 | `/pluginportal config refresh` | `pluginportal.manage.config` | Reload local plugin cache/config state. | Command root is `pluginportal config`, not `/pp config`. |
 
@@ -303,7 +307,7 @@ Export/import:
 | --- | --- | --- | --- |
 | `/pp view <name> [platform] [--byId] [--exact]` | `pluginportal.view` | View marketplace plugin details. | `--exact` also has shorthand `-e`. |
 | `/pp install <name> [platform] [channel] [--byId] [--exact] [--version <version>]` | `pluginportal.manage.install` | Install a plugin from marketplace search/API. | `channel` is positional and saved for future updates. `--exact` also has shorthand `-e`. `--version` installs an exact compatible version and excludes it from `updateAll`. |
-| `/pp update <name> [--byId] [--ignoreOutdated] [--channel <name>] [--version <version>]` | `pluginportal.maintain.update` | Update one tracked local plugin. | `--channel` changes the saved channel before updating. `--version` installs an exact compatible version and excludes it from `updateAll`. Without `--ignoreOutdated`, skips if already up to date. |
+| `/pp update <name> [--byId] [--ignoreOutdated] [--refresh] [--channel <name>] [--version <version>]` | `pluginportal.maintain.update` | Update one tracked local plugin. | `--refresh` bypasses the local marketplace cache. `--channel` changes the saved channel before updating. `--version` installs an exact compatible version and excludes it from `updateAll`. |
 | `/pp blacklist [name] [--byId]` | `pluginportal.maintain.update` | Toggle whether a plugin is skipped by `/pp updateAll`. | With no name, lists blacklisted plugins. Manual `/pp update` still works. |
 | `/pp platform <name> <platform> [--byId]` | `pluginportal.maintain.update` | Switch a tracked plugin to another available marketplace platform. | Downloads the latest compatible jar from the target platform. Restart required. |
 | `/pp delete <name> [--byId]` | `pluginportal.manage.uninstall` | Delete/uninstall a tracked local plugin. | Alias: `/pp uninstall`. Restart required. |

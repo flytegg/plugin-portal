@@ -157,6 +157,7 @@ object PluginPortalBase {
             DeleteSubCommand(),
             HelpSubCommand(),
             ViewSubCommand(),
+            SearchSubCommand(),
             ListSubCommand(),
             DumpSubCommand(),
             SupportSubCommand(),
