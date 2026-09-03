@@ -61,12 +61,12 @@ enforcement, not by a separate premium artifact.
 
 | Command | Permission | Description |
 | --- | --- | --- |
-| `/pp view <name \| id> [platform] [--byId] [--exact]` | `pluginportal.view` | View marketplace plugin details. |
-| `/pp install <name \| id> [platform] [channel] [--byId] [--exact] [--version <version>]` | `pluginportal.manage.install` | Install a plugin from a marketplace. |
-| `/pp update <name \| id> [--byId] [--channel <name>] [--version <version>]` | `pluginportal.maintain.update` | Update a tracked plugin. |
+| `/pp view <name\|id> [platform] [--byId] [--exact]` | `pluginportal.view` | View marketplace plugin details. |
+| `/pp install <name\|id> [platform] [channel] [--byId] [--exact] [--version <version>]` | `pluginportal.manage.install` | Install a plugin from a marketplace. |
+| `/pp update <name\|id> [--byId] [--channel <name>] [--version <version>]` | `pluginportal.maintain.update` | Update a tracked plugin. |
 | `/pp updateAll` | `pluginportal.maintain.update` | Update all tracked plugins with available updates. |
 | `/pp list [--all]` | `pluginportal.view` | List managed plugins; `--all` also shows unrecognized JARs. |
-| `/pp external <add \| import \| check \| install \| update \| invalidate \| updateAll \| reload>` | `pluginportal.manage.external` | Manage external plugins configured in `external-plugins.yml`. |
+| `/pp external <add\|import\|check\|install\|update\|invalidate\|updateAll\|reload>` | `pluginportal.manage.external` | Manage external plugins configured in `external-plugins.yml`. |
 | `/pp delete <name>` or `/pp uninstall <name>` | `pluginportal.manage.uninstall` | Remove a tracked plugin. |
 | `/pp recognize <file>` / `/pp recognizeAll` | `pluginportal.manage.recognize` | Track manually installed plugin JARs. |
 | `/pp upgrade [--yes]` | `pluginportal.admin` | Check for and install Plugin Portal updates. |
