@@ -33,6 +33,20 @@ Local development uses localhost only when the server starts with:
 
 ## Useful Commands
 
+The common development loop is available through `make`:
+
+```bash
+make test   # Fast MockBukkit checks
+make check  # Tests plus a complete build
+make smoke  # Disposable real-Paper install test
+make paper  # Reusable Paper server connected to the local API
+```
+
+`make paper` passes the localhost development flag automatically. It expects the API at
+`http://localhost:3001` and keeps its server files in `run/latest`.
+
+The underlying Gradle commands remain available when a more specific task is needed.
+
 Compile the plugin:
 
 ```bash

@@ -20,6 +20,9 @@ tasks {
     runServer {
         minecraftVersion("1.21.11")
         runDirectory(file((project.findProperty("runDir") as? String) ?: "run/latest"))
+        if ((project.findProperty("pluginPortalDev") as? String)?.toBoolean() == true) {
+            jvmArgs("-Dpluginportal.dev=true")
+        }
         javaLauncher.set(
             project.javaToolchains.launcherFor {
                 languageVersion.set(JavaLanguageVersion.of(21))
