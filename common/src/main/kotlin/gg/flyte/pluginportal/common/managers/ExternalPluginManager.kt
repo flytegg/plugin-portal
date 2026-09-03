@@ -101,7 +101,7 @@ object ExternalPluginManager {
             val provider = source.substringBefore(':').lowercase()
             val sourceId = source.substringAfter(':', "").trim()
             val file = section.getString("file")?.trim()?.takeIf(String::isNotEmpty)
-                ?: managedFileName(id, provider)
+                ?: managedExternalFileName(id, provider)
             val updatesValue = section.getString("updates", "manual").orEmpty()
             val updates = ExternalUpdatePolicy.from(updatesValue)
             val artifact = section.getString("artifact")?.trim()?.takeIf(String::isNotEmpty)
@@ -318,14 +318,14 @@ object ExternalPluginManager {
         repository: String,
         asset: String,
         prereleases: Boolean
-    ): ExternalPluginResult = addConfig(gitHubConfig(id, repository, asset, managedFileName(id, "github"), prereleases))
+    ): ExternalPluginResult = addConfig(gitHubConfig(id, repository, asset, managedExternalFileName(id, "github"), prereleases))
 
     @Synchronized
     fun addGeyser(
         id: String,
         project: String,
         artifact: String
-    ): ExternalPluginResult = addConfig(geyserConfig(id, project, artifact, managedFileName(id, "geysermc")))
+    ): ExternalPluginResult = addConfig(geyserConfig(id, project, artifact, managedExternalFileName(id, "geysermc")))
 
     @Synchronized
     fun importGitHub(
@@ -453,7 +453,7 @@ object ExternalPluginManager {
         provider = "github",
         sourceId = repository,
         artifact = null,
-        asset = normalizeGitHubAssetPattern(asset),
+        asset = normalizeExternalGitHubAssetPattern(asset),
         file = file,
         prereleases = prereleases,
         updates = ExternalUpdatePolicy.MANUAL
@@ -501,7 +501,7 @@ object ExternalPluginManager {
 
         val hash = HashType.SHA256.hash(pluginFile)
         val artifact = resolvedArtifact ?: runCatching { providers.getValue(config.provider).resolve(config) }.getOrNull()
-        val installed = artifactStateForInstalledFile(pluginFile, hash, artifact)
+        val installed = externalArtifactStateForInstalledFile(hash, readPluginVersion(pluginFile), artifact)
 
         states[config.id] = emptyState(config).copy(
             installed = installed,
@@ -535,30 +535,6 @@ object ExternalPluginManager {
             pluginFile,
             "Imported existing ${config.id} from ${relativePath(pluginFile)}",
             artifact
-        )
-    }
-
-    private fun artifactStateForInstalledFile(
-        pluginFile: File,
-        hash: String,
-        resolvedArtifact: ExternalArtifact?
-    ): ExternalArtifactState {
-        if (resolvedArtifact?.sha256?.equals(hash, ignoreCase = true) == true) {
-            return ExternalArtifactState(
-                artifactId = resolvedArtifact.artifactId,
-                version = resolvedArtifact.version,
-                build = resolvedArtifact.build,
-                sha256 = hash,
-                recordedAt = Instant.now().toString()
-            )
-        }
-
-        return ExternalArtifactState(
-            artifactId = "imported:${hash.take(12)}",
-            version = readPluginVersion(pluginFile) ?: "imported",
-            build = null,
-            sha256 = hash,
-            recordedAt = Instant.now().toString()
         )
     }
 
@@ -741,25 +717,50 @@ object ExternalPluginManager {
         return if (path.startsWith(root)) root.relativize(path).toString().replace(File.separatorChar, '/') else file.path
     }
 
-    private fun managedFileName(id: String, provider: String): String {
-        val name = id.replace(Regex("[^A-Za-z0-9_.-]+"), "-").trim('-', '.', '_')
-            .takeIf(String::isNotBlank)
-            ?: "external"
-        return "[PP] $name [${provider.uppercase(Locale.ROOT)}].jar"
-    }
-
-    private fun normalizeGitHubAssetPattern(asset: String): String {
-        val trimmed = asset.trim()
-        val hasRegexSyntax = trimmed.any { it in "^$.*+?[](){}|\\" }
-        return if (hasRegexSyntax) trimmed else ".*${Regex.escape(trimmed)}.*\\.jar"
-    }
-
     private fun failure(message: String) = ExternalPluginResult(false, message)
 
     private data class ExternalPluginStateFile(
         val plugins: Map<String, ExternalPluginState> = emptyMap()
     )
 
+}
+
+internal fun managedExternalFileName(id: String, provider: String): String {
+    val name = id.replace(Regex("[^A-Za-z0-9_.-]+"), "-").trim('-', '.', '_')
+        .takeIf(String::isNotBlank)
+        ?: "external"
+    return "[PP] $name [${provider.uppercase(Locale.ROOT)}].jar"
+}
+
+internal fun normalizeExternalGitHubAssetPattern(asset: String): String {
+    val trimmed = asset.trim()
+    val hasRegexSyntax = trimmed.any { it in "^$.*+?[](){}|\\" }
+    return if (hasRegexSyntax) trimmed else ".*${Regex.escape(trimmed)}.*\\.jar"
+}
+
+internal fun externalArtifactStateForInstalledFile(
+    hash: String,
+    installedVersion: String?,
+    resolvedArtifact: ExternalArtifact?,
+    recordedAt: String = Instant.now().toString()
+): ExternalArtifactState {
+    if (resolvedArtifact?.sha256?.equals(hash, ignoreCase = true) == true) {
+        return ExternalArtifactState(
+            artifactId = resolvedArtifact.artifactId,
+            version = resolvedArtifact.version,
+            build = resolvedArtifact.build,
+            sha256 = hash,
+            recordedAt = recordedAt
+        )
+    }
+
+    return ExternalArtifactState(
+        artifactId = "imported:${hash.take(12)}",
+        version = installedVersion ?: "imported",
+        build = null,
+        sha256 = hash,
+        recordedAt = recordedAt
+    )
 }
 
 data class ExternalPluginResult(
