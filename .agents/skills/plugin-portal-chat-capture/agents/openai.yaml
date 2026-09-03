@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plugin Portal chat capture"
+  short_description: "Capture and share real Minecraft chat output"
+  default_prompt: "Capture the requested Plugin Portal command output in MC Pilot and share the screenshot."
