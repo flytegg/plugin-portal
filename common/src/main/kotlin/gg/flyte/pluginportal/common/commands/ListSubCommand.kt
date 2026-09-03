@@ -44,13 +44,15 @@ class ListSubCommand {
         @Switch("detailed") detailed: Boolean = false,
         @Switch("all") all: Boolean = false,
         @Switch("outdated") outdated: Boolean = false,
+        @Switch("external") externalOnly: Boolean = false,
     ) {
         async {
             if (all && outdated) return@async audience.sendFailure("Use either --all or --outdated, not both")
+            if (all && externalOnly) return@async audience.sendFailure("Use either --all or --external, not both")
 
-            val plugins = LocalPluginCache
-                .sortedBy { plugin -> plugin.name }
-                .filter { plugin -> plugin.name != PluginPortalBase.plugin.name }
+            val plugins = if (externalOnly) emptyList() else LocalPluginCache
+                    .sortedBy { plugin -> plugin.name }
+                    .filter { plugin -> plugin.name != PluginPortalBase.plugin.name }
             val marketplaceUpdates = if (outdated && plugins.isNotEmpty()) {
                 val remotes = API.getAllPluginsByPlatformIds(plugins.map(LocalPlugin::platformWithId))
                     ?: return@async audience.sendFailure("Could not check marketplace plugins for updates")
@@ -71,40 +73,56 @@ class ListSubCommand {
             val unrecognizedJars = if (all) findUnrecognizedJars(plugins, externalPlugins) else emptyList()
 
             if (outdated && marketplaceUpdates.isEmpty() && externalPlugins.isEmpty() && failedExternalChecks.isEmpty()) {
-                return@async audience.sendSuccess("All managed plugins are up to date")
+                return@async audience.sendSuccess(
+                    if (externalOnly) "All external plugins are up to date" else "All plugins are up to date"
+                )
             }
             if (!outdated && plugins.isEmpty() && externalPlugins.isEmpty() && unrecognizedJars.isEmpty()) {
-                return@async audience.sendMessage(Component.text("No plugins found", NamedTextColor.GRAY).boxed())
+                val emptyMessage = if (externalOnly) "No external plugins configured" else "No plugins found"
+                return@async audience.sendMessage(Component.text(emptyMessage, NamedTextColor.GRAY).boxed())
             }
 
-            var message = Component.text(if (outdated) "Outdated plugins" else "Plugins managed by Plugin Portal", NamedTextColor.GRAY)
+            var message = Component.empty()
+            var hasSection = false
             val console = audience.isConsole()
             val showDetails = detailed || console
 
-            if (outdated) {
-                marketplaceUpdates.forEach { update ->
-                    message = message.append(Component.text("\n"))
-                        .append(getOutdatedMarketplaceLine(update, showDetails, console))
-                }
-            } else {
-                plugins.forEach { plugin ->
-                    message = message.append(Component.text("\n"))
-                        .append(if (showDetails) getDetailedPluginLine(plugin) else getCompactPluginLine(plugin, console))
+            fun startSection(title: String) {
+                if (hasSection) message = message.append(Component.text("\n\n"))
+                message = message.append(textPrimary(title).bold())
+                hasSection = true
+            }
+
+            val marketplaceEntries = if (outdated) marketplaceUpdates else plugins
+            if (marketplaceEntries.isNotEmpty()) {
+                startSection("Marketplace")
+                if (outdated) {
+                    marketplaceUpdates.forEach { update ->
+                        message = message.append(Component.text("\n"))
+                            .append(getOutdatedMarketplaceLine(update, showDetails, console))
+                    }
+                } else {
+                    plugins.forEach { plugin ->
+                        message = message.append(Component.text("\n"))
+                            .append(if (showDetails) getDetailedPluginLine(plugin, console) else getCompactPluginLine(plugin, console))
+                    }
                 }
             }
 
-            externalPlugins.forEach { plugin ->
-                message = message.append(Component.text("\n"))
-                    .append(
-                        if (outdated) getOutdatedExternalPluginLine(plugin, showDetails, console)
-                        else if (showDetails) getDetailedExternalPluginLine(plugin)
-                        else getCompactExternalPluginLine(plugin)
-                    )
+            if (externalPlugins.isNotEmpty()) {
+                startSection("External")
+                externalPlugins.forEach { plugin ->
+                    message = message.append(Component.text("\n"))
+                        .append(
+                            if (outdated) getOutdatedExternalPluginLine(plugin, showDetails, console)
+                            else if (showDetails) getDetailedExternalPluginLine(plugin, console)
+                            else getCompactExternalPluginLine(plugin, console)
+                        )
+                }
             }
 
             if (failedExternalChecks.isNotEmpty()) {
-                message = message.append(Component.text("\n\n"))
-                    .append(textSecondary("Could not check external plugins"))
+                startSection("External check failures")
                 failedExternalChecks.forEach { entry ->
                     message = message.append(Component.text("\n"))
                         .append(textDark(" - "))
@@ -114,8 +132,7 @@ class ListSubCommand {
             }
 
             if (unrecognizedJars.isNotEmpty()) {
-                message = message.append(Component.text("\n\n"))
-                    .append(textSecondary("Unrecognized JARs"))
+                startSection("Unrecognized JARs")
 
                 unrecognizedJars.forEach { jar ->
                     message = message.append(Component.text("\n"))
@@ -159,29 +176,32 @@ class ListSubCommand {
         return line
     }
 
-    private fun getCompactExternalPluginLine(entry: ExternalListEntry): Component {
-        val installed = entry.state?.installed?.version ?: "not installed"
-        val summary = listOfNotNull(installed, entry.status()).joinToString(" — ")
-        return Component.text(" - ", NamedTextColor.DARK_GRAY)
+    private fun getCompactExternalPluginLine(entry: ExternalListEntry, console: Boolean): Component {
+        var line = Component.text(" - ", NamedTextColor.DARK_GRAY)
             .append(
                 textPrimary(entry.config.id)
                     .hoverEvent(HoverEvent.showText(textSecondary("External plugin: ${entry.config.sourceId}")))
                     .suggestCommand("/pp external check ${entry.config.id}")
             )
-            .append(textDark(" (EXTERNAL/${entry.config.provider.uppercase()}) "))
-            .append(textSecondary(summary))
+            .append(textDark(" (${entry.providerName()}) "))
+            .append(externalStatusButton(entry))
+
+        if (!console && entry.state?.installed != null) {
+            line = line.append(Component.text(" ")).append(externalUninstallButton(entry))
+        }
+        return line
     }
 
     private fun getOutdatedExternalPluginLine(entry: ExternalListEntry, detailed: Boolean, console: Boolean): Component {
-        val installed = entry.state?.installed ?: return getCompactExternalPluginLine(entry)
-        val available = entry.check.artifact ?: return getCompactExternalPluginLine(entry)
+        val installed = entry.state?.installed ?: return getCompactExternalPluginLine(entry, console)
+        val available = entry.check.artifact ?: return getCompactExternalPluginLine(entry, console)
         var line = textDark(" - ")
             .append(
                 textPrimary(entry.config.id)
                     .showOnHover("External plugin: ${entry.config.sourceId}")
                     .suggestCommand("/pp external check ${entry.config.id}")
             )
-            .appendDark(" (EXTERNAL/${entry.config.provider.uppercase()}) ")
+            .appendDark(" (${entry.providerName()}) ")
 
         if (detailed) line = line.appendSecondary("source=${entry.config.sourceId} ")
 
@@ -191,22 +211,20 @@ class ListSubCommand {
             .append(Component.text(available.version, NamedTextColor.GREEN))
 
         if (!console) {
-            line = line.appendSecondary("  ").append(
-                textPrimary("Update")
-                    .hyperlink()
-                    .showOnHover("Update ${entry.config.id}")
-                    .suggestCommand("/pp external update ${entry.config.id}")
-            )
+            line = line.append(Component.text(" "))
+                .append(externalActionButton("Update", "/pp external update ${entry.config.id}", NamedTextColor.AQUA))
+                .append(Component.text(" "))
+                .append(externalUninstallButton(entry))
         }
         return line
     }
 
-    private fun getDetailedExternalPluginLine(entry: ExternalListEntry): Component {
+    private fun getDetailedExternalPluginLine(entry: ExternalListEntry, console: Boolean): Component {
         val installed = entry.state?.installed?.version ?: "not installed"
         val latest = entry.check.artifact?.version
         var line = Component.text(" - ", NamedTextColor.DARK_GRAY)
             .append(textPrimary(entry.config.id).suggestCommand("/pp external check ${entry.config.id}"))
-            .append(textDark(" (EXTERNAL/${entry.config.provider.uppercase()}) "))
+            .append(textDark(" (${entry.providerName()}) "))
             .append(textSecondary("source="))
             .append(textPrimary(entry.config.sourceId))
             .append(textDark(" installed="))
@@ -216,8 +234,41 @@ class ListSubCommand {
             line = line.append(textDark(" latest=")).append(Component.text(latest, NamedTextColor.GREEN))
         }
 
-        return entry.status()?.let { line.append(textDark(" status=")).append(textSecondary(it)) } ?: line
+        line = entry.status()?.let { line.append(textDark(" status=")).append(textSecondary(it)) } ?: line
+        if (!console) {
+            line = line.append(Component.text(" ")).append(externalStatusButton(entry))
+            if (entry.state?.installed != null) {
+                line = line.append(Component.text(" ")).append(externalUninstallButton(entry))
+            }
+        }
+        return line
     }
+
+    private fun ExternalListEntry.providerName(): String = when (config.provider.lowercase()) {
+        "github" -> "GitHub"
+        "geysermc" -> "GeyserMC"
+        else -> config.provider
+    }
+
+    private fun externalStatusButton(entry: ExternalListEntry): Component = when {
+        !entry.check.success -> externalActionButton("Check failed", "/pp external check ${entry.config.id}", NamedTextColor.RED)
+        entry.state?.staged != null -> externalActionButton("Staged", "/pp external check ${entry.config.id}", NamedTextColor.GRAY)
+        entry.state?.installed == null -> externalActionButton("Install", "/pp external install ${entry.config.id}", NamedTextColor.AQUA)
+        entry.check.updateAvailable -> externalActionButton("Update", "/pp external update ${entry.config.id}", NamedTextColor.AQUA)
+        else -> externalActionButton("Up to date", "/pp external check ${entry.config.id}", NamedTextColor.GRAY)
+    }
+
+    private fun externalUninstallButton(entry: ExternalListEntry): Component = externalActionButton(
+        "Uninstall",
+        "/pp external uninstall ${entry.config.id}",
+        NamedTextColor.RED
+    )
+
+    private fun externalActionButton(label: String, command: String, color: NamedTextColor): Component = textDark("[")
+        .append(Component.text(label, color))
+        .appendDark("]")
+        .showOnHover("Click to run $command", color)
+        .suggestCommand(command)
 
     private fun ExternalListEntry.status(): String? = when {
         !check.success -> "check failed"
@@ -266,7 +317,7 @@ class ListSubCommand {
         return line
     }
 
-    private fun getDetailedPluginLine(plugin: LocalPlugin): Component {
+    private fun getDetailedPluginLine(plugin: LocalPlugin, console: Boolean): Component {
         val marketplace = MarketplacePluginCache.getCachedPluginById(plugin.platform, plugin.platformId)
         val targetVersion = marketplace?.let(plugin::targetUpdateVersion)?.versionNumber
         val status = if (plugin.isUpToDate) "Up to date" else "Update available"
@@ -295,10 +346,9 @@ class ListSubCommand {
             .append(textDark(" status="))
             .append(Component.text(status, if (plugin.isUpToDate) NamedTextColor.GRAY else NamedTextColor.AQUA))
 
-        if (!plugin.isUpToDate) {
-            line = line
-                .append(textDark(" command="))
-                .append(textPrimary("/pp update \"${plugin.platformId}\" --byId"))
+        if (!console) {
+            line = line.append(Component.text(" ")).append(SharedComponents.getUpdateButton(plugin))
+                .append(Component.text(" ")).append(SharedComponents.getInstallButton(plugin, true))
         }
 
         return line

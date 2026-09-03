@@ -84,6 +84,13 @@ class ExternalSubCommand {
     ) = runAsync(audience) { ExternalPluginManager.update(id) }
 
     @RequiresAuth
+    @Subcommand("external uninstall")
+    fun uninstall(
+        audience: Audience,
+        @Named("id") @SuggestWith(ExternalPluginSuggestionProvider::class) id: String
+    ) = runAsync(audience) { ExternalPluginManager.uninstall(id) }
+
+    @RequiresAuth
     @Subcommand("external invalidate")
     fun invalidate(
         audience: Audience,

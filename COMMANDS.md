@@ -181,6 +181,7 @@ plugins:
 | `/pp external check <id>` | Resolve the latest matching provider artifact without downloading it. |
 | `/pp external install <id>` | Install a configured external plugin into `plugins/`. |
 | `/pp external update <id>` | Stage an installed external plugin update in `plugins/update/`. |
+| `/pp external uninstall <id>` | Remove an installed or staged external plugin JAR. The configuration remains available for reinstalling it later. |
 | `/pp external invalidate <id>` | Force the next eligible update to download the latest artifact again. |
 | `/pp external updateAll` | Explicitly update installed `manual` and `auto` entries. |
 | `/pp external reload` | Reload user intent from `external-plugins.yml`. |
@@ -297,7 +298,7 @@ Export/import:
 | `/pp help` | `pluginportal.view` | Show command help. | Also works by running `/pp`. |
 | `/pp info` | `pluginportal.view` | Show Plugin Portal version, edition, license state, and update info. | Alias: `/pp version`. |
 | `/pp version` | `pluginportal.view` | Same as `/pp info`. | Shows Licensed: Yes/No. |
-| `/pp list [--all] [--outdated]` | `pluginportal.view` | List marketplace and external plugins managed by Plugin Portal. | `--outdated` shows available marketplace and external updates. `--all` also shows unrecognized JARs; the two flags cannot be combined. |
+| `/pp list [--all] [--outdated] [--external] [--detailed]` | `pluginportal.view` | List installed marketplace plugins and configured external plugins in separate sections. | `--outdated` includes available marketplace and external updates. `--external` limits output to external plugins. `--detailed` adds versions, IDs, and sources. `--all` also shows unrecognized JARs and cannot be combined with `--outdated` or `--external`. |
 | `/pp dump` | `pluginportal.dump` | Upload logs/support dump to MCLogs and return a support URL. | Use for diagnostics. |
 | `/pluginportal config refresh` | `pluginportal.manage.config` | Reload local plugin cache/config state. | Command root is `pluginportal config`, not `/pp config`. |
 

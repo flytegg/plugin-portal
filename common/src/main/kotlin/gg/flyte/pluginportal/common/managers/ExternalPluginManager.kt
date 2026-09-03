@@ -292,6 +292,35 @@ object ExternalPluginManager {
     }
 
     @Synchronized
+    fun uninstall(id: String): ExternalPluginResult {
+        val config = configs[id] ?: return failure("External plugin '$id' is not configured")
+        val installedFile = File(Constants.INSTALL_DIRECTORY, config.file)
+        val stagedFile = File(Constants.UPDATE_DIRECTORY, config.file)
+        val targets = listOf(installedFile, stagedFile).distinctBy { it.canonicalPath }
+        if (targets.none(File::exists) && states[id]?.installed == null && states[id]?.staged == null) {
+            return failure("${config.id} is not installed")
+        }
+
+        val failure = targets.firstNotNullOfOrNull { file ->
+            runCatching { Files.deleteIfExists(file.toPath()) }
+                .exceptionOrNull()
+                ?.let { "Could not delete ${relativePath(file)}: ${it.message ?: it::class.simpleName}" }
+        }
+        if (failure != null) return failure(failure)
+
+        states.remove(id)
+        val stateError = runCatching { saveState() }.exceptionOrNull()
+        if (stateError != null) {
+            return failure("Removed ${config.id}, but could not update external plugin state: ${stateError.message ?: stateError::class.simpleName}")
+        }
+        return ExternalPluginResult(
+            success = true,
+            message = "${config.id} has been uninstalled; restart the server to finish unloading it",
+            changed = true
+        )
+    }
+
+    @Synchronized
     fun invalidate(id: String): ExternalPluginResult {
         val config = configs[id] ?: return failure("External plugin '$id' is not configured")
         if (config.updates == ExternalUpdatePolicy.DISABLED) return failure("${config.id} has updates disabled")

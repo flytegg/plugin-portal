@@ -52,7 +52,7 @@ try {
   await expectOutput(/ViaVersionStatus/i, "related marketplace search results", 30_000);
 
   child.stdin.write("pp list --outdated\n");
-  await expectOutput(/All managed plugins are up to date/i, "the combined outdated list", 30_000);
+  await expectOutput(/All (?:managed )?plugins are up to date/i, "the combined outdated list", 30_000);
 
   child.stdin.write("pp update ViaVersion --refresh\n");
   await expectOutput(/Plugin is already up to date/i, "a fresh single-plugin update check", 30_000);
