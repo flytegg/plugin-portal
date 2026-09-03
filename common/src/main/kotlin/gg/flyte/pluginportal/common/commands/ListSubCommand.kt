@@ -1,6 +1,8 @@
 package gg.flyte.pluginportal.common.commands
 
+import com.google.gson.JsonParser
 import gg.flyte.pluginportal.common.PluginPortalBase
+import gg.flyte.pluginportal.common.Constants
 import gg.flyte.pluginportal.common.adapters.external.ExternalPluginConfig
 import gg.flyte.pluginportal.common.adapters.external.ExternalPluginState
 import gg.flyte.pluginportal.common.chat.*
@@ -11,12 +13,16 @@ import gg.flyte.pluginportal.common.managers.ExternalPluginResult
 import gg.flyte.pluginportal.common.managers.LocalPluginCache
 import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
 import gg.flyte.pluginportal.common.types.LocalPlugin
+import gg.flyte.pluginportal.common.util.HashType
 import gg.flyte.pluginportal.common.util.SharedComponents
 import gg.flyte.pluginportal.common.util.async
+import gg.flyte.pluginportal.common.util.isJarFile
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
+import java.io.File
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Subcommand
 import revxrsal.commands.annotation.Switch
@@ -34,6 +40,7 @@ class ListSubCommand {
     fun listCommand(
         audience: Audience,
         @Switch("detailed") detailed: Boolean = false,
+        @Switch("all") all: Boolean = false,
     ) {
         async {
             val plugins = LocalPluginCache
@@ -42,8 +49,9 @@ class ListSubCommand {
             val externalPlugins = ExternalPluginManager.configuredPlugins().map { (config, state) ->
                 ExternalListEntry(config, state, ExternalPluginManager.check(config.id))
             }
+            val unrecognizedJars = if (all) findUnrecognizedJars(plugins, externalPlugins) else emptyList()
 
-            if (plugins.isEmpty() && externalPlugins.isEmpty()) return@async audience.sendMessage(
+            if (plugins.isEmpty() && externalPlugins.isEmpty() && unrecognizedJars.isEmpty()) return@async audience.sendMessage(
                 Component.text("No plugins found", NamedTextColor.GRAY).boxed())
 
             var message = Component.text("Plugins managed by Plugin Portal", NamedTextColor.GRAY)
@@ -58,6 +66,16 @@ class ListSubCommand {
             externalPlugins.forEach { plugin ->
                 message = message.append(Component.text("\n"))
                     .append(if (showDetails) getDetailedExternalPluginLine(plugin) else getCompactExternalPluginLine(plugin))
+            }
+
+            if (unrecognizedJars.isNotEmpty()) {
+                message = message.append(Component.text("\n\n"))
+                    .append(textSecondary("Unrecognized JARs"))
+
+                unrecognizedJars.forEach { jar ->
+                    message = message.append(Component.text("\n"))
+                        .append(if (showDetails) getDetailedUnrecognizedJarLine(jar) else getCompactUnrecognizedJarLine(jar))
+                }
             }
 
             audience.sendMessage(message.boxed())
@@ -174,5 +192,76 @@ class ListSubCommand {
 
         return line
     }
+
+    private fun findUnrecognizedJars(
+        plugins: List<LocalPlugin>,
+        externalPlugins: List<ExternalListEntry>
+    ): List<UnrecognizedJar> {
+        val managedHashes = buildSet {
+            addAll(plugins.map { it.sha256.lowercase() })
+            addAll(ExternalPluginManager.managedHashes())
+            addAll(externalPlugins.flatMap { entry ->
+                listOfNotNull(entry.state?.installed?.sha256, entry.state?.staged?.sha256)
+            }.map(String::lowercase))
+            addAll(adapterManagedHashes())
+            add(HashType.SHA256.hash(PluginPortalBase.info.pluginJarFile).lowercase())
+        }
+        val externalFileNames = ExternalPluginManager.managedFileNames()
+
+        return Constants.INSTALL_DIRECTORY
+            .listFiles()
+            .orEmpty()
+            .filter(File::isJarFile)
+            .filterNot(LocalPluginCache::hasManagedDownloadedFile)
+            .filterNot { it.name.lowercase() in externalFileNames }
+            .mapNotNull { file ->
+                val hash = runCatching { HashType.SHA256.hash(file) }.getOrNull() ?: return@mapNotNull null
+                file.takeUnless { hash.lowercase() in managedHashes }?.let { UnrecognizedJar(it, hash) }
+            }
+            .sortedBy { it.file.name.lowercase() }
+    }
+
+    private fun adapterManagedHashes(): Set<String> {
+        val file = File(PluginPortalBase.plugin.dataFolder, "adapter-plugins.json")
+        if (!file.isFile) return emptySet()
+
+        return runCatching {
+            JsonParser.parseString(file.readText()).asJsonArray
+                .mapNotNull { element ->
+                    element.asJsonObject.get("sha256")?.takeUnless { it.isJsonNull }?.asString
+                }
+                .map(String::lowercase)
+                .toSet()
+        }.getOrDefault(emptySet())
+    }
+
+    private fun getCompactUnrecognizedJarLine(jar: UnrecognizedJar): Component =
+        Component.text(" - ", NamedTextColor.DARK_GRAY)
+            .append(textPrimary(jar.file.name).suggestCommand("/pp recognize \"${jar.file.name}\""))
+            .append(Component.text(" "))
+            .append(recognizeButton(jar.file))
+
+    private fun getDetailedUnrecognizedJarLine(jar: UnrecognizedJar): Component =
+        Component.text(" - ", NamedTextColor.DARK_GRAY)
+            .append(textPrimary(jar.file.name).suggestCommand("/pp recognize \"${jar.file.name}\""))
+            .append(Component.text(" "))
+            .append(textSecondary("sha256="))
+            .append(textPrimary(jar.sha256.take(12)))
+            .append(Component.text(" "))
+            .append(recognizeButton(jar.file))
+
+    private fun recognizeButton(file: File): Component {
+        val command = "/pp recognize \"${file.name}\""
+        return textDark("[")
+            .append(Component.text("RECOGNIZE", NamedTextColor.AQUA))
+            .append(textDark("]"))
+            .hoverEvent(HoverEvent.showText(textSecondary("Click to run $command")))
+            .clickEvent(ClickEvent.runCommand(command))
+    }
+
+    private data class UnrecognizedJar(
+        val file: File,
+        val sha256: String
+    )
 
 }

@@ -146,8 +146,10 @@ asset regex that matches exactly one release asset. GeyserMC sources require an
 artifact name such as `spigot`, `bungee`, or `velocity`.
 
 External plugin IDs may contain letters, numbers, underscores, and hyphens. Each
-entry must use a unique target filename. GitHub releases with no matching asset are
-skipped, while multiple matching assets in the newest applicable release are
+entry must use a unique target filename. When `file` is omitted or a plugin is
+created through `/pp external add`, Plugin Portal uses a managed stable filename
+such as `[PP] viaversion [GITHUB].jar`. GitHub releases with no matching asset
+are skipped, while multiple matching assets in the newest applicable release are
 reported as an ambiguity instead of falling back to an older release.
 
 ```yaml
@@ -155,19 +157,23 @@ plugins:
   floodgate:
     source: geysermc:floodgate
     artifact: spigot
-    file: floodgate-spigot.jar
+    file: "[PP] floodgate [GEYSERMC].jar"
     updates: manual
 
   viaversion:
     source: github:ViaVersion/ViaVersion
     asset: "^ViaVersion.*\\.jar$"
-    file: ViaVersion.jar
+    file: "[PP] viaversion [GITHUB].jar"
     prereleases: false
     updates: manual
 ```
 
 | Command | Purpose |
 | --- | --- |
+| `/pp external add github <id> <owner> <repo> <asset> [--prereleases]` | Add a GitHub external plugin entry using a managed `[PP] ... [GITHUB].jar` filename. `<asset>` may be a simple include string like `ViaVersion` or a full regex. |
+| `/pp external add geysermc <id> <project> <artifact>` | Add a GeyserMC external plugin entry using a managed `[PP] ... [GEYSERMC].jar` filename. |
+| `/pp external import github <id> <owner> <repo> <asset> <file> [--prereleases]` | Track an already installed JAR as a GitHub external plugin. `<asset>` may be a simple include string like `ViaVersion` or a full regex. |
+| `/pp external import geysermc <id> <project> <artifact> <file>` | Track an already installed JAR as a GeyserMC external plugin. |
 | `/pp external check <id>` | Resolve the latest matching provider artifact without downloading it. |
 | `/pp external install <id>` | Install a configured external plugin into `plugins/`. |
 | `/pp external update <id>` | Stage an installed external plugin update in `plugins/update/`. |
@@ -287,7 +293,7 @@ Export/import:
 | `/pp help` | `pluginportal.view` | Show command help. | Also works by running `/pp`. |
 | `/pp info` | `pluginportal.view` | Show Plugin Portal version, edition, license state, and update info. | Alias: `/pp version`. |
 | `/pp version` | `pluginportal.view` | Same as `/pp info`. | Shows Licensed: Yes/No. |
-| `/pp list` | `pluginportal.view` | List marketplace and external plugins managed by Plugin Portal. | Checks and displays update status; marketplace entries include update/uninstall buttons in player chat. |
+| `/pp list [--all]` | `pluginportal.view` | List marketplace and external plugins managed by Plugin Portal. | Checks and displays update status; `--all` also shows unrecognized JARs in `plugins/`. |
 | `/pp dump` | `pluginportal.dump` | Upload logs/support dump to MCLogs and return a support URL. | Use for diagnostics. |
 | `/pluginportal config refresh` | `pluginportal.manage.config` | Reload local plugin cache/config state. | Command root is `pluginportal config`, not `/pp config`. |
 
