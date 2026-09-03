@@ -10,6 +10,7 @@ import gg.flyte.pluginportal.common.commands.lamp.EnabledCommand
 import gg.flyte.pluginportal.common.commands.lamp.Features
 import gg.flyte.pluginportal.common.commands.lamp.MarketplacePluginSuggestionProvider
 import gg.flyte.pluginportal.common.commands.lamp.ReleaseChannelSuggestionProvider
+import gg.flyte.pluginportal.common.managers.LocalPluginCache
 import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
 import gg.flyte.pluginportal.common.types.ExactVersionSelection
 import gg.flyte.pluginportal.common.types.exactCompatibleVersionWithFallback
@@ -49,8 +50,12 @@ class InstallSubCommand {
             byId,
             exact = exact,
             ifSingle = { plugin ->
-                audience.sendMessage(startLine().appendSecondary("Starting installation of ").appendPrimary(plugin.name).appendSecondary("...").appendNewline())
                 async {
+                    if (LocalPluginCache.hasPlugin(plugin)) {
+                        audience.sendInfo("${plugin.name} is already installed.")
+                        return@async
+                    }
+
 //                    val request = DownloadRequest(
 //                        plugin = plugin,
 //                        targetDirectory = File("plugins"),
@@ -100,6 +105,8 @@ class InstallSubCommand {
                         return@async
                     }
 
+                    audience.sendMessage(progress("Installing", plugin.name))
+
                     val newPlugin = plugin.download(
                         update = false,
                         marketplacePlatform = targetPlatform.platform,
@@ -114,11 +121,6 @@ class InstallSubCommand {
                     if (newPlugin != null) {
                         audience.sendMessage(SharedComponents.successfullyInstalledPlugin(plugin.name, newPlugin.platform))
                         if (exactVersionNumber != null) audience.sendInfo("${plugin.name} is excluded from updateAll because you installed a specific version.")
-                    } else {
-                        // Send this as any failure would have been of itself, boxed.
-                        audience.sendMessage(endLine())
-                        // This should be handled already
-//                        audience.sendFailure("Installation failed when attempting to install ${plugin.name} (${plugin.id})")
                     }
                 }
             },

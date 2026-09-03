@@ -105,7 +105,7 @@ class UpdateSubCommand {
             return audience.sendSuccess("Plugin is already up to date")
         }
 
-        audience.sendMessage(startLine().appendSecondary("Starting update of ").appendPrimary(localPlugin.name).appendSecondary("...").appendNewline())
+        audience.sendMessage(progress("Updating", localPlugin.name))
 
         val targetPlatform = localPlugin.platform
         val targetMessage = "${localPlugin.name} from $targetPlatform with ID ${localPlugin.platformId}"

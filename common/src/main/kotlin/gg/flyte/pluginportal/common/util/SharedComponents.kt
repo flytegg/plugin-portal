@@ -21,7 +21,7 @@ object SharedComponents {
     fun successfullyInstalledPlugin(pluginName: String, platform: MarketplacePlatform, plsrestart: Boolean = true) =
         status(Status.SUCCESS, "Downloaded $pluginName from ${platform.name}.")
             .also { if (plsrestart) it.appendSecondary("\n- Please restart your server to enable this plugin") }
-            .append(endLine())
+            .boxed()
 
     fun getUpdateBeforeAndAfterComponent(plugin: LocalPlugin, new: Plugin) = Component.text(
         "(",

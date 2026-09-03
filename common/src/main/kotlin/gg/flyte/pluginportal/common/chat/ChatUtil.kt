@@ -74,6 +74,9 @@ fun Audience.sendFailure(msg: String) = send(Status.FAILURE, msg)
 fun Audience.sendInfo(msg: String) = send(Status.INFO, msg)
 fun Audience.sendSuccess(msg: String) = send(Status.SUCCESS, msg)
 
+fun progress(action: String, target: String): Component =
+    textSecondary("$action ").appendPrimary(target).appendSecondary("...")
+
 fun Audience.sendUnAuthed() = sendMessage(
     status(Status.FAILURE, "You are not authenticated. ")
         .appendSecondary("Join our ")
@@ -115,7 +118,7 @@ fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plu
             }
         }
 
-        val platform = plugin.bestPlatform ?: return audience.sendFailure("Can't find a platform to pull information from")
+        val platform = plugin.bestPlatform ?: return@forEach
         val name = plugin.name.shortenToLine(
             23 + plugin.totalDownloads.format().pixelLength() + plugin.platformString.pixelLength()
         )
