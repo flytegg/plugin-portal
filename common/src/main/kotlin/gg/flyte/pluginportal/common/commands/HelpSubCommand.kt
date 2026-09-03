@@ -46,7 +46,11 @@ class HelpSubCommand {
         message = if (pageNumber == 1) {
             message.append(section("Plugins"))
                 .appendNewline()
-                .append(helpLine("/pp list", "Installed"))
+                .append(helpLine("/pp list [--outdated]", "Installed", details = listOf(
+                    "--outdated shows marketplace and external updates."
+                )))
+                .appendNewline()
+                .append(helpLine("/pp search <query> [platform]", "Search marketplace"))
                 .appendNewline()
                 .append(helpLine("/pp view <plugin> [platform]", "Details", details = listOf(
                     "Flags: --byId, --exact or -e",
@@ -60,7 +64,8 @@ class HelpSubCommand {
                 )))
                 .appendNewline()
                 .append(helpLine("/pp update <plugin>", "Update", details = listOf(
-                    "Flags: --byId, --ignoreOutdated, --channel <name>, --version <version>",
+                    "Flags: --byId, --ignoreOutdated, --refresh, --channel <name>, --version <version>",
+                    "--refresh bypasses Plugin Portal's local marketplace cache.",
                     "--channel disambiguates duplicate version names.",
                     "Example: /pp update luckperms --version 5.4.134"
                 )))

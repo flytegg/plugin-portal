@@ -34,6 +34,7 @@ class UpdateSubCommand {
         @Named("name") @SuggestWith(InstalledPluginSuggestionProvider::class) name: String,
         @Switch("byId") byId: Boolean = false, // @Suggest("--byId", "--ignoreOutdated", "-b", "-i", "-bi")
         @Switch("ignoreOutdated") ignoreOutdated: Boolean = false,
+        @Switch("refresh") refresh: Boolean = false,
         @Optional @Flag("channel") @SuggestWith(ReleaseChannelSuggestionProvider::class) channel: String? = null,
         @Optional @Flag("version") versionNumber: String? = null,
     ) {
@@ -41,28 +42,39 @@ class UpdateSubCommand {
             audience,
             name,
             byId,
-            ifSingle = { plugin: LocalPlugin -> handleSinglePlugin(audience, plugin, ignoreOutdated, channel, versionNumber) }.async(),
+            ifSingle = { plugin: LocalPlugin -> handleSinglePlugin(audience, plugin, ignoreOutdated, refresh, channel, versionNumber) }.async(),
             ifMore = { plugins: List<LocalPlugin> ->
                 sendLocalPluginListMessage(
                     audience,
                     "Multiple plugins found, click one to prompt update command",
                     plugins,
                     "update",
-                    buildUpdateSuggestionSuffix(ignoreOutdated, channel, versionNumber)
+                    buildUpdateSuggestionSuffix(ignoreOutdated, refresh, channel, versionNumber)
                 )
             },
 
         )
     }
 
-    private fun handleSinglePlugin(audience: Audience, localPlugin: LocalPlugin, ignoreOutdated: Boolean, channel: String?, versionNumber: String?) {
+    private fun handleSinglePlugin(
+        audience: Audience,
+        localPlugin: LocalPlugin,
+        ignoreOutdated: Boolean,
+        refresh: Boolean,
+        channel: String?,
+        versionNumber: String?,
+    ) {
         val targetChannel = channel?.takeIf { it.isNotBlank() }
         val exactVersionNumber = versionNumber?.takeIf { it.isNotBlank() }
-        var marketplacePluginOverride: Plugin? = null
+        var marketplacePluginOverride: Plugin? = if (refresh) {
+            MarketplacePluginCache.refreshPluginById(localPlugin.platform, localPlugin.platformId)
+                ?: return audience.sendFailure("Could not refresh ${localPlugin.name} from the marketplace")
+        } else null
         var targetVersionOverride: Version? = null
 
         if (exactVersionNumber != null) {
-            val marketplacePlugin = MarketplacePluginCache.getCachedPluginById(localPlugin.platform, localPlugin.platformId)
+            val marketplacePlugin = marketplacePluginOverride
+                ?: MarketplacePluginCache.getCachedPluginById(localPlugin.platform, localPlugin.platformId)
                 ?: runCatching { MarketplacePluginCache.getOrFetchPluginById(localPlugin.platform, localPlugin.platformId) }.getOrNull()
                 ?: return audience.sendFailure("Could not find plugin in marketplace (${localPlugin.name} with ID ${localPlugin.platformId} on ${localPlugin.platform})")
             val platformPlugin = marketplacePlugin.platform(localPlugin.platform)
@@ -101,7 +113,9 @@ class UpdateSubCommand {
             LocalPluginCache.save()
         }
 
-        if (exactVersionNumber == null && !ignoreOutdated && localPlugin.isUpToDate) {
+        val updateTarget = marketplacePluginOverride?.let(localPlugin::targetUpdateVersion)
+        val isUpToDate = marketplacePluginOverride?.let { updateTarget == null } ?: localPlugin.isUpToDate
+        if (exactVersionNumber == null && !ignoreOutdated && isUpToDate) {
             return audience.sendSuccess("Plugin is already up to date")
         }
 
@@ -122,16 +136,25 @@ class UpdateSubCommand {
         )
 
         if (response.success) {
-            audience.sendMessage(SharedComponents.successfullyInstalledPlugin(localPlugin.name, targetPlatform))
+            val installedVersion = response.meta?.version ?: targetVersionOverride?.versionNumber ?: updateTarget?.versionNumber ?: "unknown"
+            audience.sendMessage(
+                SharedComponents.successfullyUpdatedPlugin(
+                    localPlugin.name,
+                    localPlugin.version,
+                    installedVersion,
+                    targetPlatform,
+                )
+            )
             if (exactVersionNumber != null) audience.sendInfo("${localPlugin.name} is excluded from updateAll because you installed a specific version.")
         } else {
             response.alertFailure(audience)
         }
     }
 
-    private fun buildUpdateSuggestionSuffix(ignoreOutdated: Boolean, channel: String?, versionNumber: String?): String {
+    private fun buildUpdateSuggestionSuffix(ignoreOutdated: Boolean, refresh: Boolean, channel: String?, versionNumber: String?): String {
         val parts = mutableListOf<String>()
         if (ignoreOutdated) parts += "--ignoreOutdated"
+        if (refresh) parts += "--refresh"
         channel?.takeIf { it.isNotBlank() }?.let { parts += "--channel \"$it\"" }
         versionNumber?.takeIf { it.isNotBlank() }?.let { parts += "--version \"$it\"" }
         return if (parts.isEmpty()) "" else " ${parts.joinToString(" ")}"

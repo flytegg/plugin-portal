@@ -127,7 +127,7 @@ class InstallSubCommand {
             ifMore = {
                 sendPluginListMessage(
                     audience,
-                    "Multiple plugins found, click one to prompt install command",
+                    "Choose a plugin to install",
                     it,
                     "install",
                     buildInstallSuggestionSuffix(platform, channel, exact, versionNumber)

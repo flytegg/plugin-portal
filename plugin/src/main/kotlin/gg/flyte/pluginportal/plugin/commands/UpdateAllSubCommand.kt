@@ -12,6 +12,7 @@ import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.common.types.enums.MarketplacePlatform
 import gg.flyte.pluginportal.common.util.ActionResponseComponent
 import gg.flyte.pluginportal.common.util.ActionResponseString
+import gg.flyte.pluginportal.common.util.SharedComponents
 import gg.flyte.pluginportal.common.util.async
 import gg.flyte.pluginportal.plugin.commands.lamp.RequiresAuth
 import net.kyori.adventure.audience.Audience
@@ -111,13 +112,12 @@ class UpdateAllSubCommand {
                         if (response.success) {
                             successCount++
                             audience.sendMessage(
-                                Component.text("[SUCCESS]: ", NamedTextColor.GREEN)
-                                    .appendSecondary("Updated ")
-                                    .appendPrimary(localPlugin.name)
-                                    .appendSecondary(" from ")
-                                    .appendPrimary(platform.name)
-                                    .appendSecondary("...")
-                                    .boxed()
+                                SharedComponents.successfullyUpdatedPlugin(
+                                    localPlugin.name,
+                                    localPlugin.version,
+                                    response.meta?.version ?: localPlugin.targetUpdateVersion(marketplacePlugin)?.versionNumber ?: "unknown",
+                                    platform,
+                                )
                             )
                         } else {
                             failCount++

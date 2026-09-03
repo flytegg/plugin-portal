@@ -36,13 +36,26 @@ try {
   child.stdin.write("pluginportal\n");
   await expectOccurrences(/\/pp install/g, 2, "the pluginportal command alias");
 
-  child.stdin.write("pp install ViaVersion MODRINTH --exact\n");
+  child.stdin.write("pp install ViaVersion MODRINTH\n");
   await expectOutput(
     /Downloaded ViaVersion from MODRINTH|Successfully installed ViaVersion/i,
-    "a ViaVersion install from the public API",
+    "an exact-name ViaVersion install from the public API",
     75_000,
   );
   await assertInstalled("ViaVersion");
+
+  child.stdin.write("pp install DKY9btbd MODRINTH --byId\n");
+  await expectOutput(/Downloaded WorldGuard from MODRINTH/i, "a Minecraft-compatible WorldGuard install", 75_000);
+  await assertTrackedVersionSupports("WorldGuard", "1.21.11");
+
+  child.stdin.write("pp search ViaVersion\n");
+  await expectOutput(/ViaVersionStatus/i, "related marketplace search results", 30_000);
+
+  child.stdin.write("pp list --outdated\n");
+  await expectOutput(/All managed plugins are up to date/i, "the combined outdated list", 30_000);
+
+  child.stdin.write("pp update ViaVersion --refresh\n");
+  await expectOutput(/Plugin is already up to date/i, "a fresh single-plugin update check", 30_000);
 
   child.stdin.write("stop\n");
   const exitCode = await waitForExit(45_000);
@@ -103,6 +116,29 @@ async function assertInstalled(pluginName: string) {
   const installed = files.some((file) => file.endsWith(".jar") && file.toLowerCase().includes(pluginName.toLowerCase()));
   if (!installed) {
     throw new Error(`The install command succeeded but no ${pluginName} JAR exists in ${pluginsDirectory}.`);
+  }
+}
+
+async function assertTrackedVersionSupports(pluginName: string, minecraftVersion: string) {
+  const pluginsFile = join(runDirectory, "plugins", "PluginPortal", "plugins.json");
+  let tracked: { name: string; version: string; platform: string; platformId: string } | undefined;
+
+  for (let attempt = 0; attempt < 25 && !tracked; attempt++) {
+    const contents = await readFile(pluginsFile, "utf8").catch(() => "[]");
+    tracked = (JSON.parse(contents) as Array<typeof tracked>).find((plugin) => plugin?.name === pluginName);
+    if (!tracked) await Bun.sleep(200);
+  }
+  if (!tracked) throw new Error(`${pluginName} was downloaded but not written to plugins.json.`);
+
+  const response = await fetch(
+    `https://v3.pluginportal.link/versions/platform/${tracked.platform.toLowerCase()}/${tracked.platformId}?limit=500&offset=0`,
+  );
+  if (!response.ok) throw new Error(`Could not verify ${pluginName} compatibility: API returned ${response.status}.`);
+
+  const payload = await response.json() as { versions?: Array<{ versionNumber: string; mcVersions?: string[] }> };
+  const version = payload.versions?.find((candidate) => candidate.versionNumber === tracked.version);
+  if (!version?.mcVersions?.includes(minecraftVersion)) {
+    throw new Error(`${pluginName} ${tracked.version} does not explicitly support Minecraft ${minecraftVersion}.`);
   }
 }
 

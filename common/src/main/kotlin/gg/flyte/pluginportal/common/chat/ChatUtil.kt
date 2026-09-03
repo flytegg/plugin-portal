@@ -135,6 +135,51 @@ fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plu
     audience.sendMessage(solidLine("", ""))
 }
 
+fun sendPluginSearchResultsMessage(audience: Audience, query: String, plugins: List<Plugin>) {
+    val duplicateNames = plugins
+        .groupingBy { it.name.lowercase() }
+        .eachCount()
+        .filterValues { it > 1 }
+        .keys
+
+    audience.sendMessage(startLine().appendSecondary("Search results for \"$query\"").appendNewline())
+    plugins.take(16).forEach { plugin ->
+        val viewPlatform = plugin.platforms.best ?: return@forEach
+        val installPlatform = plugin.platforms.bestDownloadable
+        val platformSummary = plugin.platforms.available.joinToString(", ") { it.name }
+        val hover = text(plugin.name, AQUA).appendNewline()
+            .append(text("${plugin.totalDownloads.format()} downloads · $platformSummary", GRAY))
+            .appendNewline()
+            .append(text(plugin.sanitisedDescription ?: "No description available", DARK_GRAY))
+
+        var row = textSecondary(" - ")
+            .append(textPrimary(plugin.name).hoverEvent(HoverEvent.showText(hover)))
+
+        if (plugin.name.lowercase() in duplicateNames) {
+            row = row.appendDark(" (${viewPlatform.platform.name.lowercase()}:${viewPlatform.platformId})")
+        }
+
+        row = row.appendSecondary("  ").append(
+            textPrimary("View")
+                .hyperlink()
+                .showOnHover("View ${plugin.name}")
+                .suggestCommand("/pp view \"${viewPlatform.platformId}\" ${viewPlatform.platform} --byId")
+        )
+
+        if (installPlatform != null) {
+            row = row.appendSecondary(" | ").append(
+                textPrimary("Install")
+                    .hyperlink()
+                    .showOnHover("Install ${plugin.name} from ${installPlatform.platform.name}")
+                    .suggestCommand("/pp install \"${installPlatform.platformId}\" ${installPlatform.platform} --byId")
+            )
+        }
+
+        audience.sendMessage(row)
+    }
+    audience.sendMessage(solidLine("", ""))
+}
+
 fun sendLocalPluginListMessage(audience: Audience, message: String, plugins: List<LocalPlugin>, command: String, commandSuffix: String = "") {
     audience.sendMessage(startLine().appendSecondary(message).appendNewline())
     plugins.forEach { plugin ->
