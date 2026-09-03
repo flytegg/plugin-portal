@@ -117,6 +117,8 @@ object MarketplacePluginCache: PluginCache<Plugin>() {
                 var plugins = getFilteredPlugins(name, platform)
                 if (exact) {
                     plugins = plugins.filter { it.name.equals(name, true) }
+                } else {
+                    plugins = plugins.preferUniqueExactName(name)
                 }
                 when {
                     plugins.isEmpty() -> audience.sendFailure("No plugins found")
@@ -188,6 +190,11 @@ object MarketplacePluginCache: PluginCache<Plugin>() {
      */
     fun List<Plugin>.sortedByRelevance(query: String): List<Plugin> = sortedByDescending {
         it.totalDownloads * if (query.equals(it.name, true)) 50 else 1 // Arbitrary bias to exact matches
+    }
+
+    internal fun List<Plugin>.preferUniqueExactName(query: String): List<Plugin> {
+        val exactMatches = filter { it.name.equals(query, ignoreCase = true) }
+        return if (exactMatches.size == 1) exactMatches else this
     }
 
     private fun String.normalizedLookup(): String =

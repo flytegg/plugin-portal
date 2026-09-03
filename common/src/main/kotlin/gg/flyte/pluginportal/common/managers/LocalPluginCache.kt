@@ -36,7 +36,7 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
 
     fun getAllPluginsAsPlatformIds() = map { PlatformId(it.platformId, it.platform) }
     fun getEntryIdMap(): EntryIdMap = groupBy { it.platform }
-        .mapValues { it.value.map(LocalPlugin::entryId) }
+        .mapValues { (_, plugins) -> plugins.filter(LocalPlugin::hasResolvedEntryId).map(LocalPlugin::entryId) }
         .let { EntryIdMap(it[MODRINTH] ?: listOf(), it[HANGAR] ?: listOf(), it[SPIGOTMC] ?: listOf(), it[POLYMART] ?: listOf()) }
 
     fun reloadCache() {
@@ -45,8 +45,9 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
 
         try {
             clear()
-            val plugins = GSON.fromJson(text, Array<LocalPlugin>::class.java)
-            addAll(plugins)
+            val migration = readPlugins(text)
+            addAll(migration.plugins)
+            if (migration.migratedCount > 0) save()
 
         } catch (_: JsonSyntaxException) {
         }
@@ -80,7 +81,8 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
         }
 
         try {
-            val plugins = GSON.fromJson(text, Array<LocalPlugin>::class.java)
+            val migration = readPlugins(text)
+            val plugins = migration.plugins
 
             plugins.forEach { plugin ->
                 // Update Plugin Portal's own local cache entry.
@@ -102,6 +104,29 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
             PortalLogger.info(PortalLogger.Action.LOAD_PLUGINS, "Loaded ${plugins.size} plugins from local cache")
         } catch (_: JsonSyntaxException) {
         }
+    }
+
+    private fun readPlugins(text: String): LocalPluginCacheMigrationResult {
+        val migration = migrateLocalPluginCache(text) { platformIds ->
+            val pluginsByPlatform = API.getAllPluginsByPlatformIds(platformIds) ?: return@migrateLocalPluginCache emptyMap()
+            platformIds.mapNotNull { identity ->
+                val entryId = pluginsByPlatform[identity.platform]
+                    ?.get(identity.platformId)
+                    ?.platform(identity.platform)
+                    ?.entryId
+                entryId?.let { identity to it }
+            }.toMap()
+        }
+
+        if (migration.migratedCount > 0) {
+            PluginPortalBase.plugin.logger.info("Migrated ${migration.migratedCount} legacy Plugin Portal cache entries.")
+        }
+        if (migration.unresolvedCount > 0) {
+            PluginPortalBase.plugin.logger.warning(
+                "Could not resolve ${migration.unresolvedCount} legacy cache entry IDs; retained those plugins and will retry later."
+            )
+        }
+        return migration
     }
 
     fun save() {

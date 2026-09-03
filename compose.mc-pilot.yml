@@ -1,0 +1,24 @@
+services:
+  mc-pilot:
+    platform: linux/amd64
+    build:
+      context: docker/mc-pilot
+      args:
+        MC_PILOT_COMMIT: 561b15c79894672f4b046aadf93bbdb70d61c34b
+    init: true
+    working_dir: /workspace
+    environment:
+      DISPLAY: :99
+      MCT_SKILL_TARGETS: none
+    volumes:
+      - .:/workspace:ro
+      - ./build/mc-pilot:/output
+      - mc-pilot-state:/home/node/.mct
+    shm_size: 1gb
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  mc-pilot-state:
