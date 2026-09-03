@@ -17,7 +17,7 @@ import gg.flyte.pluginportal.plugin.websocket.TypedSocketManager
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
-class PluginPortal : JavaPlugin() {
+open class PluginPortal : JavaPlugin() {
 
     companion object {
         lateinit var instance: PluginPortal

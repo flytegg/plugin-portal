@@ -57,6 +57,17 @@ Run a local Paper test server:
 ./gradlew :plugin:runServer
 ```
 
+Run the automated Paper startup and command smoke test:
+
+```bash
+./gradlew :plugin:paperSmoke
+```
+
+This uses a disposable `runServer` directory, executes `/pp`, `/pp key get`, and the
+`pluginportal` alias from the console, installs ViaVersion through the public Plugin Portal
+API, verifies the downloaded JAR, checks that Plugin Portal did not fail during enable,
+and stops the server cleanly. It requires internet access and a healthy public API.
+
 The built plugin JAR is written to `out/PluginPortal-<version>.jar`.
 
 ## Version Information

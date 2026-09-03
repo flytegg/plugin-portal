@@ -1,11 +1,13 @@
 ---
 name: plugin-portal-release
-description: Build, test, publish, and verify Plugin Portal releases to GitHub, Modrinth, and Hangar.
+description: Build, smoke-test, publish, and verify Plugin Portal Minecraft releases from the Plugin Portal project.
 ---
 
 # Plugin Portal Release
 
-Use this skill when publishing Plugin Portal from this repository.
+Use this project-local skill when publishing Plugin Portal from this repository. Plugin Portal
+builds one public `out/PluginPortal-<x.y.z>.jar`; premium behavior is controlled by runtime
+entitlement and server-side enforcement, not a second artifact.
 
 ## Release Channels
 
