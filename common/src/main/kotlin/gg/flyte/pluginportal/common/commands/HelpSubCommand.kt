@@ -75,12 +75,12 @@ class HelpSubCommand {
                     "Example: /pp platform essentialsx modrinth"
                 )))
                 .appendNewline()
-                .append(helpLine("/pp <uninstall|delete> <plugin>", "Remove", details = listOf(
+                .append(helpLine("/pp <uninstall | delete> <plugin>", "Remove", details = listOf(
                     "Flags: --byId",
                     "Example: /pp uninstall luckperms"
                 )))
                 .appendNewline()
-                .append(helpLine("/pp <version|info>", "Status"))
+                .append(helpLine("/pp <version | info>", "Status"))
                 .appendNewline()
                 .appendNewline()
                 .append(footer(2))
@@ -91,7 +91,7 @@ class HelpSubCommand {
                     "Example: /pp install-url https://example.com/plugin.jar"
                 )))
                 .appendNewline()
-                .append(helpLine("/pp key <set|get|clear>", "API key", details = listOf(
+                .append(helpLine("/pp key <set | get | clear>", "API key", details = listOf(
                     "Example: /pp key set pp_live_..."
                 )))
                 .appendNewline()
@@ -133,7 +133,7 @@ class HelpSubCommand {
             .appendNewline()
             .append(section("Premium", gold))
             .appendNewline()
-            .append(helpLine("/pp editor [status|url|reconnect|stop]", "Editor", gold, listOf(
+            .append(helpLine("/pp editor [status | url | reconnect | stop]", "Editor", gold, listOf(
                 "Creates a temporary browser editor session.",
                 "Example: /pp editor url"
             )))
@@ -149,7 +149,7 @@ class HelpSubCommand {
             .appendNewline()
             .append(helpLine("/pp recognizeAll", "Recognize all", gold))
             .appendNewline()
-            .append(helpLine("/pp <import|export>", "Import/export", gold, listOf(
+            .append(helpLine("/pp <import | export>", "Import/export", gold, listOf(
                 "Import requires an MCLogs URL created by /pp export.",
                 "Example: /pp import https://mclo.gs/abc123"
             )))

@@ -8,29 +8,32 @@ import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.Plugin
 import gg.flyte.pluginportal.common.types.enums.MarketplacePlatform
-import gg.flyte.pluginportal.common.util.async
+import revxrsal.commands.autocomplete.AsyncSuggestionProvider
 import revxrsal.commands.autocomplete.SuggestionProvider
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
 import revxrsal.commands.node.ExecutionContext
 import revxrsal.commands.stream.StringStream
+import java.util.concurrent.CompletableFuture
 
 abstract class CustomSuggestionProvider(val suggestions: (ExecutionContext<BukkitCommandActor>) -> List<String>): SuggestionProvider<BukkitCommandActor> {
     override fun getSuggestions(context: ExecutionContext<BukkitCommandActor>) = suggestions(context)
 }
 
-class MarketplacePluginSuggestionProvider: CustomSuggestionProvider({
-    val searchName = it.input().toArgs().last()
-    if (searchName.length == 2) async { SearchPlugins.search(searchName) }
-    if (searchName.length <= 2)
-        listOf("Keep typing...")
-    else {
-        SearchPlugins.getCachedSearch(searchName)
-            ?.map(Plugin::name)
-            ?.filter { it.startsWith(searchName, true) }
-            ?.map { "\"$it\"" }
-            ?: listOf("Loading...")
+class MarketplacePluginSuggestionProvider : AsyncSuggestionProvider<BukkitCommandActor> {
+    override fun getSuggestionsAsync(context: ExecutionContext<BukkitCommandActor>): CompletableFuture<Collection<String>> {
+        val searchName = context.input().toArgs().last()
+        if (searchName.length <= 2) {
+            return CompletableFuture.completedFuture(listOf("Keep typing..."))
+        }
+
+        return CompletableFuture.supplyAsync {
+            SearchPlugins.search(searchName.take(3))
+                .map(Plugin::name)
+                .filter { it.startsWith(searchName, true) }
+                .map { "\"$it\"" }
+        }
     }
-})
+}
 
 class InstalledPluginSuggestionProvider: CustomSuggestionProvider({
     LocalPluginCache.map { "\"${it.name}\"" }
