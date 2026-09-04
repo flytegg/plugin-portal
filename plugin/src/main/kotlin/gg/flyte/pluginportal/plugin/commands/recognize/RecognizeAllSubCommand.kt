@@ -7,6 +7,7 @@ import gg.flyte.pluginportal.common.PlatformId
 import gg.flyte.pluginportal.common.chat.*
 import gg.flyte.pluginportal.common.commands.lamp.EnabledCommand
 import gg.flyte.pluginportal.common.commands.lamp.Features
+import gg.flyte.pluginportal.common.commands.lamp.ReleaseChannelSuggestionProvider
 import gg.flyte.pluginportal.common.managers.ExternalPluginManager
 import gg.flyte.pluginportal.common.managers.LocalPluginCache
 import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
@@ -22,7 +23,10 @@ import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
 import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Flag
+import revxrsal.commands.annotation.Optional
 import revxrsal.commands.annotation.Subcommand
+import revxrsal.commands.annotation.SuggestWith
 import revxrsal.commands.bukkit.annotation.CommandPermission
 import java.io.File
 
@@ -42,7 +46,10 @@ class RecognizeAllSubCommand {
     @EnabledCommand(Features.RECOGNISE)
     @Subcommand("recognizeAll")
     @CommandPermission("pluginportal.manage.recognize")
-    fun recognizeAllCommand(audience: Audience) {
+    fun recognizeAllCommand(
+        audience: Audience,
+        @Optional @Flag("channel") @SuggestWith(ReleaseChannelSuggestionProvider::class) channel: String? = null,
+    ) {
         async {
             val externalHashes = ExternalPluginManager.managedHashes()
             val externalFileNames = ExternalPluginManager.managedFileNames()
@@ -98,7 +105,17 @@ class RecognizeAllSubCommand {
                         log("Could not find a compatible Bukkit/Paper version for ${plugin.name} from ${file.name}")
                         return@forEach noRecognize(file)
                     }
-                    val local = LocalPlugin(ppl.entryId, ppl.platformId, plugin.name, version, ppl.platform, sha256, sha512, System.currentTimeMillis())
+                    val local = LocalPlugin(
+                        ppl.entryId,
+                        ppl.platformId,
+                        plugin.name,
+                        version,
+                        ppl.platform,
+                        sha256,
+                        sha512,
+                        System.currentTimeMillis(),
+                        preferredChannel = channel?.takeIf { it.isNotBlank() },
+                    )
                     log("Found plugin ${ppl.platform} ${plugin.name} $version from ${file.name}")
                     LocalPluginCache.add(local)
                     recognizedPlugins.add(local)

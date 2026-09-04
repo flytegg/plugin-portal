@@ -9,6 +9,7 @@ import gg.flyte.pluginportal.common.chat.sendInfo
 import gg.flyte.pluginportal.common.chat.sendSuccess
 import gg.flyte.pluginportal.common.commands.lamp.EnabledCommand
 import gg.flyte.pluginportal.common.commands.lamp.Features
+import gg.flyte.pluginportal.common.commands.lamp.ReleaseChannelSuggestionProvider
 import gg.flyte.pluginportal.common.managers.ExternalPluginManager
 import gg.flyte.pluginportal.common.managers.LocalPluginCache
 import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
@@ -23,7 +24,9 @@ import gg.flyte.pluginportal.plugin.commands.lamp.RequiresAuth
 import gg.flyte.pluginportal.plugin.commands.lamp.SafeFileName
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Flag
 import revxrsal.commands.annotation.Named
+import revxrsal.commands.annotation.Optional
 import revxrsal.commands.annotation.Subcommand
 import revxrsal.commands.annotation.SuggestWith
 import revxrsal.commands.bukkit.annotation.CommandPermission
@@ -40,7 +43,8 @@ class RecognizeSubCommand {
     @CommandPermission("pluginportal.manage.recognize")
     fun recognizeCommand(
         audience: Audience,
-        @Named("file") @SuggestWith(PluginJarFilesUnrecognisedSP::class) @SafeFileName pluginFileName: String
+        @Named("file") @SuggestWith(PluginJarFilesUnrecognisedSP::class) @SafeFileName pluginFileName: String,
+        @Optional @Flag("channel") @SuggestWith(ReleaseChannelSuggestionProvider::class) channel: String? = null,
     ) {
         async {
             logger.info("[ RECOGNITION ] - Attempting to recognize $pluginFileName")
@@ -123,6 +127,7 @@ class RecognizeSubCommand {
                     sha256,
                     sha512,
                     System.currentTimeMillis(),
+                    preferredChannel = channel?.takeIf { it.isNotBlank() },
                 )
             )
 
