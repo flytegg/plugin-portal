@@ -8,6 +8,91 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 class VersionSelectionTest {
+    private fun cachedAlpha() = version("3.0-alpha", "2026-06-03T00:00:00Z", ServerType.PAPER,
+        channel = "alpha", minecraftVersions = listOf("1.21.4"))
+
+    private fun installedPlugin() = LocalPlugin("entry", "project", "Example", "1.0",
+        gg.flyte.pluginportal.common.types.enums.MarketplacePlatform.MODRINTH, "installed-sha256", "installed-sha512", 0L)
+
+    @Test
+    fun `update selects later stable instead of cached newer alpha`() {
+        val alpha = cachedAlpha()
+        val selected = installedPlugin().targetUpdateVersion(platformEntry(listOf(alpha)), listOf(ServerType.PAPER), "1.21.4") {
+            listOf(alpha, version("2.0", "2026-06-02T00:00:00Z", ServerType.PAPER, minecraftVersions = listOf("1.21.4")))
+        }
+        assertEquals("2.0", selected?.versionNumber)
+    }
+
+    @Test
+    fun `update does not resurrect cached alpha when full stable is already installed`() {
+        val alpha = cachedAlpha()
+        val selected = installedPlugin().targetUpdateVersion(platformEntry(listOf(alpha)), listOf(ServerType.PAPER), "1.21.4") {
+            listOf(alpha, version("1.0", "2026-06-02T00:00:00Z", ServerType.PAPER, minecraftVersions = listOf("1.21.4")))
+        }
+        assertNull(selected)
+    }
+
+    @Test
+    fun `update with failed lookup does not fall back to implicit alpha`() {
+        assertNull(installedPlugin().targetUpdateVersion(platformEntry(listOf(cachedAlpha())), listOf(ServerType.PAPER), "1.21.4") { null })
+    }
+
+    @Test
+    fun `cached compatible alpha does not hide stable on later pages`() {
+        val alpha = cachedAlpha()
+        var fetched = false
+        val selected = platformEntry(listOf(alpha)).newestCompatibleVersionWithFallback(null, listOf(ServerType.PAPER), "1.21.4") {
+            fetched = true
+            listOf(alpha, version("2.0", "2026-06-02T00:00:00Z", ServerType.PAPER, minecraftVersions = listOf("1.21.4")))
+        }
+        assertEquals(true, fetched)
+        assertEquals("2.0", selected?.versionNumber)
+    }
+
+    @Test
+    fun `full lookup with incompatible stable does not resurrect cached alpha`() {
+        val alpha = cachedAlpha()
+        val selected = platformEntry(listOf(alpha)).newestCompatibleVersionWithFallback(null, listOf(ServerType.PAPER), "1.21.4") {
+            listOf(alpha, version("2.0", "2026-06-02T00:00:00Z", ServerType.PAPER, minecraftVersions = listOf("1.20.6")))
+        }
+        assertNull(selected)
+    }
+
+    @Test
+    fun `failed full lookup cannot establish that a project only has prereleases`() {
+        val selected = platformEntry(listOf(cachedAlpha())).newestCompatibleVersionWithFallback(null, listOf(ServerType.PAPER), "1.21.4") { null }
+        assertNull(selected)
+    }
+
+    @Test
+    fun `complete prerelease only project remains installable`() {
+        val alpha = cachedAlpha()
+        val selected = platformEntry(listOf(alpha)).newestCompatibleVersionWithFallback(null, listOf(ServerType.PAPER), "1.21.4") { listOf(alpha) }
+        assertEquals(alpha, selected)
+    }
+
+    @Test
+    fun `explicit alpha channel can use a compatible cached alpha`() {
+        val alpha = cachedAlpha()
+        val selected = platformEntry(listOf(alpha)).newestCompatibleVersionWithFallback("ALPHA", listOf(ServerType.PAPER), "1.21.4") {
+            error("An exact cached channel match should not need a full lookup")
+        }
+        assertEquals(alpha, selected)
+    }
+
+    @Test
+    fun `unordered versions and duplicate entries do not select oldest release`() {
+        val newest = version("2.0", "2026-06-02T00:00:00Z", ServerType.PAPER)
+        val old = version("1.0", "2026-06-01T00:00:00Z", ServerType.PAPER)
+        assertEquals(newest, listOf(old, newest, old).newestCompatibleVersion(null, listOf(ServerType.PAPER)))
+    }
+
+    @Test
+    fun `structured patch version does not imply compatibility with base version`() {
+        val versions = listOf(version("1.0", "2026-06-01T00:00:00Z", ServerType.PAPER, minecraftVersions = listOf("1.21.4")))
+        assertNull(versions.newestCompatibleVersion(null, listOf(ServerType.PAPER), "1.21"))
+    }
+
     @Test
     fun `chooses newest compatible version behind newer incompatible builds`() {
         val versions = listOf(
@@ -187,14 +272,14 @@ class VersionSelectionTest {
     }
 
     @Test
-    fun `treats minor minecraft versions as family compatibility`() {
+    fun `structured minor minecraft version does not imply later patch compatibility`() {
         val versions = listOf(
             version("1.0.0", "2026-06-01T00:00:00Z", ServerType.PAPER, minecraftVersions = listOf("1.21")),
         )
 
         val selected = versions.newestCompatibleVersion("release", listOf(ServerType.PAPER), "1.21.4")
 
-        assertEquals("1.0.0", selected?.versionNumber)
+        assertNull(selected)
     }
 
     @Test

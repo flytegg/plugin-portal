@@ -161,11 +161,19 @@ fun PlatformPlugin.newestCompatibleVersionWithFallback(
     serverTypePreference: List<ServerType>,
     minecraftVersion: String? = null,
     fetchVersions: () -> List<Version>?
-): Version? =
-    newestCompatibleVersion(channel, serverTypePreference, minecraftVersion)
-        ?.takeIf { version -> version.isSpecificMatch(serverTypePreference, minecraftVersion) }
-        ?: fetchVersions()?.newestCompatibleVersion(channel, serverTypePreference, minecraftVersion)
-        ?: newestCompatibleVersion(channel, serverTypePreference, minecraftVersion)
+): Version? {
+    val cached = newestCompatibleVersion(channel, serverTypePreference, minecraftVersion)
+    if (cached != null && cached.hasResolvedChannel(channel) && cached.isSpecificMatch(serverTypePreference, minecraftVersion)) return cached
+
+    // A successful lookup with no match is authoritative, not a reason to reuse the slice.
+    val full = fetchVersions()
+    if (full != null) return full.newestCompatibleVersion(channel, serverTypePreference, minecraftVersion)
+    return cached?.takeIf { it.hasResolvedChannel(channel) }
+}
+
+internal fun Version.hasResolvedChannel(requestedChannel: String?): Boolean =
+    requestedChannel != null || releaseChannel.equals("release", ignoreCase = true) ||
+        releaseChannel.equals("stable", ignoreCase = true)
 
 fun PlatformPlugin.exactCompatibleVersionWithFallback(
     versionNumber: String,
@@ -190,12 +198,7 @@ private fun List<Version>.preferMinecraftVersion(minecraftVersion: String?): Lis
     val explicitMatches = filter { version -> version.explicitlySupportsMinecraftVersion(normalized) }
     if (explicitMatches.isNotEmpty()) return explicitMatches
 
-    val versionsWithoutStructuredCompatibility = filter { version -> version.mcVersions.isNullOrEmpty() }
-    return when {
-        versionsWithoutStructuredCompatibility.isNotEmpty() -> versionsWithoutStructuredCompatibility
-        any { version -> !version.mcVersions.isNullOrEmpty() } -> emptyList()
-        else -> this
-    }
+    return filter { version -> version.mcVersions.isNullOrEmpty() }
 }
 
 private fun List<Version>.preferStableChannel(requestedChannel: String?): List<Version> {
@@ -315,6 +318,8 @@ data class Version(
 
     fun explicitlySupportsMinecraftVersion(minecraftVersion: String?): Boolean {
         val normalized = normalizeMinecraftVersion(minecraftVersion) ?: return false
+        // Structured marketplace versions are exact versions, not minor-version wildcards.
+        if (!mcVersions.isNullOrEmpty()) return mcVersions.any { it.equals(normalized, ignoreCase = true) }
         return supportedMinecraftVersions.any { supported -> minecraftVersionsMatch(supported, normalized) }
     }
 
