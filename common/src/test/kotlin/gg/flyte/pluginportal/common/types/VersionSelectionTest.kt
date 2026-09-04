@@ -5,6 +5,7 @@ import java.time.Instant
 import java.util.Date
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class VersionSelectionTest {
     @Test
@@ -32,6 +33,42 @@ class VersionSelectionTest {
         val selected = versions.newestCompatibleVersion("release", listOf(ServerType.PAPER, ServerType.SPIGOT, ServerType.BUKKIT))
 
         assertEquals("1.9.0", selected?.versionNumber)
+    }
+
+    @Test
+    fun `defaults to a stable channel instead of a newer prerelease`() {
+        val versions = listOf(
+            version("2.0.0-alpha", "2026-06-02T00:00:00Z", ServerType.PAPER, channel = "alpha"),
+            version("1.9.0", "2026-06-01T00:00:00Z", ServerType.PAPER),
+        )
+
+        val selected = versions.newestCompatibleVersion(null, listOf(ServerType.PAPER))
+
+        assertEquals("1.9.0", selected?.versionNumber)
+    }
+
+    @Test
+    fun `honors an explicitly requested prerelease channel`() {
+        val versions = listOf(
+            version("2.0.0-beta", "2026-06-02T00:00:00Z", ServerType.PAPER, channel = "beta"),
+            version("1.9.0", "2026-06-01T00:00:00Z", ServerType.PAPER),
+        )
+
+        val selected = versions.newestCompatibleVersion("beta", listOf(ServerType.PAPER))
+
+        assertEquals("2.0.0-beta", selected?.versionNumber)
+    }
+
+    @Test
+    fun `does not silently cross to alpha when stable versions are incompatible`() {
+        val versions = listOf(
+            version("2.0.0-alpha", "2026-06-02T00:00:00Z", ServerType.PAPER, channel = "alpha", minecraftVersions = listOf("1.21.4")),
+            version("1.9.0", "2026-06-01T00:00:00Z", ServerType.PAPER, minecraftVersions = listOf("1.20.6")),
+        )
+
+        val selected = versions.newestCompatibleVersion(null, listOf(ServerType.PAPER), "1.21.4")
+
+        assertNull(selected)
     }
 
     @Test
@@ -113,6 +150,40 @@ class VersionSelectionTest {
         val selected = versions.newestCompatibleVersion("release", listOf(ServerType.PAPER, ServerType.SPIGOT, ServerType.BUKKIT), "1.21.4")
 
         assertEquals("1.9.0", selected?.versionNumber)
+    }
+
+    @Test
+    fun `does not install a version that explicitly targets another minecraft version`() {
+        val versions = listOf(
+            version("2.0.0", "2026-06-02T00:00:00Z", ServerType.PAPER, minecraftVersions = listOf("26.1")),
+            version("1.9.0", "2026-06-01T00:00:00Z", ServerType.PAPER, minecraftVersions = listOf("1.20.6")),
+        )
+
+        val selected = versions.newestCompatibleVersion("release", listOf(ServerType.PAPER), "1.21.4")
+
+        assertNull(selected)
+    }
+
+    @Test
+    fun `finds Advanced Portals Paper build beyond the cached first page`() {
+        val cachedVersions = listOf(
+            version("2.8.0-folia", "2026-05-27T21:30:47Z", ServerType.FOLIA, channel = "alpha", minecraftVersions = listOf("26.1.1")),
+            version("2.8.0-legacy-spigot", "2026-05-27T21:30:43Z", ServerType.BUKKIT, ServerType.SPIGOT, ServerType.PAPER, minecraftVersions = listOf("1.8.8", "1.12.2")),
+        )
+        val platform = platformEntry(cachedVersions)
+
+        val selected = platform.newestCompatibleVersionWithFallback(
+            null,
+            listOf(ServerType.PAPER, ServerType.SPIGOT, ServerType.BUKKIT),
+            "1.21.4",
+        ) {
+            cachedVersions + listOf(
+                version("2.8.0-spigot", "2026-05-27T21:30:37Z", ServerType.BUKKIT, ServerType.SPIGOT, ServerType.PAPER, minecraftVersions = listOf("1.21", "1.21.4")),
+                version("0.0.41", "2023-04-20T02:20:14Z", ServerType.PAPER, minecraftVersions = listOf("1.8.8", "1.12.2")),
+            )
+        }
+
+        assertEquals("2.8.0-spigot", selected?.versionNumber)
     }
 
     @Test

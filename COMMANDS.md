@@ -110,10 +110,11 @@ Install from command:
 2. Plugin searches marketplace cache/API.
 3. If `--byId` is used, `platform` is required and `<name>` is treated as the marketplace/platform ID.
 4. If `--exact` or `-e` is used, name search is filtered to exact case-insensitive plugin-name matches.
-5. If `--version <version>` is used, Plugin Portal selects that exact compatible version. If the version label exists on multiple channels, rerun with a channel.
-6. If one match exists, it downloads the plugin JAR into `plugins/`.
-7. It writes a tracked `LocalPlugin` entry to `plugins/PluginPortal/plugins.json`.
-8. User usually needs to restart the server for Bukkit/Paper to load the newly installed plugin.
+5. If no channel is supplied, Plugin Portal prefers `release` or `stable` builds when either is available.
+6. If `--version <version>` is used, Plugin Portal selects that exact compatible version. If the version label exists on multiple channels, rerun with a channel.
+7. If one match exists, it downloads the newest version compatible with the server software and Minecraft version into `plugins/`.
+8. It writes a tracked `LocalPlugin` entry to `plugins/PluginPortal/plugins.json`.
+9. User usually needs to restart the server for Bukkit/Paper to load the newly installed plugin.
 
 Install command arguments:
 
@@ -265,7 +266,7 @@ If the JAR is already gone, Plugin Portal removes the cache entry but reports it
 
 Recognition is for manually installed plugins.
 
-`/pp recognize <file>`:
+`/pp recognize <file> [--channel <name>]`:
 
 - Looks for the JAR in `plugins/`.
 - Allows a single partial filename match.
@@ -275,14 +276,16 @@ Recognition is for manually installed plugins.
 - Reads `polymart.yml` from the JAR if present and handles Polymart metadata locally.
 - Otherwise asks the API to recognize by hash.
 - Adds a `LocalPlugin` entry to `plugins.json`.
+- Saves `--channel` as the update channel when provided.
 - Renames the JAR to Plugin Portal's downloaded filename format when recognized.
 
-`/pp recognizeAll`:
+`/pp recognizeAll [--channel <name>]`:
 
 - Scans all JARs in `plugins/`.
 - Skips Plugin Portal itself and already tracked hashes.
 - Handles Polymart metadata first.
 - Then batch-recognizes remaining JARs by hash.
+- Saves `--channel` as the update channel for hash-recognized JARs when provided.
 - Shows recognized and unrecognized results.
 
 Export/import:
@@ -331,8 +334,8 @@ These require valid Plugin Portal entitlement unless noted. The same JAR contain
 | Command | Permission | Purpose | Notes |
 | --- | --- | --- | --- |
 | `/pp updateAll [--ignoreOutdated]` | `pluginportal.maintain.update` | Bulk update all tracked plugins. | Skips blacklisted plugins and uses each plugin's saved channel. |
-| `/pp recognize <file>` | `pluginportal.manage.recognize` | Recognize one untracked plugin JAR in the plugins folder by hash/metadata. | May rename the file to Plugin Portal format. |
-| `/pp recognizeAll` | `pluginportal.manage.recognize` | Recognize all untracked plugin JARs in the plugins folder. | Skips Plugin Portal itself and already tracked hashes. |
+| `/pp recognize <file> [--channel <name>]` | `pluginportal.manage.recognize` | Recognize one untracked plugin JAR in the plugins folder by hash/metadata. | May rename the file to Plugin Portal format. `--channel` pins future updates to that channel. |
+| `/pp recognizeAll [--channel <name>]` | `pluginportal.manage.recognize` | Recognize all untracked plugin JARs in the plugins folder. | Skips Plugin Portal itself and already tracked hashes. `--channel` applies to hash-recognized JARs. |
 | `/pp export` | `pluginportal.manage.export` | Export tracked plugin platform IDs to an MCLogs URL. | Used for migration/import. |
 | `/pp import <mclogs-url>` | `pluginportal.manage.import` | Import and install plugins from an export URL. | URL must contain `mclo.gs`. |
 | `/pp scan <file>` | `pluginportal.manage.scan` | Scan a plugin JAR for Hangar scanner alerts. | Findings are warnings, not automatic proof of malware. |

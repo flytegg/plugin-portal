@@ -152,6 +152,7 @@ private fun List<Version>.bestCompatibleVersion(serverTypePreference: List<Serve
 fun List<Version>.newestCompatibleVersion(channel: String?, serverTypePreference: List<ServerType>, minecraftVersion: String? = null): Version? =
     filter { version -> version.isCompatibleWith(serverTypePreference) }
         .filter { version -> channel == null || version.releaseChannel.equals(channel, ignoreCase = true) }
+        .preferStableChannel(channel)
         .preferMinecraftVersion(minecraftVersion)
         .bestCompatibleVersion(serverTypePreference)
 
@@ -189,8 +190,21 @@ private fun List<Version>.preferMinecraftVersion(minecraftVersion: String?): Lis
     val explicitMatches = filter { version -> version.explicitlySupportsMinecraftVersion(normalized) }
     if (explicitMatches.isNotEmpty()) return explicitMatches
 
-    val unknownCompatibility = filter { version -> version.supportedMinecraftVersions.isEmpty() }
-    return unknownCompatibility.ifEmpty { this }
+    val versionsWithoutStructuredCompatibility = filter { version -> version.mcVersions.isNullOrEmpty() }
+    return when {
+        versionsWithoutStructuredCompatibility.isNotEmpty() -> versionsWithoutStructuredCompatibility
+        any { version -> !version.mcVersions.isNullOrEmpty() } -> emptyList()
+        else -> this
+    }
+}
+
+private fun List<Version>.preferStableChannel(requestedChannel: String?): List<Version> {
+    if (requestedChannel != null) return this
+    val stableVersions = filter { version ->
+        version.releaseChannel.equals("release", ignoreCase = true) ||
+            version.releaseChannel.equals("stable", ignoreCase = true)
+    }
+    return stableVersions.ifEmpty { this }
 }
 
 private fun Version.isSpecificMatch(serverTypePreference: List<ServerType>, minecraftVersion: String?): Boolean {
