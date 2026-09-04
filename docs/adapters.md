@@ -4,7 +4,7 @@ External adapters let Plugin Portal manage plugins that are distributed outside
 its marketplace catalog. The built-in providers are GitHub Releases and the
 GeyserMC download API.
 
-External plugin commands require a linked Plugin Portal server and the
+External plugin commands require an active Plugin Portal premium entitlement and the
 `pluginportal.manage.external` permission.
 
 ## Configuration
@@ -83,13 +83,16 @@ and skips prereleases unless `prereleases` is `true`. A release with no matching
 asset is skipped. If more than one asset in the same release matches, the check
 fails so that Plugin Portal does not guess which JAR to install.
 
-You can create the same entry in game. A plain asset value such as `ViaVersion`
-is converted to a JAR filename pattern by the command:
+You can also add ViaVersion in game. These commands create a manual-update
+entry with a broader filename pattern containing `ViaVersion`:
 
 ```text
 /pp external add github viaversion ViaVersion ViaVersion ViaVersion
 /pp external install viaversion
 ```
+
+To use the narrower asset pattern and automatic updates shown above, edit
+`asset` and `updates` in `external-plugins.yml`, then run `/pp external reload`.
 
 To adopt an existing `ViaVersion.jar` instead:
 
