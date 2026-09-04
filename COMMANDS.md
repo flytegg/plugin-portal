@@ -145,6 +145,9 @@ External plugins are declared in `external-plugins.yml`. GitHub sources require 
 asset regex that matches exactly one release asset. GeyserMC sources require an
 artifact name such as `spigot`, `bungee`, or `velocity`.
 
+See [External plugin adapters](docs/adapters.md) for configuration rules, complete
+GitHub Releases and GeyserMC examples, filenames, and recognition exclusions.
+
 External plugin IDs may contain letters, numbers, underscores, and hyphens. Each
 entry must use a unique target filename. When `file` is omitted or a plugin is
 created through `/pp external add`, Plugin Portal uses a managed stable filename
