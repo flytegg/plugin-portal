@@ -4,6 +4,8 @@ import gg.flyte.pluginportal.common.Config
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -15,6 +17,45 @@ import org.mockbukkit.mockbukkit.ServerMock
 class PluginPortalTest {
     private lateinit var server: ServerMock
     private lateinit var plugin: PluginPortal
+
+    @Test
+    fun `marketplace key is persisted and imported even when validation cannot finish`() {
+        val licenseFile = plugin.dataFolder.resolve("mclicense.txt")
+        val legacyFile = plugin.dataFolder.resolve("pluginportal.txt")
+        Config.clearAuthenticationKey()
+        licenseFile.delete()
+        legacyFile.delete()
+        val manager = EntitlementManager(plugin,
+            marketplaceKey = { MarketplaceKey.resolve("fixture-license", "%%__BBB_LICENSE__%%") },
+            validateMarketplace = {
+                assertEquals("pm_fixture-license", licenseFile.readText())
+                throw IllegalStateException("Simulated provider outage")
+            },
+        )
+        try {
+            assertEquals("pm_fixture-license", manager.loadConfiguredKey())
+            assertEquals("pm_fixture-license", Config.getApiKey())
+            assertEquals("pm_fixture-license", licenseFile.readText())
+            assertFalse(manager.hasPremiumAccess())
+            Config.clearAuthenticationKey()
+            val restarted = EntitlementManager(plugin, marketplaceKey = { error("Must reuse saved key") })
+            assertEquals("pm_fixture-license", restarted.loadConfiguredKey())
+        } finally {
+            Config.clearAuthenticationKey()
+            licenseFile.delete()
+        }
+    }
+
+    @Test
+    fun `configured key is not overwritten by marketplace delivery`() {
+        Config.setApiKey("existing-fixture")
+        try {
+            val manager = EntitlementManager(plugin, marketplaceKey = { error("Must preserve configured key") })
+            assertEquals("existing-fixture", manager.loadConfiguredKey())
+        } finally {
+            Config.clearAuthenticationKey()
+        }
+    }
 
     @BeforeAll
     fun setUp() {
