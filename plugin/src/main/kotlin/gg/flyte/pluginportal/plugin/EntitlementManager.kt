@@ -11,13 +11,13 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.bukkit.plugin.java.JavaPlugin
 import org.mclicense.library.MCLicense
 
-class EntitlementManager(private val plugin: JavaPlugin) {
+class EntitlementManager(
+    private val plugin: JavaPlugin,
+    private val marketplaceKey: () -> String? = MarketplaceKey::embedded,
+    private val validateMarketplace: () -> Unit = { MCLicense.validateKey(plugin, "676ff1b14cf2cdb257c4ee2d"); Unit },
+) {
     private companion object {
-        const val MC_LICENSE_PLUGIN_ID = "676ff1b14cf2cdb257c4ee2d"
         const val PLACEHOLDER_PREFIX = "%%__"
-        const val POLYMART_MARKER = "%%__POLYMART__%%"
-        const val POLYMART_LICENSE = "%%__LICENSE__%%"
-        const val BUILT_BY_BIT_LICENSE = "%%__BBB_LICENSE__%%"
     }
 
     private var state: EntitlementState = EntitlementState.MissingKey
@@ -118,12 +118,17 @@ class EntitlementManager(private val plugin: JavaPlugin) {
     }
 
     private fun loadMarketplaceKey(mcLicensePath: java.io.File): String? {
-        val hasBuiltByBitKey = !BUILT_BY_BIT_LICENSE.startsWith(PLACEHOLDER_PREFIX)
-        val hasPolymartKey = POLYMART_MARKER == "1" && !POLYMART_LICENSE.startsWith(PLACEHOLDER_PREFIX)
-        if (!hasBuiltByBitKey && !hasPolymartKey) return null
-
-        MCLicense.validateKey(plugin, MC_LICENSE_PLUGIN_ID)
-        return mcLicensePath.readNonBlankText()
+        val key = marketplaceKey() ?: return null
+        mcLicensePath.parentFile.mkdirs()
+        // Seed the file so MCLicense does not repeat its marker-dependent detection.
+        mcLicensePath.writeText(key)
+        try {
+            validateMarketplace()
+        } catch (_: Exception) {
+            plugin.logger.warning("Marketplace license validation is unavailable; the imported key is saved for retry.")
+        }
+        // Importing a key never grants access. refresh() still checks /premium/validate.
+        return mcLicensePath.readNonBlankText() ?: key
     }
 
     private fun persistKey(key: String, pluginPortalPath: java.io.File, mcLicensePath: java.io.File) {
