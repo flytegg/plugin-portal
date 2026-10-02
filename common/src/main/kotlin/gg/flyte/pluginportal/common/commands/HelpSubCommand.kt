@@ -157,7 +157,8 @@ class HelpSubCommand {
             "Excluded plugins are skipped. Use /pp blacklist to view exclusions.",
             "External plugins use /pp external updateAll."
         )),
-        "list" to ("/pp list [--all] [--outdated] [--external] [--detailed] [--page <number>] [--full]" to listOf(
+        "list" to ("/pp list [--all] [--untracked] [--outdated] [--external] [--detailed] [--page <number>] [--full]" to listOf(
+            "--untracked shows only unmanaged JARs. Use it without --all, --outdated, or --external.",
             "--all includes unrecognized JARs. It cannot be combined with --outdated or --external.",
             "--outdated checks for updates without installing them.",
             "--external shows only configured external plugins.",

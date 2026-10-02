@@ -83,6 +83,22 @@ try {
   await runCommand("pp blacklist ViaVersion", /blacklisted from/, "exclude a plugin from bulk updates");
   await runCommand("pp blacklist", /ViaVersion/, "persisted exclusion list");
 
+  await runCommand("pp list --untracked", /No untracked JARs found/, "managed JARs excluded from untracked list");
+  // Add a JAR after startup so Paper does not try to load this file-only fixture.
+  const fixtureDir = join(runDirectory, "untracked-fixture");
+  await mkdir(fixtureDir);
+  await writeFile(join(fixtureDir, "plugin.yml"), "name: ManualSmoke\nversion: 1.0\nmain: test.ManualSmoke\n");
+  const jarTool = process.env.JAVA_HOME ? join(process.env.JAVA_HOME, "bin", "jar") : "jar";
+  const fixture = Bun.spawn([jarTool, "cf", join(runDirectory, "plugins", "manual-smoke.jar"), "-C", fixtureDir, "plugin.yml"], { stdout: "pipe", stderr: "pipe" });
+  if (await fixture.exited !== 0) throw new Error("Could not create untracked JAR fixture");
+  const untrackedStart = output.length;
+  await runCommand("pp list --full --untracked", /manual-smoke.jar/, "untracked-only list");
+  if (/Marketplace|ViaVersion/.test(clean(output.slice(untrackedStart)))) throw new Error("Untracked list included managed plugins");
+  const allStart = output.length;
+  await runCommand("pp list --all --full", /manual-smoke.jar/, "combined managed and untracked list");
+  if (!/ViaVersion/.test(clean(output.slice(allStart)))) throw new Error("All list omitted managed plugins");
+  await runCommand("pp list --untracked --outdated", /Use --untracked without/, "conflicting list filters");
+
   child.stdin.write("stop\n");
   const exitCode = await waitForExit(45_000);
   if (exitCode !== 0) throw new Error(`Paper exited with code ${exitCode}.`);

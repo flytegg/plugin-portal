@@ -45,6 +45,7 @@ class ListSubCommand {
         audience: Audience,
         @Switch("detailed") detailed: Boolean = false,
         @Switch("all") all: Boolean = false,
+        @Switch("untracked") untracked: Boolean = false,
         @Switch("outdated") outdated: Boolean = false,
         @Switch("external") externalOnly: Boolean = false,
         @Optional @Flag("page") page: Int? = null,
@@ -55,6 +56,22 @@ class ListSubCommand {
             if (full && page != null) return@async audience.sendFailure("Use either --full or --page, not both")
             if (all && outdated) return@async audience.sendFailure("Use either --all or --outdated, not both")
             if (all && externalOnly) return@async audience.sendFailure("Use either --all or --external, not both")
+
+            if (untracked && (all || outdated || externalOnly)) {
+                return@async audience.sendFailure("Use --untracked without --all, --outdated, or --external")
+            }
+            if (untracked) {
+                val jars = findUnrecognizedJars(LocalPluginCache.toList())
+                if (jars.isEmpty()) return@async audience.sendSuccess("No untracked JARs found")
+                val rows = jars.map { jar ->
+                    "Unrecognized JARs" to {
+                        if (detailed || audience.isConsole()) getDetailedUnrecognizedJarLine(jar)
+                        else getCompactUnrecognizedJarLine(jar)
+                    }
+                }
+                return@async sendPagedRows(audience, rows, page, full,
+                    "/pp list --untracked" + if (detailed) " --detailed" else "")
+            }
 
             val plugins = if (externalOnly) emptyList() else LocalPluginCache
                     .sortedBy { plugin -> plugin.name }
@@ -89,7 +106,7 @@ class ListSubCommand {
             val failedExternalChecks = if (outdated) {
                 checkedExternalPlugins.filter { entry -> entry.state?.installed != null && !entry.check.success }
             } else emptyList()
-            val unrecognizedJars = if (all) findUnrecognizedJars(plugins, externalPlugins) else emptyList()
+            val unrecognizedJars = if (all) findUnrecognizedJars(plugins) else emptyList()
 
             if (outdated && marketplaceUpdates.isEmpty() && externalPlugins.isEmpty() && failedExternalChecks.isEmpty() && failedMarketplaceChecks.isEmpty()) {
                 return@async audience.sendSuccess(
@@ -354,15 +371,11 @@ class ListSubCommand {
     }
 
     private fun findUnrecognizedJars(
-        plugins: List<LocalPlugin>,
-        externalPlugins: List<ExternalListEntry>
+        plugins: List<LocalPlugin>
     ): List<UnrecognizedJar> {
         val managedHashes = buildSet {
             addAll(plugins.map { it.sha256.lowercase() })
             addAll(ExternalPluginManager.managedHashes())
-            addAll(externalPlugins.flatMap { entry ->
-                listOfNotNull(entry.state?.installed?.sha256, entry.state?.staged?.sha256)
-            }.map(String::lowercase))
             addAll(adapterManagedHashes())
             add(HashType.SHA256.hash(PluginPortalBase.info.pluginJarFile).lowercase())
         }

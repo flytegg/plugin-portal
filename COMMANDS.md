@@ -29,7 +29,7 @@ datapacks or install plugins on proxy servers.
 | `/pp help [page or command]` | Show help page 1 or 2, or help for a command. |
 | `/pp search <query> [platform] [--page <number>] [--full]` | Search the marketplace catalog. |
 | `/pp view <name> [platform] [--byId] [--exact]` | Show marketplace details and available actions. |
-| `/pp list [--all] [--outdated] [--external] [--detailed] [--page <number>] [--full]` | List local plugins and configured external plugins. |
+| `/pp list [--all] [--untracked] [--outdated] [--external] [--detailed] [--page <number>] [--full]` | List local plugins and configured external plugins. |
 | `/pp info` | Show the Plugin Portal version, license state, and update information. Alias: `/pp version`. |
 
 These commands require `pluginportal.view`.
@@ -41,6 +41,7 @@ combine `--page` and `--full`.
 
 List options:
 
+- `--untracked` shows only JARs that Plugin Portal does not manage. It uses local files and does not check remote sources. Do not combine it with `--all`, `--outdated`, or `--external`.
 - `--all` includes unrecognized JARs. Do not combine it with `--outdated` or `--external`.
 - `--outdated` shows available marketplace and external updates. Failed checks appear separately.
 - `--external` shows only configured external plugins.
