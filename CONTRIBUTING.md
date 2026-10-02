@@ -77,10 +77,20 @@ Run the automated Paper startup and command smoke test:
 ./gradlew :plugin:paperSmoke
 ```
 
-This uses a disposable `runServer` directory, executes `/pp`, `/pp key get`, and the
-`pluginportal` alias from the console, installs ViaVersion through the public Plugin Portal
-API, verifies the downloaded JAR, checks that Plugin Portal did not fail during enable,
-and stops the server cleanly. It requires internet access and a healthy public API.
+This starts a disposable Paper 1.21.11 server. It checks startup, command aliases,
+command help, list options, flag order, compatible Modrinth downloads, explicit
+reinstall, and bulk-update exclusions. It stops the server and removes the test
+folder. It requires Bun, internet access, and a healthy public API.
+
+To check an existing legacy Paper server JAR without changing its server folder:
+
+```bash
+JAVA_HOME=/path/to/compatible/jdk bun scripts/smoke-run-paper.ts --server-jar /path/to/server.jar
+```
+
+The script copies the server JAR and its adjacent Paperclip cache into a temporary
+folder. It runs the same basic commands and a ViaVersion download. The modern-only
+WorldGuard and Enchanted Timber checks do not run on this path.
 
 The built plugin JAR is written to `out/PluginPortal-<version>.jar`.
 
@@ -132,3 +142,15 @@ Please include:
 - Known follow-up work.
 
 Security issues should be reported privately as described in `SECURITY.md`.
+
+## Documentation
+
+Update `COMMANDS.md` when a command, permission, option, or configuration behavior
+changes. Keep the hosted documentation consistent in the API/web repository.
+Use short sentences, active voice, and one action per instruction. Use the same
+term for the same thing. Keep literal command names and configuration keys exact.
+These conventions follow the intent of ASD-STE100. Do not claim formal compliance
+without checking its complete rules and dictionary.
+
+Describe shipped behavior. Label planned or unsupported behavior explicitly.
+Do not describe version selection or self-upgrade as Premium-only.
