@@ -62,6 +62,7 @@ try {
     await assertTrackedVersionSupports("Enchanted Timber", "1.21.11");
   }
 
+  await runCommand("pp view ViaVersion MODRINTH --exact", /https:\/\/modrinth.com\//, "plain console marketplace details");
   await runCommand("pp help update", /--refresh/, "command-specific update help");
   await runCommand("pluginportal help install", /The channel is positional/, "long help alias");
   await runCommand("pp list --page 99", /Choose a page from/, "out-of-range list page");

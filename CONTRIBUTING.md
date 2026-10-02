@@ -89,7 +89,8 @@ JAVA_HOME=/path/to/compatible/jdk bun scripts/smoke-run-paper.ts --server-jar /p
 ```
 
 The script copies the server JAR and its adjacent Paperclip cache into a temporary
-folder. It runs the same basic commands and a ViaVersion download. The modern-only
+folder. It runs the same basic commands and a ViaVersion download from Hangar. Modrinth currently labels ViaVersion for 1.8.9,
+so the legacy check uses Hangar metadata that explicitly includes 1.8.8. The modern-only
 WorldGuard and Enchanted Timber checks do not run on this path.
 
 The built plugin JAR is written to `out/PluginPortal-<version>.jar`.

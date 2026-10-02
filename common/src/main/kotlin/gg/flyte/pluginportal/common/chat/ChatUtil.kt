@@ -95,6 +95,16 @@ private fun Audience.send(status: Status, msg: String) = sendMessage(status(stat
 fun Audience.isConsole() = get(Identity.UUID).isEmpty && "CONSOLE" == get(Identity.NAME).getOrDefault("")
 fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plugin>, command: String, commandSuffix: String = "") {
     audience.sendMessage(startLine().appendSecondary(message).appendNewline())
+    if (audience.isConsole()) {
+        plugins.forEach { plugin ->
+            audience.sendMessage(textPrimary(plugin.name))
+            plugin.platforms.asList().filter { Config.isDownloadPlatformEnabled(it.platform) }.forEach { entry ->
+                audience.sendMessage(textSecondary("  /pp $command \"${entry.platformId}\" ${entry.platform}$commandSuffix --byId"))
+            }
+        }
+        return
+    }
+    if (plugins.size > 16) audience.sendInfo("Showing 16 of ${plugins.size} matches. Use /pp search <name> to page through results, or use a more specific name.")
     plugins.take(16).forEach { plugin ->
         var platformSuffix = textDark(" (")
 
@@ -189,6 +199,11 @@ fun sendLocalPluginListMessage(audience: Audience, message: String, plugins: Lis
     audience.sendMessage(startLine().appendSecondary(message).appendNewline())
     plugins.forEach { plugin ->
         val platformSuffix = textDark(" (${plugin.platform.name})")
+        if (audience.isConsole()) {
+            audience.sendMessage(textPrimary(plugin.name).append(platformSuffix)
+                .appendNewline().appendSecondary("  /pp $command \"${plugin.platformId}\"$commandSuffix --byId"))
+            return@forEach
+        }
 
         audience.sendMessage(
             textSecondary(" - ").appendPrimary(plugin.name)

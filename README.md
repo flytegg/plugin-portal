@@ -28,8 +28,8 @@ are excluded from bulk updates until you remove the exclusion with `/pp blacklis
 Updates take effect after a server restart.
 
 The plugin targets Java 17 or later. Use the Java version required by your server.
-The automated runtime checks cover Paper 1.21.11. A supplied legacy Paper JAR can
-also be tested with the smoke script. See [contributing](CONTRIBUTING.md).
+The runtime checks pass on Paper 1.21.11 and Paper 1.8.8 with Java 21.
+Java 8 hosts are not supported. See [contributing](CONTRIBUTING.md).
 
 Datapack management, proxy-server plugins, and paid Polymart downloads are not
 supported. A marketplace listing must supply a downloadable compatible JAR.
