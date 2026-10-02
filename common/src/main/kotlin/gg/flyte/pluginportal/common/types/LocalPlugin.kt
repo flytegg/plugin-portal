@@ -4,6 +4,7 @@ import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.PlatformId
 import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
 import gg.flyte.pluginportal.common.types.enums.MarketplacePlatform
+import gg.flyte.pluginportal.common.types.enums.ServerType
 import gg.flyte.pluginportal.common.util.currentMinecraftVersion
 import gg.flyte.pluginportal.common.util.currentServerTypePreference
 
@@ -33,23 +34,34 @@ data class LocalPlugin(
 
     fun targetUpdateVersion(plugin: Plugin = marketplacePlugin): Version? {
         val platformPlugin = plugin.platform(platform) ?: return null
-        val serverTypes = currentServerTypePreference()
-        val minecraftVersion = currentMinecraftVersion()
+        return targetUpdateVersion(platformPlugin, currentServerTypePreference(), currentMinecraftVersion()) {
+            API.getPluginVersions(platformPlugin.platformWithId)?.toList()
+        }
+    }
+
+    internal fun targetUpdateVersion(
+        platformPlugin: PlatformPlugin,
+        serverTypes: List<ServerType>,
+        minecraftVersion: String?,
+        fetchVersions: () -> List<Version>?,
+    ): Version? {
         val cachedTarget = platformPlugin.newestCompatibleVersion(preferredChannel, serverTypes, minecraftVersion)
 
         if (
             cachedTarget != null
+            && cachedTarget.hasResolvedChannel(preferredChannel)
             && isNewerThanInstalled(cachedTarget)
             && cachedTarget.bestServerTypeRank(serverTypes) == 0
             && (minecraftVersion == null || cachedTarget.explicitlySupportsMinecraftVersion(minecraftVersion))
         ) return cachedTarget
 
-        val fullTarget = API.getPluginVersions(platformPlugin.platformWithId)
-            ?.toList()
-            ?.newestCompatibleVersion(preferredChannel, serverTypes, minecraftVersion)
-
-        return fullTarget?.takeIf(::isNewerThanInstalled)
-            ?: cachedTarget?.takeIf(::isNewerThanInstalled)
+        val fullVersions = fetchVersions()
+        val target = if (fullVersions != null) {
+            fullVersions.newestCompatibleVersion(preferredChannel, serverTypes, minecraftVersion)
+        } else {
+            cachedTarget?.takeIf { it.hasResolvedChannel(preferredChannel) }
+        }
+        return target?.takeIf(::isNewerThanInstalled)
     }
 
     fun matchesVersion(target: Version): Boolean =

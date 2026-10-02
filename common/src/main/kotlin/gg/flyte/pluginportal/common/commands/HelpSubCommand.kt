@@ -150,11 +150,11 @@ class HelpSubCommand {
                 "Example: /pp updateAll --ignoreOutdated"
             )))
             .appendNewline()
-            .append(helpLine("/pp recognize <file>", "Recognize", gold, listOf(
-                "Example: /pp recognize SomePlugin.jar"
+            .append(helpLine("/pp recognize <file> [--channel <name>]", "Recognize", gold, listOf(
+                "Example: /pp recognize SomePlugin.jar --channel release"
             )))
             .appendNewline()
-            .append(helpLine("/pp recognizeAll", "Recognize all", gold))
+            .append(helpLine("/pp recognizeAll [--channel <name>]", "Recognize all", gold))
             .appendNewline()
             .append(helpLine("/pp <import | export>", "Import/export", gold, listOf(
                 "Import requires an MCLogs URL created by /pp export.",

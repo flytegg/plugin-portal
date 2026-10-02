@@ -26,7 +26,7 @@ data class AuthCreds(
 // ORPC Response Types (minimal, focused on what the plugin needs)
 private data class ORPCVersionsResponse(val versions: List<ORPCVersionInfo>)
 private data class ORPCVersionInfo(val version: String, val fullVersion: String, val channel: String, val stable: Boolean, val filename: String)
-private data class ORPCPlatformVersionsResponse(val versions: Array<Version>, val pagination: Pagination)
+internal data class ORPCPlatformVersionsResponse(val versions: Array<Version>, val pagination: Pagination)
 private data class ORPCUpdateResponse(val updateAvailable: Boolean, val current: ORPCVersionChannel, val latest: ORPCLatestVersion?)
 private data class ORPCVersionChannel(val version: String, val channel: String)  
 private data class ORPCLatestVersion(val version: String, val channel: String, val downloadUrl: String, val changelog: String?)
@@ -44,6 +44,19 @@ internal fun nextPlatformVersionsOffset(pagination: Pagination, currentOffset: I
 
     val nextOffset = pagination.offset + pagination.limit
     return nextOffset.takeIf { it > currentOffset }
+}
+
+internal fun collectPlatformVersionPages(fetchPage: (Int) -> ORPCPlatformVersionsResponse?): Array<Version>? {
+    val versions = mutableListOf<Version>()
+    var offset = 0
+    repeat(MAX_PLATFORM_VERSION_PAGES) {
+        val page = fetchPage(offset) ?: return null
+        versions.addAll(page.versions)
+        if (!page.pagination.hasMore) return versions.toTypedArray()
+        offset = nextPlatformVersionsOffset(page.pagination, offset, page.versions.size) ?: return null
+    }
+    // Partial results must not masquerade as a complete version history.
+    return null
 }
 
 object API {
@@ -319,11 +332,7 @@ object API {
 
     fun getPluginVersions(platformId: PlatformId, limit: Int = MAX_PLATFORM_VERSION_PAGE_SIZE): Array<Version>? {
         val pageSize = limit.coerceIn(1, MAX_PLATFORM_VERSION_PAGE_SIZE)
-        val versions = mutableListOf<Version>()
-        var offset = 0
-        var pagesFetched = 0
-
-        while (pagesFetched < MAX_PLATFORM_VERSION_PAGES) {
+        return collectPlatformVersionPages { offset ->
             val response = orpcCall(
                 "/versions/platform/${platformId.platform.name.lowercase()}/${platformId.platformId}",
                 params = mapOf(
@@ -334,26 +343,15 @@ object API {
 
             if (!response.isSuccessful()) {
                 logRequestFailure("Plugin version lookup", response)
-                return versions.takeIf { it.isNotEmpty() }?.toTypedArray()
+                return@collectPlatformVersionPages null
             }
 
-            val page = runCatching {
+            runCatching {
                 GSON.fromJson(response.body, ORPCPlatformVersionsResponse::class.java)
             }.onFailure {
                 logParseFailure("Plugin version lookup", it)
-            }.getOrNull() ?: return versions.takeIf { it.isNotEmpty() }?.toTypedArray()
-
-            versions.addAll(page.versions.asList())
-            pagesFetched++
-
-            offset = nextPlatformVersionsOffset(page.pagination, offset, page.versions.size) ?: break
+            }.getOrNull()
         }
-
-        if (pagesFetched >= MAX_PLATFORM_VERSION_PAGES) {
-            PluginPortalBase.plugin.logger.warning("Plugin version lookup stopped after $MAX_PLATFORM_VERSION_PAGES pages for ${platformId.platform} ${platformId.platformId}.")
-        }
-
-        return versions.toTypedArray()
     }
 
     fun getAllPluginsByPlatformIds(platformIds: List<PlatformId>): Map<MarketplacePlatform, Map<String, Plugin?>>? {
