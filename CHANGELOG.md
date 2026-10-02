@@ -4,6 +4,8 @@
 
 ### 3.8.9 candidate
 
+Prepared for release. The JAR is not published yet.
+
 - Fix startup and marketplace access on legacy Paper servers, including 1.8.8.
 - Add `/pp list --untracked` for local JARs that Plugin Portal does not manage.
 - Add chat pagination for lists and search results. Use `--full` for all results.
