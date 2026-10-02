@@ -21,6 +21,7 @@ import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import revxrsal.commands.Lamp
 import revxrsal.commands.bukkit.BukkitLamp
+import revxrsal.commands.bukkit.BukkitLampConfig
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
 import java.io.File
 
@@ -137,7 +138,8 @@ object PluginPortalBase {
         audiences = BukkitAudiences.create(plugin)
 
         lamp = BukkitLamp
-            .builder(plugin)
+            // Lamp's Brigadier tree rejects reordered flags on commands with more than four options.
+            .builder(BukkitLampConfig.builder<BukkitCommandActor>(plugin).disableBrigadier().enableAsyncCompletion().build())
             .senderResolver(AudienceResolver(audiences))
             .commandCondition(CommandEnabledConditionValidator())
             .exceptionHandler(LampExceptionHandler(audiences))

@@ -42,7 +42,7 @@ available fields are:
 | --- | --- | --- |
 | `source` | Yes | Provider and project separated by `:`. Use `github:owner/repository` or `geysermc:project`. |
 | `asset` | GitHub only | Regular expression matched against the entire release asset filename. |
-| `artifact` | GeyserMC only | Artifact returned by the GeyserMC API, such as `spigot`, `bungee`, or `velocity`. |
+| `artifact` | GeyserMC only | Server-compatible artifact returned by the GeyserMC API, such as `spigot`. Do not use a proxy artifact on a Bukkit server. |
 | `file` | No | Stable filename used in the server's `plugins` directory. |
 | `prereleases` | No | Whether a GitHub adapter may use prereleases. Defaults to `false`. |
 | `updates` | No | `manual`, `auto`, or `disabled`. Defaults to `manual`. |

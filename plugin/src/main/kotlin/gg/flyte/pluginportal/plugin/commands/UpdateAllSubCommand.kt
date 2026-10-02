@@ -46,29 +46,41 @@ class UpdateAllSubCommand {
 
                 audience.sendInfo("Checking updates for $numLocalPlugins ${"plugin".plural(numLocalPlugins)}...")
 
-                // Fetch latest plugin info from API TODO: Just use cache
-                val marketplacePlugins: Map<MarketplacePlatform, Map<String, Plugin?>> = API.getAllPluginsByPlatformIds(LocalPluginCache.getAllPluginsAsPlatformIds())
-                    ?.takeIf { it.isNotEmpty() }
+                val eligible = LocalPluginCache.filter { !it.excludedFromUpdates }
+                val excluded = LocalPluginCache.filter { it.excludedFromUpdates }
+                excluded.forEach { audience.sendInfo("Skipped ${it.name}: excluded from updateAll") }
+                if (eligible.isEmpty()) return@async audience.sendInfo("No plugins eligible for update.")
+
+                val marketplacePlugins = API.getAllPluginsByPlatformIds(eligible.map { it.platformWithId })
                     ?: return@async audience.sendFailure("Failed to fetch plugin details from marketplace")
-
-                val updates: Map<LocalPlugin, Plugin> = LocalPluginCache
-                    .associateWith { lcl ->
-                        marketplacePlugins[lcl.platform]?.get(lcl.platformId)
+                val updates = linkedMapOf<LocalPlugin, Pair<Plugin, gg.flyte.pluginportal.common.types.Version>>()
+                var skipped = excluded.size
+                for (local in eligible) {
+                    try {
+                        val remote = marketplacePlugins[local.platform]?.get(local.platformId)
+                        if (remote == null) {
+                            skipped++
+                            audience.sendInfo("Skipped ${local.name}: marketplace data is unavailable")
+                            continue
+                        }
+                        val target = local.targetUpdateVersion(remote, includeCurrent = true)
+                        if (target == null) {
+                            skipped++
+                            audience.sendInfo("Skipped ${local.name}: no compatible version found")
+                        } else if (ignoreOutdated || local.targetUpdateVersion(remote) != null) {
+                            updates[local] = remote to target
+                        }
+                    } catch (e: Exception) {
+                        skipped++
+                        audience.sendInfo("Skipped ${local.name}: could not check for updates")
                     }
-                    // Not up to date
-                    .filter { (lcl, mkp) ->
-                        if (mkp == null) return@filter false
-                        val target = lcl.targetUpdateVersion(mkp) ?: return@filter false
-                        ignoreOutdated || !lcl.matchesVersion(target)
-                    }
-                    // Excluded from auto-updates
-                    .filter { (lcl, _) -> !lcl.excludedFromUpdates}
-                    .ifEmpty { return@async audience.sendSuccess("All plugins are up to date!") }
-                    .mapNotNull { (localPlugin, marketplacePlugin) ->
-                        marketplacePlugin?.let { localPlugin to it }
-                    }
-                    .toMap()
-
+                }
+                if (updates.isEmpty()) {
+                    return@async audience.sendInfo(
+                        if (skipped == 0) "All plugins are up to date!"
+                        else "No updates to install. $skipped plugins skipped."
+                    )
+                }
 
                 // Show update list
                 var messageComponent = Component.text()
@@ -77,9 +89,9 @@ class UpdateAllSubCommand {
                     .append(Component.newline())
                     .append(Component.newline())
 
-                updates.forEach { (local, marketplace) ->
+                updates.forEach { (local, resolved) ->
                     val currentVersion = local.version
-                    val newVersion = local.targetUpdateVersion(marketplace)?.versionNumber ?: "unknown"
+                    val newVersion = resolved.second.versionNumber
 
                     messageComponent = messageComponent
                         .append(textSecondary(" • "))
@@ -101,13 +113,14 @@ class UpdateAllSubCommand {
                 var successCount = 0
                 var failCount = 0
 
-                for ((localPlugin, marketplacePlugin) in updates) {
+                for ((localPlugin, resolved) in updates) {
+                    val (marketplacePlugin, targetVersion) = resolved
                     try {
                         val platform = localPlugin.platform
                         val targetMessage = "${localPlugin.name} from $platform with ID ${localPlugin.platformId}"
                         PortalLogger.log(audience, PortalLogger.Action.INITIATED_UPDATE, targetMessage)
 
-                        val response = localPlugin.installUpdate(audience, true, marketplacePlugin)
+                        val response = localPlugin.installUpdate(audience, true, marketplacePlugin, targetVersionOverride = targetVersion)
 
                         if (response.success) {
                             successCount++
@@ -115,7 +128,7 @@ class UpdateAllSubCommand {
                                 SharedComponents.successfullyUpdatedPlugin(
                                     localPlugin.name,
                                     localPlugin.version,
-                                    response.meta?.version ?: localPlugin.targetUpdateVersion(marketplacePlugin)?.versionNumber ?: "unknown",
+                                    response.meta?.version ?: targetVersion.versionNumber,
                                     platform,
                                 )
                             )
@@ -159,7 +172,7 @@ class UpdateAllSubCommand {
                 audience.sendMessage(
                     status(
                         if (failCount == 0) Status.SUCCESS else Status.WARNING,
-                        "Update complete: $successCount updated, $failCount failed"
+                        "Update complete: $successCount updated, $failCount failed, $skipped skipped"
                     ).boxed()
                 )
 

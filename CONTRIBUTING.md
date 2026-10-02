@@ -77,10 +77,50 @@ Run the automated Paper startup and command smoke test:
 ./gradlew :plugin:paperSmoke
 ```
 
-This uses a disposable `runServer` directory, executes `/pp`, `/pp key get`, and the
-`pluginportal` alias from the console, installs ViaVersion through the public Plugin Portal
-API, verifies the downloaded JAR, checks that Plugin Portal did not fail during enable,
-and stops the server cleanly. It requires internet access and a healthy public API.
+This starts a disposable Paper 1.21.11 server. It checks startup, command aliases,
+command help, list options, flag order, compatible Modrinth downloads, explicit
+reinstall, and bulk-update exclusions. It stops the server and removes the test
+folder. It requires Bun, internet access, and a healthy public API.
+
+To check an existing legacy Paper server JAR without changing its server folder:
+
+```bash
+JAVA_HOME=/path/to/compatible/jdk bun scripts/smoke-run-paper.ts --server-jar /path/to/server.jar
+```
+
+The script copies the server JAR and its adjacent Paperclip cache into a temporary
+folder. It runs the same basic commands and a ViaVersion download from Hangar. Modrinth currently labels ViaVersion for 1.8.9,
+so the legacy check uses Hangar metadata that explicitly includes 1.8.8. The modern-only
+WorldGuard and Enchanted Timber checks do not run on the 1.8.8 path.
+
+For a newer server JAR, specify its Minecraft version. Use `PAPER_JAVA_HOME` to
+select the server JDK without changing the JDK used by Gradle:
+
+```bash
+PAPER_JAVA_HOME=/path/to/jdk25 bun scripts/smoke-run-paper.ts --server-jar /path/to/paper-26.2.jar --minecraft-version 26.2
+```
+
+The 26.x check uses Enchanted Timber's release channel. The 1.21.11 check uses beta.
+For a server whose test plugin has no compatible release in the API, add
+`--expect-incompatible`. This checks rejection without a JAR or tracking record,
+then runs the read-only command checks. It skips successful install/update checks.
+Do not report that mode as full install support. The current 26.3 production API
+needs a version-table update and refreshed marketplace metadata before the full
+ViaVersion install check can pass.
+
+To test a separately started local API at `http://localhost:3001`, add `--dev`.
+The local API must contain compatible marketplace releases. The test does not
+start or seed the API. Public builds use production unless the development JVM
+property is set.
+
+To check that an existing installation survives a JAR replacement:
+
+```bash
+PAPER_JAVA_HOME=/path/to/jdk25 bun scripts/smoke-in-place-upgrade.ts 3.8.7 3.8.9 --server-jar /path/to/paper-26.3.jar --dev
+```
+
+This runs the released JAR first, installs ViaVersion, replaces only Plugin Portal,
+and checks the saved installation after restart.
 
 The built plugin JAR is written to `out/PluginPortal-<version>.jar`.
 
@@ -132,3 +172,15 @@ Please include:
 - Known follow-up work.
 
 Security issues should be reported privately as described in `SECURITY.md`.
+
+## Documentation
+
+Update `COMMANDS.md` when a command, permission, option, or configuration behavior
+changes. Keep the hosted documentation consistent in the API/web repository.
+Use short sentences, active voice, and one action per instruction. Use the same
+term for the same thing. Keep literal command names and configuration keys exact.
+These conventions follow the intent of ASD-STE100. Do not claim formal compliance
+without checking its complete rules and dictionary.
+
+Describe shipped behavior. Label planned or unsupported behavior explicitly.
+Do not describe version selection or self-upgrade as Premium-only.

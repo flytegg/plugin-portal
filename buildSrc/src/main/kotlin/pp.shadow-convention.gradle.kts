@@ -23,6 +23,8 @@ tasks {
 
         minimize()
         exclude("com/google/common/")
+        // Legacy servers bundle Gson versions that cannot parse the current API responses.
+        relocate("com.google.gson", "gg.flyte.pluginportal.libs.gson")
         relocate("org.bstats", "gg.flyte.pluginportal.libs.bstats")
     }
 

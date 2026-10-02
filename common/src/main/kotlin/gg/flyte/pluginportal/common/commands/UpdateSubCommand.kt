@@ -36,7 +36,7 @@ class UpdateSubCommand {
         @Switch("ignoreOutdated") ignoreOutdated: Boolean = false,
         @Switch("refresh") refresh: Boolean = false,
         @Optional @Flag("channel") @SuggestWith(ReleaseChannelSuggestionProvider::class) channel: String? = null,
-        @Optional @Flag("version") versionNumber: String? = null,
+        @Optional @Flag("version") @Named("version") versionNumber: String? = null,
     ) {
         LocalPluginCache.searchPluginsWithFeedback(
             audience,
@@ -113,7 +113,7 @@ class UpdateSubCommand {
             LocalPluginCache.save()
         }
 
-        val updateTarget = marketplacePluginOverride?.let(localPlugin::targetUpdateVersion)
+        val updateTarget = marketplacePluginOverride?.let { localPlugin.targetUpdateVersion(it) }
         val isUpToDate = marketplacePluginOverride?.let { updateTarget == null } ?: localPlugin.isUpToDate
         if (exactVersionNumber == null && !ignoreOutdated && isUpToDate) {
             return audience.sendSuccess("Plugin is already up to date")

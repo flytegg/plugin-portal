@@ -32,9 +32,9 @@ data class LocalPlugin(
         return targetUpdateVersion() == null
     }
 
-    fun targetUpdateVersion(plugin: Plugin = marketplacePlugin): Version? {
+    fun targetUpdateVersion(plugin: Plugin = marketplacePlugin, includeCurrent: Boolean = false): Version? {
         val platformPlugin = plugin.platform(platform) ?: return null
-        return targetUpdateVersion(platformPlugin, currentServerTypePreference(), currentMinecraftVersion()) {
+        return targetUpdateVersion(platformPlugin, currentServerTypePreference(), currentMinecraftVersion(), includeCurrent) {
             API.getPluginVersions(platformPlugin.platformWithId)?.toList()
         }
     }
@@ -43,6 +43,7 @@ data class LocalPlugin(
         platformPlugin: PlatformPlugin,
         serverTypes: List<ServerType>,
         minecraftVersion: String?,
+        includeCurrent: Boolean = false,
         fetchVersions: () -> List<Version>?,
     ): Version? {
         val cachedTarget = platformPlugin.newestCompatibleVersion(preferredChannel, serverTypes, minecraftVersion)
@@ -50,7 +51,7 @@ data class LocalPlugin(
         if (
             cachedTarget != null
             && cachedTarget.hasResolvedChannel(preferredChannel)
-            && isNewerThanInstalled(cachedTarget)
+            && (includeCurrent || isNewerThanInstalled(cachedTarget))
             && cachedTarget.bestServerTypeRank(serverTypes) == 0
             && (minecraftVersion == null || cachedTarget.explicitlySupportsMinecraftVersion(minecraftVersion))
         ) return cachedTarget
@@ -61,7 +62,7 @@ data class LocalPlugin(
         } else {
             cachedTarget?.takeIf { it.hasResolvedChannel(preferredChannel) }
         }
-        return target?.takeIf(::isNewerThanInstalled)
+        return target?.takeIf { includeCurrent || isNewerThanInstalled(it) }
     }
 
     fun matchesVersion(target: Version): Boolean =

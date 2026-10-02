@@ -1,459 +1,244 @@
-# Plugin Portal Support Memory
+# Plugin Portal commands
 
-Concise support-agent memory for Plugin Portal commands, dashboard behavior, update flow, auth, and common troubleshooting.
+Use `/pp`, `/pluginportal`, or `/ppm`. In the server console, omit `/`.
+Use `/pp help <command>` for instructions, for example `/pp help update`.
+Quote names, filenames, or version labels that contain spaces.
 
-## Basics
+Plugin Portal uses one JAR. Premium commands unlock when the server validates
+an eligible key. A command permission does not grant Premium access.
 
-- Main aliases: `/pp`, `/pluginportal`, `/ppm`
-- Help aliases: `/pp`, `/pp help`, `/pluginportal`, `/ppm`, `/ppm help`
-- Plugin folder: `plugins/`
-- Plugin Portal data folder: `plugins/PluginPortal/`
-- Tracked local plugin cache: `plugins/PluginPortal/plugins.json`
-- External plugin config: `plugins/PluginPortal/external-plugins.yml`
-- External plugin state: `plugins/PluginPortal/external-plugins-state.json`
-- Bukkit/Paper update folder: `plugins/update/`
-- Plugin Portal API used by plugin code: `https://v3.pluginportal.link`
-- Web dashboard/editor URL: `https://pluginportal.link/rooms/<room-or-server-id>`
-- Most install/update/delete/list commands can be disabled in `config.yml` under `EnabledFeatures`.
-- Premium-only commands require a valid configured Plugin Portal key. The plugin now ships as one JAR, and premium access is controlled by runtime entitlement. If auth fails, users see an unauthenticated/support message.
-- After installing, updating, deleting, or upgrading plugin jars, tell users to restart the server when prompted.
+## Start here
 
-## What Plugin Portal Does
+1. Put `PluginPortal-<version>.jar` in `plugins/`.
+2. Start the server. Run `/pp info` to check the version and license state.
+3. Run `/pp search ViaVersion` to find a plugin.
+4. Run `/pp install ViaVersion MODRINTH` to download it.
+5. Restart the server to load the new JAR.
 
-Plugin Portal is a Minecraft plugin manager for installing, tracking, updating, deleting, recognizing, importing/exporting, and remotely managing plugins through a web dashboard.
+Plugin Portal supports marketplace plugins from Modrinth, Hangar, SpigotMC,
+and free Polymart listings. A marketplace entry must provide a downloadable
+JAR. Paid Polymart downloads are not supported.
 
-Supported marketplace/platform concepts in code:
+Plugin Portal manages Bukkit-compatible server plugins. It does not manage
+datapacks or install plugins on proxy servers.
 
-- Modrinth
-- Hangar
-- SpigotMC
-- Polymart
-- Custom direct JAR URLs for `/pp install-url`
-- GitHub Releases and GeyserMC downloads configured as external plugins
+## Find and list plugins
 
-Important distinction:
+| Command | What it does |
+| --- | --- |
+| `/pp help [page or command]` | Show help page 1 or 2, or help for a command. |
+| `/pp search <query> [platform] [--page <number>] [--full]` | Search the marketplace catalog. |
+| `/pp view <name> [platform] [--byId] [--exact]` | Show marketplace details and available actions. |
+| `/pp list [--all] [--untracked] [--outdated] [--external] [--detailed] [--page <number>] [--full]` | List local plugins and configured external plugins. |
+| `/pp info` | Show the Plugin Portal version, license state, and update information. Alias: `/pp version`. |
 
-- Plugin Portal only fully manages plugins it has in `plugins.json`.
-- External plugins are managed separately and never written to `plugins.json`.
-- Manually installed JARs are not tracked until recognized with `/pp recognize <file>` or `/pp recognizeAll`.
-- The dashboard's installed/update views are based on the local tracked cache plus marketplace API enrichment.
+These commands require `pluginportal.view`.
 
-## Authentication And Keys
+Lists and search results show eight entries per page in chat. Use the page
+buttons or `--page 2` to continue. Use `--full` to show every entry. The console
+shows every entry unless you request a page. Page numbers start at 1. Do not
+combine `--page` and `--full`.
 
-Premium auth key lookup order on startup:
+List options:
 
-1. `plugins/PluginPortal/config.yml` -> `Authentication.ApiKey`
-2. `plugins/PluginPortal/pluginportal.txt`
-3. `plugins/PluginPortal/mclicense.txt` legacy
-4. Embedded `mclicense.txt` inside the premium JAR
+- `--untracked` shows only JARs that Plugin Portal does not manage. It uses local files and does not check remote sources. Do not combine it with `--all`, `--outdated`, or `--external`.
+- `--all` includes unrecognized JARs. Do not combine it with `--outdated` or `--external`.
+- `--outdated` shows available marketplace and external updates. Failed checks appear separately.
+- `--external` shows only configured external plugins.
+- `--detailed` includes versions, IDs, and source details. Console output includes these details by default.
 
-Set/manage key:
+Use `MODRINTH`, `HANGAR`, `SPIGOTMC`, or `POLYMART` for `[platform]`.
+For `/pp view` and `/pp install`, `--byId` requires a platform. On Modrinth,
+use the project ID, such as `P1OZGk5p`, rather than the URL slug.
+`--exact` or `-e` matches the full plugin name without case sensitivity.
 
-| Command | Permission | Purpose |
+## Install and update
+
+| Command | Permission | What it does |
 | --- | --- | --- |
-| `/pp key` | `pluginportal.manage` | Show key-management help. |
-| `/pp key set <key>` | `pluginportal.manage` | Validate and save an API/license key. |
-| `/pp key get` | `pluginportal.manage` | Show current configured key as a clickable copy component. |
-| `/pp key clear` | `pluginportal.manage` | Remove saved authentication key. |
+| `/pp install <name> [platform] [channel] [--byId] [--exact] [--version <version>]` | `pluginportal.manage.install` | Download a compatible plugin JAR. |
+| `/pp update <name> [--byId] [--ignoreOutdated] [--refresh] [--channel <name>] [--version <version>]` | `pluginportal.maintain.update` | Update one tracked plugin. |
+| `/pp updateAll [--ignoreOutdated]` | `pluginportal.maintain.update` | Update tracked marketplace plugins. Requires Premium. |
+| `/pp blacklist [name] [--byId]` | `pluginportal.maintain.update` | Toggle exclusion from `updateAll`. With no name, list exclusions. |
+| `/pp platform <name> <platform> [--byId]` | `pluginportal.maintain.update` | Download a compatible version from another linked marketplace. |
+| `/pp uninstall <name> [--byId]` | `pluginportal.manage.uninstall` | Remove a tracked plugin JAR. Alias: `/pp delete`. |
+| `/pp install-url <url>` | `pluginportal.manage.install-url` | Download a JAR from a direct URL. Console only. |
+| `/pp upgrade [--yes] [--channel <name>]` | `pluginportal.admin` | Check for a Plugin Portal update. Add `--yes` to download it. |
 
-Support notes:
+Restart after an install, update, uninstall, platform change, or self-upgrade.
+Plugin Portal stages updates in `plugins/update/`. A staged version can appear
+in `/pp list` before the server loads it. `/pp reload` does not load JARs.
 
-- There is no `/pp set-key <key>` command in code. Use `/pp key set <key>`.
-- Current code validates and saves `/pp key set <key>`, but may not refresh premium command auth until restart. If premium commands still say unauthenticated after setting a valid key, restart the server/plugin.
-- Valid key types can include Plugin Portal API keys beginning with `pp_` or `pps_`, legacy MCLicense keys, and Polymart license keys.
+Plugin Portal selects versions for the server software and Minecraft version.
+When the marketplace has release or stable builds, an install without a channel
+prefers those builds. The channel on `/pp install` is a positional argument.
+The channel on `/pp update` is a flag.
 
-## Dashboard And Editor
-
-The dashboard/editor is a web UI connected to the running Minecraft plugin over websocket.
-
-How users connect:
-
-- Permanent dashboard connection: planned for `/pp connect`, but not supported in the current build.
-- Temporary editor session: `/pp editor`
-- If the dashboard says "No Plugin Connected", run `/pp editor` again from the Minecraft server.
-
-Dashboard tabs/features:
-
-- `Browse Plugins`: search marketplace plugins. Search starts after at least 2 characters.
-- `Installed`: shows tracked local plugins from `plugins.json`, enriched with marketplace data.
-- `Updates Available`: shows tracked plugins where local version differs from latest marketplace version.
-- Settings modal: toggles Plugin Portal feature flags stored in `config.yml`.
-
-Dashboard plugin actions:
-
-- Install plugin from marketplace.
-- Uninstall tracked plugin.
-- Update tracked plugin.
-- Choose platform when a plugin exists on multiple marketplaces.
-- Choose release channel and version in the install dialog UI.
-- View compatibility/version metadata when available.
-
-Dashboard connection details:
-
-- The web app connects to `/ws/temp/<room>?token=<otp>&role=dashboard` for temporary rooms, or `/ws/servers/<serverId>` for permanent rooms.
-- It fetches local plugins via websocket message `query.localPlugins`.
-- It fetches settings via `query.getSettings`.
-- It mutates plugins via `mutation.installPlugin`, `mutation.uninstallPlugin`, and `mutation.updatePlugin`.
-- It mutates settings via `mutation.updateSetting`.
-
-Dashboard limitations/gotchas:
-
-- The install dialog can pass selected `version` and `channel` values through the websocket mutation to the plugin backend.
-- Premium Polymart plugin installs are currently not supported by the plugin download adapter. Free Polymart downloads may work.
-- If the room is missing/expired, the web UI tells the user to create a new session.
-
-## How Installing Works
-
-Install from command:
-
-1. User runs `/pp install <name> [platform] [channel] [--byId] [--exact] [--version <version>]`.
-2. Plugin searches marketplace cache/API.
-3. If `--byId` is used, `platform` is required and `<name>` is treated as the marketplace/platform ID.
-4. If `--exact` or `-e` is used, name search is filtered to exact case-insensitive plugin-name matches.
-5. If no channel is supplied, Plugin Portal prefers `release` or `stable` builds when either is available.
-6. If `--version <version>` is used, Plugin Portal selects that exact compatible version. If the version label exists on multiple channels, rerun with a channel.
-7. If one match exists, it downloads the newest version compatible with the server software and Minecraft version into `plugins/`.
-8. It writes a tracked `LocalPlugin` entry to `plugins/PluginPortal/plugins.json`.
-9. User usually needs to restart the server for Bukkit/Paper to load the newly installed plugin.
-
-Install command arguments:
-
-| Argument/flag | Required | Meaning | Notes |
-| --- | --- | --- | --- |
-| `<name>` | Yes | Marketplace plugin search term. | Quote names with spaces. With `--byId`, this is the marketplace/platform ID. |
-| `[platform]` | No | Marketplace enum: `MODRINTH`, `HANGAR`, `SPIGOTMC`, or `POLYMART`. | Required with `--byId`; otherwise narrows search/download to one platform. |
-| `[channel]` | No | Marketplace release-channel name. | Positional argument, not a flag. Examples include `release`, `stable`, `beta`, `alpha`, or any custom channel returned by the marketplace. Saved for future updates unless an exact version is selected. |
-| `--byId` | No | Treat `<name>` as a marketplace/platform ID. | Requires `[platform]` so Plugin Portal knows which marketplace ID namespace to use. For Modrinth, use the base62 project ID/project_id, not the slug from the URL. |
-| `--exact`, `-e` | No | Require exact case-insensitive plugin-name matches. | This is still name search; it does not turn `<name>` into an ID or slug lookup. |
-| `--version <version>` | No | Install an exact compatible version. | Exact command-selected installs are marked excluded from `updateAll`. Add `[channel]` when the same version label exists on multiple channels. |
-
-Install from dashboard:
-
-1. Dashboard sends `mutation.installPlugin` with `{ platform, id }` plus optional `{ version, channel }`.
-2. Plugin fetches marketplace plugin by platform/id.
-3. Plugin downloads through the download adapter system.
-4. Local cache is updated and dashboard refetches local plugins.
-
-Download adapters:
-
-- Polymart adapter has highest priority.
-- Standard marketplace adapter handles non-Polymart marketplace plugins.
-- Custom URL adapter handles direct JAR URLs.
-
-## External Plugins
-
-External plugins are declared in `external-plugins.yml`. GitHub sources require an
-asset regex that matches exactly one release asset. GeyserMC sources require an
-artifact name such as `spigot`, `bungee`, or `velocity`.
-
-See [External plugin adapters](docs/adapters.md) for configuration rules, complete
-GitHub Releases and GeyserMC examples, filenames, and recognition exclusions.
-
-External plugin IDs may contain letters, numbers, underscores, and hyphens. Each
-entry must use a unique target filename. When `file` is omitted or a plugin is
-created through `/pp external add`, Plugin Portal uses a managed stable filename
-such as `[PP] viaversion [GITHUB].jar`. GitHub releases with no matching asset
-are skipped, while multiple matching assets in the newest applicable release are
-reported as an ambiguity instead of falling back to an older release.
-
-This replaces the old startup-only adapter workflow. New GitHub and GeyserMC
-plugins should use `/pp external` and `external-plugins.yml`; do not add new
-entries to the legacy `adapters.yml` file.
-
-```yaml
-plugins:
-  floodgate:
-    source: geysermc:floodgate
-    artifact: spigot
-    file: "[PP] floodgate [GEYSERMC].jar"
-    updates: manual
-
-  viaversion:
-    source: github:ViaVersion/ViaVersion
-    asset: "^ViaVersion.*\\.jar$"
-    file: "[PP] viaversion [GITHUB].jar"
-    prereleases: false
-    updates: manual
+```text
+/pp install P1OZGk5p MODRINTH --byId
+/pp install "Plugin Name" MODRINTH beta
+/pp update "Plugin Name" --channel beta --refresh
+/pp update "Plugin Name" --version "1.2.3"
 ```
 
-| Command | Purpose |
+A selected channel is saved for future updates. An exact version must still be
+compatible. If a version label exists on more than one channel, specify the
+channel too. Exact command-selected versions are excluded from `updateAll`.
+Use `/pp blacklist <name>` to remove that exclusion when you want bulk updates again.
+
+`--refresh` bypasses the local two-hour marketplace cache. It does not force the
+API scanner to fetch new upstream data. `--ignoreOutdated` permits a reinstall
+even when the selected compatible version is current. It does not bypass compatibility.
+
+`updateAll` respects exclusions and each plugin's saved channel. It reports
+excluded plugins, unavailable compatible versions, lookup failures, and download
+failures. One failed check does not stop the other plugins. It does not update
+external plugins. Use `/pp external updateAll` for those.
+
+A blacklist entry only affects marketplace bulk updates. A manual single-plugin
+update still works. Plugin Portal refuses to uninstall itself.
+
+## Recognize existing JARs
+
+These commands require Premium and `pluginportal.manage.recognize`.
+
+```text
+/pp recognize "Example.jar" [--channel <name>]
+/pp recognizeAll [--channel <name>]
+```
+
+Recognition identifies files in `plugins/` by their hashes or supported Polymart
+metadata. A partial filename must match one JAR. Recognized files become tracked
+plugins and may be renamed to Plugin Portal's managed filename format.
+Recognition skips Plugin Portal, tracked files, and configured external files.
+`--channel` sets the future update channel for hash-recognized files.
+
+An unrecognized file is not proof of a broken plugin. The marketplace or API may
+not have its hash. Install the correct listing through Plugin Portal if needed.
+Back up your server before replacing manually installed files.
+
+## External plugins
+
+External sources require Premium and `pluginportal.manage.external`.
+They use `external-plugins.yml`, separately from marketplace tracking.
+GitHub Releases and GeyserMC are supported. Jenkins is not supported.
+See [external source setup](docs/adapters.md) for complete examples.
+
+| Command | What it does |
 | --- | --- |
-| `/pp external add github <id> <owner> <repo> <asset> [--prereleases]` | Add a GitHub external plugin entry using a managed `[PP] ... [GITHUB].jar` filename. `<asset>` may be a simple include string like `ViaVersion` or a full regex. |
-| `/pp external add geysermc <id> <project> <artifact>` | Add a GeyserMC external plugin entry using a managed `[PP] ... [GEYSERMC].jar` filename. |
-| `/pp external import github <id> <owner> <repo> <asset> <file> [--prereleases]` | Track an already installed JAR as a GitHub external plugin. `<asset>` may be a simple include string like `ViaVersion` or a full regex. |
-| `/pp external import geysermc <id> <project> <artifact> <file>` | Track an already installed JAR as a GeyserMC external plugin. |
-| `/pp external check <id>` | Resolve the latest matching provider artifact without downloading it. |
-| `/pp external install <id>` | Install a configured external plugin into `plugins/`. |
-| `/pp external update <id>` | Stage an installed external plugin update in `plugins/update/`. |
-| `/pp external uninstall <id>` | Remove an installed or staged external plugin JAR. The configuration remains available for reinstalling it later. |
-| `/pp external invalidate <id>` | Force the next eligible update to download the latest artifact again. |
-| `/pp external updateAll` | Explicitly update installed `manual` and `auto` entries. |
-| `/pp external reload` | Reload user intent from `external-plugins.yml`. |
-
-Update policies:
-
-- `manual`: updated only by explicit external update commands.
-- `auto`: also checked and updated during startup.
-- `disabled`: tracked but never updated.
-
-Installed and staged artifact IDs, versions, hashes, check timestamps, and errors are
-stored in `external-plugins-state.json`. Provider, source, target filename, and update
-policy remain only in `external-plugins.yml`. Downloads are rejected when their SHA-256
-does not match a digest supplied by the provider; GitHub assets without a digest remain
-supported for compatibility with older releases.
-
-Install failure patterns:
-
-- Already installed: use update instead.
-- No download URL: marketplace entry likely uses an external/download page Plugin Portal cannot resolve.
-- Premium Polymart plugin: currently unsupported.
-- Network/API failure: retry and collect `/pp dump` if persistent.
-
-## How Updating Works
-
-Single plugin update:
-
-1. `/pp update <name> [--byId] [--ignoreOutdated] [--refresh] [--channel <name>] [--version <version>]` finds a tracked local plugin in `plugins.json`.
-2. If `--channel <name>` is used, Plugin Portal saves that channel before updating.
-3. If `--version <version>` is used, Plugin Portal selects that exact compatible version and marks the plugin excluded from `updateAll`.
-4. Without `--version`, it compares local version to marketplace latest version. `--refresh` first bypasses the plugin's two-hour marketplace cache.
-5. If already current, it exits unless `--ignoreOutdated` is used.
-6. It downloads the new JAR into `plugins/update/`.
-7. It removes the old local cache entry, adds the new one, and saves `plugins.json`.
-8. Restart is needed for Bukkit/Paper to apply the update from `plugins/update/`.
-
-Bulk update:
-
-1. `/pp updateAll` fetches marketplace data for all tracked platform IDs.
-2. It builds a list where local version differs from latest marketplace version.
-3. It skips plugins excluded from auto-updates.
-4. It updates each plugin one by one with a short delay.
-5. It reports success/failure counts.
-
-Dashboard update:
-
-1. Dashboard computes updates by comparing tracked local version to marketplace latest version.
-2. User clicks Update.
-3. Dashboard sends `mutation.updatePlugin`.
-4. Plugin runs the same local update flow for that tracked plugin.
-
-Plugin Portal itself:
-
-- `/pp info` checks whether Plugin Portal has an update.
-- `/pp upgrade` checks/downloads a Plugin Portal update.
-- `/pp upgrade --yes` performs the upgrade.
-- Downloaded Plugin Portal updates go through internal adapter logic and require restart.
-- `EnabledFeatures.AUTOMATICALLY_UPDATE_PPP` controls automatic Plugin Portal self-update behavior where used.
-
-Update failure patterns:
-
-- "Plugin not installed": plugin is not tracked in `plugins.json`; use `/pp recognize` or reinstall through Plugin Portal.
-- "Could not find plugin in marketplace": cached platform id may be stale, plugin removed, API unavailable, or marketplace data missing.
-- "Plugin is already up to date": expected unless forcing with `--ignoreOutdated`.
-- Download succeeds but running plugin is still old: user has not restarted server.
-
-## How Uninstalling Works
-
-Uninstall/delete:
-
-1. `/pp delete <name>` or dashboard uninstall finds a tracked local plugin.
-2. Plugin Portal refuses to delete Plugin Portal itself.
-3. It finds the plugin JAR by SHA-256 in `plugins/` or `plugins/update/`.
-4. It removes the tracked entry from `plugins.json`.
-5. It deletes the JAR if found.
-6. Restart is needed for Bukkit/Paper to unload the plugin.
-
-If the JAR is already gone, Plugin Portal removes the cache entry but reports it could not find the JAR to delete.
-
-## Recognition, Import, And Export
-
-Recognition is for manually installed plugins.
-
-`/pp recognize <file> [--channel <name>]`:
-
-- Looks for the JAR in `plugins/`.
-- Allows a single partial filename match.
-- Skips Plugin Portal itself.
-- Hashes SHA-256 and SHA-512.
-- Checks whether the hash is already tracked.
-- Reads `polymart.yml` from the JAR if present and handles Polymart metadata locally.
-- Otherwise asks the API to recognize by hash.
-- Adds a `LocalPlugin` entry to `plugins.json`.
-- Saves `--channel` as the update channel when provided.
-- Renames the JAR to Plugin Portal's downloaded filename format when recognized.
-
-`/pp recognizeAll [--channel <name>]`:
-
-- Scans all JARs in `plugins/`.
-- Skips Plugin Portal itself and already tracked hashes.
-- Handles Polymart metadata first.
-- Then batch-recognizes remaining JARs by hash.
-- Saves `--channel` as the update channel for hash-recognized JARs when provided.
-- Shows recognized and unrecognized results.
-
-Export/import:
-
-- `/pp export` serializes tracked plugin platform IDs and uploads them to MCLogs.
-- `/pp import <mclogs-url>` reads that MCLogs export, fetches marketplace details, skips already installed plugins, and installs the rest.
-- Import URL must contain `mclo.gs`.
-
-## Common Commands
-
-| Command | Permission | Purpose | Notes |
-| --- | --- | --- | --- |
-| `/pp help` | `pluginportal.view` | Show command help. | Also works by running `/pp`. |
-| `/pp info` | `pluginportal.view` | Show Plugin Portal version, edition, license state, and update info. | Alias: `/pp version`. |
-| `/pp version` | `pluginportal.view` | Same as `/pp info`. | Shows Licensed: Yes/No. |
-| `/pp list [--all] [--outdated] [--external] [--detailed]` | `pluginportal.view` | List installed marketplace plugins and configured external plugins in separate sections. | `--outdated` includes available marketplace and external updates. `--external` limits output to external plugins. `--detailed` adds versions, IDs, and sources. `--all` also shows unrecognized JARs and cannot be combined with `--outdated` or `--external`. |
-| `/pp dump` | `pluginportal.dump` | Upload logs/support dump to MCLogs and return a support URL. | Use for diagnostics. |
-| `/pluginportal config refresh` | `pluginportal.manage.config` | Reload local plugin cache/config state. | Command root is `pluginportal config`, not `/pp config`. |
-
-## Marketplace Plugin Commands
-
-| Command | Permission | Purpose | Notes |
-| --- | --- | --- | --- |
-| `/pp view <name> [platform] [--byId] [--exact]` | `pluginportal.view` | View marketplace plugin details. | `--exact` also has shorthand `-e`. |
-| `/pp install <name> [platform] [channel] [--byId] [--exact] [--version <version>]` | `pluginportal.manage.install` | Install a plugin from marketplace search/API. | `channel` is positional and saved for future updates. `--exact` also has shorthand `-e`. `--version` installs an exact compatible version and excludes it from `updateAll`. |
-| `/pp update <name> [--byId] [--ignoreOutdated] [--refresh] [--channel <name>] [--version <version>]` | `pluginportal.maintain.update` | Update one tracked local plugin. | `--refresh` bypasses the local marketplace cache. `--channel` changes the saved channel before updating. `--version` installs an exact compatible version and excludes it from `updateAll`. |
-| `/pp blacklist [name] [--byId]` | `pluginportal.maintain.update` | Toggle whether a plugin is skipped by `/pp updateAll`. | With no name, lists blacklisted plugins. Manual `/pp update` still works. |
-| `/pp platform <name> <platform> [--byId]` | `pluginportal.maintain.update` | Switch a tracked plugin to another available marketplace platform. | Downloads the latest compatible jar from the target platform. Restart required. |
-| `/pp delete <name> [--byId]` | `pluginportal.manage.uninstall` | Delete/uninstall a tracked local plugin. | Alias: `/pp uninstall`. Restart required. |
-| `/pp uninstall <name> [--byId]` | `pluginportal.manage.uninstall` | Same as `/pp delete`. | Restart required. |
-| `/pp install-url <url>` | `pluginportal.manage.install-url` | Download a plugin JAR directly from a URL. | Console-only command parameter type is used in code. Restart required. |
-
-Argument notes:
-
-- `platform` is a marketplace platform enum, such as Modrinth, Hangar, SpigotMC, or Polymart.
-- `channel` on `/pp install` is a positional marketplace release-channel name, such as release, stable, beta, alpha, or any custom channel a marketplace returns.
-- `--channel <name>` on `/pp update` is the flag form for changing the saved update channel.
-- `--byId` treats the name argument as a marketplace/platform ID. For marketplace search commands, specify `platform` too. For Modrinth, Plugin Portal stores the base62 project ID/project_id, not the vanity slug.
-- `--exact` or `-e` forces exact case-insensitive name matching. It is not an ID or slug lookup.
-- `--version <version>` selects an exact compatible marketplace version. Exact command-selected install/update versions are skipped by `/pp updateAll`.
-
-## Premium Commands
-
-These require valid Plugin Portal entitlement unless noted. The same JAR contains the command implementations; locked commands stay unavailable until auth succeeds.
-
-| Command | Permission | Purpose | Notes |
-| --- | --- | --- | --- |
-| `/pp updateAll [--ignoreOutdated]` | `pluginportal.maintain.update` | Bulk update all tracked plugins. | Skips blacklisted plugins and uses each plugin's saved channel. |
-| `/pp recognize <file> [--channel <name>]` | `pluginportal.manage.recognize` | Recognize one untracked plugin JAR in the plugins folder by hash/metadata. | May rename the file to Plugin Portal format. `--channel` pins future updates to that channel. |
-| `/pp recognizeAll [--channel <name>]` | `pluginportal.manage.recognize` | Recognize all untracked plugin JARs in the plugins folder. | Skips Plugin Portal itself and already tracked hashes. `--channel` applies to hash-recognized JARs. |
-| `/pp export` | `pluginportal.manage.export` | Export tracked plugin platform IDs to an MCLogs URL. | Used for migration/import. |
-| `/pp import <mclogs-url>` | `pluginportal.manage.import` | Import and install plugins from an export URL. | URL must contain `mclo.gs`. |
-| `/pp scan <file>` | `pluginportal.manage.scan` | Scan a plugin JAR for Hangar scanner alerts. | Findings are warnings, not automatic proof of malware. |
-| `/pp upgrade [--yes]` | `pluginportal.admin` | Check/download Plugin Portal update. | Without `--yes`, shows available updates. Restart required after upgrade. |
-
-## Editor And Dashboard Commands
-
-| Command | Permission | Auth Required | Purpose | Notes |
-| --- | --- | --- | --- | --- |
-| `/pp connect [--isConsole]` | `pluginportal.manage.editor` | No | Planned permanent dashboard connection. | Not supported in the current build. |
-| `/pp connect temp [--isConsole]` | `pluginportal.manage.editor` | Yes | Planned temporary editor/dashboard alias. | Not supported in the current build; use `/pp editor`. |
-| `/pp editor [--isConsole]` | `pluginportal.manage.editor` | Yes | Create temporary editor/dashboard link. | Opens `pluginportal.link` room URL. |
-| `/pp editor status` | `pluginportal.manage.editor` | Yes | Show current editor websocket status, room, duration, activity, connected users. | Warns near timeout. |
-| `/pp editor stop` | `pluginportal.manage.editor` | Yes | Stop active editor session. | |
-| `/pp editor reconnect` | `pluginportal.manage.editor` | Yes | Reconnect previous editor session. | Fails if no previous session exists. |
-| `/pp editor url [--isConsole]` | `pluginportal.manage.editor` | Yes | Show current editor URL. | Use after an editor session exists. |
-
-`--isConsole` forces raw URL output instead of clickable text, useful for console/support copy-paste.
-
-## Feature Flags
-
-Generated config feature keys:
-
-- `EnabledFeatures.INSTALL`
-- `EnabledFeatures.UPDATE`
-- `EnabledFeatures.DELETE`
-- `EnabledFeatures.LIST`
-- `EnabledFeatures.RECOGNISE`
-- `EnabledFeatures.IMPORT`
-- `EnabledFeatures.EXPORT`
-- `EnabledFeatures.AUTOMATICALLY_UPDATE_PPP`
-
-If a feature-backed command says it is disabled, check `plugins/PluginPortal/config.yml` and run `/pluginportal config refresh` or restart if needed.
-
-Dashboard settings can toggle:
-
-- Install
-- Update
-- Delete
-- List
-- Recognise
-- Import
-- Export
-- Auto-update Plugin Portal
-
-Polymart settings:
-
-- Dashboard can show whether a Polymart token is configured.
-- Dashboard can revoke `Polymart.token`.
-- If no token exists, UI says Polymart purchase linking is managed from the Premium dashboard.
-
-## Permissions Summary
-
-- View/help/list/version/view marketplace: `pluginportal.view`
-- Install marketplace plugin: `pluginportal.manage.install`
-- Install URL: `pluginportal.manage.install-url`
-- Update one/all plugins: `pluginportal.maintain.update`
-- Delete/uninstall: `pluginportal.manage.uninstall`
-- Recognize: `pluginportal.manage.recognize`
-- Import: `pluginportal.manage.import`
-- Export: `pluginportal.manage.export`
-- Scan: `pluginportal.manage.scan`
-- Editor/dashboard: `pluginportal.manage.editor`
-- Key management: `pluginportal.manage`
-- Config refresh: `pluginportal.manage.config`
-- Dump support logs: `pluginportal.dump`
-- Plugin Portal upgrade: `pluginportal.admin`
-
-## Support Diagnostics
-
-Ask for these first:
-
-- Plugin Portal edition and license state: `/pp info`
-- Installed/tracked list: `/pp list`
-- Support dump: `/pp dump`
-- Current key state: `/pp key get`
-- Dashboard/editor status: `/pp editor status`
-- Exact command run and exact error message.
-
-Good questions:
-
-- Did they install the plugin manually or through Plugin Portal?
-- Did they restart after install/update/delete?
-- Is the plugin tracked in `/pp list`?
-- Is this free or premium Polymart?
-- Is the dashboard temporary room expired?
-- Are feature flags disabled in dashboard/settings?
-
-Known command mismatch:
-
-- If logs mention `/pp set-key <key>`, tell the user to use `/pp key set <key>`.
-
-## Common Support Flows
-
-Premium JAR installed but commands say unauthenticated:
-
-1. Ask user to run `/pp info` and check `Edition` plus `Licensed`.
-2. If `Licensed: No`, run `/pp key get` to confirm whether a key is configured.
-3. If missing/invalid, run `/pp key set <key>`.
-4. Restart the server if premium commands still fail after key is saved.
-
-User asks how to open dashboard/editor:
-
-1. Use `/pp editor`.
-2. Open the generated editor link.
-3. Do not direct users to `/pp connect` yet; it is planned but not supported in the current build.
-
-User has plugins installed manually and wants Plugin Portal to track them:
-
-1. Use `/pp recognize <file>` for one JAR.
-2. Use `/pp recognizeAll` for all untracked JARs.
-3. Use `/pp list` to confirm tracked plugins.
-
-User wants to migrate tracked plugins to another server:
-
-1. On old server, run `/pp export`.
-2. Copy the returned MCLogs URL.
-3. On new server, run `/pp import <mclogs-url>`.
+| `/pp external add github <id> <owner> <repo> <asset> [--prereleases]` | Add a GitHub source. The asset selector can be a name fragment or a regular expression. |
+| `/pp external add geysermc <id> <project> <artifact>` | Add a GeyserMC source. Use a server-compatible artifact, such as `spigot`. |
+| `/pp external import github <id> <owner> <repo> <asset> <file> [--prereleases]` | Track an existing JAR from GitHub. |
+| `/pp external import geysermc <id> <project> <artifact> <file>` | Track an existing JAR from GeyserMC. |
+| `/pp external check <id>` | Check the matching artifact without downloading it. |
+| `/pp external install <id>` | Install a configured entry. |
+| `/pp external update <id>` | Stage an installed entry's update. |
+| `/pp external uninstall <id>` | Remove the JAR and staged update. Keep the configuration. |
+| `/pp external invalidate <id>` | Make the next eligible update download the artifact again. |
+| `/pp external updateAll` | Update installed entries with `manual` or `auto` policies. |
+| `/pp external reload` | Reload the external configuration. |
+
+The `manual` policy requires an explicit update command. The `auto` policy also
+checks and updates at startup. The `disabled` policy prevents updates.
+Use unique filenames. Plugin Portal rejects ambiguous asset matches and checks
+provider-supplied SHA-256 digests. GitHub assets without a digest remain supported.
+Do not add new entries to the old `adapters.yml` file.
+
+## Premium access
+
+Use `/pp key set <key>` to validate and save a key. Access refreshes in the same
+session. A restart is not normally required. Use `/pp info` to check the result.
+Key commands require `pluginportal.manage`.
+
+| Command | What it does |
+| --- | --- |
+| `/pp key` | Show key instructions. |
+| `/pp key set <key>` | Validate and save a key. |
+| `/pp key get` | Show masked key status. In chat, the copy action contains the full key. |
+| `/pp key clear` | Clear configured authentication and refresh access. |
+
+At startup, Plugin Portal checks `Authentication.ApiKey` in `config.yml`, then
+`pluginportal.txt`, then `mclicense.txt`, then supported embedded or marketplace
+license data. These files are in `plugins/PluginPortal/`. A saved key takes
+priority over marketplace delivery. See [marketplace license import](docs/marketplace-license-import.md).
+
+Never post a key, editor link, or token in a public issue. Support only needs the
+license state from `/pp info`, not the key itself.
+
+## Temporary web editor
+
+Editor commands require Premium and `pluginportal.manage.editor`.
+
+| Command | What it does |
+| --- | --- |
+| `/pp editor [--isConsole]` | Create a temporary editor session and show its link. |
+| `/pp editor status` | Show connection and session status. |
+| `/pp editor url [--isConsole]` | Show the active session link. |
+| `/pp editor reconnect` | Reconnect the previous session. |
+| `/pp editor stop` | Stop the session. |
+
+`--isConsole` prints a URL for copying. Treat the link as a credential. If the
+session expires or the editor reports no connected plugin, run `/pp editor`
+again. `/pp connect` is not supported.
+
+## Import, export, and diagnostics
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/pp export` | `pluginportal.manage.export` | Upload tracked marketplace IDs to MCLogs. Premium. |
+| `/pp import <mclogs-url>` | `pluginportal.manage.import` | Install the exported marketplace plugins. Premium. |
+| `/pp scan <file>` | `pluginportal.manage.scan` | Run the bundled Hangar JAR scanner locally. Premium. |
+| `/pp dump` | `pluginportal.dump` | Upload a support dump to MCLogs. |
+| `/pp support <code>` | `pluginportal.admin` | Upload a diagnostic bundle with the 8-digit code supplied by support. The bundle expires in 24 hours. |
+| `/pp reload` | `pluginportal.manage.config` | Reload configuration and local tracking files. |
+
+`/pp config refresh` and `/pp config reload` are aliases for `/pp reload`.
+
+Export is a list of marketplace IDs. It is not a backup of exact versions,
+configuration, plugin data, or external sources. Back up those files separately.
+Import accepts an MCLogs URL and skips already installed plugins.
+
+Scanner findings need review. A warning does not prove that a JAR is malicious,
+and a clean result does not prove that a JAR is safe.
+
+For a bug report, include the Plugin Portal version, server software and Minecraft
+version, exact command, exact error, and steps to reproduce it. Review a support
+dump before sharing its link.
+
+## Configuration and files
+
+| Path in `plugins/PluginPortal/` | Purpose |
+| --- | --- |
+| `config.yml` | Authentication, feature flags, disabled platforms, telemetry, and webhook settings. |
+| `plugins.json` | Tracked marketplace plugins, versions, channels, and bulk-update exclusions. |
+| `external-plugins.yml` | External source definitions and update policies. |
+| `external-plugins-state.json` | Installed/staged external versions, hashes, and check results. |
+
+Do not edit tracking files while an operation is in progress. Back up files before
+manual changes. Prefer commands for normal maintenance.
+
+`EnabledFeatures` contains `INSTALL`, `UPDATE`, `DELETE`, `LIST`, `RECOGNISE`,
+`IMPORT`, `EXPORT`, and `AUTOMATICALLY_UPDATE_PPP`. A disabled feature blocks its
+associated commands. `AUTOMATICALLY_UPDATE_PPP` concerns Plugin Portal itself.
+It is not a scheduler for all installed marketplace plugins.
+
+- `DownloadPlatforms.Disabled` lists marketplace names to exclude from downloads.
+- `Telemetry.Enabled` controls telemetry.
+- `DiscordWebhook.Url` sets the notification destination. Keep it private.
+- `Authentication.ApiKey` stores the configured key.
+
+Run `/pp reload` after changing supported configuration values. Use the key
+commands to change authentication. Restart the server to apply JAR changes.
+
+## Troubleshooting
+
+| Problem | Action |
+| --- | --- |
+| Plugin is not tracked | Run recognition, or install it through Plugin Portal. Check `/pp list --all`. |
+| New upstream release is missing | Try `/pp update <name> --refresh`. If it is still missing, report the marketplace URL and version. API catalog scans can lag. |
+| No compatible version | Check the Minecraft version, server type, and selected channel. Do not force a client mod or datapack into the plugin folder. |
+| Download succeeded but old code still runs | Restart the server to apply the staged update. |
+| Premium command is locked | Check `/pp info`. Set a valid key. If validation fails, include the error in a support request without sharing the key. |
+| Editor session is missing | Run `/pp editor` again. |
+| External asset is ambiguous | Change the asset selector to match one JAR. |
+| Command is disabled | Check `EnabledFeatures` and run `/pp reload`. |

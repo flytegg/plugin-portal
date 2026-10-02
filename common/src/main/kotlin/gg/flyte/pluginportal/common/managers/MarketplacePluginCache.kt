@@ -18,8 +18,7 @@ import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitTask
 import java.io.File
-import java.time.Duration
-import java.time.temporal.ChronoUnit
+import java.util.concurrent.TimeUnit
 
 object MarketplacePluginCache: PluginCache<Plugin>() {
 
@@ -32,7 +31,7 @@ object MarketplacePluginCache: PluginCache<Plugin>() {
 
     private val pp: JavaPlugin get() = PluginPortalBase.plugin
 
-    private val pluginCache: Cache<PlatformId, Plugin> = CacheBuilder.newBuilder().maximumSize(10_000).expireAfterWrite(Duration.of(2, ChronoUnit.HOURS)).build()
+    private val pluginCache: Cache<PlatformId, Plugin> = CacheBuilder.newBuilder().maximumSize(10_000).expireAfterWrite(2, TimeUnit.HOURS).build()
 
     private var timer: CancellableTimer<*>? = null
 

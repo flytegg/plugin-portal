@@ -1,6 +1,6 @@
 package gg.flyte.pluginportal.common.commands
 
-import gg.flyte.pluginportal.common.chat.boxed
+import gg.flyte.pluginportal.common.chat.*
 import gg.flyte.pluginportal.common.chat.sendPluginListMessage
 import gg.flyte.pluginportal.common.commands.lamp.MarketplacePluginSuggestionProvider
 import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
@@ -28,7 +28,19 @@ class ViewSubCommand {
             platform,
             byId,
             exact = exact,
-            ifSingle = { audience.sendMessage(it.getImageComponent().boxed()) },
+            ifSingle = { plugin ->
+                if (audience.isConsole()) {
+                    var details = textPrimary(plugin.name).bold()
+                        .appendNewline().appendSecondary(plugin.sanitisedDescription ?: "")
+                        .appendNewline().appendSecondary("Downloads: ${plugin.totalDownloads}")
+                    plugin.platforms.asList().forEach { entry ->
+                        details = details.appendNewline().appendPrimary("${entry.platform}: ${entry.platformId}")
+                            .appendNewline().appendSecondary(entry.webpageURL)
+                            .appendNewline().appendSecondary("/pp install \"${entry.platformId}\" ${entry.platform} --byId")
+                    }
+                    audience.sendMessage(details.boxed())
+                } else audience.sendMessage(plugin.getImageComponent().boxed())
+            },
             ifMore = { sendPluginListMessage(audience, "Choose a plugin to view", it, "view") }
         )
     }

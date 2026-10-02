@@ -1,5 +1,8 @@
 package gg.flyte.pluginportal.plugin
 
+import gg.flyte.pluginportal.common.chat.sendPagedRows
+import gg.flyte.pluginportal.common.commands.lamp.CommandSenderAudience
+import net.kyori.adventure.text.Component
 import gg.flyte.pluginportal.common.Config
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.junit.jupiter.api.AfterAll
@@ -96,6 +99,39 @@ class PluginPortalTest {
         val shortAliasMessage = PlainTextComponentSerializer.plainText()
             .serialize(requireNotNull(server.consoleSender.nextComponentMessage()))
         assertTrue(shortAliasMessage.contains("/pp install"), shortAliasMessage)
+    }
+
+    @Test
+    fun `command help works through every alias without intercepting commands`() {
+        for (alias in listOf("pp", "pluginportal", "ppm")) {
+            assertTrue(server.dispatchCommand(server.consoleSender, "$alias help update"))
+            val message = PlainTextComponentSerializer.plainText()
+                .serialize(requireNotNull(server.consoleSender.nextComponentMessage()))
+            assertTrue(message.contains("--refresh"), message)
+            assertTrue(message.contains("--ignoreOutdated"), message)
+        }
+    }
+
+    @Test
+    fun `chat pages keep filters and console shows the complete list`() {
+        val player = server.addPlayer()
+        val rows = (1..9).map { number -> "Installed" to { Component.text("Entry $number") } }
+        val playerAudience = CommandSenderAudience(player, gg.flyte.pluginportal.common.PluginPortalBase.audiences)
+        sendPagedRows(playerAudience, rows, null, false, "/pp list --outdated")
+        val firstPage = requireNotNull(player.nextComponentMessage())
+        val plain = PlainTextComponentSerializer.plainText()
+        assertTrue(plain.serialize(firstPage).contains("Entry 8"))
+        assertFalse(plain.serialize(firstPage).contains("Entry 9"))
+        fun clicks(component: Component): List<String> =
+            listOfNotNull(component.clickEvent()?.value()) + component.children().flatMap(::clicks)
+        assertTrue(clicks(firstPage).contains("/pp list --outdated --page 2"))
+        sendPagedRows(playerAudience, rows, 2, false, "/pp list --outdated")
+        val secondPage = plain.serialize(requireNotNull(player.nextComponentMessage()))
+        assertTrue(secondPage.contains("Entry 9"))
+        assertFalse(secondPage.contains("Entry 8"))
+        sendPagedRows(CommandSenderAudience(server.consoleSender, gg.flyte.pluginportal.common.PluginPortalBase.audiences), rows, null, false, "/pp list")
+        val console = plain.serialize(requireNotNull(server.consoleSender.nextComponentMessage()))
+        assertTrue(console.contains("Entry 1") && console.contains("Entry 9"))
     }
 
     @Test

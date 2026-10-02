@@ -7,6 +7,10 @@ import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import { pipeline } from "node:stream/promises";
 
 const root = process.cwd();
+const development = process.argv.includes("--dev");
+const serverJarIndex = process.argv.indexOf("--server-jar");
+const suppliedServerJar = serverJarIndex >= 0 ? process.argv[serverJarIndex + 1] : undefined;
+if (serverJarIndex >= 0 && !suppliedServerJar) throw new Error("--server-jar requires a path");
 const previousVersion = process.argv[2] ?? "3.8.5";
 const currentVersion = process.argv[3] ?? "3.8.6";
 const currentJar = join(root, "out", `PluginPortal-${currentVersion}.jar`);
@@ -18,9 +22,9 @@ const runDirectory = await mkdtemp(join(tmpdir(), "plugin-portal-upgrade-"));
 if (!existsSync(currentJar)) throw new Error(`Missing ${currentJar}; build the plugin first.`);
 await mkdir(cacheDir, { recursive: true });
 await downloadPreviousRelease();
-await downloadPaper();
+if (!suppliedServerJar) await downloadPaper();
 await mkdir(join(runDirectory, "plugins"), { recursive: true });
-await copyFile(paperJar, join(runDirectory, "server.jar"));
+await copyFile(suppliedServerJar ?? paperJar, join(runDirectory, "server.jar"));
 await copyFile(previousJar, join(runDirectory, "plugins", basename(previousJar)));
 await writeFile(join(runDirectory, "eula.txt"), "eula=true\n");
 await writeFile(join(runDirectory, "server.properties"), "online-mode=false\nserver-port=0\n");
@@ -70,10 +74,13 @@ try {
 }
 
 async function startServer() {
-  const child = spawn("docker", [
-    "run", "--rm", "-i", "-v", `${runDirectory}:/server`, "-w", "/server",
-    "eclipse-temurin:21-jre", "java", "-Xms1G", "-Xmx2G", "-jar", "server.jar", "--nogui",
-  ], { stdio: ["pipe", "pipe", "pipe"] });
+  const javaArgs = ["-Xms1G", "-Xmx2G", ...(development ? ["-Dpluginportal.dev=true"] : []), "-jar", "server.jar", "--nogui"];
+  const child = process.env.PAPER_JAVA_HOME
+    ? spawn(join(process.env.PAPER_JAVA_HOME, "bin", "java"), javaArgs, { cwd: runDirectory, stdio: ["pipe", "pipe", "pipe"] })
+    : spawn("docker", [
+      "run", "--rm", "-i", "-v", `${runDirectory}:/server`, "-w", "/server",
+      "eclipse-temurin:21-jre", "java", ...javaArgs,
+    ], { stdio: ["pipe", "pipe", "pipe"] });
   let output = "";
   child.stdout.on("data", (chunk) => output += chunk.toString());
   child.stderr.on("data", (chunk) => output += chunk.toString());
