@@ -135,16 +135,15 @@ fun sendPluginListMessage(audience: Audience, message: String, plugins: List<Plu
     audience.sendMessage(solidLine("", ""))
 }
 
-fun sendPluginSearchResultsMessage(audience: Audience, query: String, plugins: List<Plugin>) {
+fun sendPluginSearchResultsMessage(audience: Audience, query: String, plugins: List<Plugin>, page: Int? = null, full: Boolean = false, command: String = "/pp search") {
     val duplicateNames = plugins
         .groupingBy { it.name.lowercase() }
         .eachCount()
         .filterValues { it > 1 }
         .keys
 
-    audience.sendMessage(startLine().appendSecondary("Search results for \"$query\"").appendNewline())
-    plugins.take(16).forEach { plugin ->
-        val viewPlatform = plugin.platforms.best ?: return@forEach
+    val rows = plugins.mapNotNull { plugin ->
+        val viewPlatform = plugin.platforms.best ?: return@mapNotNull null
         val installPlatform = plugin.platforms.bestDownloadable
         val platformSummary = plugin.platforms.available.joinToString(", ") { it.name }
         val hover = text(plugin.name, AQUA).appendNewline()
@@ -175,9 +174,15 @@ fun sendPluginSearchResultsMessage(audience: Audience, query: String, plugins: L
             )
         }
 
-        audience.sendMessage(row)
+        if (audience.isConsole()) {
+            row = textPrimary(plugin.name).appendSecondary(" ($platformSummary)")
+                .appendNewline().appendSecondary("  /pp view \"${viewPlatform.platformId}\" ${viewPlatform.platform} --byId")
+            if (installPlatform != null) row = row.appendNewline()
+                .appendSecondary("  /pp install \"${installPlatform.platformId}\" ${installPlatform.platform} --byId")
+        }
+        "Search results for \"$query\"" to { row }
     }
-    audience.sendMessage(solidLine("", ""))
+    sendPagedRows(audience, rows, page, full, command)
 }
 
 fun sendLocalPluginListMessage(audience: Audience, message: String, plugins: List<LocalPlugin>, command: String, commandSuffix: String = "") {
@@ -242,3 +247,38 @@ fun Char.pixelLength(bold: Boolean = false) =
 fun String.pixelLength(bold: Boolean = false) = sumOf { it.pixelLength(bold) }
 
 val Plugin.platformString: String get() = platforms.available.joinToString(", ", "(", ")")
+
+/** Paginate chat output; console output stays complete unless a page is requested. */
+fun sendPagedRows(
+    audience: Audience,
+    rows: List<Pair<String, () -> Component>>,
+    page: Int?,
+    full: Boolean,
+    command: String,
+) {
+    val pageSize = 8
+    val pages = maxOf(1, (rows.size + pageSize - 1) / pageSize)
+    val selectedPage = page ?: 1
+    if (selectedPage !in 1..pages) return audience.sendFailure("Choose a page from 1 to $pages")
+    val paginated = !full && (!audience.isConsole() || page != null)
+    val visible = if (paginated) rows.drop((selectedPage - 1) * pageSize).take(pageSize) else rows
+    var message = Component.empty()
+    var section: String? = null
+    for ((title, render) in visible) {
+        if (title != section) {
+            if (section != null) message = message.appendNewline().appendNewline()
+            message = message.append(textPrimary(title).bold())
+            section = title
+        }
+        message = message.appendNewline().append(render())
+    }
+    if (paginated && pages > 1) {
+        message = message.appendNewline().appendNewline().append(textSecondary("Page $selectedPage of $pages"))
+        if (selectedPage > 1) message = message.append(textPrimary("  [Previous]")
+            .clickEvent(ClickEvent.runCommand("$command --page ${selectedPage - 1}")))
+        if (selectedPage < pages) message = message.append(textPrimary("  [Next]")
+            .clickEvent(ClickEvent.runCommand("$command --page ${selectedPage + 1}")))
+        message = message.appendNewline().append(textDark("$command --page <number> | --full"))
+    }
+    audience.sendMessage(message.boxed())
+}

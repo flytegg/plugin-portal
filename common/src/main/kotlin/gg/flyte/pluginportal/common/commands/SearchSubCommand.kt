@@ -7,6 +7,8 @@ import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
 import gg.flyte.pluginportal.common.types.enums.MarketplacePlatform
 import gg.flyte.pluginportal.common.util.async
 import net.kyori.adventure.audience.Audience
+import revxrsal.commands.annotation.Flag
+import revxrsal.commands.annotation.Switch
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Named
 import revxrsal.commands.annotation.Optional
@@ -23,7 +25,11 @@ class SearchSubCommand {
         audience: Audience,
         @Named("query") @SuggestWith(MarketplacePluginSuggestionProvider::class) query: String,
         @Optional @Named("platform") platform: MarketplacePlatform? = null,
+        @Optional @Flag("page") page: Int? = null,
+        @Switch("full") full: Boolean = false,
     ) = async {
+        if (page != null && page < 1) return@async audience.sendFailure("Page must be at least 1")
+        if (full && page != null) return@async audience.sendFailure("Use either --full or --page, not both")
         val plugins = MarketplacePluginCache.getFilteredPlugins(query, platform)
             .let { matches -> with(MarketplacePluginCache) { matches.sortedByRelevance(query) } }
 
@@ -32,6 +38,8 @@ class SearchSubCommand {
             return@async
         }
 
-        sendPluginSearchResultsMessage(audience, query, plugins)
+        val quotedQuery = query.replace("\\", "\\\\").replace("\"", "\\\"")
+        val command = "/pp search \"$quotedQuery\"${platform?.let { " $it" } ?: ""}"
+        sendPluginSearchResultsMessage(audience, query, plugins, page, full, command)
     }
 }

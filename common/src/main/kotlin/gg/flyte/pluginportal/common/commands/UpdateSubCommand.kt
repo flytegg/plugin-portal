@@ -36,7 +36,7 @@ class UpdateSubCommand {
         @Switch("ignoreOutdated") ignoreOutdated: Boolean = false,
         @Switch("refresh") refresh: Boolean = false,
         @Optional @Flag("channel") @SuggestWith(ReleaseChannelSuggestionProvider::class) channel: String? = null,
-        @Optional @Flag("version") versionNumber: String? = null,
+        @Optional @Flag("version") @Named("version") versionNumber: String? = null,
     ) {
         LocalPluginCache.searchPluginsWithFeedback(
             audience,

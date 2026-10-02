@@ -39,7 +39,7 @@ class InstallSubCommand {
         @Optional @Named("channel") @SuggestWith(ReleaseChannelSuggestionProvider::class) channel: String? = null,
         @Optional @Switch("byId") byId: Boolean = false,
         @Optional @Switch(value="exact", shorthand='e') exact: Boolean = false,
-        @Optional @Flag("version") versionNumber: String? = null,
+        @Optional @Flag("version") @Named("version") versionNumber: String? = null,
     ) {
         
         // Handle marketplace plugin installation

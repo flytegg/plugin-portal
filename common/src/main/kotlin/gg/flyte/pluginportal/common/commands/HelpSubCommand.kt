@@ -12,24 +12,41 @@ import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.CommandPlaceholder
+import revxrsal.commands.annotation.Subcommand
 import revxrsal.commands.annotation.Named
 import revxrsal.commands.annotation.Optional
 import revxrsal.commands.bukkit.annotation.CommandPermission
 
-// /pluginpportal help was broken so I removed it
-@Command("pp", "pluginportal", "ppm", "pp help", "ppm help")
+@Command("pp", "pluginportal", "ppm")
 @CommandPermission("pluginportal.view")
 class HelpSubCommand {
 
-//    @Subcommand("help")
     @CommandPlaceholder
+    fun rootCommand(audience: Audience) = helpCommand(audience)
+
+    @Subcommand("help")
     @CommandPermission("pluginportal.view")
     fun helpCommand(
         audience: Audience,
-        @Optional @Named("page") page: Int = 1
+        @Optional @Named("topic") topic: String = "1"
     ) {
         val GOLD = TextColor.color(0xfebe00)
-        val pageNumber = page.coerceIn(1, 2)
+        val pageNumber = topic.toIntOrNull()
+        if (pageNumber == null) {
+            val command = when (topic.lowercase()) {
+                "delete" -> "uninstall"
+                "version" -> "info"
+                "config" -> "reload"
+                else -> topic.lowercase()
+            }
+            val help = commandHelp[command]
+                ?: return audience.sendFailure("Unknown help topic. Use /pp help or /pp help 2.")
+            var message = textPrimary(help.first).bold().appendNewline()
+            help.second.forEach { message = message.appendNewline().append(textSecondary(it)) }
+            audience.sendMessage(message.boxed())
+            return
+        }
+        if (pageNumber !in 1..2) return audience.sendFailure("Choose help page 1 or 2, or a command such as /pp help install")
 
         var message = centerComponentLine(
             textPrimary("Plugin Portal").bold()
@@ -46,10 +63,11 @@ class HelpSubCommand {
         message = if (pageNumber == 1) {
             message.append(section("Plugins"))
                 .appendNewline()
-                .append(helpLine("/pp list [--outdated] [--external]", "Installed", details = listOf(
+                .append(helpLine("/pp list [--outdated] [--external] [--page <number>]", "Installed", details = listOf(
                     "--outdated shows marketplace and external updates.",
                     "--external shows only configured external plugins.",
-                    "--detailed includes versions, IDs, and sources."
+                    "--detailed includes versions, IDs, and sources.",
+                    "--full shows every entry. Console output is complete by default."
                 )))
                 .appendNewline()
                 .append(helpLine("/pp search <query> [platform]", "Search marketplace"))
@@ -90,6 +108,8 @@ class HelpSubCommand {
                 .append(helpLine("/pp <version | info>", "Status"))
                 .appendNewline()
                 .appendNewline()
+                .append(helpLine("/pp help <command>", "Command details"))
+                .appendNewline()
                 .append(footer(2))
         } else {
             message.append(section("More Commands"))
@@ -102,7 +122,7 @@ class HelpSubCommand {
                     "Example: /pp key set pp_live_..."
                 )))
                 .appendNewline()
-                .append(helpLine("/pp upgrade", "Self-update", details = listOf(
+                .append(helpLine("/pp upgrade [--channel <name>]", "Self-update", details = listOf(
                     "Flag: --yes skips the confirmation prompt.",
                     "Example: /pp upgrade --yes"
                 )))
@@ -116,6 +136,121 @@ class HelpSubCommand {
             message.boxed()
         )
     }
+
+    private val commandHelp = mapOf(
+        "install" to ("/pp install <name> [platform] [channel] [--byId] [--exact] [--version <version>]" to listOf(
+            "Install a compatible plugin. Restart the server to load it.",
+            "Quote names with spaces. --byId requires a platform and its project ID.",
+            "The channel is positional: release, beta, alpha, or a provider channel.",
+            "An exact version is excluded from updateAll.",
+            "Example: /pp install LuckPerms MODRINTH release"
+        )),
+        "update" to ("/pp update <name> [--byId] [--refresh] [--channel <name>] [--version <version>] [--ignoreOutdated]" to listOf(
+            "Update one tracked plugin. Restart the server to apply the update.",
+            "--refresh bypasses the local marketplace cache, not the API scanner.",
+            "--ignoreOutdated reinstalls the selected compatible version.",
+            "--version selects an exact version and excludes it from updateAll.",
+            "Example: /pp update LuckPerms --refresh"
+        )),
+        "updateall" to ("/pp updateAll [--ignoreOutdated]" to listOf(
+            "Premium: update tracked marketplace plugins. Restart to apply updates.",
+            "Excluded plugins are skipped. Use /pp blacklist to view exclusions.",
+            "External plugins use /pp external updateAll."
+        )),
+        "list" to ("/pp list [--all] [--outdated] [--external] [--detailed] [--page <number>] [--full]" to listOf(
+            "--all includes unrecognized JARs. It cannot be combined with --outdated or --external.",
+            "--outdated checks for updates without installing them.",
+            "--external shows only configured external plugins.",
+            "Chat shows eight entries per page. Console shows all entries by default.",
+            "Use --full or --page, not both."
+        )),
+        "search" to ("/pp search <query> [platform] [--page <number>] [--full]" to listOf(
+            "Search the marketplace. Quote queries with spaces.",
+            "Example: /pp search \"ViaVersion\" MODRINTH"
+        )),
+        "view" to ("/pp view <name> [platform] [--byId] [--exact]" to listOf(
+            "View marketplace details. --byId requires a platform.",
+            "Example: /pp view LuckPerms MODRINTH --exact"
+        )),
+        "blacklist" to ("/pp blacklist [name] [--byId]" to listOf(
+            "Without a name, list plugins excluded from updateAll.",
+            "With a name, toggle the exclusion. The plugin stays tracked.",
+            "A deliberate /pp update still works."
+        )),
+        "platform" to ("/pp platform <name> <platform> [--byId]" to listOf(
+            "Switch to another marketplace source for the same merged plugin.",
+            "Restart after the download."
+        )),
+        "uninstall" to ("/pp uninstall <name> [--byId]" to listOf(
+            "Delete the tracked JAR. Keep the plugin data folder.",
+            "Restart the server to unload the plugin. Alias: /pp delete."
+        )),
+        "install-url" to ("/pp install-url <url>" to listOf(
+            "Console only: download a JAR from a direct URL. Restart to load it.",
+            "Use a trusted source. A raw URL does not establish a marketplace update source."
+        )),
+        "key" to ("/pp key <set <key> | get | clear>" to listOf(
+            "Set and validate a key to enable premium features.",
+            "Do not share keys, screenshots of keys, or command logs that contain keys."
+        )),
+        "upgrade" to ("/pp upgrade [--channel <name>] [--yes]" to listOf(
+            "Check for a Plugin Portal update. The default channel is release.",
+            "--yes downloads the update. Restart the server to apply it."
+        )),
+        "recognize" to ("/pp recognize <file> [--channel <name>]" to listOf(
+            "Premium: track a manually installed JAR that a marketplace recognizes.",
+            "The file must be in plugins/. Recognition can rename it.",
+            "--channel saves the channel for future updates."
+        )),
+        "recognizeall" to ("/pp recognizeAll [--channel <name>]" to listOf(
+            "Premium: recognize untracked JARs in plugins/.",
+            "Plugin Portal skips itself and managed external files.",
+            "An unknown file remains untracked."
+        )),
+        "editor" to ("/pp editor [status | url | reconnect | stop]" to listOf(
+            "Premium: open a temporary browser editor session.",
+            "Treat the editor URL as a secret. /pp connect is not supported.",
+            "Use status to check the connection or stop to end the session."
+        )),
+        "import" to ("/pp import <mclogs-url>" to listOf(
+            "Premium: install plugins from a /pp export link.",
+            "The export contains marketplace IDs, not exact versions or plugin configuration."
+        )),
+        "export" to ("/pp export" to listOf(
+            "Premium: export tracked marketplace IDs to MCLogs.",
+            "This is not a server backup. External plugins and configuration are not included."
+        )),
+        "scan" to ("/pp scan <file>" to listOf(
+            "Premium: scan a local JAR with the bundled scanner.",
+            "A scan result does not guarantee that a plugin is safe."
+        )),
+        "external" to ("/pp external <action>" to listOf(
+            "Premium: manage GitHub Releases and GeyserMC plugins.",
+            "Add: /pp external add github <id> <owner> <repo> <asset> [--prereleases]",
+            "Add: /pp external add geysermc <id> <project> <artifact>",
+            "Import: replace add with import and append <file> before flags.",
+            "Actions: check, install, update, uninstall, invalidate <id>",
+            "Other actions: updateAll, reload",
+            "Configuration: plugins/PluginPortal/external-plugins.yml",
+            "Uninstall keeps configuration. Restart after file changes."
+        )),
+        "reload" to ("/pp reload" to listOf(
+            "Reload config.yml, plugins.json, and external-plugins.yml.",
+            "Aliases: /pp config reload, /pp config refresh.",
+            "This does not reload installed plugins or apply staged updates."
+        )),
+        "info" to ("/pp info" to listOf(
+            "Show Plugin Portal version, license state, and update information.",
+            "Alias: /pp version."
+        )),
+        "dump" to ("/pp dump" to listOf(
+            "Upload sanitized diagnostic information for support.",
+            "Review diagnostic files before sharing them publicly."
+        )),
+        "support" to ("/pp support" to listOf(
+            "Show the support link."
+        ))
+    )
 
     private fun section(name: String, color: TextColor = NamedTextColor.AQUA): Component =
         text(name, color, TextDecoration.BOLD)

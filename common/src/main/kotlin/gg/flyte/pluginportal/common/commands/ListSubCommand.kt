@@ -28,6 +28,8 @@ import java.io.File
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Subcommand
 import revxrsal.commands.annotation.Switch
+import revxrsal.commands.annotation.Flag
+import revxrsal.commands.annotation.Optional
 import revxrsal.commands.bukkit.annotation.CommandPermission
 
 @Command("pp", "pluginportal", "ppm")
@@ -45,20 +47,37 @@ class ListSubCommand {
         @Switch("all") all: Boolean = false,
         @Switch("outdated") outdated: Boolean = false,
         @Switch("external") externalOnly: Boolean = false,
+        @Optional @Flag("page") page: Int? = null,
+        @Switch("full") full: Boolean = false,
     ) {
         async {
+            if (page != null && page < 1) return@async audience.sendFailure("Page must be at least 1")
+            if (full && page != null) return@async audience.sendFailure("Use either --full or --page, not both")
             if (all && outdated) return@async audience.sendFailure("Use either --all or --outdated, not both")
             if (all && externalOnly) return@async audience.sendFailure("Use either --all or --external, not both")
 
             val plugins = if (externalOnly) emptyList() else LocalPluginCache
                     .sortedBy { plugin -> plugin.name }
                     .filter { plugin -> plugin.name != PluginPortalBase.plugin.name }
+            val failedMarketplaceChecks = mutableListOf<Pair<LocalPlugin, String>>()
             val marketplaceUpdates = if (outdated && plugins.isNotEmpty()) {
                 val remotes = API.getAllPluginsByPlatformIds(plugins.map(LocalPlugin::platformWithId))
                     ?: return@async audience.sendFailure("Could not check marketplace plugins for updates")
                 plugins.mapNotNull { local ->
-                    val remote = remotes[local.platform]?.get(local.platformId) ?: return@mapNotNull null
-                    local.targetUpdateVersion(remote)?.let { version -> MarketplaceUpdate(local, version) }
+                    val remote = remotes[local.platform]?.get(local.platformId)
+                    if (remote == null) {
+                        failedMarketplaceChecks += local to "Not found in the marketplace"
+                        return@mapNotNull null
+                    }
+                    try {
+                        if (local.targetUpdateVersion(remote, includeCurrent = true) == null) {
+                            failedMarketplaceChecks += local to "No compatible version found"
+                            null
+                        } else local.targetUpdateVersion(remote)?.let { version -> MarketplaceUpdate(local, version) }
+                    } catch (error: Exception) {
+                        failedMarketplaceChecks += local to "Could not check for updates"
+                        null
+                    }
                 }
             } else emptyList()
             val checkedExternalPlugins = ExternalPluginManager.configuredPlugins().map { (config, state) ->
@@ -72,7 +91,7 @@ class ListSubCommand {
             } else emptyList()
             val unrecognizedJars = if (all) findUnrecognizedJars(plugins, externalPlugins) else emptyList()
 
-            if (outdated && marketplaceUpdates.isEmpty() && externalPlugins.isEmpty() && failedExternalChecks.isEmpty()) {
+            if (outdated && marketplaceUpdates.isEmpty() && externalPlugins.isEmpty() && failedExternalChecks.isEmpty() && failedMarketplaceChecks.isEmpty()) {
                 return@async audience.sendSuccess(
                     if (externalOnly) "All external plugins are up to date" else "All plugins are up to date"
                 )
@@ -82,65 +101,45 @@ class ListSubCommand {
                 return@async audience.sendMessage(Component.text(emptyMessage, NamedTextColor.GRAY).boxed())
             }
 
-            var message = Component.empty()
-            var hasSection = false
             val console = audience.isConsole()
             val showDetails = detailed || console
-
-            fun startSection(title: String) {
-                if (hasSection) message = message.append(Component.text("\n\n"))
-                message = message.append(textPrimary(title).bold())
-                hasSection = true
-            }
-
-            val marketplaceEntries = if (outdated) marketplaceUpdates else plugins
-            if (marketplaceEntries.isNotEmpty()) {
-                startSection("Marketplace")
-                if (outdated) {
-                    marketplaceUpdates.forEach { update ->
-                        message = message.append(Component.text("\n"))
-                            .append(getOutdatedMarketplaceLine(update, showDetails, console))
-                    }
-                } else {
-                    plugins.forEach { plugin ->
-                        message = message.append(Component.text("\n"))
-                            .append(if (showDetails) getDetailedPluginLine(plugin, console) else getCompactPluginLine(plugin, console))
-                    }
+            val rows = mutableListOf<Pair<String, () -> Component>>()
+            if (outdated) marketplaceUpdates.forEach { update ->
+                rows += "Marketplace" to { getOutdatedMarketplaceLine(update, showDetails, console) }
+            } else plugins.forEach { plugin ->
+                rows += "Marketplace" to {
+                    if (showDetails) getDetailedPluginLine(plugin, console) else getCompactPluginLine(plugin, console)
                 }
             }
-
-            if (externalPlugins.isNotEmpty()) {
-                startSection("External")
-                externalPlugins.forEach { plugin ->
-                    message = message.append(Component.text("\n"))
-                        .append(
-                            if (outdated) getOutdatedExternalPluginLine(plugin, showDetails, console)
-                            else if (showDetails) getDetailedExternalPluginLine(plugin, console)
-                            else getCompactExternalPluginLine(plugin, console)
-                        )
+            externalPlugins.forEach { plugin ->
+                rows += "External" to {
+                    if (outdated) getOutdatedExternalPluginLine(plugin, showDetails, console)
+                    else if (showDetails) getDetailedExternalPluginLine(plugin, console)
+                    else getCompactExternalPluginLine(plugin, console)
                 }
             }
-
-            if (failedExternalChecks.isNotEmpty()) {
-                startSection("External check failures")
-                failedExternalChecks.forEach { entry ->
-                    message = message.append(Component.text("\n"))
-                        .append(textDark(" - "))
-                        .appendPrimary(entry.config.id)
-                        .appendSecondary(": ${entry.check.message}")
+            failedMarketplaceChecks.forEach { (plugin, reason) ->
+                rows += "Marketplace check failures" to {
+                    textDark(" - ").appendPrimary(plugin.name).appendSecondary(": $reason")
                 }
             }
-
-            if (unrecognizedJars.isNotEmpty()) {
-                startSection("Unrecognized JARs")
-
-                unrecognizedJars.forEach { jar ->
-                    message = message.append(Component.text("\n"))
-                        .append(if (showDetails) getDetailedUnrecognizedJarLine(jar) else getCompactUnrecognizedJarLine(jar))
+            failedExternalChecks.forEach { entry ->
+                rows += "External check failures" to {
+                    textDark(" - ").appendPrimary(entry.config.id).appendSecondary(": ${entry.check.message}")
                 }
             }
-
-            audience.sendMessage(message.boxed())
+            unrecognizedJars.forEach { jar ->
+                rows += "Unrecognized JARs" to {
+                    if (showDetails) getDetailedUnrecognizedJarLine(jar) else getCompactUnrecognizedJarLine(jar)
+                }
+            }
+            val filters = buildString {
+                if (detailed) append(" --detailed")
+                if (all) append(" --all")
+                if (outdated) append(" --outdated")
+                if (externalOnly) append(" --external")
+            }
+            sendPagedRows(audience, rows, page, full, "/pp list$filters")
         }
     }
 
