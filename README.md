@@ -28,7 +28,9 @@ are excluded from bulk updates until you remove the exclusion with `/pp blacklis
 Updates take effect after a server restart.
 
 The plugin targets Java 17 or later. Use the Java version required by your server.
-The runtime checks pass on Paper 1.21.11 and Paper 1.8.8 with Java 21.
+The full runtime checks pass on Paper 1.21.11 and Paper 1.8.8 with Java 21,
+and Paper 26.2 build 129 with Java 25. Paper 26.3 build 143 passes startup and
+command checks. Its install/update coverage is pending an API metadata fix.
 Java 8 hosts are not supported. See [contributing](CONTRIBUTING.md).
 
 Datapack management, proxy-server plugins, and paid Polymart downloads are not

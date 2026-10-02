@@ -91,7 +91,22 @@ JAVA_HOME=/path/to/compatible/jdk bun scripts/smoke-run-paper.ts --server-jar /p
 The script copies the server JAR and its adjacent Paperclip cache into a temporary
 folder. It runs the same basic commands and a ViaVersion download from Hangar. Modrinth currently labels ViaVersion for 1.8.9,
 so the legacy check uses Hangar metadata that explicitly includes 1.8.8. The modern-only
-WorldGuard and Enchanted Timber checks do not run on this path.
+WorldGuard and Enchanted Timber checks do not run on the 1.8.8 path.
+
+For a newer server JAR, specify its Minecraft version. Use `PAPER_JAVA_HOME` to
+select the server JDK without changing the JDK used by Gradle:
+
+```bash
+PAPER_JAVA_HOME=/path/to/jdk25 bun scripts/smoke-run-paper.ts --server-jar /path/to/paper-26.2.jar --minecraft-version 26.2
+```
+
+The 26.2 check uses Enchanted Timber's release channel. The 1.21.11 check uses beta.
+For a server whose test plugin has no compatible release in the API, add
+`--expect-incompatible`. This checks rejection without a JAR or tracking record,
+then runs the read-only command checks. It skips successful install/update checks.
+Do not report that mode as full install support. The current 26.3 production API
+needs a version-table update and refreshed marketplace metadata before the full
+ViaVersion install check can pass.
 
 The built plugin JAR is written to `out/PluginPortal-<version>.jar`.
 
