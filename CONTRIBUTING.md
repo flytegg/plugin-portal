@@ -100,13 +100,27 @@ select the server JDK without changing the JDK used by Gradle:
 PAPER_JAVA_HOME=/path/to/jdk25 bun scripts/smoke-run-paper.ts --server-jar /path/to/paper-26.2.jar --minecraft-version 26.2
 ```
 
-The 26.2 check uses Enchanted Timber's release channel. The 1.21.11 check uses beta.
+The 26.x check uses Enchanted Timber's release channel. The 1.21.11 check uses beta.
 For a server whose test plugin has no compatible release in the API, add
 `--expect-incompatible`. This checks rejection without a JAR or tracking record,
 then runs the read-only command checks. It skips successful install/update checks.
 Do not report that mode as full install support. The current 26.3 production API
 needs a version-table update and refreshed marketplace metadata before the full
 ViaVersion install check can pass.
+
+To test a separately started local API at `http://localhost:3001`, add `--dev`.
+The local API must contain compatible marketplace releases. The test does not
+start or seed the API. Public builds use production unless the development JVM
+property is set.
+
+To check that an existing installation survives a JAR replacement:
+
+```bash
+PAPER_JAVA_HOME=/path/to/jdk25 bun scripts/smoke-in-place-upgrade.ts 3.8.7 3.8.9 --server-jar /path/to/paper-26.3.jar --dev
+```
+
+This runs the released JAR first, installs ViaVersion, replaces only Plugin Portal,
+and checks the saved installation after restart.
 
 The built plugin JAR is written to `out/PluginPortal-<version>.jar`.
 

@@ -5,6 +5,8 @@ import { dirname, join, resolve } from "node:path";
 import { spawn } from "node:child_process";
 
 const root = process.cwd();
+const development = process.argv.includes("--dev");
+const apiBase = development ? "http://localhost:3001" : "https://v3.pluginportal.link";
 const runDirectory = await mkdtemp(join(tmpdir(), "plugin-portal-run-paper-"));
 await writeFile(join(runDirectory, "eula.txt"), "eula=true\n");
 await writeFile(join(runDirectory, "server.properties"), "online-mode=false\nserver-port=0\n");
@@ -28,8 +30,8 @@ if (serverJar) {
 }
 const serverJavaHome = process.env.PAPER_JAVA_HOME ?? process.env.JAVA_HOME;
 const child = serverJar
-  ? spawn(serverJavaHome ? join(serverJavaHome, "bin", "java") : "java", ["-Xmx1G", "-jar", "server.jar", "nogui"], { cwd: runDirectory, stdio: ["pipe", "pipe", "pipe"] })
-  : spawn("./gradlew", [":plugin:runServer", `-PrunDir=${runDirectory}`], { cwd: root, stdio: ["pipe", "pipe", "pipe"] });
+  ? spawn(serverJavaHome ? join(serverJavaHome, "bin", "java") : "java", ["-Xmx1G", ...(development ? ["-Dpluginportal.dev=true"] : []), "-jar", "server.jar", "nogui"], { cwd: runDirectory, stdio: ["pipe", "pipe", "pipe"] })
+  : spawn("./gradlew", [":plugin:runServer", `-PrunDir=${runDirectory}`, ...(development ? ["-PpluginPortalDev=true"] : [])], { cwd: root, stdio: ["pipe", "pipe", "pipe"] });
 
 let output = "";
 const append = (chunk: Buffer) => {
@@ -71,7 +73,7 @@ try {
     if (!legacy) {
       await runCommand("pp install DKY9btbd MODRINTH --byId", /Downloaded WorldGuard from MODRINTH/i, "WorldGuard install", 75_000);
       await assertTrackedVersionSupports("WorldGuard", minecraftVersion);
-      await runCommand(`pp install FfpCagQb MODRINTH ${minecraftVersion === "26.2" ? "release" : "beta"} --byId`, /Downloaded Enchanted Timber from MODRINTH/i, "Enchanted Timber plugin artifact", 75_000);
+      await runCommand(`pp install FfpCagQb MODRINTH ${minecraftVersion.startsWith("26.") ? "release" : "beta"} --byId`, /Downloaded Enchanted Timber from MODRINTH/i, "Enchanted Timber plugin artifact", 75_000);
       await assertTrackedVersionSupports("Enchanted Timber", minecraftVersion);
     }
 
@@ -199,7 +201,7 @@ async function assertTrackedVersionSupports(pluginName: string, minecraftVersion
   if (!tracked) throw new Error(`${pluginName} was downloaded but not written to plugins.json.`);
 
   const response = await fetch(
-    `https://v3.pluginportal.link/versions/platform/${tracked.platform.toLowerCase()}/${tracked.platformId}?limit=500&offset=0`,
+    `${apiBase}/versions/platform/${tracked.platform.toLowerCase()}/${tracked.platformId}?limit=500&offset=0`,
   );
   if (!response.ok) throw new Error(`Could not verify ${pluginName} compatibility: API returned ${response.status}.`);
 
