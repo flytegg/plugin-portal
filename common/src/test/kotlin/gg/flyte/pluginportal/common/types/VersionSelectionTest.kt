@@ -15,6 +15,16 @@ class VersionSelectionTest {
         gg.flyte.pluginportal.common.types.enums.MarketplacePlatform.MODRINTH, "installed-sha256", "installed-sha512", 0L)
 
     @Test
+    fun `explicit reinstall retains current compatible version but ordinary update skips it`() {
+        val current = version("1.0", "2026-06-01T00:00:00Z", ServerType.PAPER, minecraftVersions = listOf("1.21.4"))
+        val platform = platformEntry(listOf(current))
+        val local = installedPlugin()
+        assertNull(local.targetUpdateVersion(platform, listOf(ServerType.PAPER), "1.21.4") { listOf(current) })
+        assertEquals(current, local.targetUpdateVersion(platform, listOf(ServerType.PAPER), "1.21.4", includeCurrent = true) { listOf(current) })
+        assertNull(local.targetUpdateVersion(platform, listOf(ServerType.PAPER), "1.20.6", includeCurrent = true) { listOf(current) })
+    }
+
+    @Test
     fun `update selects later stable instead of cached newer alpha`() {
         val alpha = cachedAlpha()
         val selected = installedPlugin().targetUpdateVersion(platformEntry(listOf(alpha)), listOf(ServerType.PAPER), "1.21.4") {

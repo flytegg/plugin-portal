@@ -173,7 +173,7 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
                 ActionResponseString(false, "Could not find plugin in marketplace ($target)")
             }
 
-        val targetVersion = targetVersionOverride ?: targetUpdateVersion(marketplacePlugin)
+        val targetVersion = targetVersionOverride ?: targetUpdateVersion(marketplacePlugin, includeCurrent = ignoreOutdated)
             ?: return ActionResponseString(false, "No compatible version found for ${preferredChannel ?: "the default channel"}")
 
         if (!ignoreOutdated && matchesVersion(targetVersion)) return ActionResponseString(false, "Plugin is already up to date")

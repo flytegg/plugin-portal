@@ -113,7 +113,7 @@ class UpdateSubCommand {
             LocalPluginCache.save()
         }
 
-        val updateTarget = marketplacePluginOverride?.let(localPlugin::targetUpdateVersion)
+        val updateTarget = marketplacePluginOverride?.let { localPlugin.targetUpdateVersion(it) }
         val isUpToDate = marketplacePluginOverride?.let { updateTarget == null } ?: localPlugin.isUpToDate
         if (exactVersionNumber == null && !ignoreOutdated && isUpToDate) {
             return audience.sendSuccess("Plugin is already up to date")
