@@ -17,6 +17,6 @@ Prepared for release. The JAR is not published yet.
 
 Use Java 17 or later, and meet your server's Java requirements. Tests cover Paper
 1.8.8 and 1.21.11 with Java 21, and Paper 26.2 and 26.3 beta with Java 25.
-Paper 26.3 requires the API metadata fix and a marketplace refresh before release.
+The API metadata fix and marketplace refresh for Paper 26.3 are deployed.
 Existing Plugin Portal 3.8.7 works with the corrected API without a plugin upgrade.
 The 3.8.9 JAR also preserves its saved installation data on upgrade.

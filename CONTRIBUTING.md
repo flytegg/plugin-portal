@@ -104,9 +104,8 @@ The 26.x check uses Enchanted Timber's release channel. The 1.21.11 check uses b
 For a server whose test plugin has no compatible release in the API, add
 `--expect-incompatible`. This checks rejection without a JAR or tracking record,
 then runs the read-only command checks. It skips successful install/update checks.
-Do not report that mode as full install support. The current 26.3 production API
-needs a version-table update and refreshed marketplace metadata before the full
-ViaVersion install check can pass.
+Do not report that mode as full install support. The 26.3 production API passed the full check after the version-table update
+and marketplace metadata refresh.
 
 To test a separately started local API at `http://localhost:3001`, add `--dev`.
 The local API must contain compatible marketplace releases. The test does not
