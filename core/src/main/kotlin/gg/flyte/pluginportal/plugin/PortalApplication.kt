@@ -9,11 +9,15 @@ import gg.flyte.pluginportal.plugin.commands.lamp.SafeFileNameValidator
 import gg.flyte.pluginportal.plugin.commands.recognize.RecognizeAllSubCommand
 import gg.flyte.pluginportal.plugin.commands.recognize.RecognizeSubCommand
 import gg.flyte.pluginportal.plugin.websocket.TypedSocketManager
+import gg.flyte.pluginportal.plugin.network.NetworkClient
+import gg.flyte.pluginportal.plugin.network.NetworkCommands
 
 object PortalApplication {
     lateinit var runtime: PortalRuntime
         private set
     private lateinit var entitlement: EntitlementManager
+    lateinit var network: NetworkClient
+        private set
 
     fun start(runtime: PortalRuntime) {
         this.runtime = runtime
@@ -25,15 +29,18 @@ object PortalApplication {
             runtime.jarFile, ::isAuthed, ::refreshEntitlement,
         ), arrayOf(
             ImportSubCommand(), ExportSubCommand(), UpdateAllSubCommand(), ScanSubCommand(),
-            RecognizeSubCommand(), RecognizeAllSubCommand(), EditorSubCommand(), ExternalSubCommand(),
+            RecognizeSubCommand(), RecognizeAllSubCommand(), EditorSubCommand(), ExternalSubCommand(), NetworkCommands(),
         )) { it.parameterValidator(String::class.java, SafeFileNameValidator()) }
         AdapterPluginCache.load()
+        network = NetworkClient(runtime)
+        network.start()
     }
 
     fun isAuthed() = entitlement.hasPremiumAccess()
     fun refreshEntitlement() = entitlement.refresh() is EntitlementState.Valid
     fun lockedPremiumMessage() = entitlement.lockedMessage()
     fun stop() {
+        if (::network.isInitialized) network.close()
         TypedSocketManager.stop()
         PluginPortalBase.onDisable()
         runtime.close()

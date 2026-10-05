@@ -36,6 +36,13 @@ class VelocityPluginPortal @Inject constructor(
             override fun suggest(invocation: SimpleCommand.Invocation): List<String> =
                 PluginPortalBase.lamp.autoCompleter().complete(actor(invocation.source()), "pp " + invocation.arguments().joinToString(" "))
         })
+        proxy.commandManager.register(proxy.commandManager.metaBuilder("ppnetwork").plugin(this).build(), object : SimpleCommand {
+            override fun execute(invocation: SimpleCommand.Invocation) {
+                PluginPortalBase.lamp.dispatch(actor(invocation.source()), "ppnetwork " + invocation.arguments().joinToString(" "))
+            }
+            override fun suggest(invocation: SimpleCommand.Invocation): List<String> =
+                PluginPortalBase.lamp.autoCompleter().complete(actor(invocation.source()), "ppnetwork " + invocation.arguments().joinToString(" "))
+        })
     }
 
     private fun actor(source: CommandSource): PortalCommandActor {
@@ -67,7 +74,7 @@ private class VelocityRuntime(private val proxy: ProxyServer, override val dataF
     override val commandName = "ppv"
     override fun close() {
         super.close()
-        if (!executor.isTerminated) {
+        if (!executor.isTerminated || !PortalApplication.network.isStopped) {
             logger.warning("Pending updates retained because plugin tasks did not stop. Apply them while the proxy is stopped.")
             return
         }

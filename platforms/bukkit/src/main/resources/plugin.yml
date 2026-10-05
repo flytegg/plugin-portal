@@ -16,3 +16,6 @@ permissions:
     children:
       pluginportal.admin: true
       pluginportal.manage.*: true
+      pluginportal.network: true
+  pluginportal.network:
+    default: op

@@ -3,6 +3,7 @@ package gg.flyte.pluginportal.common.types
 import com.google.gson.JsonObject
 import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.Config
+import gg.flyte.pluginportal.common.commands.lamp.Features
 import gg.flyte.pluginportal.common.logging.PortalLogger
 import gg.flyte.pluginportal.common.managers.LocalPluginCache
 import gg.flyte.pluginportal.common.managers.LocalPluginCache.installUpdate
@@ -18,6 +19,7 @@ import net.kyori.adventure.audience.Audience
 
 class SocketActions {
     val install = SocketAction("install") { data: JsonObject ->
+        if (!Features.INSTALL.isEnabled()) return@SocketAction PluginActionResponse(false, "Installing plugins is disabled")
         val platform = data.get("platform")?.asString ?: return@SocketAction PluginActionResponse(false, "Missing platform")
         val id = data.get("id")?.asString ?: return@SocketAction PluginActionResponse(false, "Missing id")
         val versionNumber = data.get("version")?.asString?.takeIf { it.isNotBlank() }
@@ -73,6 +75,7 @@ class SocketActions {
     }
 
     val uninstall = SocketAction("uninstall") { data: JsonObject ->
+        if (!Features.DELETE.isEnabled()) return@SocketAction PluginActionResponse(false, "Removing plugins is disabled")
         val platform = data.get("platform")?.asString ?: return@SocketAction PluginActionResponse(false, "Missing platform")
         val id = data.get("id")?.asString ?: return@SocketAction PluginActionResponse(false, "Missing id")
 
@@ -91,6 +94,7 @@ class SocketActions {
     }
 
     val update = SocketAction("update") { data: JsonObject ->
+        if (!Features.UPDATE.isEnabled()) return@SocketAction PluginActionResponse(false, "Updating plugins is disabled")
         val platform = data.get("platform")?.asString ?: return@SocketAction PluginActionResponse(false, "Missing platform")
         val id = data.get("id")?.asString ?: return@SocketAction PluginActionResponse(false, "Missing id")
 
@@ -99,9 +103,31 @@ class SocketActions {
             
         val localPlugin = LocalPluginCache.find { it.platformId == id && it.platform == marketplacePlatform }
             ?: return@SocketAction PluginActionResponse(false, "Plugin not installed")
+        if (localPlugin.excludedFromUpdates) return@SocketAction PluginActionResponse(false, "Plugin is excluded from updates")
+        if (!Config.isDownloadPlatformEnabled(marketplacePlatform)) return@SocketAction PluginActionResponse(false, "Downloading from this marketplace is disabled")
+        val remote = MarketplacePluginCache.getOrFetchPluginById(marketplacePlatform, id)
+            ?: return@SocketAction PluginActionResponse(false, "Plugin not found")
+        val platformPlugin = remote.platform(marketplacePlatform)
+            ?: return@SocketAction PluginActionResponse(false, "Plugin not found on this marketplace")
+        val versionNumber = data.get("version")?.asString?.takeIf { it.isNotBlank() }
+        val channel = data.get("channel")?.asString?.takeIf { it.isNotBlank() } ?: localPlugin.preferredChannel
+        val types = currentServerTypePreference()
+        val minecraft = currentMinecraftVersion()
+        val selected = if (versionNumber != null) {
+            when (val selection = platformPlugin.exactCompatibleVersionWithFallback(versionNumber, channel, types, minecraft) { API.getPluginVersions(platformPlugin.platformWithId)?.toList() }) {
+                is ExactVersionSelection.Found -> selection.version
+                is ExactVersionSelection.Ambiguous -> return@SocketAction PluginActionResponse(false, "Version is ambiguous; select a channel")
+                ExactVersionSelection.NotFound -> return@SocketAction PluginActionResponse(false, "No compatible version found")
+            }
+        } else if (data.has("channel")) {
+            platformPlugin.newestCompatibleVersionWithFallback(channel, types, minecraft) { API.getPluginVersions(platformPlugin.platformWithId)?.toList() }
+                ?: return@SocketAction PluginActionResponse(false, "No compatible version found")
+        } else localPlugin.targetUpdateVersion(remote)
+            ?: return@SocketAction PluginActionResponse(true, "Plugin is already up to date")
+        if (localPlugin.matchesVersion(selected)) return@SocketAction PluginActionResponse(true, "Plugin is already up to date")
             
         // Use the built-in update method from LocalPluginCache
-        val response = localPlugin.installUpdate(Audience.empty())
+        val response = localPlugin.installUpdate(Audience.empty(), marketplacePlugin = remote, targetVersionOverride = selected, preferredChannelOverride = channel, excludedFromUpdatesOverride = versionNumber != null)
         val errorMessage = if (!response.success && response is ActionResponseString) {
             PortalLogger.warn("Update failed for $platform $id: ${response.error ?: "unknown error"}")
             response.error ?: "Update failed"
