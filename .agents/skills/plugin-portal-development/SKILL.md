@@ -38,7 +38,9 @@ and add 127.0.0.1:25565 to the matching local Minecraft client.
 
 Use shared Bukkit Adventure styling for command output on both platforms. Keep
 chat pages short. Append bold headings to an unstyled parent so rows do not
-inherit bold. Put long IDs and result messages in hover/copy actions, and
+inherit bold. Boxed messages default to normal weight; detail lines must never
+inherit heading decorations. Keep info cards centered like the Bukkit command,
+with gray labels, white values, and colored status. Put long IDs and result messages in hover/copy actions, and
 retain full console details. Gate native command discovery as well as execution.
 Verify no-permission and authorized player flows through the proxy after restarts.
 

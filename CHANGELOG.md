@@ -7,6 +7,7 @@
 - Hide command roots, completions, and help from players without view access.
 - Add compact help pages and paged network results with copyable IDs.
 - Show the exact beta version and connection immediately in the info command.
+- Match the centered Bukkit info card and keep detail lines at normal weight.
 - Package one JAR with shared core and Bukkit and Velocity entrypoints.
 - Make all local tools free, including recognition, bulk updates, and the editor.
 - Add paid network enrollment and scoped proxy commands for inventory, install,

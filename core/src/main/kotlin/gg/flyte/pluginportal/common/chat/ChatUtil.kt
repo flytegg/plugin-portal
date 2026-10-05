@@ -32,6 +32,7 @@ fun TextComponent.Builder.appendStartLine() = append(startLine())
 fun TextComponent.Builder.appendEndLine() = append(endLine())
 
 fun Component.boxed(): Component = Component.empty()
+    .decoration(TextDecoration.BOLD, false)
     .append(startLine())
     .append(this)
     .append(endLine())

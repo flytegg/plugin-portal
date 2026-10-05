@@ -7,6 +7,7 @@ import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
 import gg.flyte.pluginportal.common.types.enums.MarketplacePlatform
 import gg.flyte.pluginportal.common.util.getImageComponent
 import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.text.Component
 import revxrsal.commands.annotation.*
 import gg.flyte.pluginportal.common.commands.lamp.CommandPermission
 
@@ -30,7 +31,7 @@ class ViewSubCommand {
             exact = exact,
             ifSingle = { plugin ->
                 if (audience.isConsole()) {
-                    var details = textPrimary(plugin.name).bold()
+                    var details = Component.empty().append(textPrimary(plugin.name).bold())
                         .appendNewline().appendSecondary(plugin.sanitisedDescription ?: "")
                         .appendNewline().appendSecondary("Downloads: ${plugin.totalDownloads}")
                     plugin.platforms.asList().forEach { entry ->
