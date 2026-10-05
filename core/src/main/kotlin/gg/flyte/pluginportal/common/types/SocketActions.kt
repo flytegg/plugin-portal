@@ -187,7 +187,6 @@ class SocketActions {
         ) ?: return@SocketAction PluginActionResponse(false, "Platform switch failed")
 
         LocalPluginCache.remove(localPlugin)
-        LocalPluginCache.addToUpdatedPluginMap(newPlugin, localPlugin)
         LocalPluginCache.save()
         DiscordWebhookNotifier.managedPluginPlatformSwitched(localPlugin, newPlugin, platformPlugin.webpageURL)
         PluginActionResponse(true)

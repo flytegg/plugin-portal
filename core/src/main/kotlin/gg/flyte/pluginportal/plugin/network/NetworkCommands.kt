@@ -33,6 +33,17 @@ class NetworkCommands {
             "${value.get("id").asString}  ${value.get("name").asString} (${value.get("platform").asString}) ${if (value.get("online").asBoolean) "online" else "offline"}${if (value.get("revoked").asBoolean) " revoked" else ""}"
         }.ifEmpty { "No enrolled nodes" }
     }
+    @Subcommand("operations")
+    fun operations(actor: PortalCommandActor) = work(actor) {
+        client.state().getAsJsonArray("operations").take(20).joinToString("\n") { value ->
+            val operation = value.asJsonObject
+            "${operation.get("id").asString} ${operation.getAsJsonObject("action").get("kind").asString}\n" +
+                operation.getAsJsonObject("results").entrySet().joinToString("\n") { (id, result) ->
+                    val outcome = result.asJsonObject
+                    "$id: ${outcome.get("status").asString}${outcome.get("message")?.asString?.let { " - $it" } ?: ""}"
+                }
+        }.ifEmpty { "No recent operations" }
+    }
     @Subcommand("refresh")
     fun refresh(actor: PortalCommandActor, @Named("nodeIds") targetIds: String) = operate(actor, targetIds, NetworkClient.jsonObject("kind" to "inventory"))
     @Subcommand("install")
@@ -46,7 +57,7 @@ class NetworkCommands {
     private fun action(kind: String, platform: String, id: String, version: String?) = NetworkClient.jsonObject("kind" to kind, "platform" to platform.uppercase(), "id" to id).apply { version?.let { addProperty("version", it) } }
     private fun operate(actor: PortalCommandActor, targetIds: String, action: com.google.gson.JsonObject) = work(actor) {
         val operation = client.submit(targetIds.split(','), action)
-        "Operation ${operation.get("id").asString}\n" + operation.getAsJsonObject("results").entrySet().joinToString("\n") { (id, value) -> "$id: ${value.asJsonObject.get("status").asString}" } + "\nUse the dashboard to follow results. Offline nodes are skipped."
+        "Operation ${operation.get("id").asString}\n" + operation.getAsJsonObject("results").entrySet().joinToString("\n") { (id, value) -> "$id: ${value.asJsonObject.get("status").asString}" } + "\nUse network operations or the dashboard to follow results. Offline nodes are skipped."
     }
     private fun work(actor: PortalCommandActor, task: () -> String) {
         PortalApplication.runtime.executor.execute {

@@ -190,7 +190,6 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
 
         if (newPlugin != null) {
             remove(this) // From local plugin cache, as install adds the new version
-            addToUpdatedPluginMap(newPlugin, this)
             save()
             PortalLogger.log(initiator, PortalLogger.Action.UPDATE, target)
             DiscordWebhookNotifier.managedPluginUpdated(
@@ -208,16 +207,25 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
 
     }
 
-    private val updatedPluginMap: HashMap<LocalPlugin, File?> = hashMapOf()
-    fun addToUpdatedPluginMap(newPlugin: LocalPlugin, oldPlugin: LocalPlugin) { updatedPluginMap[newPlugin] = oldPlugin.findFile() }
-    /**
-     * @return The file for the currently installed version of this plugin, if this [LocalPlugin] was installed via an update,
-     *             otherwise null
-     */
-    fun LocalPlugin.popCurrentVersionFile() = updatedPluginMap.remove(this)
-
     private val pluginsFolder get() = Constants.INSTALL_DIRECTORY
     private val updateFolder get() = Constants.UPDATE_DIRECTORY.apply { mkdirs() }
+
+    /** Resolve installed and staged copies from the verified managed JAR, including after a crash. */
+    fun LocalPlugin.managedFiles(): List<File> {
+        val anchor = findFile() ?: return emptyList()
+        require(!Files.isSymbolicLink(anchor.toPath())) { "Symbolic-link plugin JAR" }
+        val metadata = requireNotNull(anchor.getPluginYML()) { "Missing plugin descriptor" }
+        val identity = requireNotNull(metadata["id"] ?: metadata["name"]) { "Missing plugin identity" }
+        return listOf(pluginsFolder, updateFolder).distinctBy { it.canonicalPath }.flatMap { directory ->
+            val matches = directory.listFiles { file -> file.isFile && file.extension == "jar" }.orEmpty().filter { file ->
+                val descriptor = file.getPluginYML()
+                descriptor != null && (descriptor["id"] ?: descriptor["name"]) == identity
+            }
+            require(matches.size <= 1) { "Multiple JARs have this plugin identity; inspect them manually" }
+            require(matches.none { Files.isSymbolicLink(it.toPath()) }) { "Symbolic-link plugin JAR" }
+            matches.toList()
+        }
+    }
 
     fun LocalPlugin.findFile(): File? {
         val files = mutableListOf<File>().apply {

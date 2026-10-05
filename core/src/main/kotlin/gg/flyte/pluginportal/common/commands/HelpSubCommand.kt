@@ -153,7 +153,7 @@ class HelpSubCommand {
             "Example: /pp update LuckPerms --refresh"
         )),
         "updateall" to ("/pp updateAll [--ignoreOutdated]" to listOf(
-            "Premium: update tracked marketplace plugins. Restart to apply updates.",
+            "update tracked marketplace plugins. Restart to apply updates.",
             "Excluded plugins are skipped. Use /pp blacklist to view exclusions.",
             "External plugins use /pp external updateAll."
         )),
@@ -199,34 +199,34 @@ class HelpSubCommand {
             "--yes downloads the update. Restart the server to apply it."
         )),
         "recognize" to ("/pp recognize <file> [--channel <name>]" to listOf(
-            "Premium: track a manually installed JAR that a marketplace recognizes.",
+            "track a manually installed JAR that a marketplace recognizes.",
             "The file must be in plugins/. Recognition can rename it.",
             "--channel saves the channel for future updates."
         )),
         "recognizeall" to ("/pp recognizeAll [--channel <name>]" to listOf(
-            "Premium: recognize untracked JARs in plugins/.",
+            "recognize untracked JARs in plugins/.",
             "Plugin Portal skips itself and managed external files.",
             "An unknown file remains untracked."
         )),
         "editor" to ("/pp editor [status | url | reconnect | stop]" to listOf(
-            "Premium: open a temporary browser editor session.",
+            "open a temporary browser editor session.",
             "Treat the editor URL as a secret. /pp connect is not supported.",
             "Use status to check the connection or stop to end the session."
         )),
         "import" to ("/pp import <mclogs-url>" to listOf(
-            "Premium: install plugins from a /pp export link.",
+            "install plugins from a /pp export link.",
             "The export contains marketplace IDs, not exact versions or plugin configuration."
         )),
         "export" to ("/pp export" to listOf(
-            "Premium: export tracked marketplace IDs to MCLogs.",
+            "export tracked marketplace IDs to MCLogs.",
             "This is not a server backup. External plugins and configuration are not included."
         )),
         "scan" to ("/pp scan <file>" to listOf(
-            "Premium: scan a local JAR with the bundled scanner.",
+            "scan a local JAR with the bundled scanner.",
             "A scan result does not guarantee that a plugin is safe."
         )),
         "external" to ("/pp external <action>" to listOf(
-            "Premium: manage GitHub Releases and GeyserMC plugins.",
+            "manage GitHub Releases and GeyserMC plugins.",
             "Add: /pp external add github <id> <owner> <repo> <asset> [--prereleases]",
             "Add: /pp external add geysermc <id> <project> <artifact>",
             "Import: replace add with import and append <file> before flags.",

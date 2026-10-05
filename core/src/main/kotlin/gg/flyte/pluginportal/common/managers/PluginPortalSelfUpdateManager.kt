@@ -49,7 +49,6 @@ object PluginPortalSelfUpdateManager {
     }
 
     fun downloadMarketplaceUpdate(update: AvailableUpdate, audience: Audience? = null): Boolean {
-        val oldPlugin = LocalPluginCache.firstOrNull { it.isPluginPortal }
         val newPlugin = update.plugin.download(
             update = true,
             marketplacePlatform = null,
@@ -58,7 +57,6 @@ object PluginPortalSelfUpdateManager {
             preferredChannel = update.targetVersion.releaseChannel,
         ) ?: return false
 
-        if (oldPlugin != null) LocalPluginCache.addToUpdatedPluginMap(newPlugin, oldPlugin)
         return true
     }
 

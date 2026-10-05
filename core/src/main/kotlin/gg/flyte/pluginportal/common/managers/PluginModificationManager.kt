@@ -4,8 +4,7 @@ import gg.flyte.pluginportal.common.Constants
 import gg.flyte.pluginportal.common.adapters.DownloadManager
 import gg.flyte.pluginportal.common.adapters.DownloadRequest
 import gg.flyte.pluginportal.common.logging.PortalLogger
-import gg.flyte.pluginportal.common.managers.LocalPluginCache.findFile
-import gg.flyte.pluginportal.common.managers.LocalPluginCache.popCurrentVersionFile
+import gg.flyte.pluginportal.common.managers.LocalPluginCache.managedFiles
 import gg.flyte.pluginportal.common.notifications.DiscordWebhookNotifier
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.enums.MarketplacePlatform
@@ -52,11 +51,11 @@ object PluginModificationManager {
             return ActionResponseString(false, "You cannot delete Plugin Portal")
         }
 
-        val file = localPlugin.findFile()
-        val otherFile = localPlugin.popCurrentVersionFile()
-        val files = listOf(file, otherFile)
+        val files = try { localPlugin.managedFiles() } catch (failure: IllegalArgumentException) {
+            return ActionResponseString(false, failure.message ?: "Could not identify plugin JARs safely")
+        }
 
-        if (file == null && otherFile == null) {
+        if (files.isEmpty()) {
             LocalPluginCache.remove(localPlugin)
             LocalPluginCache.save()
             return ActionResponseString(false, "Could not find plugin jar to delete")

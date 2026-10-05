@@ -24,6 +24,7 @@ import java.util.UUID
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 
 /** The API owns authorization. This client only receives operations for its own node. */
 class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
@@ -32,7 +33,9 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
         .followRedirects(false).followSslRedirects(false).build()
     private val scheduler = ScheduledThreadPoolExecutor(1) { Thread(it, "PluginPortal-network-link").apply { isDaemon = true } }
         .apply { removeOnCancelPolicy = true }
-    private val operations = java.util.concurrent.Executors.newSingleThreadExecutor { Thread(it, "PluginPortal-network-operation").apply { isDaemon = true } }
+    private val operations = java.util.concurrent.ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS,
+        java.util.concurrent.ArrayBlockingQueue(32),
+        { Thread(it, "PluginPortal-network-operation").apply { isDaemon = true } })
     private val closed = AtomicBoolean(false)
     private val credentialFile = File(runtime.dataFolder, "network-node.json")
     private val journalFile = File(runtime.dataFolder, "network-operations.json")
@@ -42,7 +45,7 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
     @Volatile var status: String = "Not enrolled"
         private set
     private var retrySeconds = 2L
-    @Volatile private var generation = 0L
+    private val generation = AtomicLong(0)
     @Volatile private var ready = false
     val isStopped get() = operations.isTerminated
     val nodeId get() = identity?.get("nodeId")?.asString
@@ -98,7 +101,7 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
 
     @Synchronized fun leave() {
         // Removing a local credential does not grant permission to revoke a different node.
-        generation++
+        generation.incrementAndGet()
         identity = null
         socket?.close(1000, "Local disconnect")
         socket = null
@@ -139,27 +142,27 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
 
     private fun connect() {
         if (closed.get() || identity == null) return
-        val current = ++generation
+        val current = generation.incrementAndGet()
         try {
             status = "Connecting"
             val session = request("connect")
-            if (closed.get() || current != generation || identity == null) return
+            if (closed.get() || current != generation.get() || identity == null) return
             check(session.get("nodeId").asString == nodeId && session.get("networkId").asString == identity?.get("networkId")?.asString)
             val url = session.get("websocketUrl").asString
             val uri = URI(url)
-            require(uri.userInfo == null && uri.query == null && uri.fragment == null && (uri.scheme == "wss" || (System.getProperty("pluginportal.dev", "false").toBoolean() && uri.scheme == "ws" && uri.host in setOf("localhost", "127.0.0.1")))) { "Unsafe relay URL" }
+            require(uri.userInfo == null && uri.query == null && uri.fragment == null && (uri.scheme == "wss" || (System.getProperty("pluginportal.dev", "false").toBoolean() && uri.scheme == "ws" && uri.host in setOf("localhost", "127.0.0.1", "host.docker.internal")))) { "Unsafe relay URL" }
             val expiresAt = session.get("expiresAt").asLong
             require(expiresAt > System.currentTimeMillis() && expiresAt <= System.currentTimeMillis() + 310_000)
             socket?.close(1000, "Session renewed")
             socket = transport.newWebSocket(Request.Builder().url(url).header("Authorization", "Bearer ${session.get("ticket").asString}").build(), object : WebSocketListener() {
                 override fun onOpen(webSocket: WebSocket, response: Response) {
-                    if (closed.get() || current != generation) { webSocket.close(1000, "Superseded"); return }
+                    if (closed.get() || current != generation.get()) { webSocket.close(1000, "Superseded"); return }
                     retrySeconds = 2
                     status = "Connected"
                     publishInventory(webSocket)
                 }
                 override fun onMessage(webSocket: WebSocket, text: String) {
-                    if (current != generation || closed.get()) return
+                    if (current != generation.get() || closed.get()) return
                     if (text == "pong") return
                     if (text.toByteArray().size > 256 * 1024) { webSocket.close(1008, "Message too large"); return }
                     try {
@@ -169,7 +172,10 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
                             "ready" -> require(message.get("nodeId").asString == nodeId)
                             "operation" -> {
                                 val operation = message.getAsJsonObject("operation").deepCopy()
-                                operations.execute { execute(operation) }
+                                try { operations.execute { execute(operation) } }
+                                catch (_: java.util.concurrent.RejectedExecutionException) {
+                                    operation.get("id")?.asString?.takeIf(::validId)?.let { sendResult(it, result("failed", "Node operation queue is full; submit a new operation later.")) }
+                                }
                             }
                             else -> error("Invalid message")
                         }
@@ -179,24 +185,24 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
                 override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) = reconnect(current)
                 override fun onClosing(webSocket: WebSocket, code: Int, reason: String) { webSocket.close(code, reason) }
             })
-            scheduler.schedule({ if (current == generation) connect() }, maxOf(1, expiresAt - System.currentTimeMillis() - 60_000), TimeUnit.MILLISECONDS)
-            scheduler.schedule({ if (current == generation) heartbeat(current) }, 30, TimeUnit.SECONDS)
+            scheduler.schedule({ if (current == generation.get()) connect() }, maxOf(1, expiresAt - System.currentTimeMillis() - 60_000), TimeUnit.MILLISECONDS)
+            scheduler.schedule({ if (current == generation.get()) heartbeat(current) }, 30, TimeUnit.SECONDS)
         } catch (_: Exception) { reconnect(current) }
     }
     private fun heartbeat(current: Long) {
-        if (closed.get() || current != generation) return
+        if (closed.get() || current != generation.get()) return
         socket?.send("ping")
         publishInventory()
         scheduler.schedule({ heartbeat(current) }, 30, TimeUnit.SECONDS)
     }
     private fun reconnect(current: Long) {
-        if (closed.get() || current != generation) return
+        if (closed.get() || !generation.compareAndSet(current, current + 1)) return
         status = "Disconnected; retrying enrollment authorization"
         // Fence duplicate failure/close callbacks so each session schedules one retry.
-        val retryGeneration = ++generation
+        val retryGeneration = current + 1
         val delay = retrySeconds + java.util.concurrent.ThreadLocalRandom.current().nextLong(0, 3)
         retrySeconds = minOf(60, retrySeconds * 2)
-        scheduler.schedule({ if (retryGeneration == generation) connect() }, delay, TimeUnit.SECONDS)
+        scheduler.schedule({ if (retryGeneration == generation.get()) connect() }, delay, TimeUnit.SECONDS)
     }
 
     private fun execute(operation: JsonObject) {
@@ -210,6 +216,7 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
             if (existing.get("action").asString == fingerprint) sendResult(id, existing.getAsJsonObject("result"))
             return
         }
+        if (closed.get() || identity == null) { sendResult(id, result("skipped", "Node disconnected before execution")); return }
         if (expiresAt <= System.currentTimeMillis() || expiresAt > System.currentTimeMillis() + 310_000) {
             sendResult(id, result("skipped", "Operation expired before execution")); return
         }
@@ -230,14 +237,16 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
                     "uninstall" -> actions.uninstall.run(action)
                     else -> error("Unsupported operation")
                 }
-                if (response.success) result("staged", "Files changed; restart this node to apply the change.")
+                if (response.success && response.message == "Plugin is already up to date") result("succeeded", response.message)
+                else if (response.success) result("staged", "Files changed; restart this node to apply the change.")
                 else result("failed", response.message ?: "Operation failed")
             }
             entry.add("result", outcome)
             saveJournal()
             sendResult(id, outcome)
             publishInventory()
-        } catch (_: Exception) {
+        } catch (failure: Exception) {
+            runtime.logger.warning("Network operation interrupted: ${failure.javaClass.simpleName} at ${failure.stackTrace.take(5).joinToString()}")
             val outcome = result("unknown", "Operation interrupted; inspect installed files before retrying.")
             entry.add("result", outcome)
             runCatching { saveJournal() }
@@ -290,7 +299,7 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
 
     override fun close() {
         if (!closed.compareAndSet(false, true)) return
-        generation++
+        generation.incrementAndGet()
         socket?.close(1000, "Node stopping")
         scheduler.shutdownNow()
         operations.shutdown()

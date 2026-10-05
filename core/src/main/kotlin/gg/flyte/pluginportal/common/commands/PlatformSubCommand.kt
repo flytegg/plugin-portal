@@ -90,7 +90,6 @@ class PlatformSubCommand {
             ) ?: return audience.sendFailure("Failed to switch ${localPlugin.name} to ${targetPlatform.name}.")
 
             LocalPluginCache.remove(localPlugin)
-            LocalPluginCache.addToUpdatedPluginMap(newPlugin, localPlugin)
             LocalPluginCache.save()
 
             DiscordWebhookNotifier.managedPluginPlatformSwitched(localPlugin, newPlugin, platformPlugin.webpageURL)
