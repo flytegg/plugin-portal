@@ -64,6 +64,9 @@ or ask for help in [Discord](https://flyte.gg/discord). Include `/pp info`, the
 server version, and the exact command and error. Do not share API keys or editor links.
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) for build and test commands.
+For a persistent local proxy and backend, see the sibling API repository's
+`docs/network-playground.md`. The universal candidate is `4.0.0-beta.1` and is
+not published yet.
 Report security problems as described in [SECURITY.md](SECURITY.md).
 
 This repository contains the Minecraft plugin. The hosted API, dashboard, release

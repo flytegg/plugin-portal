@@ -32,5 +32,9 @@ bun run smoke:network in ../plugin-portal-api. This uses disposable OrbStack
 containers and local Durable Objects. Inspect failures, fix the flow, and rerun.
 Never substitute a compile for an actual install/update/restart check.
 
+For requested persistent servers and console access, follow the sibling API's
+docs/network-playground.md. Keep the backend private, use modern forwarding,
+and add 127.0.0.1:25565 to the matching local Minecraft client.
+
 Keep COMMANDS.md, README, docs/network-mvp.md and hosted command docs synchronized.
 Record local, CI, cloud deployment, and production evidence separately.
