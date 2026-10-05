@@ -4,8 +4,10 @@ Use `/pp`, `/pluginportal`, or `/ppm`. In the server console, omit `/`.
 Use `/pp help <command>` for instructions, for example `/pp help update`.
 Quote names, filenames, or version labels that contain spaces.
 
-Plugin Portal uses one JAR. Premium commands unlock when the server validates
-an eligible key. A command permission does not grant Premium access.
+Plugin Portal uses one JAR. All local management is free. Network management
+requires an active account entitlement checked by the hosted API. A permission
+does not grant network access. On Velocity, replace `/pp` with `/ppv`.
+`/ppnetwork` is an alias for `/ppv network`.
 
 ## Start here
 
@@ -19,8 +21,8 @@ Plugin Portal supports marketplace plugins from Modrinth, Hangar, SpigotMC,
 and free Polymart listings. A marketplace entry must provide a downloadable
 JAR. Paid Polymart downloads are not supported.
 
-Plugin Portal manages Bukkit-compatible server plugins. It does not manage
-datapacks or install plugins on proxy servers.
+Plugin Portal manages Bukkit-compatible plugins and Velocity proxy plugins.
+BungeeCord, datapacks, and paid Polymart downloads are outside this release.
 
 ## Find and list plugins
 
@@ -58,7 +60,7 @@ use the project ID, such as `P1OZGk5p`, rather than the URL slug.
 | --- | --- | --- |
 | `/pp install <name> [platform] [channel] [--byId] [--exact] [--version <version>]` | `pluginportal.manage.install` | Download a compatible plugin JAR. |
 | `/pp update <name> [--byId] [--ignoreOutdated] [--refresh] [--channel <name>] [--version <version>]` | `pluginportal.maintain.update` | Update one tracked plugin. |
-| `/pp updateAll [--ignoreOutdated]` | `pluginportal.maintain.update` | Update tracked marketplace plugins. Requires Premium. |
+| `/pp updateAll [--ignoreOutdated]` | `pluginportal.maintain.update` | Update tracked marketplace plugins. |
 | `/pp blacklist [name] [--byId]` | `pluginportal.maintain.update` | Toggle exclusion from `updateAll`. With no name, list exclusions. |
 | `/pp platform <name> <platform> [--byId]` | `pluginportal.maintain.update` | Download a compatible version from another linked marketplace. |
 | `/pp uninstall <name> [--byId]` | `pluginportal.manage.uninstall` | Remove a tracked plugin JAR. Alias: `/pp delete`. |
@@ -100,7 +102,7 @@ update still works. Plugin Portal refuses to uninstall itself.
 
 ## Recognize existing JARs
 
-These commands require Premium and `pluginportal.manage.recognize`.
+These commands require `pluginportal.manage.recognize`.
 
 ```text
 /pp recognize "Example.jar" [--channel <name>]
@@ -119,7 +121,7 @@ Back up your server before replacing manually installed files.
 
 ## External plugins
 
-External sources require Premium and `pluginportal.manage.external`.
+External sources require `pluginportal.manage.external`.
 They use `external-plugins.yml`, separately from marketplace tracking.
 GitHub Releases and GeyserMC are supported. Jenkins is not supported.
 See [external source setup](docs/adapters.md) for complete examples.
@@ -144,7 +146,7 @@ Use unique filenames. Plugin Portal rejects ambiguous asset matches and checks
 provider-supplied SHA-256 digests. GitHub assets without a digest remain supported.
 Do not add new entries to the old `adapters.yml` file.
 
-## Premium access
+## Legacy API key support
 
 Use `/pp key set <key>` to validate and save a key. Access refreshes in the same
 session. A restart is not normally required. Use `/pp info` to check the result.
@@ -167,7 +169,7 @@ license state from `/pp info`, not the key itself.
 
 ## Temporary web editor
 
-Editor commands require Premium and `pluginportal.manage.editor`.
+Editor commands require `pluginportal.manage.editor`.
 
 | Command | What it does |
 | --- | --- |
@@ -185,9 +187,9 @@ again. `/pp connect` is not supported.
 
 | Command | Permission | What it does |
 | --- | --- | --- |
-| `/pp export` | `pluginportal.manage.export` | Upload tracked marketplace IDs to MCLogs. Premium. |
-| `/pp import <mclogs-url>` | `pluginportal.manage.import` | Install the exported marketplace plugins. Premium. |
-| `/pp scan <file>` | `pluginportal.manage.scan` | Run the bundled Hangar JAR scanner locally. Premium. |
+| `/pp export` | `pluginportal.manage.export` | Upload tracked marketplace IDs to MCLogs. Free local tool. |
+| `/pp import <mclogs-url>` | `pluginportal.manage.import` | Install the exported marketplace plugins. Free local tool. |
+| `/pp scan <file>` | `pluginportal.manage.scan` | Run the bundled Hangar JAR scanner locally. Free local tool. |
 | `/pp dump` | `pluginportal.dump` | Upload a support dump to MCLogs. |
 | `/pp support <code>` | `pluginportal.admin` | Upload a diagnostic bundle with the 8-digit code supplied by support. The bundle expires in 24 hours. |
 | `/pp reload` | `pluginportal.manage.config` | Reload configuration and local tracking files. |
@@ -238,7 +240,48 @@ commands to change authentication. Restart the server to apply JAR changes.
 | New upstream release is missing | Try `/pp update <name> --refresh`. If it is still missing, report the marketplace URL and version. API catalog scans can lag. |
 | No compatible version | Check the Minecraft version, server type, and selected channel. Do not force a client mod or datapack into the plugin folder. |
 | Download succeeded but old code still runs | Restart the server to apply the staged update. |
-| Premium command is locked | Check `/pp info`. Set a valid key. If validation fails, include the error in a support request without sharing the key. |
+| Network access is denied | Check the account purchase, node role, and enrollment. Never share the node credential or enrollment code. |
 | Editor session is missing | Run `/pp editor` again. |
 | External asset is ambiguous | Change the asset selector to match one JAR. |
 | Command is disabled | Check `EnabledFeatures` and run `/pp reload`. |
+
+## Paid network management
+
+Open the dashboard, create a network, and issue an enrollment code per node.
+Choose `node` for a backend and `controller` for a proxy that will initiate operations.
+Enrollment and leaving are console-only. All network commands require
+`pluginportal.network` (or the platform admin permission). Controllers require a
+current paid owner entitlement for listing and operating on the network.
+
+| Command | Purpose |
+| --- | --- |
+| `/pp network enroll <code>` | Consume a one-use code and save a private node credential. |
+| `/pp network leave` | Delete the local credential; revoke the old node in the dashboard too. |
+| `/pp network status` | Show local connection state, node ID, and role. |
+| `/pp network list` | Show node IDs and online state. Controller only. |
+| `/pp network operations` | Show recent per-node operation outcomes. Controller only. |
+| `/pp network refresh <nodeIds>` | Refresh inventories on explicit targets. |
+| `/pp network install <nodeIds> <platform> <pluginId> [version]` | Install compatible catalog artifacts. |
+| `/pp network update <nodeIds> <platform> <pluginId> [version]` | Stage compatible updates; respect each node's blacklist. |
+| `/pp network uninstall <nodeIds> <platform> <pluginId>` | Remove managed JARs; retain data folders. |
+
+Use comma-separated UUIDs without spaces for `nodeIds`. On Velocity use
+`/ppv network` or `/ppnetwork`. Example:
+
+```text
+ppnetwork install <backend-uuid>,<proxy-uuid> MODRINTH Vebnzrzj
+ppnetwork operations
+```
+
+The dashboard also supports release-channel selection, enrollment, node revocation,
+inventory, operation history, and reviewing retry targets. Each retry creates a new
+operation. Inspect unknown outcomes on disk before retrying. Offline nodes are
+skipped and work is never queued for a future connection.
+
+Network operations support catalog inventory, install, update, and uninstall.
+Arbitrary URLs, console commands, restarts, and configuration changes are not remote
+operations. Local feature switches and blacklists still apply. Restart each node
+to apply JAR changes. Velocity applies pending replacements at graceful shutdown;
+a crash leaves them staged until the next successful graceful shutdown.
+
+See [network architecture and operating guide](docs/network-mvp.md).

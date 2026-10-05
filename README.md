@@ -1,7 +1,7 @@
 # Plugin Portal
 
 Plugin Portal installs, updates, and manages plugins on Bukkit-compatible Minecraft
-servers. Search Modrinth, Hangar, SpigotMC, and free Polymart listings from chat
+servers and Velocity proxies. One JAR contains every platform and feature. Search Modrinth, Hangar, SpigotMC, and free Polymart listings from chat
 or the server console.
 
 ## Get started
@@ -11,6 +11,9 @@ or the server console.
 3. Run `/pp search ViaVersion`.
 4. Run `/pp install ViaVersion MODRINTH`.
 5. Restart the server to load the plugin.
+
+On Velocity, use `/ppv` instead of `/pp`. The proxy also exposes `/ppnetwork` for
+network management and leaves backend `/pp` commands available.
 
 Use `/pp help <command>` for command details. Use `/pp list --outdated` to check
 for updates. Chat results have page controls. Console lists show all entries by
@@ -27,29 +30,32 @@ You can select a release channel or an exact compatible version. Exact versions
 are excluded from bulk updates until you remove the exclusion with `/pp blacklist`.
 Updates take effect after a server restart.
 
-The plugin targets Java 17 or later. Use the Java version required by your server.
-The full runtime checks pass on Paper 1.21.11 and Paper 1.8.8 with Java 21,
-and Paper 26.2 build 129 with Java 25. Paper 26.3 build 143 (beta) passes the full
-check against the production API with Java 25.
-Java 8 hosts are not supported. See [contributing](CONTRIBUTING.md).
+The shared plugin code targets Java 17 or later. Use the Java version required by
+your server. The universal MVP is checked with Paper 1.21.11 and Velocity 3.4.0
+on Java 21. Other Bukkit-family adapters compile; their runtime checks are separate.
+Java 8, BungeeCord, datapacks, and paid Polymart downloads are outside this release.
+A marketplace listing must supply a compatible downloadable JAR.
 
-Datapack management, proxy-server plugins, and paid Polymart downloads are not
-supported. A marketplace listing must supply a downloadable compatible JAR.
+## Free local tools and paid networks
 
-## Premium
+All local commands are free: recognition, bulk updates, external sources,
+import/export, JAR scanning, and the temporary web editor are included.
+A local command permission still applies.
 
-The same JAR contains the free and Premium commands. A valid Plugin Portal key
-unlocks recognition, bulk marketplace updates, external sources, import/export,
-JAR scanning, and the temporary web editor.
+Paid network management uses your account on the hosted Plugin Portal API. Open
+[the dashboard](https://pluginportal.link/dashboard), create a network, and generate
+an enrollment code for each backend and proxy. Run the generated command in the
+node console. Give the proxy controller access to manage enrolled nodes from there.
 
-Run `/pp key set <key>`, then `/pp info` to check access. A valid key refreshes
-access without a restart. Marketplace-delivered licenses can import automatically.
-See [license import](docs/marketplace-license-import.md).
+Run `/ppv network list` to find node IDs. Submit an operation with explicit IDs,
+then use `/ppv network operations` or the dashboard to inspect per-node results.
+Offline nodes are skipped. File changes require a restart of each affected node.
+See [network setup and security](docs/network-mvp.md).
 
-Single-plugin install/update, version and channel selection, and Plugin Portal
-self-upgrade do not require Premium.
-
-[Get Plugin Portal Premium](https://polymart.org/product/6974/plugin-portal-premium)
+Network access depends on the hosted API and a current entitlement. A modified
+client cannot grant itself access to the hosted service. Source is available under
+[LICENSE.md](LICENSE.md), which restricts entitlement bypass and unauthorized
+network service access. It does not make Java bytecode impossible to modify.
 
 ## Support and contributions
 

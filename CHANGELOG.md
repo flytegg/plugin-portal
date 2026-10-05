@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+### 4.0.0 universal network candidate
+
+- Package one JAR with shared core and Bukkit and Velocity entrypoints.
+- Make all local tools free, including recognition, bulk updates, and the editor.
+- Add paid network enrollment and scoped proxy commands for inventory, install,
+  update, and uninstall across explicit backend and proxy targets.
+- Select artifacts for each platform and stage Velocity updates at shutdown.
+- Persist operation results and recover connections without replaying mutations.
+- Fix cache removal and uninstalling installed plus pending plugin versions.
+- Enforce hosted authorization rather than embedding account keys in universal JARs.
+- Publish the architecture, recovery, security, and local integration workflow.
+
+The candidate is built and tested locally on Paper 1.21.11 and Velocity 3.4.0 with
+Java 21. It is not published or deployed to production.
+
 ### 3.8.9 candidate
 
 Prepared for release. The JAR is not published yet.
