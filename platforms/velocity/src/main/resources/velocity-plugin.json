@@ -1,0 +1,1 @@
+{"id":"pluginportal","name":"PluginPortal","version":"${version}","description":"Local and network plugin management","authors":["Flyte"],"url":"https://pluginportal.gg","main":"gg.flyte.pluginportal.velocity.VelocityPluginPortal"}
