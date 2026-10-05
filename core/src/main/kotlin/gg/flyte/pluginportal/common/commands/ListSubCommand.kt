@@ -56,7 +56,7 @@ class ListSubCommand {
         @Optional @Flag("page") page: Int? = null,
         @Switch("full") full: Boolean = false,
         @Optional @Flag("server") @SuggestWith(ServerTargetSuggestionProvider::class) server: String? = null,
-        @Optional @Flag("servers") @SuggestWith(ServerTargetSuggestionProvider::class) servers: String? = null,
+        @Optional @Flag(value = "servers", shorthand = 'S') @SuggestWith(ServerTargetSuggestionProvider::class) servers: String? = null,
     ) {
         if (ServerTargets.requested(actor, server, servers) { selection ->
             require(!outdated && !externalOnly) { "Remote inventory does not support --outdated or --external." }

@@ -45,7 +45,7 @@ class InstallSubCommand {
         @Optional @Switch(value="exact", shorthand='e') exact: Boolean = false,
         @Optional @Flag("version") @Named("version") versionNumber: String? = null,
         @Optional @Flag("server") @SuggestWith(ServerTargetSuggestionProvider::class) server: String? = null,
-        @Optional @Flag("servers") @SuggestWith(ServerTargetSuggestionProvider::class) servers: String? = null,
+        @Optional @Flag(value = "servers", shorthand = 'S') @SuggestWith(ServerTargetSuggestionProvider::class) servers: String? = null,
     ) {
         if (ServerTargets.requested(actor, server, servers) { selection -> ServerTargets.install(actor, selection, name, platform, byId, exact, versionNumber, channel) }) return
 

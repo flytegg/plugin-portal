@@ -27,7 +27,7 @@ class DeleteSubCommand {
         @Named("name") @SuggestWith(InstalledPluginNotPortalSuggestionProvider::class) name: String,
         @Switch("byId") byId: Boolean = false,
         @Optional @Flag("server") @SuggestWith(ServerTargetSuggestionProvider::class) server: String? = null,
-        @Optional @Flag("servers") @SuggestWith(ServerTargetSuggestionProvider::class) servers: String? = null,
+        @Optional @Flag(value = "servers", shorthand = 'S') @SuggestWith(ServerTargetSuggestionProvider::class) servers: String? = null,
     ) {
         if (ServerTargets.requested(actor, server, servers) { selection -> ServerTargets.change(actor, selection, "uninstall", name, byId) }) return
 
