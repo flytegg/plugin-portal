@@ -22,6 +22,7 @@ import gg.flyte.pluginportal.common.commands.lamp.CommandPermission
 class HelpSubCommand {
 
     @CommandPlaceholder
+    @CommandPermission("pluginportal.view")
     fun rootCommand(audience: Audience) = helpCommand(audience)
 
     @Subcommand("help")

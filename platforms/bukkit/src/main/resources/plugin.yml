@@ -10,12 +10,42 @@ commands:
   pp:
     description: Manage plugins on this server
     aliases: [pluginportal, ppm]
+    permission: pluginportal.view
+    permission-message: You do not have permission to use Plugin Portal.
 permissions:
   pluginportal.*:
     default: op
     children:
       pluginportal.admin: true
+  pluginportal.admin:
+    default: op
+    children:
+      pluginportal.view: true
+      pluginportal.dump: true
       pluginportal.manage.*: true
+      pluginportal.maintain.*: true
       pluginportal.network: true
+  pluginportal.view:
+    default: op
+  pluginportal.dump:
+    default: op
+  pluginportal.manage.*:
+    default: op
+    children:
+      pluginportal.manage: true
+      pluginportal.manage.config: true
+      pluginportal.manage.editor: true
+      pluginportal.manage.export: true
+      pluginportal.manage.external: true
+      pluginportal.manage.import: true
+      pluginportal.manage.install: true
+      pluginportal.manage.install-url: true
+      pluginportal.manage.recognize: true
+      pluginportal.manage.scan: true
+      pluginportal.manage.uninstall: true
+  pluginportal.maintain.*:
+    default: op
+    children:
+      pluginportal.maintain.update: true
   pluginportal.network:
     default: op

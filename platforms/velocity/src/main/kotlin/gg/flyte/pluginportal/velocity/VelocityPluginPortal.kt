@@ -34,6 +34,7 @@ class VelocityPluginPortal @Inject constructor(
     fun initialize(event: ProxyInitializeEvent) {
         PortalApplication.start(VelocityRuntime(proxy, dataDirectory.toFile()))
         proxy.commandManager.register(proxy.commandManager.metaBuilder("ppv").aliases("pluginportalvelocity").plugin(this).build(), object : SimpleCommand {
+            override fun hasPermission(invocation: SimpleCommand.Invocation) = allows(invocation.source(), "pluginportal.view")
             override fun execute(invocation: SimpleCommand.Invocation) {
                 PluginPortalBase.lamp.dispatch(actor(invocation.source()), "pp " + invocation.arguments().joinToString(" "))
             }
@@ -41,6 +42,7 @@ class VelocityPluginPortal @Inject constructor(
                 PluginPortalBase.lamp.autoCompleter().complete(actor(invocation.source()), "pp " + invocation.arguments().joinToString(" "))
         })
         proxy.commandManager.register(proxy.commandManager.metaBuilder("ppnetwork").plugin(this).build(), object : SimpleCommand {
+            override fun hasPermission(invocation: SimpleCommand.Invocation) = allows(invocation.source(), "pluginportal.network")
             override fun execute(invocation: SimpleCommand.Invocation) {
                 PluginPortalBase.lamp.dispatch(actor(invocation.source()), "ppnetwork " + invocation.arguments().joinToString(" "))
             }
@@ -48,6 +50,9 @@ class VelocityPluginPortal @Inject constructor(
                 PluginPortalBase.lamp.autoCompleter().complete(actor(invocation.source()), "ppnetwork " + invocation.arguments().joinToString(" "))
         })
     }
+
+    private fun allows(source: CommandSource, permission: String) =
+        source !is Player || source.hasPermission(permission) || source.hasPermission("pluginportal.admin")
 
     private fun actor(source: CommandSource): PortalCommandActor {
         val player = source as? Player
@@ -63,7 +68,7 @@ class VelocityPluginPortal @Inject constructor(
             override fun sendMessage(identity: Identity, message: Component, type: MessageType) = source.sendMessage(identity, proxyCommands(message), type)
         }
         return PortalCommandActor(audience, name, id, player == null) { permission ->
-            player == null || source.hasPermission(permission) || source.hasPermission("pluginportal.admin")
+            allows(source, permission)
         }
     }
 

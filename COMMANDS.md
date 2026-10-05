@@ -9,6 +9,13 @@ requires an active account entitlement checked by the hosted API. A permission
 does not grant network access. On Velocity, replace `/pp` with `/ppv`.
 `/ppnetwork` is an alias for `/ppv network`.
 
+Command discovery and help require `pluginportal.view`. Grant it alongside the
+specific action permissions for limited roles. Players without it cannot see
+or complete the command root. On Bukkit, operators and `pluginportal.admin`
+receive local command access by default. Velocity uses its permission provider;
+give proxy administrators `pluginportal.admin`. Network commands still require
+`pluginportal.network` and a hosted entitlement.
+
 ## Start here
 
 1. Put `PluginPortal-<version>.jar` in `plugins/`.

@@ -44,7 +44,8 @@ open class PluginPortal : JavaPlugin() {
 
     private fun actor(sender: CommandSender) = PortalCommandActor(
         CommandSenderAudience(sender, audiences), sender.name,
-        (sender as? Player)?.uniqueId ?: UUID(0, 0), sender is ConsoleCommandSender, sender::hasPermission,
+        (sender as? Player)?.uniqueId ?: UUID(0, 0), sender is ConsoleCommandSender,
+        { permission -> sender.hasPermission(permission) || sender.hasPermission("pluginportal.admin") },
     )
     fun refreshEntitlement() = PortalApplication.refreshEntitlement()
     fun isAuthed() = PortalApplication.isAuthed()
