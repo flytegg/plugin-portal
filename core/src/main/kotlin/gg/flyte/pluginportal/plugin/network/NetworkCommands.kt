@@ -10,6 +10,7 @@ import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor.*
 import revxrsal.commands.annotation.*
+import revxrsal.commands.node.ExecutionContext
 
 @Command("pp network", "ppnetwork")
 @CommandPermission("pluginportal.network")
@@ -17,7 +18,34 @@ class NetworkCommands {
     private val client get() = PortalApplication.network
 
     @CommandPlaceholder
-    fun root(actor: PortalCommandActor) = help(actor)
+    fun root(actor: PortalCommandActor, context: ExecutionContext<PortalCommandActor>) {
+        val path = context.input().source().substringAfter(' ', "").trim()
+        val action = (if (path.startsWith("network")) path.substringAfter(' ', "") else path).substringBefore(' ')
+        if (action.isEmpty()) help(actor)
+        else if (!showCommandHelp(actor, action)) actor.audience.sendFailure("Unknown network command. Use /pp network help for available actions.")
+    }
+
+    fun showCommandHelp(actor: PortalCommandActor, action: String): Boolean {
+        val help = commandHelp[action.lowercase()] ?: return false
+        actor.audience.sendMessage(Component.empty().append(textPrimary(help.first).bold())
+            .appendNewline().append(textSecondary(help.second))
+            .appendNewline().append(textDark("Restart nodes to apply JAR changes.")).boxed())
+        return true
+    }
+
+    private val commandHelp = mapOf(
+        "help" to ("/pp network help" to "Show network actions and usage hints."),
+        "status" to ("/pp network status" to "Show this node's connection, ID, and role."),
+        "list" to ("/pp network list [--page <number>] [--full]" to "Show enrolled nodes. Use --page or --full, not both."),
+        "operations" to ("/pp network operations [--page <number>] [--full]" to "Show recent results. Use --page or --full, not both."),
+        "operation" to ("/pp network operation <operationId> [--page <number>] [--full]" to "Show outcomes for one operation. Copy its full UUID from operations."),
+        "refresh" to ("/pp network refresh <nodeIds>" to "Refresh inventories. Use comma-separated node UUIDs without spaces."),
+        "install" to ("/pp network install <nodeIds> <platform> <pluginId> [version]" to "Install a catalog plugin on explicit targets. Use comma-separated node UUIDs."),
+        "update" to ("/pp network update <nodeIds> <platform> <pluginId> [version]" to "Update a catalog plugin on explicit targets. Use comma-separated node UUIDs."),
+        "uninstall" to ("/pp network uninstall <nodeIds> <platform> <pluginId>" to "Remove a managed plugin and retain its data folder."),
+        "enroll" to ("/pp network enroll <code>" to "Console only. Use the one-use enrollment code from your dashboard."),
+        "leave" to ("/pp network leave" to "Console only. Remove this node's local credential; revoke it in the dashboard too."),
+    )
 
     @Subcommand("help")
     fun help(actor: PortalCommandActor) {

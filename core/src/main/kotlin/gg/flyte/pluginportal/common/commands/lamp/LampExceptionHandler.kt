@@ -15,7 +15,7 @@ class LampExceptionHandler: DefaultExceptionHandler<PortalCommandActor>() {
 
 
     override fun onMissingArgument(ex: MissingArgumentException, actor: PortalCommandActor, parameter: ParameterNode<PortalCommandActor, *>) {
-        actor.audience.sendFailure("No value provided for ${parameter.name()}") // Doesn't actually run in v4 with @CommandPlaceholder
+        actor.audience.sendFailure("No value provided for ${parameter.name()}")
     }
 
     @HandleException
@@ -44,7 +44,7 @@ class LampExceptionHandler: DefaultExceptionHandler<PortalCommandActor>() {
     }
 
     override fun onEnumNotFound(ex: EnumNotFoundException, actor: PortalCommandActor) {
-        actor.audience.sendFailure("${ex.input()} is not recognised}")  // Generic because they removed parameters
+        actor.audience.sendFailure("${ex.input()} is not recognised.")
     }
 
 //    override fun invalidEnumValue(actor: CommandActor, exception: EnumNotFoundException) {

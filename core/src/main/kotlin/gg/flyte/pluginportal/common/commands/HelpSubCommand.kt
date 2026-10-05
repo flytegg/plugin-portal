@@ -11,6 +11,9 @@ import revxrsal.commands.annotation.Subcommand
 import revxrsal.commands.annotation.Named
 import revxrsal.commands.annotation.Optional
 import gg.flyte.pluginportal.common.commands.lamp.CommandPermission
+import gg.flyte.pluginportal.common.commands.lamp.PortalCommandActor
+import gg.flyte.pluginportal.plugin.network.NetworkCommands
+import revxrsal.commands.node.ExecutionContext
 
 @Command("pp", "pluginportal", "ppm")
 @CommandPermission("pluginportal.view")
@@ -18,7 +21,27 @@ class HelpSubCommand {
 
     @CommandPlaceholder
     @CommandPermission("pluginportal.view")
-    fun rootCommand(audience: Audience) = helpCommand(audience)
+    fun rootCommand(actor: PortalCommandActor, context: ExecutionContext<PortalCommandActor>) {
+        val path = context.input().source().substringAfter(' ', "").trim()
+        val topic = path.substringBefore(' ')
+        if (topic.equals("network", ignoreCase = true)) {
+            if (!actor.hasPermission("pluginportal.network")) {
+                actor.audience.sendFailure("You do not have permission to use network commands.")
+                return
+            }
+            val action = path.substringAfter(' ', "").trim().substringBefore(' ')
+            val network = NetworkCommands()
+            if (action.isEmpty()) network.help(actor)
+            else if (!network.showCommandHelp(actor, action)) {
+                actor.audience.sendFailure("Unknown network command. Use /pp network help for available actions.")
+            }
+            return
+        }
+        if (topic.isEmpty()) helpCommand(actor.audience)
+        else if (!showCommandHelp(actor.audience, topic)) {
+            actor.audience.sendFailure("Unknown command. Use /pp help for available commands.")
+        }
+    }
 
     @Subcommand("help")
     @CommandPermission("pluginportal.view")
@@ -28,17 +51,7 @@ class HelpSubCommand {
     ) {
         val pageNumber = topic.toIntOrNull()
         if (pageNumber == null) {
-            val command = when (topic.lowercase()) {
-                "delete" -> "uninstall"
-                "version" -> "info"
-                "config" -> "reload"
-                else -> topic.lowercase()
-            }
-            val help = commandHelp[command]
-                ?: return audience.sendFailure("Unknown topic. Use /pp help or /pp help <command>.")
-            var message = Component.empty().append(textPrimary(help.first).bold())
-            help.second.forEach { message = message.appendNewline().append(textSecondary(it)) }
-            audience.sendMessage(message.boxed())
+            if (!showCommandHelp(audience, topic)) audience.sendFailure("Unknown topic. Use /pp help or /pp help <command>.")
             return
         }
         if (pageNumber !in helpPages.indices.map { it + 1 }) {
@@ -51,6 +64,20 @@ class HelpSubCommand {
             message = message.appendNewline().append(helpLine(command, description))
         }
         audience.sendMessage(message.appendNewline().appendNewline().append(footer(pageNumber)).boxed())
+    }
+
+    fun showCommandHelp(audience: Audience, topic: String): Boolean {
+        val command = when (topic.lowercase()) {
+            "delete" -> "uninstall"
+            "version" -> "info"
+            "config" -> "reload"
+            else -> topic.lowercase()
+        }
+        val help = commandHelp[command] ?: return false
+        var message = Component.empty().append(textPrimary(help.first).bold())
+        help.second.forEach { message = message.appendNewline().append(textSecondary(it)) }
+        audience.sendMessage(message.boxed())
+        return true
     }
 
     private val helpPages = listOf(
@@ -87,6 +114,10 @@ class HelpSubCommand {
     )
 
     private val commandHelp = mapOf(
+        "help" to ("/pp help [page or command]" to listOf(
+            "Choose page 1 to 3, or a command name.",
+            "Example: /pp help platform"
+        )),
         "install" to ("/pp install <name> [platform] [channel] [--byId] [--exact] [--version <version>]" to listOf(
             "Install a compatible plugin. Restart the server to load it.",
             "Quote names with spaces. --byId requires a platform and its project ID.",
@@ -129,6 +160,8 @@ class HelpSubCommand {
         )),
         "platform" to ("/pp platform <name> <platform> [--byId]" to listOf(
             "Switch to another marketplace source for the same merged plugin.",
+            "Platforms: MODRINTH, HANGAR, SPIGOTMC, POLYMART.",
+            "Example: /pp platform LuckPerms MODRINTH",
             "Restart after the download."
         )),
         "uninstall" to ("/pp uninstall <name> [--byId]" to listOf(

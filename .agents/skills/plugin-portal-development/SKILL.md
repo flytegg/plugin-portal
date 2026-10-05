@@ -15,6 +15,8 @@ use pp; Velocity exposes ppv and ppnetwork without intercepting backend pp.
 Capture the native command label per invocation. Help, hover hints, pagination,
 and asynchronous action buttons must retain that alias, including the shorter
 ppnetwork path. Do not store the current alias in shared or thread-local state.
+Missing or invalid arguments must show the attempted command's usage. Keep
+parser explanations, but never replace them with the general command menu.
 
 Use numbered prereleases (4.0.0-beta.N) until the universal release is promoted.
 Gradle defaults prereleases to Modrinth beta/alpha and Hangar Snapshot. Never send

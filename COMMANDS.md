@@ -11,6 +11,8 @@ does not grant network access. On Velocity, replace `/pp` with `/ppv`.
 Help, hover hints, and command buttons keep the alias you entered. For example,
 `/ppnetwork help` suggests `/ppnetwork list`, while `/ppv network help` suggests
 `/ppv network list`.
+Missing or invalid arguments show help for that command. For example,
+`/ppv platform` shows platform usage and an example.
 
 Command discovery and help require `pluginportal.view`. Grant it alongside the
 specific action permissions for limited roles. Players without it cannot see

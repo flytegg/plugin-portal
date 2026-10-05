@@ -68,8 +68,8 @@ class VelocityPluginPortal @Inject constructor(
             override fun sendMessage(identity: Identity, message: Component, type: MessageType) = source.sendMessage(identity, message, type)
         }
         val alias = invocation.alias()
-        val localRoot = if (alias == "ppnetwork") "ppv" else alias
-        val networkRoot = if (alias == "ppnetwork") alias else "$alias network"
+        val localRoot = if (alias.equals("ppnetwork", ignoreCase = true)) "ppv" else alias
+        val networkRoot = if (alias.equals("ppnetwork", ignoreCase = true)) alias else "$alias network"
         return PortalCommandActor(CommandAliasAudience(audience, localRoot, networkRoot), name, id, player == null) { permission ->
             allows(source, permission)
         }
