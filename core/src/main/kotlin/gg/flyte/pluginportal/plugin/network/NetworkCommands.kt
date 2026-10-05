@@ -21,7 +21,7 @@ class NetworkCommands {
 
     @Subcommand("help")
     fun help(actor: PortalCommandActor) {
-        var message: Component = textPrimary("Network management").bold()
+        var message: Component = Component.empty().append(textPrimary("Network management").bold())
             .append(textDark("  /  Paid"))
         listOf("status" to "This node's connection", "list" to "Nodes and online state",
             "operations" to "Recent results", "refresh" to "Refresh inventories",
@@ -58,7 +58,7 @@ class NetworkCommands {
 
     @Subcommand("status")
     fun status(actor: PortalCommandActor) {
-        var message: Component = textPrimary("Network connection").bold()
+        var message: Component = Component.empty().append(textPrimary("Network connection").bold())
             .appendNewline().append(textSecondary("Status  ")).append(textPrimary(client.status))
             .appendNewline().append(textSecondary("Role  ")).append(textPrimary(client.role ?: "Not enrolled"))
         client.nodeId?.let { message = message.appendNewline().append(textSecondary("Node  ")).append(identifier(it, actor)) }
@@ -143,7 +143,7 @@ class NetworkCommands {
     private fun operate(actor: PortalCommandActor, targetIds: String, action: JsonObject) = work(actor) {
         val operation = client.submit(targetIds.split(','), action)
         val id = operation.get("id").asString
-        actor.audience.sendMessage(textPrimary("Operation submitted").bold()
+        actor.audience.sendMessage(Component.empty().append(textPrimary("Operation submitted").bold())
             .appendNewline().append(operationSummary(operation))
             .appendNewline().append(identifier(id, actor)).append(textPrimary("  [Results]")
                 .clickEvent(ClickEvent.runCommand("/pp network operation $id")))

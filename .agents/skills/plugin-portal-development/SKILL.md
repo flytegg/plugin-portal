@@ -37,7 +37,8 @@ docs/network-playground.md. Keep the backend private, use modern forwarding,
 and add 127.0.0.1:25565 to the matching local Minecraft client.
 
 Use shared Bukkit Adventure styling for command output on both platforms. Keep
-chat pages short, put long IDs and result messages in hover/copy actions, and
+chat pages short. Append bold headings to an unstyled parent so rows do not
+inherit bold. Put long IDs and result messages in hover/copy actions, and
 retain full console details. Gate native command discovery as well as execution.
 Verify no-permission and authorized player flows through the proxy after restarts.
 

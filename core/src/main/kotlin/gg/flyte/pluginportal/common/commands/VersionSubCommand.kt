@@ -21,7 +21,7 @@ class VersionSubCommand {
     fun onCommand(audience: Audience) {
         val plugin = PluginPortalBase.plugin
         val version = plugin.description.version
-        var message: Component = textPrimary("Plugin Portal Info").bold()
+        var message: Component = Component.empty().append(textPrimary("Plugin Portal Info").bold())
             .appendNewline().append(textSecondary("Version  "))
             .append(Component.text(version, if ('-' in version) YELLOW else GREEN))
             .appendNewline().append(textSecondary("Platform  ")).append(textPrimary(plugin.server.name))

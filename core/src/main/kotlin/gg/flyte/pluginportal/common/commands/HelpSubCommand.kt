@@ -36,7 +36,7 @@ class HelpSubCommand {
             }
             val help = commandHelp[command]
                 ?: return audience.sendFailure("Unknown topic. Use /pp help or /pp help <command>.")
-            var message = textPrimary(help.first).bold()
+            var message = Component.empty().append(textPrimary(help.first).bold())
             help.second.forEach { message = message.appendNewline().append(textSecondary(it)) }
             audience.sendMessage(message.boxed())
             return
@@ -45,7 +45,7 @@ class HelpSubCommand {
             return audience.sendFailure("Choose help page 1 to ${helpPages.size}, or a command such as /pp help install.")
         }
         val page = helpPages[pageNumber - 1]
-        var message = textPrimary("Plugin Portal").bold()
+        var message = Component.empty().append(textPrimary("Plugin Portal").bold())
             .append(textDark("  /  ${page.first}"))
         page.second.forEach { (command, description) ->
             message = message.appendNewline().append(helpLine(command, description))
