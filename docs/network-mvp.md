@@ -1,6 +1,6 @@
 # Network management MVP
 
-Plugin Portal 4.0.0 builds one JAR for Bukkit-family servers and Velocity. Local
+Plugin Portal 4.0.0-beta.1 builds one JAR for Bukkit-family servers and Velocity. Local
 management is free. An active owner purchase enables hosted network management.
 BungeeCord is outside this release. This candidate is not a published release.
 

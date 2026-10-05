@@ -13,6 +13,10 @@ platforms/velocity. distribution owns the one public shaded JAR and marketplace
 tasks. Keep both descriptors and their versions aligned. Internal Lamp commands
 use pp; Velocity exposes ppv and ppnetwork without intercepting backend pp.
 
+Use numbered prereleases (4.0.0-beta.N) until the universal release is promoted.
+Gradle defaults prereleases to Modrinth beta/alpha and Hangar Snapshot. Never send
+them to the stable admin upload route or a stable marketplace channel.
+
 Local tools are free. The hosted API enforces paid ownership, enrollment, and
 revocation. Never embed account keys, service secrets, or local premium gates.
 Keep production URLs as defaults and local overrides behind pluginportal.dev.

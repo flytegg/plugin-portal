@@ -17,7 +17,17 @@ val supportedMinecraftVersions = (property("mcVersions") as String)
     .filter { it.isNotEmpty() }
 
 val marketplaceChangelog = (findProperty("marketplaceChangelog") as? String) ?: "Release ${project.version}"
-val modrinthVersionType = (findProperty("modrinthVersionType") as? String) ?: "release"
+val prereleaseChannel = when {
+    project.version.toString().contains("-beta.") -> "beta"
+    project.version.toString().contains("-alpha.") -> "alpha"
+    else -> "release"
+}
+val modrinthVersionType = (findProperty("modrinthVersionType") as? String) ?: prereleaseChannel
+val hangarReleaseChannel = (findProperty("hangarChannel") as? String)
+    ?: if (prereleaseChannel == "release") "Release" else "Snapshot"
+check(prereleaseChannel == "release" || (modrinthVersionType != "release" && !hangarReleaseChannel.equals("Release", ignoreCase = true))) {
+    "Prerelease versions cannot be published to a stable channel"
+}
 
 modrinth {
     token.set(System.getenv("MODRINTH_TOKEN"))
@@ -36,7 +46,7 @@ hangarPublish {
     publications.register("plugin") {
         version = project.version as String
         id = (findProperty("hangarProjectId") as? String) ?: "PluginPortal"
-        channel = (findProperty("hangarChannel") as? String) ?: "Release"
+        channel = hangarReleaseChannel
         changelog = marketplaceChangelog
         apiKey = System.getenv("HANGAR_API_TOKEN")
 

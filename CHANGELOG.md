@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-### 4.0.0 universal network candidate
+### 4.0.0-beta.1 universal network candidate
 
 - Package one JAR with shared core and Bukkit and Velocity entrypoints.
 - Make all local tools free, including recognition, bulk updates, and the editor.

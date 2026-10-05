@@ -20,12 +20,12 @@ const root = process.cwd();
 const args = await parseArgs(Bun.argv.slice(2));
 const pluginJar = join(root, "out", `PluginPortal-${args.version}.jar`);
 
-if (!args.version.match(/^\d+\.\d+\.\d+$/)) {
-  fail("Only stable x.y.z versions can be published.");
+if (!args.version.match(/^\d+\.\d+\.\d+(?:-(?:beta|alpha)\.\d+)?$/)) {
+  fail("Use x.y.z, x.y.z-beta.N, or x.y.z-alpha.N.");
 }
 
 if (!args.skipBuild) {
-  await runChecked(["./gradlew", ":plugin:build"], "plugin jar build");
+  await runChecked(["./gradlew", ":plugin:build", `-PprojectVersion=${args.version}`], "plugin jar build");
 }
 
 if (!existsSync(pluginJar)) fail(`Missing artifact: ${pluginJar}`);
@@ -66,13 +66,14 @@ Examples:
     skipBuild: false,
     channel: "release",
   };
+  let channelExplicit = false;
 
   for (let i = 0; i < values.length; i++) {
     const value = values[i];
     if (value === "--version") parsed.version = values[++i] ?? "";
     else if (value === "--changelog") parsed.changelog = values[++i] ?? "";
     else if (value === "--changelog-file") parsed.changelogFile = values[++i] ?? "";
-    else if (value === "--channel") parsed.channel = parseChannel(values[++i] ?? "");
+    else if (value === "--channel") { parsed.channel = parseChannel(values[++i] ?? ""); channelExplicit = true; }
     else if (value === "--hangar-channel") parsed.hangarChannel = parseRequiredValue("--hangar-channel", values[++i] ?? "");
     else if (value === "--dry-run") parsed.dryRun = true;
     else if (value === "--modrinth") parsed.modrinth = true;
@@ -85,6 +86,11 @@ Examples:
   }
 
   if (!parsed.version) fail("--version is required.");
+  const prerelease = parsed.version.match(/-(beta|alpha)\.\d+$/)?.[1];
+  if (prerelease && !channelExplicit) parsed.channel = parseChannel(prerelease);
+  if (prerelease && (parsed.channel === "release" || parsed.hangarChannel?.toLowerCase() === "release")) {
+    fail("Prerelease versions cannot be published to a stable channel.");
+  }
   if (parsed.changelogFile) parsed.changelog = await readFile(join(root, parsed.changelogFile), "utf8");
   parsed.changelog = normalizeChangelog(parsed.changelog);
   if (!parsed.changelog.trim()) parsed.changelog = `PluginPortal ${parsed.version}`;
@@ -98,9 +104,10 @@ async function publishMarketplaces(args: Args, tasks: string[], jarPath: string)
   const command = [
     "./gradlew",
     ...tasks,
+    `-PprojectVersion=${args.version}`,
     `-PmarketplaceChangelog=${args.changelog}`,
     `-PmodrinthVersionType=${args.channel}`,
-    `-PhangarChannel=${args.hangarChannel ?? toHangarChannel(args.channel)}`,
+    `-PhangarChannel=${args.hangarChannel ?? (args.version.includes("-") ? "Snapshot" : toHangarChannel(args.channel))}`,
   ];
 
   if (process.env.HANGAR_PROJECT_ID) command.push(`-PhangarProjectId=${process.env.HANGAR_PROJECT_ID}`);
