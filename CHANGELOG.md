@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.0.0-beta.2 (unreleased)
+
+- Add account dashboard server inventory and MC License purchase linking.
+- Default dashboard control to read-only, with console approval enforced by the API and each server.
+- Add link, unlink, servers, history, and dashboard commands.
+- Support explicit named or UUID targets on install, update, uninstall, and list.
+- Retain older network aliases and local command behavior.
+
 ## Unreleased
 
 ### 4.0.0-beta.1 universal network candidate

@@ -1,29 +1,38 @@
 # Network management MVP
 
-Plugin Portal 4.0.0-beta.1 builds one JAR for Bukkit-family servers and Velocity. Local
+Plugin Portal 4.0.0-beta.2 builds one JAR for Bukkit-family servers and Velocity. Local
 management is free. An active owner purchase enables hosted network management.
 BungeeCord is outside this release. This candidate is not a published release.
 
 ## Enroll a network
 
-1. Sign in to the dashboard and link your purchase.
-2. Create a network.
-3. Generate an enrollment for each node. Choose Paper / Bukkit or Velocity.
-4. Choose managed node for a backend and network controller for the proxy.
-5. Install the same JAR on every node and run its generated command in the console.
-6. Select explicit targets in the dashboard, or use `/ppnetwork list` on the proxy.
-7. Submit inventory, install, update, or uninstall operations and inspect every result.
-8. Restart affected nodes to apply JAR changes.
+1. Sign in to the dashboard. Link your MC License key under Purchases, or use your verified purchase.
+2. Choose Add server. Enter a name and choose Paper / Bukkit or Velocity.
+3. Allow network commands for a trusted controller, normally your proxy.
+4. Install the same JAR on every server and run its generated link command in the console.
+5. View status and inventory for all groups in Your servers. Viewing is read-only.
+6. Use `/ppv servers`, `/ppv list --server lobby`, or `/ppv install LuckPerms MODRINTH --servers lobby,proxy` from the controller.
+7. Inspect `/ppv history` and restart affected servers to apply JAR changes.
 
-Use `/pp network` on Bukkit-family servers, `/ppv network` on Velocity, or
-`/ppnetwork` on the proxy. The proxy leaves backend `/pp` commands available.
+Use `/pp` on backends and `/ppv` on Velocity. Existing `/pp network`, `/ppv network`,
+and `/ppnetwork` commands remain compatible. The proxy leaves backend `/pp` available.
+Names resolve within the controller's group; ambiguous names require UUIDs.
+
+Dashboard writes require separate local approval on every target. Run
+`pp dashboard enable` in the backend console or `ppv dashboard enable` in the proxy
+console. `Dashboard.AllowWrites` defaults to false and cannot be changed through
+the editor. Linking a purchase or server never grants this approval. The API tags
+operation source; the JAR checks approval again before mutation. Disabling or
+unlinking clears approval. Approval survives a normal restart. The dashboard
+requires explicit target selection and review before sending a change.
+
 A controller credential can operate every enrolled node in its own network.
 Keep controller access limited to machines you trust.
 
 Enrollment codes expire after 15 minutes and are consumed once. A node stores its
 individual credential in `network-node.json` with owner-only filesystem permissions.
 The dashboard never receives that credential. Revoke a node in the dashboard to
-remove hosted access; `/pp network leave` deletes its local credential. Leaving
+remove hosted access; `/pp unlink` deletes its local credential. Leaving
 alone does not revoke a copied credential. Re-enrollment creates a new node.
 
 ## Operations and recovery

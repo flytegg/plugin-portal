@@ -38,17 +38,23 @@ A marketplace listing must supply a compatible downloadable JAR.
 
 ## Free local tools and paid networks
 
+The dashboard lists your proxy and backends across groups. Link a purchase, use
+Add server, and run its one-use `/pp link` command in each console. Dashboard
+plugin changes default to read-only and require per-server console approval.
+Use `/pp servers`, `/pp history`, and existing commands with `--server` or
+`--servers`; use `/ppv` on Velocity. See [commands](COMMANDS.md).
+
 All local commands are free: recognition, bulk updates, external sources,
 import/export, JAR scanning, and the temporary web editor are included.
 A local command permission still applies.
 
 Paid network management uses your account on the hosted Plugin Portal API. Open
-[the dashboard](https://pluginportal.link/dashboard), create a network, and generate
-an enrollment code for each backend and proxy. Run the generated command in the
-node console. Give the proxy controller access to manage enrolled nodes from there.
+[the dashboard](https://pluginportal.link/dashboard), choose Add server, and run
+the generated link command in each console. Give your trusted proxy controller
+access to manage servers in its group.
 
-Run `/ppv network list` to find node IDs. Submit an operation with explicit IDs,
-then use `/ppv network operations` or the dashboard to inspect per-node results.
+Run `/ppv servers` to see names and UUIDs. Target existing commands with `--server`
+or `--servers`, then use `/ppv history` or the dashboard to inspect results.
 Offline nodes are skipped. File changes require a restart of each affected node.
 See [network setup and security](docs/network-mvp.md).
 
@@ -65,7 +71,7 @@ server version, and the exact command and error. Do not share API keys or editor
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) for build and test commands.
 For a persistent local proxy and backend, see the sibling API repository's
-`docs/network-playground.md`. The universal candidate is `4.0.0-beta.1` and is
+`docs/network-playground.md`. The universal candidate is `4.0.0-beta.2` and is
 not published yet.
 Report security problems as described in [SECURITY.md](SECURITY.md).
 

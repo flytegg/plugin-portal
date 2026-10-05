@@ -51,3 +51,15 @@ Verify no-permission and authorized player flows through the proxy after restart
 
 Keep COMMANDS.md, README, docs/network-mvp.md and hosted command docs synchronized.
 Record local, CI, cloud deployment, and production evidence separately.
+
+Prefer link, unlink, servers, history, and existing commands with --server or
+--servers in new user flows. Keep older network commands compatible. Resolve exact
+names to UUIDs; reject ambiguity and duplicate targets. Require both action and
+network permissions. No target flag means local behavior.
+
+Dashboard writes default off. Only the server console/configuration can approve
+Dashboard.AllowWrites. Enforce source and approval before mutations in the JAR,
+including queued operations; remote editors cannot grant approval. Unlinking and
+re-enrollment clear it. Controller commands retain separate permission checks.
+Lamp derives shorthand flags automatically; assign distinct shorthand letters
+when adding flags with the same first letter. Verify registration on real servers.

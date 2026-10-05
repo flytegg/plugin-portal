@@ -259,11 +259,48 @@ commands to change authentication. Restart the server to apply JAR changes.
 
 ## Paid network management
 
-Open the dashboard, create a network, and issue an enrollment code per node.
+Sign in to the dashboard. Link your MC License key under Purchases, or use your
+existing verified purchase. Choose **Add server**, enter its name and platform,
+and run the generated `/pp link <code>` command in its console. Groups are optional;
+the first is created automatically. API keys do not enroll servers.
 Choose `node` for a backend and `controller` for a proxy that will initiate operations.
 Enrollment and leaving are console-only. All network commands require
 `pluginportal.network` (or the platform admin permission). Controllers require a
 current paid owner entitlement for listing and operating on the network.
+
+Use the shorter commands for normal work. Commands without a target flag remain
+local. Remote commands require the action permission, `pluginportal.network`, and
+a controller enrolled in the same group. Use exact server names or UUIDs; duplicate
+names require UUIDs. Never infer an all-server target.
+
+| Command | Purpose |
+| --- | --- |
+| `/pp link <code>` | Link this server from its console. |
+| `/pp unlink` | Remove the local credential and clear dashboard approval. Console only. |
+| `/pp servers [--page <number>] [--full]` | List connected servers. Controller only. |
+| `/pp history [operationId] [--page <number>] [--full]` | Inspect operations and per-server outcomes. Controller only. |
+| `/pp list --server lobby` | View a remote inventory. |
+| `/pp install LuckPerms MODRINTH --servers lobby,proxy` | Install on explicit targets. |
+| `/pp update LuckPerms --server lobby` | Update one tracked remote plugin. |
+| `/pp uninstall LuckPerms --server lobby` | Remove a tracked remote plugin; retain its data. |
+| `/pp dashboard [enable\|disable\|status]` | Approve or disable dashboard writes on this server. Admin and console only. |
+
+On Velocity use `/ppv`; backend `/pp` still works. Remote `list` supports `--page`,
+`--full`, `--untracked`, `--all`, and `--detailed`. Remote `--outdated`, `--external`,
+`update --refresh`, and `update --ignoreOutdated` are unsupported. Exact versions
+and release channels use the same install/update arguments as local commands.
+
+The dashboard starts read-only, showing every linked server's status and plugin
+inventory. Each server independently approves dashboard plugin changes through
+`Dashboard.AllowWrites` (default `false`). Run `pp dashboard enable` in a backend
+console or `ppv dashboard enable` in the proxy console. The browser cannot enable
+this setting. The API and JAR both enforce it. Use `disable` to revoke approval.
+Proxy command permissions are separate from dashboard approval. Each dashboard
+change requires explicit targets and a review before submission.
+
+### Compatibility commands
+
+Existing `/pp network`, `/ppv network`, and `/ppnetwork` commands remain available:
 
 | Command | Purpose |
 | --- | --- |
