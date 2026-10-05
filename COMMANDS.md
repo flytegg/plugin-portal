@@ -19,7 +19,7 @@ give proxy administrators `pluginportal.admin`. Network commands still require
 ## Start here
 
 1. Put `PluginPortal-<version>.jar` in `plugins/`.
-2. Start the server. Run `/pp info` to check the version and license state.
+2. Start the server. Run `/pp info` to check the version, platform, and network connection.
 3. Run `/pp search ViaVersion` to find a plugin.
 4. Run `/pp install ViaVersion MODRINTH` to download it.
 5. Restart the server to load the new JAR.
@@ -35,11 +35,11 @@ BungeeCord, datapacks, and paid Polymart downloads are outside this release.
 
 | Command | What it does |
 | --- | --- |
-| `/pp help [page or command]` | Show help page 1 or 2, or help for a command. |
+| `/pp help [page or command]` | Show help pages 1 to 3, or help for a command. |
 | `/pp search <query> [platform] [--page <number>] [--full]` | Search the marketplace catalog. |
 | `/pp view <name> [platform] [--byId] [--exact]` | Show marketplace details and available actions. |
 | `/pp list [--all] [--untracked] [--outdated] [--external] [--detailed] [--page <number>] [--full]` | List local plugins and configured external plugins. |
-| `/pp info` | Show the Plugin Portal version, license state, and update information. Alias: `/pp version`. |
+| `/pp info` | Show the exact version, platform, free local tools, and network connection. Alias: `/pp version`. |
 
 These commands require `pluginportal.view`.
 
@@ -262,15 +262,21 @@ current paid owner entitlement for listing and operating on the network.
 
 | Command | Purpose |
 | --- | --- |
+| `/pp network [help]` | Show network actions and usage hints. |
 | `/pp network enroll <code>` | Consume a one-use code and save a private node credential. |
 | `/pp network leave` | Delete the local credential; revoke the old node in the dashboard too. |
 | `/pp network status` | Show local connection state, node ID, and role. |
-| `/pp network list` | Show node IDs and online state. Controller only. |
-| `/pp network operations` | Show recent per-node operation outcomes. Controller only. |
+| `/pp network list [--page <number>] [--full]` | Show nodes and online state with copyable IDs. Controller only. |
+| `/pp network operations [--page <number>] [--full]` | Show recent operation summaries and clickable results. Controller only. |
+| `/pp network operation <operationId> [--page <number>] [--full]` | Show outcomes for each target. Controller only. |
 | `/pp network refresh <nodeIds>` | Refresh inventories on explicit targets. |
 | `/pp network install <nodeIds> <platform> <pluginId> [version]` | Install compatible catalog artifacts. |
 | `/pp network update <nodeIds> <platform> <pluginId> [version]` | Stage compatible updates; respect each node's blacklist. |
 | `/pp network uninstall <nodeIds> <platform> <pluginId>` | Remove managed JARs; retain data folders. |
+
+Network lists show eight entries per chat page. Hover for full IDs and result
+messages; click **Copy ID** to copy a full UUID. Console output includes full IDs
+and messages. Use `--page` or `--full` as with local lists.
 
 Use comma-separated UUIDs without spaces for `nodeIds`. On Velocity use
 `/ppv network` or `/ppnetwork`. Example:

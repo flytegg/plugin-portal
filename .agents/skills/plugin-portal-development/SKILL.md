@@ -36,5 +36,10 @@ For requested persistent servers and console access, follow the sibling API's
 docs/network-playground.md. Keep the backend private, use modern forwarding,
 and add 127.0.0.1:25565 to the matching local Minecraft client.
 
+Use shared Bukkit Adventure styling for command output on both platforms. Keep
+chat pages short, put long IDs and result messages in hover/copy actions, and
+retain full console details. Gate native command discovery as well as execution.
+Verify no-permission and authorized player flows through the proxy after restarts.
+
 Keep COMMANDS.md, README, docs/network-mvp.md and hosted command docs synchronized.
 Record local, CI, cloud deployment, and production evidence separately.
