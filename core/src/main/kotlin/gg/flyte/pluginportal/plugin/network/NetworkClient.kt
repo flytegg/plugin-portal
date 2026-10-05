@@ -3,6 +3,7 @@ package gg.flyte.pluginportal.plugin.network
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import gg.flyte.pluginportal.common.PluginPortalBase
+import gg.flyte.pluginportal.common.Config
 import gg.flyte.pluginportal.common.managers.LocalPluginCache
 import gg.flyte.pluginportal.common.runtime.PortalRuntime
 import gg.flyte.pluginportal.common.types.SocketActions
@@ -94,6 +95,7 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
         val response = request("enroll", jsonObject("code" to code, "platform" to platform), authenticated = false)
         require(Regex("^ppn_[A-Za-z0-9_-]{43}$").matches(response.get("credential").asString))
         privateWrite(credentialFile, response)
+        Config.setDashboardWrites(false)
         identity = response
         status = "Enrolled; connecting"
         scheduler.execute { connect() }
@@ -102,6 +104,7 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
     @Synchronized fun leave() {
         // Removing a local credential does not grant permission to revoke a different node.
         generation.incrementAndGet()
+        Config.setDashboardWrites(false)
         identity = null
         socket?.close(1000, "Local disconnect")
         socket = null
@@ -212,7 +215,13 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
         val id = operation.get("id")?.asString ?: return
         if (!validId(id)) return
         val action = operation.getAsJsonObject("action") ?: return
-        val fingerprint = canonicalAction(action) ?: return
+        val source = operation.get("source")?.asString ?: "dashboard"
+        if (source !in setOf("dashboard", "controller")) return
+        if (action.get("kind")?.asString != "inventory" && source == "dashboard" && !Config.allowsDashboardWrites()) {
+            sendResult(id, result("failed", "Dashboard control is read-only. Enable it in this server's console first."))
+            return
+        }
+        val fingerprint = (canonicalAction(action) ?: return) + ":" + source
         val expiresAt = operation.get("expiresAt")?.asLong ?: return
         val existing = journal[id]
         if (existing != null) {
@@ -233,6 +242,7 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
             val kind = action.get("kind").asString
             val outcome = if (kind == "inventory") result("succeeded").apply { add("inventory", inventory()) }
             else {
+                check(source != "dashboard" || Config.allowsDashboardWrites()) { "Dashboard control was disabled before execution" }
                 val actions = SocketActions()
                 val response = when (kind) {
                     "install" -> actions.install.run(action)
@@ -274,12 +284,15 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
         addProperty("platform", platform)
         addProperty("pluginVersion", runtime.description.version.take(120))
         addProperty("minecraftVersion", runtime.server.minecraftVersion.take(120))
+        addProperty("dashboardControl", Config.allowsDashboardWrites())
+        addProperty("observedAt", System.currentTimeMillis())
         val managed = LocalPluginCache.map { jsonObject("name" to it.name.take(120), "version" to it.version.take(120), "platform" to it.platform.name, "id" to it.platformId.take(120)) }
         val names = managed.map { it.get("name").asString.lowercase() }.toSet()
         val other = runtime.server.plugins.filter { it.name.lowercase() !in names }.map { jsonObject("name" to it.name.take(120), "version" to it.description.version.take(120)) }
         add("plugins", GSON.toJsonTree((managed + other).take(500)))
     }
     private fun publishInventory(target: WebSocket? = socket) { target?.send(JsonObject().apply { addProperty("v", 1); addProperty("type", "inventory"); add("inventory", inventory()) }.toString()) }
+    fun refreshInventory() = publishInventory()
     private fun sendResult(id: String, result: JsonObject) { socket?.send(JsonObject().apply { addProperty("v", 1); addProperty("type", "result"); addProperty("id", id); add("result", result) }.toString()) }
     private fun result(status: String, message: String? = null) = JsonObject().apply { addProperty("status", status); message?.let { addProperty("message", it.take(500)) } }
     private fun saveJournal() = privateWrite(journalFile, JsonObject().apply { for ((id, entry) in journal) add(id, entry) })

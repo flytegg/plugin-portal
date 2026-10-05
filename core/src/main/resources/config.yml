@@ -14,3 +14,8 @@ Telemetry:
 DiscordWebhook:
   # Optional Discord webhook URL for install, update, platform-switch, and PluginPortal update notifications.
   Url: ""
+
+Dashboard:
+  # Enable explicitly with /pp dashboard enable in this server's console.
+  # Proxy controller commands keep their own permissions.
+  AllowWrites: false
