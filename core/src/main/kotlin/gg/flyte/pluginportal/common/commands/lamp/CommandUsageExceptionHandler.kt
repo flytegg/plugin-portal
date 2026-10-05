@@ -23,7 +23,7 @@ class CommandUsageExceptionHandler(
         if (path.startsWith("network ")) {
             NetworkCommands().showCommandHelp(actor, path.substringAfter(' ').substringBefore(' '))
         } else {
-            HelpSubCommand().showCommandHelp(actor.audience, path.substringBefore(' '))
+            HelpSubCommand().showCommandHelp(actor, path.substringBefore(' '))
         }
     }
 }

@@ -94,7 +94,9 @@ class NetworkCommands {
     }
 
     @Subcommand("list")
-    fun list(actor: PortalCommandActor, @Optional @Flag("page") page: Int? = null, @Switch("full") full: Boolean = false) = work(actor) {
+    fun list(actor: PortalCommandActor, @Optional @Flag("page") page: Int? = null, @Switch("full") full: Boolean = false) = showServers(actor, page, full, "/pp network list")
+
+    fun showServers(actor: PortalCommandActor, page: Int?, full: Boolean, commandPath: String) = work(actor) {
         if (!validPage(actor, page, full)) return@work
         val nodes = client.state().getAsJsonArray("nodes").map { it.asJsonObject }
         if (nodes.isEmpty()) return@work actor.audience.sendInfo("No enrolled nodes.")
@@ -111,11 +113,13 @@ class NetworkCommands {
             if (actor.isConsole) row = row.appendNewline().append(textDark("  Role: ${node.get("role").asString}"))
             row
         } }
-        sendPagedRows(actor.audience, rows, page, full, "/pp network list")
+        sendPagedRows(actor.audience, rows, page, full, commandPath)
     }
 
     @Subcommand("operations")
-    fun operations(actor: PortalCommandActor, @Optional @Flag("page") page: Int? = null, @Switch("full") full: Boolean = false) = work(actor) {
+    fun operations(actor: PortalCommandActor, @Optional @Flag("page") page: Int? = null, @Switch("full") full: Boolean = false) = showOperations(actor, page, full, "/pp network operations")
+
+    fun showOperations(actor: PortalCommandActor, page: Int?, full: Boolean, commandPath: String) = work(actor) {
         if (!validPage(actor, page, full)) return@work
         val operations = client.state().getAsJsonArray("operations").map { it.asJsonObject }
         if (operations.isEmpty()) return@work actor.audience.sendInfo("No recent operations.")
@@ -124,15 +128,17 @@ class NetworkCommands {
             operationSummary(operation)
                 .append(textSecondary("  ")).append(identifier(id, actor))
                 .append(textPrimary("  [Results]")
-                    .clickEvent(ClickEvent.runCommand("/pp network operation $id"))
+                    .clickEvent(ClickEvent.runCommand(if (commandPath == "/pp history") "/pp history $id" else "/pp network operation $id"))
                     .hoverEvent(HoverEvent.showText(textSecondary("Show outcomes for each target"))))
         } }
-        sendPagedRows(actor.audience, rows, page, full, "/pp network operations")
+        sendPagedRows(actor.audience, rows, page, full, commandPath)
     }
 
     @Subcommand("operation")
     fun operation(actor: PortalCommandActor, @Named("operationId") operationId: String,
-                  @Optional @Flag("page") page: Int? = null, @Switch("full") full: Boolean = false) = work(actor) {
+                  @Optional @Flag("page") page: Int? = null, @Switch("full") full: Boolean = false) = showOperation(actor, operationId, page, full, "/pp network operation $operationId")
+
+    fun showOperation(actor: PortalCommandActor, operationId: String, page: Int?, full: Boolean, commandPath: String) = work(actor) {
         if (!validPage(actor, page, full)) return@work
         val state = client.state()
         val operation = state.getAsJsonArray("operations").map { it.asJsonObject }
@@ -152,7 +158,7 @@ class NetworkCommands {
                 row
             }
         }
-        sendPagedRows(actor.audience, rows, page, full, "/pp network operation $operationId")
+        sendPagedRows(actor.audience, rows, page, full, commandPath)
     }
 
     @Subcommand("refresh")

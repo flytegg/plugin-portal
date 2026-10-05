@@ -22,6 +22,9 @@ import gg.flyte.pluginportal.common.util.currentServerTypePreference
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.*
 import gg.flyte.pluginportal.common.commands.lamp.CommandPermission
+import gg.flyte.pluginportal.common.commands.lamp.PortalCommandActor
+import gg.flyte.pluginportal.plugin.network.ServerTargets
+import gg.flyte.pluginportal.plugin.network.ServerTargetSuggestionProvider
 
 @Command("pp", "pluginportal", "ppm")
 class UpdateSubCommand {
@@ -31,13 +34,21 @@ class UpdateSubCommand {
     @CommandPermission("pluginportal.maintain.update")
     fun updateCommand(
         audience: Audience,
+        actor: PortalCommandActor,
         @Named("name") @SuggestWith(InstalledPluginSuggestionProvider::class) name: String,
         @Switch("byId") byId: Boolean = false, // @Suggest("--byId", "--ignoreOutdated", "-b", "-i", "-bi")
         @Switch("ignoreOutdated") ignoreOutdated: Boolean = false,
         @Switch("refresh") refresh: Boolean = false,
         @Optional @Flag("channel") @SuggestWith(ReleaseChannelSuggestionProvider::class) channel: String? = null,
         @Optional @Flag("version") @Named("version") versionNumber: String? = null,
+        @Optional @Flag("server") @SuggestWith(ServerTargetSuggestionProvider::class) server: String? = null,
+        @Optional @Flag("servers") @SuggestWith(ServerTargetSuggestionProvider::class) servers: String? = null,
     ) {
+        if (ServerTargets.requested(actor, server, servers) { selection ->
+            require(!ignoreOutdated && !refresh) { "Remote updates do not support --ignoreOutdated or --refresh." }
+            ServerTargets.change(actor, selection, "update", name, byId, versionNumber, channel)
+        }) return
+
         LocalPluginCache.searchPluginsWithFeedback(
             audience,
             name,

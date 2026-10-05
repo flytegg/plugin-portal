@@ -11,6 +11,7 @@ import gg.flyte.pluginportal.plugin.commands.recognize.RecognizeSubCommand
 import gg.flyte.pluginportal.plugin.websocket.TypedSocketManager
 import gg.flyte.pluginportal.plugin.network.NetworkClient
 import gg.flyte.pluginportal.plugin.network.NetworkCommands
+import gg.flyte.pluginportal.plugin.network.ServerCommands
 
 object PortalApplication {
     lateinit var runtime: PortalRuntime
@@ -29,7 +30,7 @@ object PortalApplication {
             runtime.jarFile, ::isAuthed, ::refreshEntitlement,
         ), arrayOf(
             ImportSubCommand(), ExportSubCommand(), UpdateAllSubCommand(), ScanSubCommand(),
-            RecognizeSubCommand(), RecognizeAllSubCommand(), EditorSubCommand(), ExternalSubCommand(), NetworkCommands(),
+            RecognizeSubCommand(), RecognizeAllSubCommand(), EditorSubCommand(), ExternalSubCommand(), NetworkCommands(), ServerCommands(),
         )) { it.parameterValidator(String::class.java, SafeFileNameValidator()) }
         AdapterPluginCache.load()
         network = NetworkClient(runtime)

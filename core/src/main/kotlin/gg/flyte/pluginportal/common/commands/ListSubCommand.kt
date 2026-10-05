@@ -30,7 +30,11 @@ import revxrsal.commands.annotation.Subcommand
 import revxrsal.commands.annotation.Switch
 import revxrsal.commands.annotation.Flag
 import revxrsal.commands.annotation.Optional
+import revxrsal.commands.annotation.SuggestWith
 import gg.flyte.pluginportal.common.commands.lamp.CommandPermission
+import gg.flyte.pluginportal.common.commands.lamp.PortalCommandActor
+import gg.flyte.pluginportal.plugin.network.ServerTargets
+import gg.flyte.pluginportal.plugin.network.ServerTargetSuggestionProvider
 
 @Command("pp", "pluginportal", "ppm")
 class ListSubCommand {
@@ -43,6 +47,7 @@ class ListSubCommand {
     @CommandPermission("pluginportal.view")
     fun listCommand(
         audience: Audience,
+        actor: PortalCommandActor,
         @Switch("detailed") detailed: Boolean = false,
         @Switch("all") all: Boolean = false,
         @Switch("untracked") untracked: Boolean = false,
@@ -50,7 +55,15 @@ class ListSubCommand {
         @Switch("external") externalOnly: Boolean = false,
         @Optional @Flag("page") page: Int? = null,
         @Switch("full") full: Boolean = false,
+        @Optional @Flag("server") @SuggestWith(ServerTargetSuggestionProvider::class) server: String? = null,
+        @Optional @Flag("servers") @SuggestWith(ServerTargetSuggestionProvider::class) servers: String? = null,
     ) {
+        if (ServerTargets.requested(actor, server, servers) { selection ->
+            require(!outdated && !externalOnly) { "Remote inventory does not support --outdated or --external." }
+            require(!untracked || !all) { "Use --untracked without --all." }
+            ServerTargets.list(actor, selection, page, full, untracked)
+        }) return
+
         async {
             if (page != null && page < 1) return@async audience.sendFailure("Page must be at least 1")
             if (full && page != null) return@async audience.sendFailure("Use either --full or --page, not both")

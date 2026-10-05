@@ -11,6 +11,9 @@ import gg.flyte.pluginportal.common.util.async
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.*
 import gg.flyte.pluginportal.common.commands.lamp.CommandPermission
+import gg.flyte.pluginportal.common.commands.lamp.PortalCommandActor
+import gg.flyte.pluginportal.plugin.network.ServerTargets
+import gg.flyte.pluginportal.plugin.network.ServerTargetSuggestionProvider
 
 @Command("pp", "pluginportal", "ppm")
 class DeleteSubCommand {
@@ -20,9 +23,14 @@ class DeleteSubCommand {
     @CommandPermission("pluginportal.manage.uninstall")
     fun deleteCommand(
         audience: Audience,
+        actor: PortalCommandActor,
         @Named("name") @SuggestWith(InstalledPluginNotPortalSuggestionProvider::class) name: String,
         @Switch("byId") byId: Boolean = false,
+        @Optional @Flag("server") @SuggestWith(ServerTargetSuggestionProvider::class) server: String? = null,
+        @Optional @Flag("servers") @SuggestWith(ServerTargetSuggestionProvider::class) servers: String? = null,
     ) {
+        if (ServerTargets.requested(actor, server, servers) { selection -> ServerTargets.change(actor, selection, "uninstall", name, byId) }) return
+
         LocalPluginCache.searchPluginsWithFeedback(
             audience,
             name,

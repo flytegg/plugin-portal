@@ -24,6 +24,9 @@ import gg.flyte.pluginportal.common.util.download
 import net.kyori.adventure.audience.Audience
 import revxrsal.commands.annotation.*
 import gg.flyte.pluginportal.common.commands.lamp.CommandPermission
+import gg.flyte.pluginportal.common.commands.lamp.PortalCommandActor
+import gg.flyte.pluginportal.plugin.network.ServerTargets
+import gg.flyte.pluginportal.plugin.network.ServerTargetSuggestionProvider
 import java.io.File
 
 @Command("pp", "pluginportal", "ppm")
@@ -34,13 +37,18 @@ class InstallSubCommand {
     @CommandPermission("pluginportal.manage.install")
     fun installCommand(
         audience: Audience,
+        actor: PortalCommandActor,
         @Named("name") @SuggestWith(MarketplacePluginSuggestionProvider::class) name: String,
         @Optional @Named("platform") platform: MarketplacePlatform? = null,
         @Optional @Named("channel") @SuggestWith(ReleaseChannelSuggestionProvider::class) channel: String? = null,
         @Optional @Switch("byId") byId: Boolean = false,
         @Optional @Switch(value="exact", shorthand='e') exact: Boolean = false,
         @Optional @Flag("version") @Named("version") versionNumber: String? = null,
+        @Optional @Flag("server") @SuggestWith(ServerTargetSuggestionProvider::class) server: String? = null,
+        @Optional @Flag("servers") @SuggestWith(ServerTargetSuggestionProvider::class) servers: String? = null,
     ) {
+        if (ServerTargets.requested(actor, server, servers) { selection -> ServerTargets.install(actor, selection, name, platform, byId, exact, versionNumber, channel) }) return
+
         
         // Handle marketplace plugin installation
         MarketplacePluginCache.handlePluginSearchFeedback(

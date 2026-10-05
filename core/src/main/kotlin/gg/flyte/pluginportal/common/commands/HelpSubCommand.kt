@@ -37,8 +37,8 @@ class HelpSubCommand {
             }
             return
         }
-        if (topic.isEmpty()) helpCommand(actor.audience)
-        else if (!showCommandHelp(actor.audience, topic)) {
+        if (topic.isEmpty()) helpCommand(actor)
+        else if (!showCommandHelp(actor, topic)) {
             actor.audience.sendFailure("Unknown command. Use /pp help for available commands.")
         }
     }
@@ -46,12 +46,13 @@ class HelpSubCommand {
     @Subcommand("help")
     @CommandPermission("pluginportal.view")
     fun helpCommand(
-        audience: Audience,
+        actor: PortalCommandActor,
         @Optional @Named("topic") topic: String = "1"
     ) {
+        val audience = actor.audience
         val pageNumber = topic.toIntOrNull()
         if (pageNumber == null) {
-            if (!showCommandHelp(audience, topic)) audience.sendFailure("Unknown topic. Use /pp help or /pp help <command>.")
+            if (!showCommandHelp(actor, topic)) audience.sendFailure("Unknown topic. Use /pp help or /pp help <command>.")
             return
         }
         if (pageNumber !in helpPages.indices.map { it + 1 }) {
@@ -60,13 +61,14 @@ class HelpSubCommand {
         val page = helpPages[pageNumber - 1]
         var message = Component.empty().append(textPrimary("Plugin Portal").bold())
             .append(textDark("  /  ${page.first}"))
-        page.second.forEach { (command, description) ->
+        page.second.filter { (command, _) -> actor.hasPermission(helpPermission(command.substringBefore(' '))) }.forEach { (command, description) ->
             message = message.appendNewline().append(helpLine(command, description))
         }
         audience.sendMessage(message.appendNewline().appendNewline().append(footer(pageNumber)).boxed())
     }
 
-    fun showCommandHelp(audience: Audience, topic: String): Boolean {
+    fun showCommandHelp(actor: PortalCommandActor, topic: String): Boolean {
+        val audience = actor.audience
         val command = when (topic.lowercase()) {
             "delete" -> "uninstall"
             "version" -> "info"
@@ -74,10 +76,20 @@ class HelpSubCommand {
             else -> topic.lowercase()
         }
         val help = commandHelp[command] ?: return false
+        if (!actor.hasPermission(helpPermission(command))) {
+            audience.sendFailure("You do not have permission to use this command.")
+            return true
+        }
         var message = Component.empty().append(textPrimary(help.first).bold())
         help.second.forEach { message = message.appendNewline().append(textSecondary(it)) }
         audience.sendMessage(message.boxed())
         return true
+    }
+
+    private fun helpPermission(command: String): String = when (command) {
+        "network", "servers", "link", "unlink", "history" -> "pluginportal.network"
+        "dashboard" -> "pluginportal.admin"
+        else -> "pluginportal.view"
     }
 
     private val helpPages = listOf(
@@ -102,7 +114,10 @@ class HelpSubCommand {
             "scan <file>" to "Scan a local JAR"
         ),
         "Settings and network" to listOf(
-            "network" to "Manage the paid network",
+            "servers" to "Connected servers",
+            "link <code>" to "Link this server to your account",
+            "history" to "Network operation results",
+            "dashboard" to "Dashboard access, console only",
             "reload" to "Reload configuration",
             "key" to "Manage your API key",
             "upgrade" to "Update Plugin Portal",
@@ -114,6 +129,11 @@ class HelpSubCommand {
     )
 
     private val commandHelp = mapOf(
+        "servers" to ("/pp servers [--page <number>] [--full]" to listOf("List connected servers. Controller access is required.", "Use names or UUIDs with --server and --servers.")),
+        "link" to ("/pp link <code>" to listOf("Console only. Copy the one-use code from Add server in your dashboard.", "Linking starts read-only and gives this server its own revocable credential.")),
+        "unlink" to ("/pp unlink" to listOf("Console only. Disconnect this server and remove its local credential.", "Revoke the server in your dashboard as well.")),
+        "history" to ("/pp history [operationId] [--page <number>] [--full]" to listOf("Show recent operations, or results for one operation.")),
+        "dashboard" to ("/pp dashboard <enable|disable|status>" to listOf("Console only. Dashboard access defaults to read-only.", "Enable dashboard plugin changes for this server, or disable them again.")),
         "help" to ("/pp help [page or command]" to listOf(
             "Choose page 1 to 3, or a command name.",
             "Example: /pp help platform"
@@ -123,6 +143,7 @@ class HelpSubCommand {
             "Quote names with spaces. --byId requires a platform and its project ID.",
             "The channel is positional: release, beta, alpha, or a provider channel.",
             "An exact version is excluded from updateAll.",
+            "Add --server <name> or --servers <name,name> for explicit remote targets.",
             "Example: /pp install LuckPerms MODRINTH release"
         )),
         "update" to ("/pp update <name> [--byId] [--refresh] [--channel <name>] [--version <version>] [--ignoreOutdated]" to listOf(
@@ -130,6 +151,7 @@ class HelpSubCommand {
             "--refresh bypasses the local marketplace cache, not the API scanner.",
             "--ignoreOutdated reinstalls the selected compatible version.",
             "--version selects an exact version and excludes it from updateAll.",
+            "Add --server <name> or --servers <name,name> to target remote servers.",
             "Example: /pp update LuckPerms --refresh"
         )),
         "updateall" to ("/pp updateAll [--ignoreOutdated]" to listOf(
@@ -143,7 +165,8 @@ class HelpSubCommand {
             "--outdated checks for updates without installing them.",
             "--external shows only configured external plugins.",
             "Chat shows eight entries per page. Console shows all entries by default.",
-            "Use --full or --page, not both."
+            "Use --full or --page, not both.",
+            "Add --server <name> or --servers <name,name> to view remote inventories."
         )),
         "search" to ("/pp search <query> [platform] [--page <number>] [--full]" to listOf(
             "Search the marketplace. Quote queries with spaces.",
@@ -164,7 +187,7 @@ class HelpSubCommand {
             "Example: /pp platform LuckPerms MODRINTH",
             "Restart after the download."
         )),
-        "uninstall" to ("/pp uninstall <name> [--byId]" to listOf(
+        "uninstall" to ("/pp uninstall <name> [--byId] [--server <name>] [--servers <names>]" to listOf(
             "Delete the tracked JAR. Keep the plugin data folder.",
             "Restart the server to unload the plugin. Alias: /pp delete."
         )),
