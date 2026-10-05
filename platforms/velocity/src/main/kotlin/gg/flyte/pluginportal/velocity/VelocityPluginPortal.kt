@@ -14,7 +14,7 @@ import gg.flyte.pluginportal.common.commands.lamp.PortalCommandActor
 import gg.flyte.pluginportal.common.runtime.*
 import gg.flyte.pluginportal.common.types.enums.ServerType
 import gg.flyte.pluginportal.plugin.PortalApplication
-import net.kyori.adventure.audience.ForwardingAudience
+import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.audience.MessageType
 import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.pointer.Pointers
@@ -53,8 +53,7 @@ class VelocityPluginPortal @Inject constructor(
         val player = source as? Player
         val name = player?.username ?: "CONSOLE"
         val id = player?.uniqueId ?: UUID(0, 0)
-        val audience = object : ForwardingAudience.Single {
-            override fun audience() = source
+        val audience = object : Audience {
             override fun pointers() = Pointers.builder().withStatic(Identity.NAME, name).apply {
                 if (player != null) withStatic(Identity.UUID, id)
             }.build()
