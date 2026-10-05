@@ -1,6 +1,36 @@
 # Changelog
 
+## 4.0.0-beta.2 (unreleased)
+
+- Add account dashboard server inventory and MC License purchase linking.
+- Default dashboard control to read-only, with console approval enforced by the API and each server.
+- Add link, unlink, servers, history, and dashboard commands.
+- Support explicit named or UUID targets on install, update, uninstall, and list.
+- Complete quoted server names and comma-separated targets without blocking Bukkit on network requests.
+- Retain older network aliases and local command behavior.
+
 ## Unreleased
+
+### 4.0.0-beta.1 universal network candidate
+
+- Hide command roots, completions, and help from players without view access.
+- Add compact help pages and paged network results with copyable IDs.
+- Show the exact beta version and connection immediately in the info command.
+- Match the centered Bukkit info card and keep detail lines at normal weight.
+- Keep the invoked command alias in help, hover hints, and action buttons.
+- Show help for the attempted command when arguments are missing or invalid.
+- Package one JAR with shared core and Bukkit and Velocity entrypoints.
+- Make all local tools free, including recognition, bulk updates, and the editor.
+- Add paid network enrollment and scoped proxy commands for inventory, install,
+  update, and uninstall across explicit backend and proxy targets.
+- Select artifacts for each platform and stage Velocity updates at shutdown.
+- Persist operation results and recover connections without replaying mutations.
+- Fix cache removal and uninstalling installed plus pending plugin versions.
+- Enforce hosted authorization rather than embedding account keys in universal JARs.
+- Publish the architecture, recovery, security, and local integration workflow.
+
+The candidate is built and tested locally on Paper 1.21.11 and Velocity 3.4.0 with
+Java 21. It is not published or deployed to production.
 
 ### 3.8.9 candidate
 

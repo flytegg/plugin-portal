@@ -1,4 +1,4 @@
-# Plugin Portal Source Available License 1.0
+# Plugin Portal Source Available License 1.1
 
 Copyright (c) Flyte. All rights reserved.
 
@@ -38,13 +38,27 @@ You may not:
   updater service, or entitlement service derived from this software.
 - Remove, disable, bypass, weaken, or alter license-key, premium-entitlement,
   API-authentication, or feature-gating functionality.
-- Provide users with access to Plugin Portal premium features, including features
-  formerly shipped in Plugin Portal Premium, without a valid Plugin Portal
-  license or entitlement.
+- Provide access to paid network management without a valid Plugin Portal
+  entitlement, including by forging grants, sharing node credentials outside their
+  assigned network, or impersonating the official API or relay.
 - Remove, obscure, or alter copyright, attribution, license, or security notices.
 - Misrepresent a fork or modified version as the official Plugin Portal project.
 - Use Plugin Portal names, logos, icons, marketplace listings, or other brand
   assets except as allowed by `TRADEMARKS.md`.
+
+## Free Local Use and Paid Network Management
+
+The same JAR runs on supported backend servers and Velocity proxies. Local plugin
+management on one installation is free, including local tools previously shipped
+in Plugin Portal Premium. Prior premium branding does not make these local tools
+paid features.
+
+Managing multiple installations from a proxy, dashboard, or other central client
+requires an active network entitlement issued by the official Plugin Portal API.
+This includes node enrollment, shared network inventory, cross-server operations,
+and access to the hosted network relay. Building or modifying the JAR does not
+grant a subscription, a network entitlement, or access to these hosted services.
+Local feature flags and client-side checks are not proof of entitlement.
 
 ## Hosted Services and APIs
 
@@ -69,6 +83,11 @@ The software is provided "as is", without warranties or conditions of any kind,
 express or implied, including warranties of merchantability, fitness for a
 particular purpose, and non-infringement. Flyte is not liable for damages arising
 from use of the software.
+
+## Third-Party Components
+
+Dependencies and third-party code remain subject to their own licenses. This
+license does not restrict rights those licenses grant for those components.
 
 ## Other Terms
 

@@ -5,7 +5,7 @@ Thanks for working on Plugin Portal.
 ## Development
 
 - Use the Gradle wrapper included in this repository.
-- Keep plugin changes scoped to `plugin/` and shared runtime code in `common/`.
+- Keep shared services in `core/`, platform APIs in `platforms/bukkit/` or `platforms/velocity/`, and packaging in `distribution/`. `build-logic/` holds Gradle conventions. `plugin/` keeps compatibility task aliases.
 - Do not commit built JARs, server run folders, API keys, or local config files.
 - Public plugin builds should use production Plugin Portal endpoints by default.
 - Localhost API/socket URLs should require the development flag, for example `-Dpluginportal.dev=true`.
@@ -16,7 +16,7 @@ Thanks for working on Plugin Portal.
 The API endpoint configuration is located in:
 
 ```text
-common/src/main/kotlin/gg/flyte/pluginportal/common/util/HttpInfo.kt
+core/src/main/kotlin/gg/flyte/pluginportal/common/util/HttpInfo.kt
 ```
 
 Release builds use:
@@ -62,7 +62,7 @@ Run tests:
 Build the release JAR:
 
 ```bash
-./gradlew :plugin:shadowJar
+./gradlew :distribution:shadowJar
 ```
 
 Run a local Paper test server:
@@ -123,11 +123,25 @@ and checks the saved installation after restart.
 
 The built plugin JAR is written to `out/PluginPortal-<version>.jar`.
 
+## Full network integration
+
+With this repository beside `plugin-portal-api/` and OrbStack running:
+
+```bash
+./gradlew :distribution:shadowJar
+cd ../plugin-portal-api
+bun run smoke:network
+```
+
+The smoke runner starts isolated MongoDB, Redis, Paper, Velocity, the API, and a local Durable Object relay. It uses disposable credentials and real catalog downloads. It checks enrollment, permissions, one-use tickets, offline handling, inventory, artifact hashes, deduplication, blacklist enforcement, updates, restarts, and removal. It cleans up only its own containers. Failure logs are retained in the printed temporary folder.
+
+To use another local API in a container, pass both `-Dpluginportal.dev=true` and `-Dpluginportal.apiUrl=http://host.docker.internal:<port>`. Production builds ignore the override. Never use production credentials for smoke runs.
+
 ## Version Information
 
 The current plugin version is defined in `gradle.properties`.
 
-The build process automatically updates the version in `plugin.yml`.
+The build expands that version into both `plugin.yml` and `velocity-plugin.json`.
 
 Plugin Portal now builds one public JAR:
 
@@ -135,7 +149,7 @@ Plugin Portal now builds one public JAR:
 PluginPortal-<version>.jar
 ```
 
-Premium features are controlled by runtime entitlement and server-side API enforcement, not by a separate premium artifact.
+Local management is free. Paid network access is enforced by the hosted API and relay. Universal 4.x downloads are identical for every account; older releases retain their legacy download compatibility.
 
 ## Local Minecraft Panel
 
