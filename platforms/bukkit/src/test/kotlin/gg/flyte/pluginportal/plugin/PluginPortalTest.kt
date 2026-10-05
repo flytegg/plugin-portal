@@ -93,12 +93,12 @@ class PluginPortalTest {
         assertTrue(server.dispatchCommand(server.consoleSender, "pluginportal"))
         val longAliasMessage = PlainTextComponentSerializer.plainText()
             .serialize(requireNotNull(server.consoleSender.nextComponentMessage()))
-        assertTrue(longAliasMessage.contains("/pp install"), longAliasMessage)
+        assertTrue(longAliasMessage.contains("/pluginportal install"), longAliasMessage)
 
         assertTrue(server.dispatchCommand(server.consoleSender, "ppm"))
         val shortAliasMessage = PlainTextComponentSerializer.plainText()
             .serialize(requireNotNull(server.consoleSender.nextComponentMessage()))
-        assertTrue(shortAliasMessage.contains("/pp install"), shortAliasMessage)
+        assertTrue(shortAliasMessage.contains("/ppm install"), shortAliasMessage)
     }
 
     @Test

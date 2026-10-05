@@ -8,6 +8,7 @@
 - Add compact help pages and paged network results with copyable IDs.
 - Show the exact beta version and connection immediately in the info command.
 - Match the centered Bukkit info card and keep detail lines at normal weight.
+- Keep the invoked command alias in help, hover hints, and action buttons.
 - Package one JAR with shared core and Bukkit and Velocity entrypoints.
 - Make all local tools free, including recognition, bulk updates, and the editor.
 - Add paid network enrollment and scoped proxy commands for inventory, install,

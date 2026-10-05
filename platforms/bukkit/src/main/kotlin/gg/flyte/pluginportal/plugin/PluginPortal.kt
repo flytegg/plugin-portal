@@ -2,6 +2,7 @@ package gg.flyte.pluginportal.plugin
 
 import gg.flyte.pluginportal.common.PluginPortalBase
 import gg.flyte.pluginportal.common.UpdateNotificationListener
+import gg.flyte.pluginportal.common.commands.lamp.CommandAliasAudience
 import gg.flyte.pluginportal.common.commands.lamp.CommandSenderAudience
 import gg.flyte.pluginportal.common.commands.lamp.PortalCommandActor
 import gg.flyte.pluginportal.common.runtime.*
@@ -30,20 +31,20 @@ open class PluginPortal : JavaPlugin() {
         audiences = BukkitAudiences.create(this)
         PortalApplication.start(BukkitRuntime(this, pluginPortalJarFile))
         getCommand("pp")!!.apply {
-            setExecutor { sender, _, _, args ->
-                PluginPortalBase.lamp.dispatch(actor(sender), "pp " + args.joinToString(" "))
+            setExecutor { sender, _, label, args ->
+                PluginPortalBase.lamp.dispatch(actor(sender, label), "pp " + args.joinToString(" "))
                 true
             }
-            setTabCompleter { sender, _, _, args ->
-                PluginPortalBase.lamp.autoCompleter().complete(actor(sender), "pp " + args.joinToString(" "))
+            setTabCompleter { sender, _, label, args ->
+                PluginPortalBase.lamp.autoCompleter().complete(actor(sender, label), "pp " + args.joinToString(" "))
             }
         }
         server.pluginManager.registerEvents(UpdateNotificationListener(), this)
         Metrics(this, 18005)
     }
 
-    private fun actor(sender: CommandSender) = PortalCommandActor(
-        CommandSenderAudience(sender, audiences), sender.name,
+    private fun actor(sender: CommandSender, label: String) = PortalCommandActor(
+        CommandAliasAudience(CommandSenderAudience(sender, audiences), label), sender.name,
         (sender as? Player)?.uniqueId ?: UUID(0, 0), sender is ConsoleCommandSender,
         { permission -> sender.hasPermission(permission) || sender.hasPermission("pluginportal.admin") },
     )

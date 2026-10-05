@@ -12,6 +12,9 @@ Keep shared logic in core; put platform APIs in platforms/bukkit or
 platforms/velocity. distribution owns the one public shaded JAR and marketplace
 tasks. Keep both descriptors and their versions aligned. Internal Lamp commands
 use pp; Velocity exposes ppv and ppnetwork without intercepting backend pp.
+Capture the native command label per invocation. Help, hover hints, pagination,
+and asynchronous action buttons must retain that alias, including the shorter
+ppnetwork path. Do not store the current alias in shared or thread-local state.
 
 Use numbered prereleases (4.0.0-beta.N) until the universal release is promoted.
 Gradle defaults prereleases to Modrinth beta/alpha and Hangar Snapshot. Never send

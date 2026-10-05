@@ -8,6 +8,9 @@ Plugin Portal uses one JAR. All local management is free. Network management
 requires an active account entitlement checked by the hosted API. A permission
 does not grant network access. On Velocity, replace `/pp` with `/ppv`.
 `/ppnetwork` is an alias for `/ppv network`.
+Help, hover hints, and command buttons keep the alias you entered. For example,
+`/ppnetwork help` suggests `/ppnetwork list`, while `/ppv network help` suggests
+`/ppv network list`.
 
 Command discovery and help require `pluginportal.view`. Grant it alongside the
 specific action permissions for limited roles. Players without it cannot see
