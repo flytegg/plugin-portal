@@ -172,7 +172,8 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
                             "ready" -> require(message.get("nodeId").asString == nodeId)
                             "operation" -> {
                                 val operation = message.getAsJsonObject("operation").deepCopy()
-                                try { operations.execute { execute(operation) } }
+                                val expectedNodeId = nodeId ?: return
+                                try { operations.execute { execute(operation, expectedNodeId) } }
                                 catch (_: java.util.concurrent.RejectedExecutionException) {
                                     operation.get("id")?.asString?.takeIf(::validId)?.let { sendResult(it, result("failed", "Node operation queue is full; submit a new operation later.")) }
                                 }
@@ -205,7 +206,9 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
         scheduler.schedule({ if (retryGeneration == generation.get()) connect() }, delay, TimeUnit.SECONDS)
     }
 
-    private fun execute(operation: JsonObject) {
+    private fun execute(operation: JsonObject, expectedNodeId: String) {
+        // A queued operation must never cross a local leave and re-enrollment.
+        if (closed.get() || nodeId != expectedNodeId) return
         val id = operation.get("id")?.asString ?: return
         if (!validId(id)) return
         val action = operation.getAsJsonObject("action") ?: return
