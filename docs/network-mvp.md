@@ -67,7 +67,12 @@ URL query parameters. Nodes renew through the API and reconnect with bounded
 backoff. Credentials and enrollment codes are stored as hashes on the API. The
 API-to-relay secret is private configuration and is never part of the JAR.
 
-Every control request checks the current owner account. Manual entitlement removal
+Every control request checks the current owner account. Manual entitlements
+and purchase credentials are protected from public account updates. The API's
+trusted admin and verified marketplace flows own these writes. Local leaving also
+fences queued work to its old node identity, so it cannot run after re-enrollment.
+
+Manual entitlement removal
 prevents new operations and renewals immediately; existing sessions expire within
 five minutes. Marketplace entitlement verification may be cached for ten minutes,
 so provider-side changes may take up to fifteen minutes to remove all live access.
