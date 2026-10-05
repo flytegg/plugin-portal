@@ -47,6 +47,9 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
         private set
     private var retrySeconds = 2L
     private val generation = AtomicLong(0)
+    private data class ServerNames(val nodeId: String, val receivedAt: Long, val values: List<String>)
+    @Volatile private var serverNames: ServerNames? = null
+    private val refreshingNames = AtomicBoolean(false)
     @Volatile private var ready = false
     val isStopped get() = operations.isTerminated
     val nodeId get() = identity?.get("nodeId")?.asString
@@ -113,7 +116,31 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
         status = "Not enrolled; revoke the old node in the dashboard"
     }
 
-    fun state(): JsonObject = request("state")
+    fun state(): JsonObject {
+        val id = nodeId
+        val response = request("state")
+        if (id != null && nodeId == id) {
+            val names = response.getAsJsonArray("nodes").map { it.asJsonObject }.filter { !it.get("revoked").asBoolean }
+                .flatMap { listOf(it.get("name").asString, it.get("id").asString) }.distinct()
+            serverNames = ServerNames(id, System.nanoTime(), names)
+        }
+        return response
+    }
+
+    fun serverNameSuggestions(): List<String> {
+        val id = nodeId ?: return emptyList()
+        if (role != "controller" || closed.get()) return emptyList()
+        val cached = serverNames?.takeIf { it.nodeId == id }
+        val age = cached?.let { System.nanoTime() - it.receivedAt } ?: Long.MAX_VALUE
+        // Bukkit completion is synchronous; refresh without blocking its server thread.
+        if (age > TimeUnit.SECONDS.toNanos(10) && refreshingNames.compareAndSet(false, true)) {
+            runtime.executor.execute {
+                try { state() } catch (_: Exception) { serverNames = null }
+                finally { refreshingNames.set(false) }
+            }
+        }
+        return cached?.takeIf { age <= TimeUnit.SECONDS.toNanos(30) }?.values ?: emptyList()
+    }
     fun submit(targets: List<String>, action: JsonObject): JsonObject {
         check(role == "controller") { "This node is not a controller" }
         require(targets.isNotEmpty() && targets.size <= 100 && targets.distinct().size == targets.size && targets.all(::validId)) { "Use 1 to 100 unique node IDs" }

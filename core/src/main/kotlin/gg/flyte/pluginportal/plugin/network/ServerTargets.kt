@@ -2,6 +2,7 @@ package gg.flyte.pluginportal.plugin.network
 
 import com.google.gson.JsonObject
 import gg.flyte.pluginportal.common.chat.*
+import gg.flyte.pluginportal.common.PluginPortalBase
 import gg.flyte.pluginportal.common.commands.lamp.PortalCommandActor
 import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
 import gg.flyte.pluginportal.common.types.enums.MarketplacePlatform
@@ -13,6 +14,16 @@ import revxrsal.commands.node.ExecutionContext
 import java.util.concurrent.CompletableFuture
 
 object ServerTargets {
+    private val targetArgument = Regex("""(?:^|\s)(?:--servers?|-s|-S)\s+("[^"]*"?|[^\s"]*)$""")
+
+    fun completingTarget(input: String): String? = targetArgument.find(input)?.groupValues?.get(1)
+
+    fun complete(actor: PortalCommandActor, input: String): List<String> {
+        val suggestions = PluginPortalBase.lamp.autoCompleter().complete(actor, input)
+        if (completingTarget(input)?.startsWith('"') != false) return suggestions
+        return suggestions.map { if (' ' in it && !it.startsWith('"')) "\"$it\"" else it }.distinct()
+    }
+
     fun requested(actor: PortalCommandActor, server: String?, servers: String?, task: (String) -> Unit): Boolean {
         if (server == null && servers == null) return false
         if (!actor.hasPermission("pluginportal.network")) actor.audience.sendFailure("You do not have permission to target other servers.")
@@ -94,15 +105,11 @@ object ServerTargets {
 class ServerTargetSuggestionProvider : AsyncSuggestionProvider<PortalCommandActor> {
     override fun getSuggestionsAsync(context: ExecutionContext<PortalCommandActor>): CompletableFuture<Collection<String>> {
         if (!context.actor().hasPermission("pluginportal.network")) return CompletableFuture.completedFuture(emptyList())
-        return CompletableFuture.supplyAsync {
-            runCatching {
-                val argument = context.input().source().substringAfterLast(' ').trim('"')
-                val prefix = if (',' in argument) argument.substringBeforeLast(',') + "," else ""
-                PortalApplication.network.state().getAsJsonArray("nodes").map { it.asJsonObject }.filter { !it.get("revoked").asBoolean }
-                    .flatMap { listOf(it.get("name").asString, it.get("id").asString) }
-                    .filter { ',' !in it && '"' !in it && it !in prefix.split(',') }
-                    .distinct().map { name -> (prefix + name).let { if (' ' in it) "\"$it\"" else it } }
-            }.getOrDefault(emptyList())
-        }
+        val argument = ServerTargets.completingTarget(context.input().source())?.trim('"') ?: ""
+        val prefix = if (',' in argument) argument.substringBeforeLast(',') + "," else ""
+        val names = PortalApplication.network.serverNameSuggestions()
+            .filter { ',' !in it && '"' !in it && it !in prefix.split(',') }
+            .flatMap { name -> (prefix + name).let { if (' ' in it) listOf(it, "\"$it\"") else listOf(it) } }
+        return CompletableFuture.completedFuture(names)
     }
 }

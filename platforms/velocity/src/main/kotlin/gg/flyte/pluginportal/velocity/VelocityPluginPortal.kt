@@ -15,6 +15,7 @@ import gg.flyte.pluginportal.common.commands.lamp.PortalCommandActor
 import gg.flyte.pluginportal.common.runtime.*
 import gg.flyte.pluginportal.common.types.enums.ServerType
 import gg.flyte.pluginportal.plugin.PortalApplication
+import gg.flyte.pluginportal.plugin.network.ServerTargets
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.audience.MessageType
 import net.kyori.adventure.identity.Identity
@@ -23,6 +24,7 @@ import net.kyori.adventure.text.Component
 import java.io.File
 import java.nio.file.Path
 import java.util.UUID
+import java.util.concurrent.CompletableFuture
 import java.util.logging.Logger
 
 class VelocityPluginPortal @Inject constructor(
@@ -38,7 +40,9 @@ class VelocityPluginPortal @Inject constructor(
                 PluginPortalBase.lamp.dispatch(actor(invocation), "pp " + invocation.arguments().joinToString(" "))
             }
             override fun suggest(invocation: SimpleCommand.Invocation): List<String> =
-                PluginPortalBase.lamp.autoCompleter().complete(actor(invocation), "pp " + invocation.arguments().joinToString(" "))
+                ServerTargets.complete(actor(invocation), "pp " + invocation.arguments().joinToString(" "))
+            override fun suggestAsync(invocation: SimpleCommand.Invocation): CompletableFuture<List<String>> =
+                CompletableFuture.supplyAsync({ suggest(invocation) }, PortalApplication.runtime.executor)
         })
         proxy.commandManager.register(proxy.commandManager.metaBuilder("ppnetwork").plugin(this).build(), object : SimpleCommand {
             override fun hasPermission(invocation: SimpleCommand.Invocation) = allows(invocation.source(), "pluginportal.network")
@@ -47,6 +51,8 @@ class VelocityPluginPortal @Inject constructor(
             }
             override fun suggest(invocation: SimpleCommand.Invocation): List<String> =
                 PluginPortalBase.lamp.autoCompleter().complete(actor(invocation), "pp network " + invocation.arguments().joinToString(" "))
+            override fun suggestAsync(invocation: SimpleCommand.Invocation): CompletableFuture<List<String>> =
+                CompletableFuture.supplyAsync({ suggest(invocation) }, PortalApplication.runtime.executor)
         })
     }
 

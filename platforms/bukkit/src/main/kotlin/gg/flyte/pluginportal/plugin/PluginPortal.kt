@@ -36,7 +36,7 @@ open class PluginPortal : JavaPlugin() {
                 true
             }
             setTabCompleter { sender, _, label, args ->
-                PluginPortalBase.lamp.autoCompleter().complete(actor(sender, label), "pp " + args.joinToString(" "))
+                gg.flyte.pluginportal.plugin.network.ServerTargets.complete(actor(sender, label), "pp " + args.joinToString(" "))
             }
         }
         server.pluginManager.registerEvents(UpdateNotificationListener(), this)

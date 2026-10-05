@@ -6,6 +6,7 @@
 - Default dashboard control to read-only, with console approval enforced by the API and each server.
 - Add link, unlink, servers, history, and dashboard commands.
 - Support explicit named or UUID targets on install, update, uninstall, and list.
+- Complete quoted server names and comma-separated targets without blocking Bukkit on network requests.
 - Retain older network aliases and local command behavior.
 
 ## Unreleased
