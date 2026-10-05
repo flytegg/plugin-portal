@@ -1,3 +1,5 @@
+import java.util.jar.JarFile
+
 plugins {
     id("pp.plugin-conventions")
     id("io.papermc.hangar-publish-plugin")
@@ -25,7 +27,7 @@ modrinth {
     versionType.set(modrinthVersionType)
     uploadFile.set(tasks.shadowJar)
     gameVersions.addAll(supportedMinecraftVersions)
-    loaders.addAll("bukkit", "folia", "paper", "purpur", "spigot")
+    loaders.addAll("bukkit", "folia", "paper", "purpur", "spigot", "velocity")
     changelog.set(marketplaceChangelog)
     debugMode.set((findProperty("modrinthDebugMode") as? String)?.toBoolean() ?: false)
 }
@@ -39,6 +41,10 @@ hangarPublish {
         apiKey = System.getenv("HANGAR_API_TOKEN")
 
         platforms {
+            velocity {
+                jar = tasks.shadowJar.flatMap { it.archiveFile }
+                platformVersions = listOf("3.4")
+            }
             paper {
                 jar = tasks.shadowJar.flatMap { it.archiveFile }
                 platformVersions = supportedMinecraftVersions
@@ -46,3 +52,20 @@ hangarPublish {
         }
     }
 }
+
+val verifyUniversalJar by tasks.registering {
+    group = "verification"
+    dependsOn(tasks.shadowJar)
+    val artifact = tasks.shadowJar.flatMap { it.archiveFile }
+    inputs.file(artifact)
+    doLast {
+        JarFile(artifact.get().asFile).use { jar ->
+            listOf(
+                "plugin.yml", "velocity-plugin.json",
+                "gg/flyte/pluginportal/plugin/PluginPortal.class",
+                "gg/flyte/pluginportal/velocity/VelocityPluginPortal.class",
+            ).forEach { path -> check(jar.getJarEntry(path) != null) { "Missing universal JAR entry: $path" } }
+        }
+    }
+}
+tasks.check { dependsOn(verifyUniversalJar) }

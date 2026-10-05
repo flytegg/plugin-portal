@@ -35,8 +35,8 @@ if (!args.modrinth && !args.hangar) {
 }
 
 const publishTasks: string[] = [];
-if (args.modrinth) publishTasks.push(":plugin:modrinth");
-if (args.hangar) publishTasks.push(":plugin:publishPluginPublicationToHangar");
+if (args.modrinth) publishTasks.push(":distribution:modrinth");
+if (args.hangar) publishTasks.push(":distribution:publishPluginPublicationToHangar");
 
 await publishMarketplaces(args, publishTasks, pluginJar);
 
@@ -121,7 +121,7 @@ async function publishMarketplaces(args: Args, tasks: string[], jarPath: string)
     if (args.hangar && !args.modrinth) return;
     if (args.modrinth) {
       await runChecked(
-        command.filter((part) => part !== ":plugin:publishPluginPublicationToHangar"),
+        command.filter((part) => part !== ":distribution:publishPluginPublicationToHangar"),
         "Modrinth dry run",
         { MODRINTH_TOKEN: process.env.MODRINTH_TOKEN ?? "dry-run-token" },
       );
