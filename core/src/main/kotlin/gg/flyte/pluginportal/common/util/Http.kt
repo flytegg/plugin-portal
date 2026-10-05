@@ -106,7 +106,7 @@ fun Plugin.download(
     val file = download(
         URL(downloadUrl),
         jarFile,
-        audience
+        audience, expectedSha256 = version.sha256
     ) ?: return null
 
     LocalPluginCache.removeIf { plugin ->
@@ -138,38 +138,9 @@ fun Plugin.download(
     return newPlugin
 }
 
-fun download(url: URL, destination: File, audience: Audience?, authCreds: AuthCreds? = null): File? = runCatching {
-    val connection = url.openConnection().apply {
-        connectTimeout = 15_000
-        readTimeout = 60_000
-        // Use a more specific User-Agent for Polymart compatibility
-        setRequestProperty("User-Agent", "PluginPortal/1.0")
-        val apiKey = authCreds?.mclKey?.trim()?.takeIf { it.isNotEmpty() }
-        if (apiKey != null && (url.host == "localhost" || url.host == "pluginportal.link" || url.host.endsWith(".pluginportal.link"))) {
-            setRequestProperty("x-api-key", apiKey)
-            setRequestProperty("Authorization", "Bearer $apiKey")
-        }
-        // Handle redirects
-        if (this is HttpURLConnection) {
-            instanceFollowRedirects = true
-        }
-    }
-
-    connection.getInputStream().use { input ->
-        destination.parentFile.mkdirs()
-        destination.outputStream().use { output -> input.copyTo(output) }
-    }
-    destination
+fun download(url: URL, destination: File, audience: Audience?, authCreds: AuthCreds? = null, expectedSha256: String? = null): File? = runCatching {
+    downloadJar(url, destination, currentServerTypePreference(), expectedSha256, authCreds?.mclKey)
 }.onFailure {
-    logger.warning("Download failed from $url: ${it.message ?: it::class.simpleName}")
-    audience?.sendMessage(
-        text("\n").append(
-            status(Status.FAILURE, "An error occurred while downloading\n")
-                .append(
-                    textSecondary("- Please try again, or join our ")
-                    .append(SharedComponents.DISCORD_COMPONENT)
-                    .appendSecondary(" for support.")
-                ).append(endLine())
-        )
-    )
+    logger.warning("Plugin download failed: ${it::class.simpleName}")
+    audience?.sendFailure(it.message ?: "Download failed")
 }.getOrNull()

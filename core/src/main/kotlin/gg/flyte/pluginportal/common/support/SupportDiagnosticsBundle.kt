@@ -116,7 +116,7 @@ object SupportDiagnosticsBundle {
     }
 
     private fun pluginFolderInventory(): List<Map<String, Any?>> {
-        val folders = listOf(File("plugins"), File("plugins/update"))
+        val folders = listOf(gg.flyte.pluginportal.common.Constants.INSTALL_DIRECTORY, gg.flyte.pluginportal.common.Constants.UPDATE_DIRECTORY)
         return folders.flatMap { folder ->
             folder.listFiles()?.toList().orEmpty().map { file ->
                 val sha256 = if (file.isFile && file.extension.equals("jar", ignoreCase = true)) {

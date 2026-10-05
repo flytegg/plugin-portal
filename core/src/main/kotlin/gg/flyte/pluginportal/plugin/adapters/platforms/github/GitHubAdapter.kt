@@ -47,7 +47,7 @@ object GitHubAdapter : PlatformAdapter {
 
     fun GithubAsset.download(adaptation: Adaptation, release: GithubRelease): Boolean {
 
-        val jarFile = File("plugins", "[PP] ${adaptation.githubRepo!!.split("/").last()} (ADAPTER-GITHUB).jar")
+        val jarFile = File(gg.flyte.pluginportal.common.Constants.INSTALL_DIRECTORY, "[PP] ${adaptation.githubRepo!!.split("/").last()} (ADAPTER-GITHUB).jar")
 
         val file = download(
             URL(browserDownloadURL),

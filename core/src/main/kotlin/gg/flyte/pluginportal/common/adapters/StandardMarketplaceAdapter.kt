@@ -57,7 +57,7 @@ class StandardMarketplaceAdapter : DownloadAdapter {
             val targetFile = File(request.targetDirectory, fileName)
             
             try {
-                val downloaded = gg.flyte.pluginportal.common.util.download(java.net.URL(version.downloadURL), targetFile, request.audience)
+                val downloaded = gg.flyte.pluginportal.common.util.download(java.net.URL(version.downloadURL), targetFile, request.audience, expectedSha256 = version.sha256)
                     ?: return DownloadResult(false, error = "Download failed")
                 
                 val localPlugin = gg.flyte.pluginportal.common.types.LocalPlugin(

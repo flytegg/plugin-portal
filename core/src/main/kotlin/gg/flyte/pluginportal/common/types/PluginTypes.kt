@@ -119,11 +119,11 @@ sealed class ExactVersionSelection {
 }
 
 fun List<Version>.compatibleVersions(serverTypePreference: List<ServerType>, minecraftVersion: String? = null): List<Version> =
-    filter { version -> version.isCompatibleWith(serverTypePreference) }
+    mapNotNull { version -> version.forRuntime(serverTypePreference) }
         .preferMinecraftVersion(minecraftVersion)
 
 fun List<Version>.exactCompatibleVersion(versionNumber: String, channel: String?, serverTypePreference: List<ServerType>, minecraftVersion: String? = null): ExactVersionSelection {
-    val matches = filter { version -> version.isCompatibleWith(serverTypePreference) }
+    val matches = mapNotNull { version -> version.forRuntime(serverTypePreference) }
         .filter { version -> version.versionNumber == versionNumber }
         .filter { version -> channel == null || version.releaseChannel.equals(channel, ignoreCase = true) }
         .preferMinecraftVersion(minecraftVersion)
@@ -150,7 +150,7 @@ private fun List<Version>.bestCompatibleVersion(serverTypePreference: List<Serve
     )
 
 fun List<Version>.newestCompatibleVersion(channel: String?, serverTypePreference: List<ServerType>, minecraftVersion: String? = null): Version? =
-    filter { version -> version.isCompatibleWith(serverTypePreference) }
+    mapNotNull { version -> version.forRuntime(serverTypePreference) }
         .filter { version -> channel == null || version.releaseChannel.equals(channel, ignoreCase = true) }
         .preferStableChannel(channel)
         .preferMinecraftVersion(minecraftVersion)
@@ -305,7 +305,17 @@ data class Version(
     val mcVersions: List<String>? = null,
     val serverTypes: Array<ServerType>,
     val sha256: String?,
+    val artifacts: List<VersionArtifact>? = null,
 ) {
+    fun forRuntime(preference: List<ServerType>): Version? {
+        if (artifacts.isNullOrEmpty()) return this.takeIf { isCompatibleWith(preference) }
+        val artifact = artifacts.minByOrNull { candidate ->
+            preference.indexOfFirst { it in candidate.serverTypes }.takeIf { it >= 0 } ?: Int.MAX_VALUE
+        }?.takeIf { candidate -> preference.any { it in candidate.serverTypes } } ?: return null
+        return copy(downloadURL = artifact.downloadURL, sha256 = artifact.sha256, serverTypes = artifact.serverTypes,
+            mcVersions = artifact.mcVersions ?: mcVersions, artifacts = null)
+    }
+
     val supportedMinecraftVersions: List<String>
         get() = (extractMinecraftVersions(supportedVersions) + mcVersions.orEmpty().mapNotNull(::normalizeMinecraftVersion))
             .distinct()
@@ -377,3 +387,5 @@ data class Hashes(
 data class Pagination(
     val total: Int, val limit: Int, val offset: Int, val hasMore: Boolean
 )
+
+data class VersionArtifact(val serverTypes: Array<ServerType>, val downloadURL: String, val sha256: String?, val mcVersions: List<String>? = null)

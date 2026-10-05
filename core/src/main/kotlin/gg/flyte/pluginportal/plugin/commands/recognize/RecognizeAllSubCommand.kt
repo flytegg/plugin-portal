@@ -98,9 +98,9 @@ class RecognizeAllSubCommand {
                     val (sha256, sha512) = file.hash
                     val plugin = recognitionResponse?.plugin
                     val ppl = plugin?.platforms?.best ?: return@forEach noRecognize(file)
-                    val version = recognitionResponse.version ?: ppl.newestBukkitPaperVersion(null)?.versionNumber
+                    val version = recognitionResponse.version ?: ppl.newestCompatibleVersion(null, gg.flyte.pluginportal.common.util.currentServerTypePreference(), gg.flyte.pluginportal.common.util.currentMinecraftVersion())?.versionNumber
                     if (version == null) {
-                        log("Could not find a compatible Bukkit/Paper version for ${plugin.name} from ${file.name}")
+                        log("Could not find a compatible version for ${plugin.name} from ${file.name}")
                         return@forEach noRecognize(file)
                     }
                     val local = LocalPlugin(

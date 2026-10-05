@@ -65,4 +65,13 @@ private class VelocityRuntime(private val proxy: ProxyServer, override val dataF
     override val serverTypes = listOf(ServerType.VELOCITY)
     override val updateDirectory get() = File(dataFolder, "pending-updates")
     override val commandName = "ppv"
+    override fun close() {
+        super.close()
+        if (!executor.isTerminated) {
+            logger.warning("Pending updates retained because plugin tasks did not stop. Apply them while the proxy is stopped.")
+            return
+        }
+        gg.flyte.pluginportal.common.runtime.StagedUpdates.apply(updateDirectory, installDirectory, File(dataFolder, "backups"))
+            .forEach { logger.warning(it) }
+    }
 }

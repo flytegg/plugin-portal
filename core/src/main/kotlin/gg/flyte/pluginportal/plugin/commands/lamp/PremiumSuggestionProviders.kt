@@ -11,7 +11,7 @@ import java.io.File
 class PluginJarFilesUnrecognisedSP: CustomSuggestionProvider({
     val externalHashes = ExternalPluginManager.managedHashes()
     val externalFileNames = ExternalPluginManager.managedFileNames()
-    File("plugins").listFiles()
+    gg.flyte.pluginportal.common.Constants.INSTALL_DIRECTORY.listFiles()
         .orEmpty()
         .filter { file ->
             if (!file.isJarFile()) return@filter false
@@ -26,5 +26,5 @@ class PluginJarFilesUnrecognisedSP: CustomSuggestionProvider({
 })
 
 class PluginJarFilesSuggestionProvider: CustomSuggestionProvider({
-    File("plugins").listFiles().orEmpty().filter(File::isJarFile).map(File::getName)
+    gg.flyte.pluginportal.common.Constants.INSTALL_DIRECTORY.listFiles().orEmpty().filter(File::isJarFile).map(File::getName)
 })

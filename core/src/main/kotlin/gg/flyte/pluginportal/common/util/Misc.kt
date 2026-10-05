@@ -17,14 +17,34 @@ fun File.createIfNotExists() = apply {
     parentFile?.mkdirs()
     if (!exists()) createNewFile()
 }
-fun File.getPluginYML() = runCatching {
+fun File.getPluginYML(): Map<String, Any>? = runCatching {
     JarFile(this).use { jar ->
-        val ymlEntry: JarEntry = jar.getJarEntry("plugin.yml") ?: return null
-        jar.getInputStream(ymlEntry).use { stream ->
-            Yaml().load<Map<String, Any>>(stream.reader())
+        val descriptor = listOf("plugin.yml", "paper-plugin.yml", "velocity-plugin.json")
+            .firstNotNullOfOrNull { jar.getJarEntry(it) } ?: return null
+        jar.getInputStream(descriptor).use { stream ->
+            val text = stream.readNBytes(256 * 1024 + 1)
+            require(text.size <= 256 * 1024) { "Plugin descriptor is too large" }
+            if (descriptor.name.endsWith(".json")) {
+                @Suppress("UNCHECKED_CAST")
+                GSON.fromJson(String(text, Charsets.UTF_8), Map::class.java) as Map<String, Any>
+            } else {
+                Yaml(org.yaml.snakeyaml.constructor.SafeConstructor(org.yaml.snakeyaml.LoaderOptions()))
+                    .load<Map<String, Any>>(String(text, Charsets.UTF_8))
+            }
         }
     }
 }.getOrNull()
+
+fun File.requireCompatibleJar(serverTypes: List<gg.flyte.pluginportal.common.types.enums.ServerType>) {
+    JarFile(this).use { jar ->
+        val velocity = gg.flyte.pluginportal.common.types.enums.ServerType.VELOCITY in serverTypes
+        val compatible = if (velocity) jar.getJarEntry("velocity-plugin.json") != null
+        else jar.getJarEntry("plugin.yml") != null ||
+            (serverTypes.any { it.platform == gg.flyte.pluginportal.common.types.enums.ServerPlatform.PAPER } && jar.getJarEntry("paper-plugin.yml") != null)
+        require(compatible) { "Downloaded JAR is incompatible with ${serverTypes.first()}" }
+        require(getPluginYML()?.get("version") != null) { "Downloaded JAR has no valid plugin descriptor" }
+    }
+}
 /** @return true if the plugin.yml name is a Plugin Portal artifact. */
 val File.isPluginPortal: Boolean get() = (getPluginYML()?.get("name") as? String)?.contains("PluginPortal") == true
 

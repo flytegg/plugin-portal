@@ -83,7 +83,7 @@ object AdapterPluginCache : PluginCache<AdapterPlugin>() {
      */
     fun AdapterPlugin.popCurrentVersionFile() = updatedPluginMap.remove(this)
 
-    private val pluginsFolder = File("plugins")
+    private val pluginsFolder = gg.flyte.pluginportal.common.Constants.INSTALL_DIRECTORY
     private val updateFolder = File(pluginsFolder, "update").apply { if (!exists()) mkdirs() }
 
     private fun AdapterPlugin.hasValidPlatform() = runCatching { platform.name }.isSuccess

@@ -43,5 +43,8 @@ abstract class PortalRuntime : AutoCloseable {
             .use { input -> destination.outputStream().use(input::copyTo) }
     }
 
-    override fun close() { executor.shutdownNow() }
+    override fun close() {
+        executor.shutdown()
+        if (!executor.awaitTermination(15, java.util.concurrent.TimeUnit.SECONDS)) executor.shutdownNow()
+    }
 }

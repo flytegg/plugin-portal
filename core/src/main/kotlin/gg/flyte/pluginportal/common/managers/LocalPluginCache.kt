@@ -67,11 +67,9 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
             installedAt = System.currentTimeMillis(),
         )
 
-        val pluginsInFolder: Map<String, File> = Constants.INSTALL_DIRECTORY
-            .listFiles()
-            ?.filter(File::isJarFile)
-            ?.associateBy { HashType.SHA256.hash(it) }
-            ?: mapOf()
+        val pluginsInFolder: Map<String, File> = (Constants.INSTALL_DIRECTORY.listFiles().orEmpty().toList() + Constants.UPDATE_DIRECTORY.listFiles().orEmpty().toList())
+            .filter(File::isJarFile)
+            .associateBy { HashType.SHA256.hash(it) }
 
         val text = getPluginsFile().readText()
         // If the config is empty, add the local pp plugin
@@ -129,11 +127,13 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
         return migration
     }
 
-    fun save() {
-        async {
-            val text = GSON.toJson(toTypedArray().distinctBy { plugin -> plugin.entryId })
-            getPluginsFile().writeText(text)
-        }
+    @Synchronized fun save() {
+        val file = getPluginsFile()
+        val temporary = Files.createTempFile(file.parentFile.toPath(), ".plugins-", ".json")
+        try {
+            Files.writeString(temporary, GSON.toJson(toTypedArray().distinctBy { plugin -> plugin.entryId }))
+            Files.move(temporary, file.toPath(), java.nio.file.StandardCopyOption.ATOMIC_MOVE, java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+        } finally { Files.deleteIfExists(temporary) }
     }
 
 
@@ -216,8 +216,8 @@ object LocalPluginCache : PluginCache<LocalPlugin>() {
      */
     fun LocalPlugin.popCurrentVersionFile() = updatedPluginMap.remove(this)
 
-    private val pluginsFolder = File("plugins")
-    private val updateFolder = File(pluginsFolder, "update").apply { if (!exists()) mkdirs() }
+    private val pluginsFolder get() = Constants.INSTALL_DIRECTORY
+    private val updateFolder get() = Constants.UPDATE_DIRECTORY.apply { mkdirs() }
 
     fun LocalPlugin.findFile(): File? {
         val files = mutableListOf<File>().apply {

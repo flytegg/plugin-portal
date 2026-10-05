@@ -110,8 +110,8 @@ class RecognizeSubCommand {
 
             val platformPlugin = recognizedPlugin.platforms.best ?: return@async audience.sendFailure("Could not find an available platform")
             val version = recognized.version
-                ?: platformPlugin.newestBukkitPaperVersion(null)?.versionNumber
-                ?: return@async audience.sendFailure("No compatible Bukkit/Paper version found for ${recognizedPlugin.name}")
+                ?: platformPlugin.newestCompatibleVersion(null, gg.flyte.pluginportal.common.util.currentServerTypePreference(), gg.flyte.pluginportal.common.util.currentMinecraftVersion())?.versionNumber
+                ?: return@async audience.sendFailure("No compatible version found for ${recognizedPlugin.name}")
 
             logger.info("Adding $platformPlugin plugin to cache ${platformPlugin.platformId} ${recognizedPlugin.name}")
 
