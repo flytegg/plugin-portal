@@ -9,31 +9,35 @@ BungeeCord is outside this release. This candidate is not a published release.
 1. Sign in to the dashboard. Link your MC License key under Purchases, or use your verified purchase.
 2. Choose Add server. Enter a name and choose Paper / Bukkit or Velocity.
 3. Allow network commands for a trusted controller, normally your proxy.
-4. Install the same JAR on every server and run its generated link command in the console.
+4. Install the same JAR on every server. Run its link command in the console, review the account/network/role, then run `pp link confirm` (or `pp link cancel`).
 5. View status and inventory for all groups in Your servers. Viewing is read-only.
-6. Use `/ppv servers`, `/ppv list --server lobby`, or `/ppv install LuckPerms MODRINTH --servers lobby,proxy` from the controller.
+6. Approve remote plugin writes with `pp control enable` in every target console. Use `/ppv servers`, `/ppv list --server lobby`, or `/ppv install LuckPerms MODRINTH --servers lobby,proxy` from the controller.
 7. Inspect `/ppv history` and restart affected servers to apply JAR changes.
 
 Use `/pp` on backends and `/ppv` on Velocity. Existing `/pp network`, `/ppv network`,
 and `/ppnetwork` commands remain compatible. The proxy leaves backend `/pp` available.
 Names resolve within the controller's group; ambiguous names require UUIDs.
 
-Dashboard writes require separate local approval on every target. Run
-`pp dashboard enable` in the backend console or `ppv dashboard enable` in the proxy
-console. `Dashboard.AllowWrites` defaults to false and cannot be changed through
+Dashboard and controller writes require local approval on every target. Run
+`pp control enable` in the backend console or `ppv control enable` in the proxy
+console. `RemoteControl.AllowWrites` defaults to false and cannot be changed through
 the editor. Linking a purchase or server never grants this approval. The API tags
 operation source; the JAR checks approval again before mutation. Disabling or
 unlinking clears approval. Approval survives a normal restart. The dashboard
 requires explicit target selection and review before sending a change.
 
-A controller credential can operate every enrolled node in its own network.
+A controller credential can read inventories and request changes only on approved
+nodes in its own network.
 Keep controller access limited to machines you trust.
 
 Enrollment codes expire after 15 minutes and are consumed once. A node stores its
 individual credential in `network-node.json` with owner-only filesystem permissions.
 The dashboard never receives that credential. Revoke a node in the dashboard to
 remove hosted access; `/pp unlink` deletes its local credential. Leaving
-alone does not revoke a copied credential. Re-enrollment creates a new node.
+alone does not revoke a copied credential. Re-enrollment creates a new node. Pending review is memory only, and confirmation
+is bound to the account, network, node, role, platform and expiry reviewed locally.
+Changes to that identity require a new review. Exclude node identity files from
+server templates. Migrating the old `Dashboard` setting leaves writes disabled.
 
 ## Operations and recovery
 
@@ -50,6 +54,8 @@ dashboard's retry control only prepares targets for review; it does not run them
 
 Updates honor each node's feature switches and blacklist. Exact versions require
 compatible catalog metadata and exclude that plugin from future automatic updates.
+Manage Plugin Portal itself through its local upgrade command; remote operations
+cannot install, update, or uninstall their own running agent.
 Downloads resolve separately for Paper and Velocity. JARs use bounded HTTPS
 downloads, platform descriptor checks, optional SHA-256 verification, atomic file
 replacement, redirect limits, and symbolic-link restrictions. File changes retain
@@ -95,6 +101,25 @@ remote shell, arbitrary download URL, restart, or configuration operation. A for
 cannot grant itself hosted access without API authorization. Source-available
 license terms prohibit entitlement bypass and unauthorized service access; they
 do not make client bytecode unmodifiable or prevent an independent implementation.
+
+## Upgrade and validation
+
+The real upgrade runner replaces the released public 3.8.7 JAR with the universal
+beta after installing ViaVersion. It verifies tracking, blacklist state, custom
+config, telemetry preference, disk/config key compatibility, external settings and
+plugin data. Old dashboard approval resets to false. This is a public 3.x binary
+upgrade plus legacy state fixtures, not proof from a historical buyer-specific
+Premium binary or a live vendor purchase.
+
+```sh
+PLUGIN_PORTAL_JAR=/absolute/path/PluginPortal-4.0.0-beta.2.jar \
+  bun scripts/smoke-in-place-upgrade.ts 3.8.7 4.0.0-beta.2 \
+  --server-jar .cache/mcjars/paper-1.21.11-latest.jar
+```
+
+`smoke-run-paper.ts` builds into ignored `build/paper-smoke-artifacts` by default.
+With `--server-jar`, `PLUGIN_PORTAL_JAR` validates an already built candidate.
+Neither flow overwrites a normal build used by an existing server.
 
 ## Bounds, costs, and outages
 

@@ -39,8 +39,10 @@ A marketplace listing must supply a compatible downloadable JAR.
 ## Free local tools and paid networks
 
 The dashboard lists your proxy and backends across groups. Link a purchase, use
-Add server, and run its one-use `/pp link` command in each console. Dashboard
-plugin changes default to read-only and require per-server console approval.
+Add server, run its one-use `/pp link` command in each console, review the account
+and network, then run `/pp link confirm`. Remote plugin changes start disabled.
+Use `pp control enable` in each target console to approve dashboard and controller
+writes. Backends enroll individually; a proxy never claims them automatically.
 Use `/pp servers`, `/pp history`, and existing commands with `--server` or
 `--servers`; use `/ppv` on Velocity. See [commands](COMMANDS.md).
 

@@ -75,6 +75,14 @@ val verifyUniversalJar by tasks.registering {
                 "gg/flyte/pluginportal/plugin/PluginPortal.class",
                 "gg/flyte/pluginportal/velocity/VelocityPluginPortal.class",
             ).forEach { path -> check(jar.getJarEntry(path) != null) { "Missing universal JAR entry: $path" } }
+            val bukkit = jar.getInputStream(jar.getJarEntry("plugin.yml")).bufferedReader().use { it.readText() }
+            val velocity = jar.getInputStream(jar.getJarEntry("velocity-plugin.json")).bufferedReader().use { it.readText() }
+            check(Regex("(?m)^version: ['\"]?${Regex.escape(project.version.toString())}['\"]?\\s*$").containsMatchIn(bukkit)) { "Bukkit descriptor version mismatch" }
+            check(Regex("\"version\"\\s*:\\s*\"${Regex.escape(project.version.toString())}\"").containsMatchIn(velocity)) { "Velocity descriptor version mismatch" }
+            check(artifact.get().asFile.name == "PluginPortal-${project.version}.jar") { "Universal filename version mismatch" }
+            listOf("mclicense.txt", "pluginportal.txt", "network-node.json", "network-operations.json", "gg/flyte/pluginportal/plugin/MarketplaceKey.class").forEach { path ->
+                check(jar.getJarEntry(path) == null) { "Runtime identity or legacy embedded key present in universal JAR: $path" }
+            }
         }
     }
 }

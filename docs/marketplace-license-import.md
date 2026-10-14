@@ -1,4 +1,20 @@
-# Marketplace license import
+# Marketplace credentials and v4 migration
+
+## Universal v4
+
+Universal v4 JARs are identical for every account. They never import embedded
+resources or rewritten marketplace placeholders. All local tools are free; a
+purchase is linked to an account in the dashboard to enable hosted networks.
+Existing `Authentication.ApiKey`, `pluginportal.txt` and `mclicense.txt` on disk
+remain compatible, but never enroll or control a server. Pair each installation
+through a reviewed console `link` command and explicit `link confirm`.
+
+A malicious JAR can run code with the server process's privileges. Enrollment
+protects against incidental account credentials in redistributed official JARs;
+it cannot make untrusted executable code safe. Use trusted artifacts.
+
+The following notes describe historical 3.x behavior only. They do not describe
+the v4 runtime or its release acceptance process.
 
 Plugin Portal imports delivery credentials before checking premium entitlement.
 Importing a credential does not grant access: `/premium/validate` remains the

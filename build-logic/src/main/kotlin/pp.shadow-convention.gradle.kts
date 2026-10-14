@@ -19,7 +19,7 @@ tasks {
 
         archiveClassifier.set("")
         archiveFileName.set("$name-${fullVersion}.jar")
-        destinationDirectory.set(file("$rootDir/out"))
+        destinationDirectory.set(file(project.findProperty("pluginPortalOutputDir") ?: "$rootDir/out"))
 
         mergeServiceFiles()
         relocate("org.yaml.snakeyaml", "gg.flyte.pluginportal.libs.yaml")

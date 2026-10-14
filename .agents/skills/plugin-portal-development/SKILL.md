@@ -60,9 +60,9 @@ Keep target suggestions cached and refresh them in the background; Bukkit tab
 completion must not wait for network I/O. Verify quoted names and comma-separated
 targets using actual completion packets, with time between proxy requests.
 
-Dashboard writes default off. Only the server console/configuration can approve
-Dashboard.AllowWrites. Enforce source and approval before mutations in the JAR,
-including queued operations; remote editors cannot grant approval. Unlinking and
+Remote writes default off. Only the server console/configuration can approve
+RemoteControl.AllowWrites for both dashboard and controller sources. Enforce source and approval before mutations in the JAR,
+including queued operations; remote editors cannot grant approval. Review account/network/role before explicit link confirmation. Unlinking and
 re-enrollment clear it. Controller commands retain separate permission checks.
 Lamp derives shorthand flags automatically; assign distinct shorthand letters
 when adding flags with the same first letter. Verify registration on real servers.

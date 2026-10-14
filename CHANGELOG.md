@@ -3,10 +3,16 @@
 ## 4.0.0-beta.2 (unreleased)
 
 - Add account dashboard server inventory and MC License purchase linking.
-- Default dashboard control to read-only, with console approval enforced by the API and each server.
-- Add link, unlink, servers, history, and dashboard commands.
+- Require reviewed console pairing, with explicit confirm/cancel and no embedded key import.
+- Default remote control to read-only; per-target console approval covers dashboard and controllers.
+- Add inventory install/update/uninstall with catalog search, fixed target review, and explicit retry handling.
+- Preserve stable downloads while offering an explicit v4 beta download.
+- Separate enrollment, transport, durable execution and storage into focused network files.
+- Add link, unlink, servers, history, and control commands (with the dashboard alias retained).
 - Support explicit named or UUID targets on install, update, uninstall, and list.
 - Complete quoted server names and comma-separated targets without blocking Bukkit on network requests.
+- Keep Plugin Portal self-upgrades local and report duplicate installs clearly.
+- Preserve released 3.x settings, tracking, blacklist, key files and plugin data on upgrade.
 - Retain older network aliases and local command behavior.
 
 ## Unreleased

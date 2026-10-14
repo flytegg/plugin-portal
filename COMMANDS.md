@@ -172,9 +172,9 @@ Key commands require `pluginportal.manage`.
 | `/pp key clear` | Clear configured authentication and refresh access. |
 
 At startup, Plugin Portal checks `Authentication.ApiKey` in `config.yml`, then
-`pluginportal.txt`, then `mclicense.txt`, then supported embedded or marketplace
-license data. These files are in `plugins/PluginPortal/`. A saved key takes
-priority over marketplace delivery. See [marketplace license import](docs/marketplace-license-import.md).
+`pluginportal.txt`, then `mclicense.txt` on disk. These files are in
+`plugins/PluginPortal/`. Embedded JAR credentials and marketplace placeholders are
+ignored in v4. Keys never enroll a server or grant remote control. See [marketplace license import](docs/marketplace-license-import.md).
 
 Never post a key, editor link, or token in a public issue. Support only needs the
 license state from `/pp info`, not the key itself.
@@ -261,7 +261,8 @@ commands to change authentication. Restart the server to apply JAR changes.
 
 Sign in to the dashboard. Link your MC License key under Purchases, or use your
 existing verified purchase. Choose **Add server**, enter its name and platform,
-and run the generated `/pp link <code>` command in its console. Groups are optional;
+and run the generated `/pp link <code>` command in its console. Review the account,
+network and role, then run `/pp link confirm` or `/pp link cancel`. Groups are optional;
 the first is created automatically. API keys do not enroll servers.
 Choose `node` for a backend and `controller` for a proxy that will initiate operations.
 Enrollment and leaving are console-only. All network commands require
@@ -275,15 +276,17 @@ names require UUIDs. Never infer an all-server target.
 
 | Command | Purpose |
 | --- | --- |
-| `/pp link <code>` | Link this server from its console. |
-| `/pp unlink` | Remove the local credential and clear dashboard approval. Console only. |
+| `/pp link <code>` | Review the account, network and role in this console. |
+| `/pp link confirm` | Consume the reviewed code and save the node credential. |
+| `/pp link cancel` | Discard the pending review without enrolling. |
+| `/pp unlink` | Remove the local credential and clear remote write approval. Console only. |
 | `/pp servers [--page <number>] [--full]` | List connected servers. Controller only. |
 | `/pp history [operationId] [--page <number>] [--full]` | Inspect operations and per-server outcomes. Controller only. |
 | `/pp list --server lobby` | View a remote inventory. |
 | `/pp install LuckPerms MODRINTH --servers lobby,proxy` | Install on explicit targets. |
 | `/pp update LuckPerms --server lobby` | Update one tracked remote plugin. |
 | `/pp uninstall LuckPerms --server lobby` | Remove a tracked remote plugin; retain its data. |
-| `/pp dashboard [enable\|disable\|status]` | Approve or disable dashboard writes on this server. Admin and console only. |
+| `/pp control [enable\|disable\|status]` | Approve or disable dashboard and controller writes on this target. Admin and console only. |
 
 On Velocity use `/ppv`; backend `/pp` still works. Remote `list` supports `--page`,
 `--full`, `--untracked`, `--all`, and `--detailed`. Remote `--outdated`, `--external`,
@@ -291,12 +294,17 @@ On Velocity use `/ppv`; backend `/pp` still works. Remote `list` supports `--pag
 and release channels use the same install/update arguments as local commands.
 
 The dashboard starts read-only, showing every linked server's status and plugin
-inventory. Each server independently approves dashboard plugin changes through
-`Dashboard.AllowWrites` (default `false`). Run `pp dashboard enable` in a backend
-console or `ppv dashboard enable` in the proxy console. The browser cannot enable
-this setting. The API and JAR both enforce it. Use `disable` to revoke approval.
-Proxy command permissions are separate from dashboard approval. Each dashboard
-change requires explicit targets and a review before submission.
+inventory. Each target independently approves dashboard and controller plugin
+changes through `RemoteControl.AllowWrites` (default `false`). Run `pp control
+enable` in a backend console or `ppv control enable` in the proxy console. The
+browser and editor cannot enable this setting. The API and JAR both enforce it.
+Use `disable` to revoke approval. Controller command permissions still apply.
+The old `dashboard` command is a compatibility alias for `control`.
+
+Normal restarts retain approval; unlinking and re-enrollment clear it. The old
+`Dashboard` section is removed without carrying its approval forward. Exclude
+`network-node.json` from server templates and shared backups: it is a credential,
+not configuration. Pending enrollment reviews remain in memory only.
 
 ### Compatibility commands
 
@@ -305,7 +313,7 @@ Existing `/pp network`, `/ppv network`, and `/ppnetwork` commands remain availab
 | Command | Purpose |
 | --- | --- |
 | `/pp network [help]` | Show network actions and usage hints. |
-| `/pp network enroll <code>` | Consume a one-use code and save a private node credential. |
+| `/pp network enroll <code\|confirm\|cancel>` | Review and confirm enrollment; same behavior as `link`. |
 | `/pp network leave` | Delete the local credential; revoke the old node in the dashboard too. |
 | `/pp network status` | Show local connection state, node ID, and role. |
 | `/pp network list [--page <number>] [--full]` | Show nodes and online state with copyable IDs. Controller only. |
@@ -334,6 +342,7 @@ operation. Inspect unknown outcomes on disk before retrying. Offline nodes are
 skipped and work is never queued for a future connection.
 
 Network operations support catalog inventory, install, update, and uninstall.
+Manage Plugin Portal itself with the local upgrade command.
 Arbitrary URLs, console commands, restarts, and configuration changes are not remote
 operations. Local feature switches and blacklists still apply. Restart each node
 to apply JAR changes. Velocity applies pending replacements at graceful shutdown;
