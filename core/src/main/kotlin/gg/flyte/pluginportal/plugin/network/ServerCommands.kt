@@ -5,6 +5,7 @@ import gg.flyte.pluginportal.common.chat.*
 import gg.flyte.pluginportal.common.commands.lamp.CommandPermission
 import gg.flyte.pluginportal.common.commands.lamp.PortalCommandActor
 import gg.flyte.pluginportal.plugin.PortalApplication
+import net.kyori.adventure.text.Component
 import revxrsal.commands.annotation.*
 
 @Command("pp", "pluginportal", "ppm")
@@ -30,19 +31,24 @@ class ServerCommands {
         else NetworkCommands().showOperation(actor, id, page, full, "/pp history $id")
     }
 
-    @Subcommand("dashboard")
+    @Subcommand("control", "dashboard")
     @CommandPermission("pluginportal.admin")
     fun dashboard(actor: PortalCommandActor, @Optional @Suggest("enable", "disable", "status") action: String = "status") {
-        if (!actor.isConsole) return actor.audience.sendFailure("Run /pp dashboard $action in this server's console.")
+        if (!actor.isConsole) return actor.audience.sendFailure("Run /pp control $action in this server's console.")
         when (action.lowercase()) {
             "enable", "disable" -> {
-                Config.setDashboardWrites(action.equals("enable", true))
+                Config.setRemoteWrites(action.equals("enable", true))
                 PortalApplication.network.refreshInventory()
             }
             "status" -> Unit
-            else -> return actor.audience.sendInfo("Use /pp dashboard <enable|disable|status>. Only this server's console can change dashboard access.")
+            else -> return actor.audience.sendInfo("Use /pp control <enable|disable|status>. Only this server's console can approve remote plugin changes.")
         }
-        actor.audience.sendInfo(if (Config.allowsDashboardWrites()) "Dashboard control enabled for this server. Use /pp dashboard disable to return to read-only."
-            else "Dashboard is read-only for this server. Use /pp dashboard enable to allow dashboard plugin changes.")
+        actor.audience.sendMessage(Component.empty().append(textPrimary("Remote plugin control").bold())
+            .appendNewline().append(textSecondary("Writes  ")).append(textPrimary(if (Config.allowsRemoteWrites()) "Approved" else "Disabled"))
+            .appendNewline().append(textDark("Applies to dashboard and network controller plugin changes on this server."))
+            .appendNewline().append(textSecondary("Enable  ")).append(textPrimary("/pp control enable"))
+            .appendNewline().append(textSecondary("Disable  ")).append(textPrimary("/pp control disable"))
+            .appendNewline().append(textDark("Local commands stay available. Restart to apply JAR changes."))
+            .boxed())
     }
 }

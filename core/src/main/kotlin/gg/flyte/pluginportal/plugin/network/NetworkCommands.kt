@@ -43,7 +43,7 @@ class NetworkCommands {
         "install" to ("/pp network install <nodeIds> <platform> <pluginId> [version]" to "Install a catalog plugin on explicit targets. Use comma-separated node UUIDs."),
         "update" to ("/pp network update <nodeIds> <platform> <pluginId> [version]" to "Update a catalog plugin on explicit targets. Use comma-separated node UUIDs."),
         "uninstall" to ("/pp network uninstall <nodeIds> <platform> <pluginId>" to "Remove a managed plugin and retain its data folder."),
-        "enroll" to ("/pp network enroll <code>" to "Console only. Use the one-use enrollment code from your dashboard."),
+        "enroll" to ("/pp network enroll <code|confirm|cancel>" to "Console only. Review the destination account and network, then confirm explicitly."),
         "leave" to ("/pp network leave" to "Console only. Remove this node's local credential; revoke it in the dashboard too."),
     )
 
@@ -75,7 +75,35 @@ class NetworkCommands {
     @Subcommand("enroll")
     fun enroll(actor: PortalCommandActor, @Named("code") code: String) {
         if (!actor.isConsole) return actor.audience.sendFailure("Run enrollment in the server or proxy console.")
-        work(actor) { client.enroll(code); actor.audience.sendSuccess("Node enrolled. ${client.status}.") }
+        work(actor) {
+            when (code.lowercase()) {
+                "confirm" -> {
+                    client.confirmEnrollment()
+                    actor.audience.sendSuccess("Server linked. Remote plugin changes remain disabled; approve them with /pp control enable in this console.")
+                }
+                "cancel" -> {
+                    client.cancelEnrollment()
+                    actor.audience.sendInfo("Pending link discarded. This server was not enrolled.")
+                }
+                else -> {
+                    val review = client.reviewEnrollment(code)
+                    actor.audience.sendMessage(Component.empty()
+                        .append(textPrimary("Review server link").bold())
+                        .appendNewline().append(textSecondary("Account  ")).append(textPrimary(review.ownerName))
+                        .appendNewline().append(textDark("Account ID  ${review.ownerId}"))
+                        .appendNewline().append(textSecondary("Network  ")).append(textPrimary(review.networkName))
+                        .appendNewline().append(textDark("Network ID  ${review.networkId}"))
+                        .appendNewline().append(textSecondary("Server  ")).append(textPrimary(review.name))
+                        .appendNewline().append(textSecondary("Role  ")).append(textPrimary(review.role))
+                        .appendNewline().append(textDark(if (review.role == "controller")
+                            "This controller may request plugin changes on approved servers in this network."
+                            else "This server will report its status and inventory to the account above."))
+                        .appendNewline().append(textDark("Remote plugin writes start disabled. Confirm only if you trust this account."))
+                        .appendNewline().append(textPrimary("/pp link confirm")).append(textSecondary("  or  ")).append(textPrimary("/pp link cancel"))
+                        .boxed())
+                }
+            }
+        }
     }
 
     @Subcommand("leave")

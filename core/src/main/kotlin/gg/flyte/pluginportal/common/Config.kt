@@ -10,7 +10,7 @@ object Config {
     private const val DISABLED_DOWNLOAD_PLATFORMS_PATH = "DownloadPlatforms.Disabled"
     private const val DISCORD_WEBHOOK_URL_PATH = "DiscordWebhook.Url"
     private const val TELEMETRY_ENABLED_PATH = "Telemetry.Enabled"
-    private const val DASHBOARD_CONTROL_PATH = "Dashboard.AllowWrites"
+    private const val REMOTE_CONTROL_PATH = "RemoteControl.AllowWrites"
     private val initialized get() = ::plugin.isInitialized
     
     fun init(plugin: PortalRuntime) {
@@ -36,8 +36,13 @@ object Config {
             config.set(TELEMETRY_ENABLED_PATH, true)
             changed = true
         }
-        if (!config.contains(DASHBOARD_CONTROL_PATH)) {
-            config.set(DASHBOARD_CONTROL_PATH, false)
+        if (!config.contains(REMOTE_CONTROL_PATH)) {
+            config.set(REMOTE_CONTROL_PATH, false)
+            changed = true
+        }
+        // Dashboard-only approval must not silently become network-wide write consent.
+        if (config.contains("Dashboard")) {
+            config.set("Dashboard", null)
             changed = true
         }
         if (changed) plugin.saveConfig()
@@ -107,8 +112,8 @@ object Config {
      * @return true if the update was successful, false otherwise
      */
     fun updateSetting(path: String, value: Any?): Boolean {
-        // Remote editors cannot grant themselves persistent dashboard control.
-        if (path.startsWith("Dashboard.") || path == "Dashboard") return false
+        // Only local console/configuration can grant persistent remote control.
+        if (path.substringBefore('.') in setOf("RemoteControl", "Dashboard")) return false
         return try {
             // Parse the path to handle nested settings
             val parts = path.split(".")
@@ -223,11 +228,11 @@ object Config {
     fun isTelemetryEnabled(): Boolean =
         initialized && plugin.config.getBoolean(TELEMETRY_ENABLED_PATH, true)
 
-    fun allowsDashboardWrites(): Boolean =
-        initialized && plugin.config.getBoolean(DASHBOARD_CONTROL_PATH, false)
+    fun allowsRemoteWrites(): Boolean =
+        initialized && plugin.config.getBoolean(REMOTE_CONTROL_PATH, false)
 
-    fun setDashboardWrites(enabled: Boolean) {
-        plugin.config.set(DASHBOARD_CONTROL_PATH, enabled)
+    fun setRemoteWrites(enabled: Boolean) {
+        plugin.config.set(REMOTE_CONTROL_PATH, enabled)
         plugin.saveConfig()
     }
 

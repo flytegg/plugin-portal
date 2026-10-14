@@ -22,27 +22,20 @@ class PluginPortalTest {
     private lateinit var plugin: PluginPortal
 
     @Test
-    fun `marketplace key is persisted and imported even when validation cannot finish`() {
+    fun `existing on-disk key remains compatible across reloads`() {
         val licenseFile = plugin.dataFolder.resolve("mclicense.txt")
         val legacyFile = plugin.dataFolder.resolve("pluginportal.txt")
         Config.clearAuthenticationKey()
         licenseFile.delete()
         legacyFile.delete()
-        val manager = EntitlementManager(PortalApplication.runtime,
-            marketplaceKey = { "pm_fixture-license" },
-            validateMarketplace = {
-                assertEquals("pm_fixture-license", licenseFile.readText())
-                throw IllegalStateException("Simulated provider outage")
-            },
-        )
+        licenseFile.writeText("existing-fixture-license")
         try {
-            assertEquals("pm_fixture-license", manager.loadConfiguredKey())
-            assertEquals("pm_fixture-license", Config.getApiKey())
-            assertEquals("pm_fixture-license", licenseFile.readText())
+            val manager = EntitlementManager(PortalApplication.runtime)
+            assertEquals("existing-fixture-license", manager.loadConfiguredKey())
+            assertEquals("existing-fixture-license", Config.getApiKey())
             assertFalse(manager.hasPremiumAccess())
             Config.clearAuthenticationKey()
-            val restarted = EntitlementManager(PortalApplication.runtime, marketplaceKey = { error("Must reuse saved key") })
-            assertEquals("pm_fixture-license", restarted.loadConfiguredKey())
+            assertEquals("existing-fixture-license", EntitlementManager(PortalApplication.runtime).loadConfiguredKey())
         } finally {
             Config.clearAuthenticationKey()
             licenseFile.delete()
@@ -50,13 +43,15 @@ class PluginPortalTest {
     }
 
     @Test
-    fun `configured key is not overwritten by marketplace delivery`() {
+    fun `configured key takes precedence over legacy disk key`() {
+        val licenseFile = plugin.dataFolder.resolve("mclicense.txt")
+        licenseFile.writeText("legacy-fixture")
         Config.setApiKey("existing-fixture")
         try {
-            val manager = EntitlementManager(PortalApplication.runtime, marketplaceKey = { error("Must preserve configured key") })
-            assertEquals("existing-fixture", manager.loadConfiguredKey())
+            assertEquals("existing-fixture", EntitlementManager(PortalApplication.runtime).loadConfiguredKey())
         } finally {
             Config.clearAuthenticationKey()
+            licenseFile.delete()
         }
     }
 

@@ -30,6 +30,9 @@ class SocketActions {
         if (!Config.isDownloadPlatformEnabled(marketplacePlatform)) {
             return@SocketAction PluginActionResponse(false, "Downloading from ${marketplacePlatform.name} is disabled in config.yml")
         }
+        if (LocalPluginCache.any { it.platform == marketplacePlatform && it.platformId == id }) {
+            return@SocketAction PluginActionResponse(false, "Plugin already installed; use Update instead")
+        }
         
         val plugin = MarketplacePluginCache.getOrFetchPluginById(marketplacePlatform, id)
             ?: return@SocketAction PluginActionResponse(false, "Plugin not found")

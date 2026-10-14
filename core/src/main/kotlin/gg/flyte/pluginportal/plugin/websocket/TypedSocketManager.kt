@@ -489,7 +489,7 @@ object TypedSocketManager {
 
             if (success) {
                 sendSuccess(message.id, message.type, mapOf("path" to path, "newValue" to value))
-                PortalLogger.info(PortalLogger.Action.WEBSOCKET, "Updated setting $path to $value")
+                PortalLogger.info(PortalLogger.Action.WEBSOCKET, "Updated setting $path")
             } else {
                 sendError(message.id, message.type, ErrorCodes.INTERNAL_ERROR, "Failed to update setting")
             }

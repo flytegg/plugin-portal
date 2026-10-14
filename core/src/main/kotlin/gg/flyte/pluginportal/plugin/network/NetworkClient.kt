@@ -2,25 +2,16 @@ package gg.flyte.pluginportal.plugin.network
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import gg.flyte.pluginportal.common.PluginPortalBase
 import gg.flyte.pluginportal.common.Config
 import gg.flyte.pluginportal.common.managers.LocalPluginCache
 import gg.flyte.pluginportal.common.runtime.PortalRuntime
-import gg.flyte.pluginportal.common.types.SocketActions
 import gg.flyte.pluginportal.common.types.enums.ServerType
 import gg.flyte.pluginportal.common.util.GSON
 import gg.flyte.pluginportal.common.util.HttpInfo
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.File
 import java.net.URI
-import java.nio.channels.FileChannel
-import java.nio.file.Files
-import java.nio.file.LinkOption
-import java.nio.file.StandardCopyOption
-import java.nio.file.StandardOpenOption
-import java.nio.file.attribute.PosixFilePermissions
 import java.util.UUID
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit
@@ -38,9 +29,10 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
         java.util.concurrent.ArrayBlockingQueue(32),
         { Thread(it, "PluginPortal-network-operation").apply { isDaemon = true } })
     private val closed = AtomicBoolean(false)
-    private val credentialFile = File(runtime.dataFolder, "network-node.json")
-    private val journalFile = File(runtime.dataFolder, "network-operations.json")
-    private val journal = linkedMapOf<String, JsonObject>()
+    private val store = NetworkStateStore(runtime.dataFolder)
+    private val enrollment = NetworkEnrollment({ platform }) { route, body -> request(route, body, authenticated = false) }
+    private val executor = NetworkOperationExecutor(runtime, store, { nodeId }, { closed.get() },
+        { inventory() }, { id, result -> sendResult(id, result) }, { publishInventory() })
     @Volatile private var identity: JsonObject? = null
     @Volatile private var socket: WebSocket? = null
     @Volatile var status: String = "Not enrolled"
@@ -58,30 +50,9 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
 
     fun start() {
         try {
-            if (journalFile.exists()) {
-                requireSafeFile(journalFile)
-                require(journalFile.length() <= 4 * 1024 * 1024) { "Journal too large" }
-                val entries = JsonParser.parseString(journalFile.readText()).asJsonObject
-                require(entries.size() <= 1000) { "Journal capacity exceeded" }
-                for ((id, value) in entries.entrySet()) {
-                    require(validId(id)) { "Invalid journal" }
-                    val entry = value.asJsonObject
-                    if (entry.getAsJsonObject("result")?.get("status")?.asString == "executing") {
-                        entry.add("result", result("unknown", "Execution interrupted; inspect installed files before retrying."))
-                    }
-                    journal[id] = entry
-                }
-                saveJournal()
-            }
-            if (credentialFile.exists()) {
-                requireSafeFile(credentialFile)
-                require(credentialFile.length() < 4096) { "Invalid credential file" }
-                val loaded = JsonParser.parseString(credentialFile.readText()).asJsonObject
-                require(Regex("^ppn_[A-Za-z0-9_-]{43}$").matches(loaded.get("credential").asString))
-                require(validId(loaded.get("nodeId").asString) && validId(loaded.get("networkId").asString))
-                identity = loaded
-                scheduler.execute { connect() }
-            }
+            executor.load()
+            identity = store.readIdentity()
+            if (identity != null) scheduler.execute { connect() }
         } catch (_: Exception) {
             status = "Network files could not be loaded; enrollment is disabled until they are repaired"
             runtime.logger.warning(status)
@@ -91,28 +62,35 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
         ready = true
     }
 
-    @Synchronized fun enroll(code: String) {
+    @Synchronized fun reviewEnrollment(code: String): EnrollmentReview {
         check(ready && !closed.get()) { "Network client is unavailable" }
-        check(identity == null) { "Already enrolled. Revoke the old node in the dashboard and run network leave first." }
-        require(Regex("^[A-Za-z0-9_-]{43}$").matches(code)) { "Invalid enrollment code" }
-        val response = request("enroll", jsonObject("code" to code, "platform" to platform), authenticated = false)
+        check(identity == null) { "Already enrolled. Revoke the old node in the dashboard and run unlink first." }
+        return enrollment.review(code)
+    }
+
+    @Synchronized fun confirmEnrollment() {
+        check(ready && !closed.get() && identity == null) { "Network client is unavailable or already linked" }
+        val response = enrollment.confirm()
         require(Regex("^ppn_[A-Za-z0-9_-]{43}$").matches(response.get("credential").asString))
-        privateWrite(credentialFile, response)
-        Config.setDashboardWrites(false)
+        require(validId(response.get("nodeId").asString) && validId(response.get("networkId").asString))
+        Config.setRemoteWrites(false)
+        store.saveIdentity(response)
         identity = response
         status = "Enrolled; connecting"
         scheduler.execute { connect() }
     }
 
+    fun cancelEnrollment() = enrollment.cancel()
+
     @Synchronized fun leave() {
         // Removing a local credential does not grant permission to revoke a different node.
         generation.incrementAndGet()
-        Config.setDashboardWrites(false)
+        Config.setRemoteWrites(false)
+        enrollment.cancel()
         identity = null
         socket?.close(1000, "Local disconnect")
         socket = null
-        requireSafeFile(credentialFile)
-        Files.deleteIfExists(credentialFile.toPath())
+        store.deleteIdentity()
         status = "Not enrolled; revoke the old node in the dashboard"
     }
 
@@ -160,7 +138,8 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
         transport.newCall(builder.build()).execute().use { response ->
             if (!response.isSuccessful) throw IllegalStateException(when (response.code) {
                 401 -> "Node credential or enrollment code is invalid, expired, or revoked"
-                403 -> "An active network subscription and controller permission are required"
+                403 -> "This action requires current account access, a controller role, and console write approval on each target"
+                400 -> "Review the enrollment again, or check the plugin and target servers"
                 429 -> "Network service rate or capacity limit reached"
                 else -> "Network service request failed (${response.code}); try again later"
             })
@@ -203,7 +182,7 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
                             "operation" -> {
                                 val operation = message.getAsJsonObject("operation").deepCopy()
                                 val expectedNodeId = nodeId ?: return
-                                try { operations.execute { execute(operation, expectedNodeId) } }
+                                try { operations.execute { executor.execute(operation, expectedNodeId) } }
                                 catch (_: java.util.concurrent.RejectedExecutionException) {
                                     operation.get("id")?.asString?.takeIf(::validId)?.let { sendResult(it, result("failed", "Node operation queue is full; submit a new operation later.")) }
                                 }
@@ -236,109 +215,26 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
         scheduler.schedule({ if (retryGeneration == generation.get()) connect() }, delay, TimeUnit.SECONDS)
     }
 
-    private fun execute(operation: JsonObject, expectedNodeId: String) {
-        // A queued operation must never cross a local leave and re-enrollment.
-        if (closed.get() || nodeId != expectedNodeId) return
-        val id = operation.get("id")?.asString ?: return
-        if (!validId(id)) return
-        val action = operation.getAsJsonObject("action") ?: return
-        val source = operation.get("source")?.asString ?: "dashboard"
-        if (source !in setOf("dashboard", "controller")) return
-        if (action.get("kind")?.asString != "inventory" && source == "dashboard" && !Config.allowsDashboardWrites()) {
-            sendResult(id, result("failed", "Dashboard control is read-only. Enable it in this server's console first."))
-            return
-        }
-        val fingerprint = (canonicalAction(action) ?: return) + ":" + source
-        val expiresAt = operation.get("expiresAt")?.asLong ?: return
-        val existing = journal[id]
-        if (existing != null) {
-            if (existing.get("action").asString == fingerprint) sendResult(id, existing.getAsJsonObject("result"))
-            return
-        }
-        if (closed.get() || identity == null) { sendResult(id, result("skipped", "Node disconnected before execution")); return }
-        if (expiresAt <= System.currentTimeMillis() || expiresAt > System.currentTimeMillis() + 310_000) {
-            sendResult(id, result("skipped", "Operation expired before execution")); return
-        }
-        journal.entries.removeIf { (_, entry) -> entry.get("createdAt").asLong < System.currentTimeMillis() - 30L * 86400_000 && entry.getAsJsonObject("result").get("status").asString != "executing" }
-        if (journal.size >= 1000) { sendResult(id, result("failed", "Local operation journal capacity reached")); return }
-        val entry = JsonObject().apply { addProperty("action", fingerprint); addProperty("createdAt", System.currentTimeMillis()); add("result", result("executing")) }
-        journal[id] = entry
-        try {
-            saveJournal() // The durable reservation must precede filesystem changes.
-            sendResult(id, entry.getAsJsonObject("result"))
-            val kind = action.get("kind").asString
-            val outcome = if (kind == "inventory") result("succeeded").apply { add("inventory", inventory()) }
-            else {
-                check(source != "dashboard" || Config.allowsDashboardWrites()) { "Dashboard control was disabled before execution" }
-                val actions = SocketActions()
-                val response = when (kind) {
-                    "install" -> actions.install.run(action)
-                    "update" -> actions.update.run(action)
-                    "uninstall" -> actions.uninstall.run(action)
-                    else -> error("Unsupported operation")
-                }
-                if (response.success && response.message == "Plugin is already up to date") result("succeeded", response.message)
-                else if (response.success) result("staged", "Files changed; restart this node to apply the change.")
-                else result("failed", response.message ?: "Operation failed")
-            }
-            entry.add("result", outcome)
-            saveJournal()
-            sendResult(id, outcome)
-            publishInventory()
-        } catch (failure: Exception) {
-            runtime.logger.warning("Network operation interrupted: ${failure.javaClass.simpleName} at ${failure.stackTrace.take(5).joinToString()}")
-            val outcome = result("unknown", "Operation interrupted; inspect installed files before retrying.")
-            entry.add("result", outcome)
-            runCatching { saveJournal() }
-            sendResult(id, outcome)
-        }
-    }
-    private fun canonicalAction(action: JsonObject): String? = runCatching {
-        val keys = setOf("kind", "platform", "id", "version", "channel")
-        require(action.keySet().all { it in keys })
-        val kind = action.get("kind").asString
-        require(kind in setOf("inventory", "install", "update", "uninstall"))
-        if (kind != "inventory") {
-            require(action.get("platform").asString in setOf("MODRINTH", "HANGAR", "SPIGOTMC", "POLYMART"))
-            require(Regex("^[a-zA-Z0-9_.-]{1,100}$").matches(action.get("id").asString))
-        }
-        action.get("version")?.let { require(it.asString.length in 1..100) }
-        action.get("channel")?.let { require(it.asString in setOf("release", "beta", "alpha")) }
-        JsonObject().apply { for (key in keys.sorted()) action.get(key)?.let { add(key, it) } }.toString()
-    }.getOrNull()
-
     private fun inventory() = JsonObject().apply {
         addProperty("platform", platform)
         addProperty("pluginVersion", runtime.description.version.take(120))
         addProperty("minecraftVersion", runtime.server.minecraftVersion.take(120))
-        addProperty("dashboardControl", Config.allowsDashboardWrites())
+        addProperty("remoteControl", Config.allowsRemoteWrites())
         addProperty("observedAt", System.currentTimeMillis())
-        val managed = LocalPluginCache.map { jsonObject("name" to it.name.take(120), "version" to it.version.take(120), "platform" to it.platform.name, "id" to it.platformId.take(120)) }
+        val managed = LocalPluginCache.map { plugin ->
+            jsonObject("name" to plugin.name.take(120), "version" to plugin.version.take(120), "platform" to plugin.platform.name, "id" to plugin.platformId.take(120)).apply {
+                runtime.server.plugins.firstOrNull { it.name.equals(plugin.name, ignoreCase = true) }?.description?.version?.let { addProperty("runningVersion", it.take(120)) }
+            }
+        }
         val names = managed.map { it.get("name").asString.lowercase() }.toSet()
-        val other = runtime.server.plugins.filter { it.name.lowercase() !in names }.map { jsonObject("name" to it.name.take(120), "version" to it.description.version.take(120)) }
+        val other = runtime.server.plugins.filter { it.name.lowercase() !in names }.map { jsonObject("name" to it.name.take(120), "version" to it.description.version.take(120), "runningVersion" to it.description.version.take(120)) }
         add("plugins", GSON.toJsonTree((managed + other).take(500)))
     }
     private fun publishInventory(target: WebSocket? = socket) { target?.send(JsonObject().apply { addProperty("v", 1); addProperty("type", "inventory"); add("inventory", inventory()) }.toString()) }
     fun refreshInventory() = publishInventory()
     private fun sendResult(id: String, result: JsonObject) { socket?.send(JsonObject().apply { addProperty("v", 1); addProperty("type", "result"); addProperty("id", id); add("result", result) }.toString()) }
     private fun result(status: String, message: String? = null) = JsonObject().apply { addProperty("status", status); message?.let { addProperty("message", it.take(500)) } }
-    private fun saveJournal() = privateWrite(journalFile, JsonObject().apply { for ((id, entry) in journal) add(id, entry) })
-    private fun requireSafeFile(file: File) { require(!Files.isSymbolicLink(file.toPath()) && (!file.exists() || Files.isRegularFile(file.toPath(), LinkOption.NOFOLLOW_LINKS))) { "Unsafe network file" } }
-    private fun privateWrite(file: File, value: JsonObject) {
-        requireSafeFile(file)
-        runtime.dataFolder.mkdirs()
-        val temporary = Files.createTempFile(runtime.dataFolder.toPath(), ".network-", ".json")
-        try {
-            if (Files.getFileStore(temporary).supportsFileAttributeView("posix")) Files.setPosixFilePermissions(temporary, PosixFilePermissions.fromString("rw-------"))
-            FileChannel.open(temporary, StandardOpenOption.WRITE).use { channel ->
-                val buffer = java.nio.ByteBuffer.wrap(value.toString().toByteArray(Charsets.UTF_8))
-                while (buffer.hasRemaining()) channel.write(buffer)
-                channel.force(true)
-            }
-            Files.move(temporary, file.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
-        } finally { Files.deleteIfExists(temporary) }
-    }
-    private fun validId(value: String) = Regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$").matches(value)
+    private fun validId(value: String) = NetworkStateStore.validId(value)
 
     override fun close() {
         if (!closed.compareAndSet(false, true)) return

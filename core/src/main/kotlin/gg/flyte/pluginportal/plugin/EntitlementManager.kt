@@ -10,15 +10,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import gg.flyte.pluginportal.common.runtime.PortalRuntime
 
-class EntitlementManager(
-    private val plugin: PortalRuntime,
-    private val marketplaceKey: () -> String? = MarketplaceKey::embedded,
-    private val validateMarketplace: () -> Unit = {},
-) {
-    private companion object {
-        const val PLACEHOLDER_PREFIX = "%%__"
-    }
-
+class EntitlementManager(private val plugin: PortalRuntime) {
     private var state: EntitlementState = EntitlementState.MissingKey
 
     private data class PremiumValidationResponse(val valid: Boolean, val message: String?)
@@ -46,17 +38,8 @@ class EntitlementManager(
             return it
         }
 
-        // Fall back to keys embedded by supported marketplace delivery flows.
-        val embeddedKey = loadEmbeddedKey()
-        if (embeddedKey != null) {
-            persistKey(embeddedKey, pluginPortalPath, mcLicensePath)
-            return embeddedKey
-        }
-
-        return loadMarketplaceKey(mcLicensePath)?.also {
-            Config.setApiKey(it)
-            plugin.logger.info("Marketplace premium key was imported into plugin configuration.")
-        }
+        // JAR resources and marketplace placeholders never supply installation identity.
+        return null
     }
 
     fun refresh(): EntitlementState {
@@ -107,35 +90,6 @@ class EntitlementManager(
             plugin.logger.warning("Premium entitlement check failed: ${e.message ?: e::class.simpleName}")
             EntitlementState.ApiUnavailable(e.message ?: e::class.simpleName ?: "unknown")
         }
-    }
-
-    private fun loadEmbeddedKey(): String? {
-        val entry = plugin.javaClass.classLoader.getResource("mclicense.txt") ?: return null
-        val content = entry.readText().trim()
-        if (content.isBlank()) return null
-        return content.takeUnless { it.startsWith(PLACEHOLDER_PREFIX) }
-    }
-
-    private fun loadMarketplaceKey(mcLicensePath: java.io.File): String? {
-        val key = marketplaceKey() ?: return null
-        mcLicensePath.parentFile.mkdirs()
-        // Seed the file so MCLicense does not repeat its marker-dependent detection.
-        mcLicensePath.writeText(key)
-        try {
-            validateMarketplace()
-        } catch (_: Exception) {
-            plugin.logger.warning("Marketplace license validation is unavailable; the imported key is saved for retry.")
-        }
-        // Importing a key never grants access. refresh() still checks /premium/validate.
-        return mcLicensePath.readNonBlankText() ?: key
-    }
-
-    private fun persistKey(key: String, pluginPortalPath: java.io.File, mcLicensePath: java.io.File) {
-        if (!plugin.dataFolder.exists()) plugin.dataFolder.mkdirs()
-        val target = if (key.startsWith("pp_")) pluginPortalPath else mcLicensePath
-        target.writeText(key)
-        Config.setApiKey(key)
-        plugin.logger.info("Embedded premium key was migrated into plugin configuration.")
     }
 
     private fun java.io.File.readNonBlankText(): String? {

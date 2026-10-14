@@ -88,7 +88,7 @@ class HelpSubCommand {
 
     private fun helpPermission(command: String): String = when (command) {
         "network", "servers", "link", "unlink", "history" -> "pluginportal.network"
-        "dashboard" -> "pluginportal.admin"
+        "control", "dashboard" -> "pluginportal.admin"
         else -> "pluginportal.view"
     }
 
@@ -117,7 +117,7 @@ class HelpSubCommand {
             "servers" to "Connected servers",
             "link <code>" to "Link this server to your account",
             "history" to "Network operation results",
-            "dashboard" to "Dashboard access, console only",
+            "control" to "Remote plugin writes, console only",
             "reload" to "Reload configuration",
             "key" to "Manage your API key",
             "upgrade" to "Update Plugin Portal",
@@ -130,10 +130,11 @@ class HelpSubCommand {
 
     private val commandHelp = mapOf(
         "servers" to ("/pp servers [--page <number>] [--full]" to listOf("List connected servers. Controller access is required.", "Use names or UUIDs with --server and --servers.")),
-        "link" to ("/pp link <code>" to listOf("Console only. Copy the one-use code from Add server in your dashboard.", "Linking starts read-only and gives this server its own revocable credential.")),
+        "link" to ("/pp link <code|confirm|cancel>" to listOf("Console only. Review the account, network and role from your dashboard link command.", "Confirm with /pp link confirm or discard with /pp link cancel. Writes start disabled.")),
         "unlink" to ("/pp unlink" to listOf("Console only. Disconnect this server and remove its local credential.", "Revoke the server in your dashboard as well.")),
         "history" to ("/pp history [operationId] [--page <number>] [--full]" to listOf("Show recent operations, or results for one operation.")),
-        "dashboard" to ("/pp dashboard <enable|disable|status>" to listOf("Console only. Dashboard access defaults to read-only.", "Enable dashboard plugin changes for this server, or disable them again.")),
+        "control" to ("/pp control <enable|disable|status>" to listOf("Console only. Remote plugin changes start disabled.", "Approve or disable dashboard and controller writes on this server.")),
+        "dashboard" to ("/pp dashboard <enable|disable|status>" to listOf("Compatibility alias for /pp control.", "Approval covers dashboard and controller plugin changes.")),
         "help" to ("/pp help [page or command]" to listOf(
             "Choose page 1 to 3, or a command name.",
             "Example: /pp help platform"
@@ -196,7 +197,7 @@ class HelpSubCommand {
             "Use a trusted source. A raw URL does not establish a marketplace update source."
         )),
         "key" to ("/pp key <set <key> | get | clear>" to listOf(
-            "Set and validate a key for paid network management.",
+            "Set a catalog or legacy purchase key. Keys never link a server or grant remote control.",
             "Do not share keys, screenshots of keys, or command logs that contain keys."
         )),
         "upgrade" to ("/pp upgrade [--channel <name>] [--yes]" to listOf(
