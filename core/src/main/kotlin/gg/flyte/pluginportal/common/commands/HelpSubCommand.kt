@@ -269,7 +269,7 @@ class HelpSubCommand {
         if (page < helpPages.size) footer = footer.append(textPrimary("  [Next]")
             .clickEvent(ClickEvent.runCommand("/pp help ${page + 1}")))
         return footer.append(textPrimary("  [Docs]")
-            .clickEvent(ClickEvent.openUrl("https://pluginportal.link/docs/commands")))
+            .clickEvent(ClickEvent.openUrl("https://pluginportal.link/docs/reference/commands")))
             .appendNewline().append(textDark("Hover for details. /pp help <command>"))
     }
 }
