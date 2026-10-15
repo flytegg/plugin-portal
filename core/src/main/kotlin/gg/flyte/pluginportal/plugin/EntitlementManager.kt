@@ -73,6 +73,14 @@ class EntitlementManager(private val plugin: PortalRuntime) {
 
     fun hasPremiumAccess(): Boolean = state is EntitlementState.Valid
 
+    /** Plan shown by /pp info: Premium, or Free with the reason a configured key does not apply. */
+    fun planLabel(): String = when (state) {
+        EntitlementState.Valid -> "Premium"
+        EntitlementState.MissingKey -> "Free"
+        is EntitlementState.Invalid -> "Free (key not valid)"
+        is EntitlementState.ApiUnavailable -> "Free (key not verified)"
+    }
+
     fun lockedMessage(): String = when (val current = state) {
         EntitlementState.MissingKey -> "Premium features require a Plugin Portal key. Run /pp key set <key> to configure one."
         is EntitlementState.Invalid -> current.message ?: "The configured Plugin Portal key is not valid for premium features."

@@ -43,7 +43,7 @@ A marketplace entry must supply a compatible JAR that you can download.
 Search, view, list, install, update, and uninstall are free.
 Premium commands require a valid key: `updateAll`, recognition, external sources, import/export, JAR scans, and the web editor.
 A JAR from BuiltByBit or Polymart contains your key. Plugin Portal saves it at the first start.
-For other purchases, run `/pp key set <key>`. `/pp info` shows `Premium: Active` or `Premium: Locked`.
+For other purchases, run `/pp key set <key>`. `/pp info` shows `Plan: Premium` or `Plan: Free`.
 Command permissions still apply.
 
 Paid network management uses your account on the hosted Plugin Portal API.

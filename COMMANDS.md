@@ -47,7 +47,7 @@ This release does not support BungeeCord or datapacks.
 | `/pp search <query> [platform] [--page <number>] [--full]` | Searches the marketplace catalog. |
 | `/pp view <name> [platform] [--byId] [--exact]` | Shows marketplace details and available actions. |
 | `/pp list [--all] [--untracked] [--outdated] [--external] [--detailed] [--page <number>] [--full]` | Lists local plugins and configured external plugins. |
-| `/pp info` | Shows the exact version, platform, Premium status, network connection, and number of changes that require a restart. Alias: `/pp version`. |
+| `/pp info` | Shows the exact version, platform, plan (Free or Premium), network connection, and number of changes that require a restart. Alias: `/pp version`. |
 
 These commands require `pluginportal.view`.
 
@@ -199,7 +199,7 @@ Keys never enroll a server or grant remote control.
 See [marketplace license import](docs/marketplace-license-import.md).
 
 Do not post a key, editor link, or token in a public issue.
-Support only needs the Premium status from `/pp info`.
+Support only needs the plan from `/pp info`.
 
 ## Temporary web editor
 

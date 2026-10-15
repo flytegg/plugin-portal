@@ -23,6 +23,11 @@ class HelpSubCommand {
     fun rootCommand(actor: PortalCommandActor, context: ExecutionContext<PortalCommandActor>) {
         val path = context.input().source().substringAfter(' ', "").trim()
         val topic = path.substringBefore(' ')
+        // A failed @RequiresAuth condition falls through to this placeholder; say why.
+        if (topic.isNotEmpty() && !gg.flyte.pluginportal.plugin.PortalApplication.isAuthed() && context.lamp().registry().commands().any {
+                it.annotations().contains(gg.flyte.pluginportal.plugin.commands.lamp.RequiresAuth::class.java) &&
+                    it.path().split(' ').getOrNull(1).equals(topic, ignoreCase = true)
+            }) return actor.audience.sendFailure(gg.flyte.pluginportal.plugin.PortalApplication.lockedPremiumMessage())
         if (topic.isEmpty()) helpCommand(actor)
         else if (!showCommandHelp(actor, topic)) {
             actor.audience.sendFailure("Unknown command. Use /pp help for available commands.")
@@ -237,7 +242,7 @@ class HelpSubCommand {
             "This does not reload installed plugins or apply staged updates."
         )),
         "info" to ("/pp info" to listOf(
-            "Show the exact version, platform, premium status, network connection, and pending restart count.",
+            "Show the exact version, platform, plan, network connection, and pending restart count.",
             "Alias: /pp version."
         )),
         "dump" to ("/pp dump" to listOf(

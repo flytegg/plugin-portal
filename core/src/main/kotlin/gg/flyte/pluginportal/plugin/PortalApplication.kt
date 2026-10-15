@@ -37,6 +37,7 @@ object PortalApplication {
     }
 
     fun isAuthed() = entitlement.hasPremiumAccess()
+    fun planLabel() = entitlement.planLabel()
     fun refreshEntitlement() = entitlement.refresh() is EntitlementState.Valid
     fun lockedPremiumMessage() = entitlement.lockedMessage()
     fun stop() {
