@@ -312,9 +312,9 @@ If names are duplicates, use UUIDs. Always specify the targets.
 | `/pp link confirm` | Uses the reviewed code and saves the node credential. |
 | `/pp link cancel` | Cancels the link review without enrollment. |
 | `/pp unlink` | Removes the local credential and clears approval for plugin changes. Requires the console. |
-| `/pp servers [--page <number>] [--full]` | Lists enrolled servers and proxies with their connection status. Requires a proxy. |
-| `/pp refresh --servers lobby,proxy` | Refreshes inventories on explicit targets. Requires a proxy. Accepts `--server` as an alias. |
-| `/pp history [operationId] [--page <number>] [--full]` | Shows operations and results for each target. Requires a proxy. |
+| `/pp servers [--page <number>] [--full]` | Lists enrolled servers and proxies with their connection status. Run it on the proxy. |
+| `/pp refresh --servers lobby,proxy` | Refreshes inventories on explicit targets. Run it on the proxy. Accepts `--server` as an alias. |
+| `/pp history [operationId] [--page <number>] [--full]` | Shows operations and results for each target. Run it on the proxy. |
 | `/pp list --server lobby` | Shows a remote inventory. |
 | `/pp install LuckPerms MODRINTH --servers lobby,proxy` | Installs a plugin on explicit targets. |
 | `/pp update LuckPerms --server lobby` | Updates one tracked remote plugin. |
