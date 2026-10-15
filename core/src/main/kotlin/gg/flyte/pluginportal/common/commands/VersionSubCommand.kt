@@ -28,11 +28,14 @@ class VersionSubCommand {
             .append(textDark("  |  ")).append(textSecondary("Local tools: ")).append(Component.text("Free", GREEN))
         val networkLine = textSecondary("Network: ").append(Component.text(networkStatus,
             if (networkStatus == "Connected") GREEN else GRAY))
-        val message = Component.empty().decoration(TextDecoration.BOLD, false)
+        var message = Component.empty().decoration(TextDecoration.BOLD, false)
             .append(centerComponentLine(textPrimary("Plugin Portal Info").bold()))
             .appendNewline().append(detailLine(versionLine))
             .appendNewline().append(detailLine(platformLine))
             .appendNewline().append(detailLine(networkLine))
+        val restartCount = plugin.inventory.snapshot().restartCount
+        if (restartCount > 0) message = message.appendNewline().append(detailLine(
+            Component.text("Restart needed: $restartCount ${if (restartCount == 1) "change applies" else "changes apply"} after restart", YELLOW)))
         audience.sendMessage(message.boxed())
         // Show local information immediately, even when the update API is unavailable.
         PortalApplication.runtime.executor.execute {

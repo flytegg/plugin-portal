@@ -1,5 +1,6 @@
 package gg.flyte.pluginportal.common.managers
 
+import gg.flyte.pluginportal.common.PluginPortalBase
 import gg.flyte.pluginportal.common.Constants
 import gg.flyte.pluginportal.common.adapters.DownloadManager
 import gg.flyte.pluginportal.common.adapters.DownloadRequest
@@ -54,6 +55,8 @@ object PluginModificationManager {
         val files = try { localPlugin.managedFiles() } catch (failure: IllegalArgumentException) {
             return ActionResponseString(false, failure.message ?: "Could not identify plugin JARs safely")
         }
+
+        PluginPortalBase.plugin.inventory.recordRemoval(localPlugin, files)
 
         if (files.isEmpty()) {
             LocalPluginCache.remove(localPlugin)

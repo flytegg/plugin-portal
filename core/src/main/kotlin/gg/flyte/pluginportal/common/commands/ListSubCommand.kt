@@ -13,6 +13,7 @@ import gg.flyte.pluginportal.common.managers.ExternalPluginManager
 import gg.flyte.pluginportal.common.managers.ExternalPluginResult
 import gg.flyte.pluginportal.common.managers.LocalPluginCache
 import gg.flyte.pluginportal.common.managers.MarketplacePluginCache
+import gg.flyte.pluginportal.common.runtime.PluginInventory
 import gg.flyte.pluginportal.common.types.LocalPlugin
 import gg.flyte.pluginportal.common.types.Version
 import gg.flyte.pluginportal.common.util.HashType
@@ -86,6 +87,12 @@ class ListSubCommand {
                     "/pp list --untracked" + if (detailed) " --detailed" else "")
             }
 
+            val inventory = PluginPortalBase.plugin.inventory.snapshot()
+            val restartEntries = inventory.plugins.filter { it.state != "running" }
+            val removals = if (externalOnly || outdated) emptyList() else restartEntries.filter { it.state == "staged-removal" }
+            fun restartTag(plugin: LocalPlugin): Component = restartTag(restartEntries.firstOrNull {
+                it.managed?.platform == plugin.platform && it.managed.platformId == plugin.platformId
+            })
             val plugins = if (externalOnly) emptyList() else LocalPluginCache
                     .sortedBy { plugin -> plugin.name }
                     .filter { plugin -> plugin.name != PluginPortalBase.plugin.description.name }
@@ -126,7 +133,7 @@ class ListSubCommand {
                     if (externalOnly) "All external plugins are up to date" else "All plugins are up to date"
                 )
             }
-            if (!outdated && plugins.isEmpty() && externalPlugins.isEmpty() && unrecognizedJars.isEmpty()) {
+            if (!outdated && plugins.isEmpty() && externalPlugins.isEmpty() && unrecognizedJars.isEmpty() && removals.isEmpty()) {
                 val emptyMessage = if (externalOnly) "No external plugins configured" else "No plugins found"
                 return@async audience.sendMessage(Component.text(emptyMessage, NamedTextColor.GRAY).boxed())
             }
@@ -135,11 +142,15 @@ class ListSubCommand {
             val showDetails = detailed || console
             val rows = mutableListOf<Pair<String, () -> Component>>()
             if (outdated) marketplaceUpdates.forEach { update ->
-                rows += "Marketplace" to { getOutdatedMarketplaceLine(update, showDetails, console) }
+                rows += "Marketplace" to { getOutdatedMarketplaceLine(update, showDetails, console).append(restartTag(update.plugin)) }
             } else plugins.forEach { plugin ->
                 rows += "Marketplace" to {
-                    if (showDetails) getDetailedPluginLine(plugin, console) else getCompactPluginLine(plugin, console)
+                    (if (showDetails) getDetailedPluginLine(plugin, console) else getCompactPluginLine(plugin, console)).append(restartTag(plugin))
                 }
+            }
+            removals.forEach { entry ->
+                rows += "Removed" to { textDark(" - ").append(textPrimary(entry.name))
+                    .append(textSecondary(" ${entry.runningVersion}")).append(restartTag(entry)) }
             }
             externalPlugins.forEach { plugin ->
                 rows += "External" to {
@@ -172,6 +183,9 @@ class ListSubCommand {
             sendPagedRows(audience, rows, page, full, "/pp list$filters")
         }
     }
+
+    private fun restartTag(entry: PluginInventory.Entry?): Component = if (entry == null) Component.empty()
+        else Component.text("  [Restart to apply${entry.stagedVersion?.let { " $it" } ?: ""}]", NamedTextColor.YELLOW)
 
     private fun getOutdatedMarketplaceLine(update: MarketplaceUpdate, detailed: Boolean, console: Boolean): Component {
         val plugin = update.plugin

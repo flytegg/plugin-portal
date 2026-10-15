@@ -3,7 +3,6 @@ package gg.flyte.pluginportal.plugin.network
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import gg.flyte.pluginportal.common.Config
-import gg.flyte.pluginportal.common.managers.LocalPluginCache
 import gg.flyte.pluginportal.common.runtime.PortalRuntime
 import gg.flyte.pluginportal.common.types.enums.ServerType
 import gg.flyte.pluginportal.common.util.GSON
@@ -221,14 +220,9 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
         addProperty("minecraftVersion", runtime.server.minecraftVersion.take(120))
         addProperty("remoteControl", Config.allowsRemoteWrites())
         addProperty("observedAt", System.currentTimeMillis())
-        val managed = LocalPluginCache.map { plugin ->
-            jsonObject("name" to plugin.name.take(120), "version" to plugin.version.take(120), "platform" to plugin.platform.name, "id" to plugin.platformId.take(120)).apply {
-                runtime.server.plugins.firstOrNull { it.name.equals(plugin.name, ignoreCase = true) }?.description?.version?.let { addProperty("runningVersion", it.take(120)) }
-            }
-        }
-        val names = managed.map { it.get("name").asString.lowercase() }.toSet()
-        val other = runtime.server.plugins.filter { it.name.lowercase() !in names }.map { jsonObject("name" to it.name.take(120), "version" to it.description.version.take(120), "runningVersion" to it.description.version.take(120)) }
-        add("plugins", GSON.toJsonTree((managed + other).take(500)))
+        val snapshot = runtime.inventory.snapshot()
+        addProperty("restartRequired", snapshot.restartRequired)
+        add("plugins", GSON.toJsonTree(snapshot.plugins.take(500).map { it.json() }))
     }
     private fun publishInventory(target: WebSocket? = socket) { target?.send(JsonObject().apply { addProperty("v", 1); addProperty("type", "inventory"); add("inventory", inventory()) }.toString()) }
     fun refreshInventory() = publishInventory()

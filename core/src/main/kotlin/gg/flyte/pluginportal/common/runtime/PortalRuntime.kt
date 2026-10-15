@@ -27,6 +27,8 @@ abstract class PortalRuntime : AutoCloseable {
     abstract val updateDirectory: File
     open val commandName: String = "pp"
 
+    val inventory by lazy { PluginInventory(this) }
+
     val executor = ScheduledThreadPoolExecutor(4) { work ->
         Thread(work, "PluginPortal-worker").apply { isDaemon = true }
     }.apply { removeOnCancelPolicy = true }
