@@ -195,10 +195,9 @@ fun Plugin.getImageComponent(): Component {
     val description = splitDescriptionIntoLines(sanitisedDescription ?: "", 160, MAX_DESCRIPTION_LINES)
     val localPlugin = LocalPluginCache.fromPlugin(this)
     val installed = localPlugin != null
-    val supportedVersions = platforms.best
+    val selectedVersion = platforms.best
         ?.newestCompatibleVersion(null, currentServerTypePreference(), currentMinecraftVersion())
-        ?.supportLabel
-        ?: "Unknown"
+    val supportedVersions = selectedVersion?.supportLabel ?: "Unknown"
 
     val image = ChatImage.ImageTextBuilder(iconURL ?: "").setLine(
             0, centerComponentLine(
@@ -211,7 +210,8 @@ fun Plugin.getImageComponent(): Component {
             }
         }.setLine(description.size + 3, textSecondary("Downloads: ${totalDownloads.format()}"))
         .setLine(description.size + 4, textSecondary("Platforms: ${platforms.available.joinToString()}"))
-        .setLine(description.size + 5, textSecondary("Versions: $supportedVersions")).setLine(
+        .setLine(description.size + 5, textSecondary("Versions: $supportedVersions")
+            .showOnHover(selectedVersion?.supportDetails ?: "Unknown")).setLine(
             11, centerComponentLine(
                 text("").let {
                     if (localPlugin != null) it.append(SharedComponents.getUpdateButton(localPlugin)).append(text(" "))
@@ -228,7 +228,21 @@ fun Plugin.getImageComponent(): Component {
     return image
 }
 
-private val Version.supportLabel: String
+internal val Version.supportLabel: String
+    get() {
+        val versions = supportedMinecraftVersions.sortedWith(compareBy(
+            { it.split('.')[0].toInt() },
+            { it.split('.')[1].toInt() },
+            { it.split('.').getOrNull(2)?.toInt() ?: 0 },
+        ))
+        return when (versions.size) {
+            0 -> supportDetails
+            1 -> versions.single()
+            else -> "${versions.first()} - ${versions.last()}"
+        }
+    }
+
+internal val Version.supportDetails: String
     get() = supportedMinecraftVersions.takeIf { it.isNotEmpty() }?.joinToString(", ")
         ?: serverTypes.joinToString(", ") { it.name.lowercase() }.takeIf { it.isNotBlank() }
         ?: "Unknown"
