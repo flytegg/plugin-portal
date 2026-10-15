@@ -29,9 +29,10 @@ paper:
 	./gradlew :plugin:runServer -PpluginPortalDev=true
 
 mc-pilot-plugin:
-	./gradlew :plugin:shadowJar
-	mkdir -p build/mc-pilot
-	cp out/PluginPortal-$(PROJECT_VERSION).jar build/mc-pilot/PluginPortal.jar
+	./gradlew :distribution:shadowJar -PpluginPortalOutputDir=$(CURDIR)/build/mc-pilot
+	cp build/mc-pilot/PluginPortal-$(PROJECT_VERSION).jar build/mc-pilot/PluginPortal.jar
+	chmod 644 build/mc-pilot/PluginPortal.jar
+	chmod 1777 build/mc-pilot
 
 mc-pilot-up: mc-pilot-plugin
 	$(MC_PILOT_COMPOSE) up -d --build

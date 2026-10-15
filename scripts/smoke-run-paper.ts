@@ -5,11 +5,13 @@ import { dirname, join, resolve } from "node:path";
 import { spawn } from "node:child_process";
 
 const root = process.cwd();
+const suppliedPluginJar = process.env.PLUGIN_PORTAL_JAR;
+const outputDirectory = resolve(process.env.PLUGIN_PORTAL_OUTPUT_DIR ?? join(root, "build/paper-smoke-artifacts"));
 const development = process.argv.includes("--dev");
 const apiBase = development ? "http://localhost:3001" : "https://v3.pluginportal.link";
 const runDirectory = await mkdtemp(join(tmpdir(), "plugin-portal-run-paper-"));
 await writeFile(join(runDirectory, "eula.txt"), "eula=true\n");
-await writeFile(join(runDirectory, "server.properties"), "online-mode=false\nserver-port=0\n");
+await writeFile(join(runDirectory, "server.properties"), "server-ip=127.0.0.1\nonline-mode=false\nserver-port=0\n");
 const jarFlag = process.argv.indexOf("--server-jar");
 const serverJar = jarFlag >= 0 ? process.argv[jarFlag + 1] : undefined;
 const versionFlag = process.argv.indexOf("--minecraft-version");
@@ -19,11 +21,13 @@ const legacy = minecraftVersion === "1.8.8";
 const expectIncompatible = process.argv.includes("--expect-incompatible");
 if (jarFlag >= 0 && !serverJar) throw new Error("--server-jar requires a path to a Paper server JAR");
 if (serverJar) {
-  const build = Bun.spawn(["./gradlew", ":plugin:shadowJar"], { cwd: root, stdout: "inherit", stderr: "inherit" });
-  if (await build.exited !== 0) throw new Error("Plugin build failed");
+  if (!suppliedPluginJar) {
+    const build = Bun.spawn(["./gradlew", ":plugin:shadowJar", `-PpluginPortalOutputDir=${outputDirectory}`], { cwd: root, stdout: "inherit", stderr: "inherit" });
+    if (await build.exited !== 0) throw new Error("Plugin build failed");
+  }
   const version = (await readFile(join(root, "gradle.properties"), "utf8")).match(/^projectVersion=(.+)$/m)?.[1];
   await mkdir(join(runDirectory, "plugins"));
-  await cp(join(root, "out", `PluginPortal-${version}.jar`), join(runDirectory, "plugins", "PluginPortal.jar"));
+  await cp(resolve(suppliedPluginJar ?? join(outputDirectory, `PluginPortal-${version}.jar`)), join(runDirectory, "plugins", "PluginPortal.jar"));
   await cp(resolve(serverJar), join(runDirectory, "server.jar"));
   // Reuse Paperclip's downloaded server cache when testing an old release offline.
   await cp(join(dirname(resolve(serverJar)), "cache"), join(runDirectory, "cache"), { recursive: true }).catch(() => {});
@@ -31,7 +35,7 @@ if (serverJar) {
 const serverJavaHome = process.env.PAPER_JAVA_HOME ?? process.env.JAVA_HOME;
 const child = serverJar
   ? spawn(serverJavaHome ? join(serverJavaHome, "bin", "java") : "java", ["-Xmx1G", ...(development ? ["-Dpluginportal.dev=true"] : []), "-jar", "server.jar", "nogui"], { cwd: runDirectory, stdio: ["pipe", "pipe", "pipe"] })
-  : spawn("./gradlew", [":plugin:runServer", `-PrunDir=${runDirectory}`, ...(development ? ["-PpluginPortalDev=true"] : [])], { cwd: root, stdio: ["pipe", "pipe", "pipe"] });
+  : spawn("./gradlew", [":plugin:runServer", `-PrunDir=${runDirectory}`, `-PpluginPortalOutputDir=${outputDirectory}`, ...(development ? ["-PpluginPortalDev=true"] : [])], { cwd: root, stdio: ["pipe", "pipe", "pipe"] });
 
 let output = "";
 const append = (chunk: Buffer) => {
@@ -53,7 +57,7 @@ try {
   await expectOutput(/No API key configured/, "the /pp key get command");
 
   child.stdin.write("pluginportal\n");
-  await expectOccurrences(/\/pp install/g, 2, "the pluginportal command alias");
+  await expectOutput(/\/pluginportal install/, "the pluginportal command alias");
 
   if (expectIncompatible) {
     await runCommand("pp install ViaVersion MODRINTH", /No compatible version found/, "incompatible install rejection");

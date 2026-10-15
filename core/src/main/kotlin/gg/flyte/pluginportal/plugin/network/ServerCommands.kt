@@ -1,0 +1,67 @@
+package gg.flyte.pluginportal.plugin.network
+
+import gg.flyte.pluginportal.common.Config
+import gg.flyte.pluginportal.common.chat.*
+import gg.flyte.pluginportal.common.commands.lamp.CommandPermission
+import gg.flyte.pluginportal.common.commands.lamp.PortalCommandActor
+import gg.flyte.pluginportal.plugin.PortalApplication
+import net.kyori.adventure.text.Component
+import revxrsal.commands.annotation.*
+
+@Command("pp", "pluginportal", "ppm")
+class ServerCommands {
+    @Subcommand("link")
+    @CommandPermission("pluginportal.network")
+    fun link(actor: PortalCommandActor, @Optional @Named("code") code: String? = null) {
+        if (code == null) NetworkMessages().showLinkStatus(actor)
+        else NetworkMessages().reviewLink(actor, code)
+    }
+
+    @Subcommand("unlink")
+    @CommandPermission("pluginportal.network")
+    fun unlink(actor: PortalCommandActor) = NetworkMessages().unlink(actor)
+
+    @Subcommand("servers")
+    @CommandPermission("pluginportal.network")
+    fun servers(actor: PortalCommandActor, @Optional @Flag("page") page: Int? = null, @Switch("full") full: Boolean = false) =
+        NetworkMessages().showServers(actor, page, full, "/pp servers")
+
+    @Subcommand("history")
+    @CommandPermission("pluginportal.network")
+    fun history(actor: PortalCommandActor, @Optional @Named("operationId") id: String? = null,
+                @Optional @Flag("page") page: Int? = null, @Switch("full") full: Boolean = false) {
+        if (id == null) NetworkMessages().showOperations(actor, page, full, "/pp history")
+        else NetworkMessages().showOperation(actor, id, page, full, "/pp history $id")
+    }
+
+    @Subcommand("refresh")
+    @CommandPermission("pluginportal.network")
+    fun refresh(actor: PortalCommandActor,
+                @Optional @Flag("server") @SuggestWith(ServerTargetSuggestionProvider::class) server: String? = null,
+                @Optional @Flag(value = "servers", shorthand = 'S') @SuggestWith(ServerTargetSuggestionProvider::class) servers: String? = null) {
+        if (!ServerTargets.requested(actor, server, servers) { ServerTargets.refresh(actor, it) }) {
+            actor.audience.sendFailure("Choose explicit targets: /pp refresh --servers <name,name>. Use /pp servers to list them.")
+        }
+    }
+
+    @Subcommand("control", "dashboard")
+    @CommandPermission("pluginportal.admin")
+    fun dashboard(actor: PortalCommandActor, @Optional @Suggest("enable", "disable", "status") action: String = "status") {
+        if (!actor.isConsole) return actor.audience.sendFailure("Run /pp control $action in this server's console.")
+        when (action.lowercase()) {
+            "enable", "disable" -> {
+                Config.setRemoteWrites(action.equals("enable", true))
+                PortalApplication.network.refreshInventory()
+            }
+            "status" -> Unit
+            else -> return actor.audience.sendInfo("Use /pp control <enable|disable|status>. Only this server's console can approve remote plugin changes.")
+        }
+        // Same words as the dashboard: one approval covers dashboard and proxy changes.
+        val allowed = Config.allowsRemoteWrites()
+        actor.audience.sendMessage(Component.empty().append(textPrimary("Plugin changes").bold())
+            .appendNewline().append(textSecondary("Status  ")).append(textPrimary(if (allowed) "Allowed" else "Off"))
+            .appendNewline().append(textDark("Covers changes sent from the dashboard and from a proxy in this network. Local commands are unaffected."))
+            .appendNewline().append(textSecondary(if (allowed) "Turn off  " else "Allow  ")).append(textPrimary(if (allowed) "/pp control disable" else "/pp control enable"))
+            .boxed())
+    }
+}

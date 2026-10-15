@@ -11,16 +11,18 @@ entitlement and server-side enforcement, not a second artifact.
 
 ## Release Channels
 
-Plugin Portal uses normal `x.y.z` versions in `gradle.properties`, `plugin.yml`,
-Git tags, GitHub releases, and marketplace version numbers. Channel is release
-metadata, not part of the JAR filename.
+Use `x.y.z-beta.N` or `x.y.z-alpha.N` for new prereleases and `x.y.z` for stable
+releases. Keep gradle.properties, both descriptors, JAR filenames, tags, and
+marketplace version numbers identical. The universal candidate starts at
+`4.0.0-beta.1`. Older 3.x betas used unsuffixed version numbers.
 
 - `beta`: GitHub prerelease, Modrinth `beta`, Hangar `Beta` when that channel exists, no admin release API upload.
 - `release`: GitHub full release, Modrinth `release`, Hangar `Release`, admin release API upload only when stable auto-updates should offer the version.
 - `alpha`: GitHub prerelease, Modrinth `alpha`, Hangar `Alpha`, no admin release API upload unless explicitly requested.
 
-For a beta such as `3.8.3 beta`, build `out/PluginPortal-3.8.3.jar` and publish
-that version as a beta channel.
+Build `out/PluginPortal-4.0.0-beta.1.jar` for that beta. Gradle and the marketplace
+wrapper infer the prerelease channel; Hangar defaults to its existing Snapshot
+channel. Both reject publishing a suffixed prerelease as a stable release.
 
 ## Guardrails
 
@@ -46,15 +48,22 @@ use a new version.
 
 ## Build and Test
 
-Run the strict dry-run release gate:
+For stable versions, run the strict dry-run release gate:
 
 ```bash
 bun scripts/release-plugin-portal.ts --version <x.y.z> --dry-run
 ```
 
 This updates `gradle.properties`, runs `./gradlew clean test build`, verifies
-the built JAR metadata, starts a local Paper smoke server, and runs a Plugin
+both built JAR descriptors, starts a local Paper smoke server, and runs a Plugin
 Portal install smoke command.
+
+For suffixed prereleases, run `./gradlew test build` and the Paper and network
+smokes directly. The stable admin uploader deliberately rejects prereleases.
+
+Before publishing 4.x, also run the sibling API repo’s `bun run smoke:network`
+against this exact universal JAR to verify Velocity and backend network flows.
+The Paper release smoke alone does not verify proxy support.
 
 Run marketplace publish dry-run. If Hangar does not have a configured `Beta`
 channel, use its existing non-release `Snapshot` channel explicitly:
@@ -96,8 +105,8 @@ bun scripts/publish-plugin-portal-marketplaces.ts --version <x.y.z> --all --chan
 
 The script publishes through Gradle:
 
-- Modrinth task: `:plugin:modrinth`, token `MODRINTH_TOKEN`.
-- Hangar task: `:plugin:publishPluginPublicationToHangar`, token `HANGAR_API_TOKEN`.
+- Modrinth task: `:distribution:modrinth`, token `MODRINTH_TOKEN`.
+- Hangar task: `:distribution:publishPluginPublicationToHangar`, token `HANGAR_API_TOKEN`.
 - Hangar has no dry-run upload mode, so the wrapper skips Hangar during `--dry-run`.
 - Use `--hangar-channel Snapshot` when publishing a beta before a true Hangar `Beta` channel has been configured with a color on the project.
 

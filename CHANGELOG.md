@@ -1,6 +1,44 @@
 # Changelog
 
+## 4.0.0-beta.2 (unreleased)
+
+- Add server inventory to the account dashboard and support links to MC License purchases.
+- Require a console review with explicit confirm/cancel. Do not import embedded keys.
+- Use read-only remote control by default. Console approval on each target permits plugin changes from the dashboard and proxy.
+- Add install/update/uninstall from the inventory with catalog search, review of fixed targets, and explicit retries.
+- Preserve stable downloads and offer an explicit v4 beta download.
+- Separate enrollment, transport, durable execution, and storage into network files.
+- Add link, unlink, servers, history, and control commands. Retain the dashboard alias.
+- Support explicit names or UUIDs for targets on install, update, uninstall, and list.
+- Complete quoted server names and targets with commas. Do not block Bukkit while network requests execute.
+- Keep Plugin Portal self-upgrades local. Report duplicate installs clearly.
+- Preserve configuration, plugin records, blacklists, key files, and plugin data from released 3.x versions on upgrade.
+- Add link status and explicit inventory refresh through `refresh --servers`.
+- Report loaded plugins and staged installs, updates, and removals. Show changes that require a restart in list, info, and link output.
+- Remove `/pp network …` and `/ppnetwork` in this beta. Use `link`, `unlink`, `servers`, `history`, `refresh`, and plugin commands with explicit targets.
+
 ## Unreleased
+
+### 4.0.0-beta.1 universal network candidate
+
+- Hide command roots, completions, and help from players without view access.
+- Add compact help pages and paged network results with copyable IDs.
+- Show the exact beta version and connection immediately in the info command.
+- Match the centered Bukkit info card and keep detail lines at normal weight.
+- Keep the invoked command alias in help, hover hints, and action buttons.
+- Show help for the attempted command when arguments are missing or invalid.
+- Package one JAR with shared core and Bukkit and Velocity entrypoints.
+- Make all local tools free, including recognition, bulk updates, and the editor.
+- Add paid network enrollment and scoped proxy commands for inventory, install,
+  update, and uninstall across explicit backend and proxy targets.
+- Select artifacts for each platform and stage Velocity updates at shutdown.
+- Persist operation results and recover connections without replaying mutations.
+- Fix cache removal and uninstalling installed plus pending plugin versions.
+- Enforce hosted authorization rather than embedding account keys in universal JARs.
+- Publish the architecture, recovery, security, and local integration workflow.
+
+The candidate is built and tested locally on Paper 1.21.11 and Velocity 3.4.0 with
+Java 21. It is not published or deployed to production.
 
 ### 3.8.9 candidate
 

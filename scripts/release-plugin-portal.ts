@@ -215,9 +215,11 @@ async function assertFile(path: string) {
 async function assertJarVersion(path: string, version: string) {
   const tempDir = await mkdtemp(join(tmpdir(), "pp-release-jar-"));
   try {
-    await capture(["jar", "xf", path, "plugin.yml"], { cwd: tempDir });
+    await capture(["jar", "xf", path, "plugin.yml", "velocity-plugin.json"], { cwd: tempDir });
     const pluginYml = await readFile(join(tempDir, "plugin.yml"), "utf8");
     if (!pluginYml.includes(`version: ${version}`)) fail(`${path} has wrong plugin.yml version.`);
+    const velocity = JSON.parse(await readFile(join(tempDir, "velocity-plugin.json"), "utf8"));
+    if (velocity.version !== version || velocity.id !== "pluginportal") fail(`${path} has wrong Velocity metadata.`);
   } finally {
     await rm(tempDir, { recursive: true, force: true });
   }

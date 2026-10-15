@@ -2,7 +2,7 @@
 import { createWriteStream, existsSync } from "node:fs";
 import { copyFile, mkdir, mkdtemp, readFile, readdir, rm, unlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { basename, join } from "node:path";
+import { basename, join, resolve } from "node:path";
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import { pipeline } from "node:stream/promises";
 
@@ -13,7 +13,9 @@ const suppliedServerJar = serverJarIndex >= 0 ? process.argv[serverJarIndex + 1]
 if (serverJarIndex >= 0 && !suppliedServerJar) throw new Error("--server-jar requires a path");
 const previousVersion = process.argv[2] ?? "3.8.5";
 const currentVersion = process.argv[3] ?? "3.8.6";
-const currentJar = join(root, "out", `PluginPortal-${currentVersion}.jar`);
+const currentJar = process.env.PLUGIN_PORTAL_JAR
+  ? resolve(process.env.PLUGIN_PORTAL_JAR)
+  : join(root, "out", `PluginPortal-${currentVersion}.jar`);
 const cacheDir = join(root, ".cache", "upgrade-smoke");
 const previousJar = join(cacheDir, `PluginPortal-${previousVersion}.jar`);
 const paperJar = join(cacheDir, "paper-1.21.11.jar");
@@ -27,7 +29,7 @@ await mkdir(join(runDirectory, "plugins"), { recursive: true });
 await copyFile(suppliedServerJar ?? paperJar, join(runDirectory, "server.jar"));
 await copyFile(previousJar, join(runDirectory, "plugins", basename(previousJar)));
 await writeFile(join(runDirectory, "eula.txt"), "eula=true\n");
-await writeFile(join(runDirectory, "server.properties"), "online-mode=false\nserver-port=0\n");
+await writeFile(join(runDirectory, "server.properties"), "server-ip=127.0.0.1\nonline-mode=false\nserver-port=0\n");
 
 try {
   const previous = await startServer();
@@ -42,8 +44,25 @@ try {
 
   const dataFile = join(runDirectory, "plugins", "PluginPortal", "plugins.json");
   const before = JSON.parse(await readFile(dataFile, "utf8")) as Array<{ name?: string; platformId?: string }>;
-  const tracked = before.find((plugin) => plugin.name === "ViaVersion");
+  const tracked = before.find((plugin) => plugin.name === "ViaVersion") as (typeof before[number] & { excludedFromUpdates?: boolean }) | undefined;
   if (!tracked?.platformId) throw new Error("Released plugin did not persist ViaVersion before upgrade.");
+
+  // Seed legacy configuration and plugin data after a real released-plugin install.
+  tracked.excludedFromUpdates = true;
+  await writeFile(dataFile, JSON.stringify(before));
+  const portalDir = join(runDirectory, "plugins/PluginPortal");
+  const legacyConfig = Bun.YAML.parse(await readFile(join(portalDir, "config.yml"), "utf8")) as Record<string, unknown>;
+  legacyConfig.Telemetry = { Enabled: false };
+  legacyConfig.Dashboard = { AllowWrites: true };
+  legacyConfig.Authentication = { ApiKey: "migration-config-fixture" };
+  legacyConfig.MigrationMarker = "keep-custom-settings";
+  await writeFile(join(portalDir, "config.yml"), Bun.YAML.stringify(legacyConfig));
+  await writeFile(join(portalDir, "mclicense.txt"), "migration-disk-fixture");
+  const externalSettings = "plugins:\n  fixture:\n    source: github:ViaVersion/ViaVersion\n    asset: '^ViaVersion.*\\.jar$'\n    updates: disabled\n";
+  await writeFile(join(portalDir, "external-plugins.yml"), externalSettings);
+  const pluginData = join(runDirectory, "plugins/ViaVersion/migration-state.txt");
+  await mkdir(join(runDirectory, "plugins/ViaVersion"), { recursive: true });
+  await writeFile(pluginData, "keep-plugin-data");
 
   for (const file of await readdir(join(runDirectory, "plugins"))) {
     if (/^PluginPortal(?:Premium)?-.*\.jar$/i.test(file)) await unlink(join(runDirectory, "plugins", file));
@@ -68,6 +87,13 @@ try {
     throw new Error("ViaVersion tracking state changed or disappeared after upgrade.");
   }
 
+  const migrated = Bun.YAML.parse(await readFile(join(portalDir, "config.yml"), "utf8")) as any;
+  const preserved = after.find((plugin) => plugin.name === "ViaVersion") as (typeof after[number] & { excludedFromUpdates?: boolean }) | undefined;
+  if (!preserved?.excludedFromUpdates || migrated.Telemetry?.Enabled !== false || migrated.Authentication?.ApiKey !== "migration-config-fixture" || migrated.MigrationMarker !== "keep-custom-settings") throw new Error("Legacy config, disk key precedence or blacklist did not survive");
+  if (migrated.Dashboard || migrated.RemoteControl?.AllowWrites !== false) throw new Error("Legacy approval widened remote control during migration");
+  if (await readFile(join(portalDir, "external-plugins.yml"), "utf8") !== externalSettings || await readFile(pluginData, "utf8") !== "keep-plugin-data" || await readFile(join(portalDir, "mclicense.txt"), "utf8") !== "migration-disk-fixture") throw new Error("External settings, plugin data or disk key changed");
+  if (await Bun.file(join(portalDir, "network-node.json")).exists()) throw new Error("Legacy keys automatically claimed this server");
+
   console.log(`In-place upgrade smoke passed: released ${previousVersion} state survived the ${currentVersion} JAR replacement.`);
 } finally {
   await rm(runDirectory, { recursive: true, force: true });
@@ -79,6 +105,7 @@ async function startServer() {
     ? spawn(join(process.env.PAPER_JAVA_HOME, "bin", "java"), javaArgs, { cwd: runDirectory, stdio: ["pipe", "pipe", "pipe"] })
     : spawn("docker", [
       "run", "--rm", "-i", "-v", `${runDirectory}:/server`, "-w", "/server",
+      ...(process.platform === "linux" ? ["--user", `${process.getuid!()}:${process.getgid!()}`] : []),
       "eclipse-temurin:21-jre", "java", ...javaArgs,
     ], { stdio: ["pipe", "pipe", "pipe"] });
   let output = "";
