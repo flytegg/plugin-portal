@@ -12,23 +12,36 @@ import revxrsal.commands.annotation.*
 class ServerCommands {
     @Subcommand("link")
     @CommandPermission("pluginportal.network")
-    fun link(actor: PortalCommandActor, @Named("code") code: String) = NetworkCommands().enroll(actor, code)
+    fun link(actor: PortalCommandActor, @Optional @Named("code") code: String? = null) {
+        if (code == null) NetworkMessages().showLinkStatus(actor)
+        else NetworkMessages().reviewLink(actor, code)
+    }
 
     @Subcommand("unlink")
     @CommandPermission("pluginportal.network")
-    fun unlink(actor: PortalCommandActor) = NetworkCommands().leave(actor)
+    fun unlink(actor: PortalCommandActor) = NetworkMessages().unlink(actor)
 
     @Subcommand("servers")
     @CommandPermission("pluginportal.network")
     fun servers(actor: PortalCommandActor, @Optional @Flag("page") page: Int? = null, @Switch("full") full: Boolean = false) =
-        NetworkCommands().showServers(actor, page, full, "/pp servers")
+        NetworkMessages().showServers(actor, page, full, "/pp servers")
 
     @Subcommand("history")
     @CommandPermission("pluginportal.network")
     fun history(actor: PortalCommandActor, @Optional @Named("operationId") id: String? = null,
                 @Optional @Flag("page") page: Int? = null, @Switch("full") full: Boolean = false) {
-        if (id == null) NetworkCommands().showOperations(actor, page, full, "/pp history")
-        else NetworkCommands().showOperation(actor, id, page, full, "/pp history $id")
+        if (id == null) NetworkMessages().showOperations(actor, page, full, "/pp history")
+        else NetworkMessages().showOperation(actor, id, page, full, "/pp history $id")
+    }
+
+    @Subcommand("refresh")
+    @CommandPermission("pluginportal.network")
+    fun refresh(actor: PortalCommandActor,
+                @Optional @Flag("server") @SuggestWith(ServerTargetSuggestionProvider::class) server: String? = null,
+                @Optional @Flag(value = "servers", shorthand = 'S') @SuggestWith(ServerTargetSuggestionProvider::class) servers: String? = null) {
+        if (!ServerTargets.requested(actor, server, servers) { ServerTargets.refresh(actor, it) }) {
+            actor.audience.sendFailure("Choose explicit targets: /pp refresh --servers <name,name>. Use /pp servers to list them.")
+        }
     }
 
     @Subcommand("control", "dashboard")

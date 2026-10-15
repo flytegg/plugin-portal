@@ -1,7 +1,6 @@
 package gg.flyte.pluginportal.common.commands.lamp
 
 import gg.flyte.pluginportal.common.commands.HelpSubCommand
-import gg.flyte.pluginportal.plugin.network.NetworkCommands
 import revxrsal.commands.exception.*
 import revxrsal.commands.exception.context.ErrorContext
 
@@ -20,10 +19,6 @@ class CommandUsageExceptionHandler(
         val command = context.context().command()
         if (!command.isVisibleTo(actor)) return
         val path = command.path().substringAfter(' ', "")
-        if (path.startsWith("network ")) {
-            NetworkCommands().showCommandHelp(actor, path.substringAfter(' ').substringBefore(' '))
-        } else {
-            HelpSubCommand().showCommandHelp(actor, path.substringBefore(' '))
-        }
+        HelpSubCommand().showCommandHelp(actor, path.substringBefore(' '))
     }
 }

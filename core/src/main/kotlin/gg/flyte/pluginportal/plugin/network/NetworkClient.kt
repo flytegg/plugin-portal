@@ -36,6 +36,13 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
     @Volatile private var socket: WebSocket? = null
     @Volatile var status: String = "Not enrolled"
         private set
+    @Volatile var lastError: String? = null
+        private set
+    val connectionState get() = when (status) {
+        "Connected" -> "connected"
+        "Connecting", "Enrolled; connecting" -> "connecting"
+        else -> "offline"
+    }
     private var retrySeconds = 2L
     private val generation = AtomicLong(0)
     private data class ServerNames(val nodeId: String, val receivedAt: Long, val values: List<String>)
@@ -44,6 +51,11 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
     @Volatile private var ready = false
     val isStopped get() = operations.isTerminated
     val nodeId get() = identity?.get("nodeId")?.asString
+    val networkId get() = identity?.get("networkId")?.asString
+    val networkName get() = identityLabel("networkName")
+    val ownerName get() = identityLabel("ownerName") ?: identityLabel("ownerId")
+    private fun identityLabel(key: String) = identity?.get(key)?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isString }
+        ?.asString?.filterNot(Char::isISOControl)?.take(120)?.takeIf { it.isNotBlank() }
     val role get() = identity?.get("role")?.asString
     private val platform get() = if (ServerType.VELOCITY in runtime.serverTypes) "velocity" else "bukkit"
 
@@ -54,6 +66,7 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
             if (identity != null) scheduler.execute { connect() }
         } catch (_: Exception) {
             status = "Network files could not be loaded; enrollment is disabled until they are repaired"
+            lastError = status
             runtime.logger.warning(status)
             ready = false
             return
@@ -75,6 +88,7 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
         Config.setRemoteWrites(false)
         store.saveIdentity(response)
         identity = response
+        lastError = null
         status = "Enrolled; connecting"
         scheduler.execute { connect() }
     }
@@ -90,6 +104,7 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
         socket?.close(1000, "Local disconnect")
         socket = null
         store.deleteIdentity()
+        lastError = null
         status = "Not enrolled; revoke the old node in the dashboard"
     }
 
@@ -129,13 +144,15 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
         return request("operations", input)
     }
 
+    private class NetworkRequestException(message: String) : IllegalStateException(message)
+
     private fun request(route: String, data: JsonObject? = null, authenticated: Boolean = true): JsonObject {
         val base = HttpInfo.getApiBaseUrl().trimEnd('/')
         val builder = Request.Builder().url("$base/network/node/$route")
         if (authenticated) builder.header("Authorization", "Bearer ${identity?.get("credential")?.asString ?: error("Enroll this node first")}")
         if (data != null || route == "connect") builder.post((data?.toString() ?: "{}").toRequestBody("application/json".toMediaType()))
         transport.newCall(builder.build()).execute().use { response ->
-            if (!response.isSuccessful) throw IllegalStateException(when (response.code) {
+            if (!response.isSuccessful) throw NetworkRequestException(when (response.code) {
                 401 -> "Node credential or enrollment code is invalid, expired, or revoked"
                 403 -> "This action requires current account access, a controller role, and console write approval on each target"
                 400 -> "Review the enrollment again, or check the plugin and target servers"
@@ -166,6 +183,7 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
                 override fun onOpen(webSocket: WebSocket, response: Response) {
                     if (closed.get() || current != generation.get()) { webSocket.close(1000, "Superseded"); return }
                     retrySeconds = 2
+                    lastError = null
                     status = "Connected"
                     publishInventory(webSocket)
                 }
@@ -190,13 +208,15 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
                         }
                     } catch (_: Exception) { webSocket.close(1008, "Invalid relay message") }
                 }
-                override fun onClosed(webSocket: WebSocket, code: Int, reason: String) = reconnect(current)
-                override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) = reconnect(current)
+                override fun onClosed(webSocket: WebSocket, code: Int, reason: String) = reconnect(current, "Connection closed; retrying")
+                override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) = reconnect(current, "Relay connection failed; retrying")
                 override fun onClosing(webSocket: WebSocket, code: Int, reason: String) { webSocket.close(code, reason) }
             })
             scheduler.schedule({ if (current == generation.get()) connect() }, maxOf(1, expiresAt - System.currentTimeMillis() - 60_000), TimeUnit.MILLISECONDS)
             scheduler.schedule({ if (current == generation.get()) heartbeat(current) }, 30, TimeUnit.SECONDS)
-        } catch (_: Exception) { reconnect(current) }
+        } catch (failure: Exception) {
+            reconnect(current, if (failure is NetworkRequestException) failure.message!! else "Could not connect to the network service; retrying")
+        }
     }
     private fun heartbeat(current: Long) {
         if (closed.get() || current != generation.get()) return
@@ -204,8 +224,9 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
         publishInventory()
         scheduler.schedule({ heartbeat(current) }, 30, TimeUnit.SECONDS)
     }
-    private fun reconnect(current: Long) {
+    private fun reconnect(current: Long, error: String) {
         if (closed.get() || !generation.compareAndSet(current, current + 1)) return
+        lastError = error
         status = "Disconnected; retrying enrollment authorization"
         // Fence duplicate failure/close callbacks so each session schedules one retry.
         val retryGeneration = current + 1
@@ -233,6 +254,7 @@ class NetworkClient(private val runtime: PortalRuntime) : AutoCloseable {
     override fun close() {
         if (!closed.compareAndSet(false, true)) return
         generation.incrementAndGet()
+        status = "Offline"
         socket?.close(1000, "Node stopping")
         scheduler.shutdownNow()
         operations.shutdown()

@@ -1,79 +1,20 @@
 package gg.flyte.pluginportal.plugin.network
 
 import com.google.gson.JsonObject
+import gg.flyte.pluginportal.common.Config
 import gg.flyte.pluginportal.common.chat.*
-import gg.flyte.pluginportal.common.commands.lamp.CommandPermission
 import gg.flyte.pluginportal.common.commands.lamp.PortalCommandActor
 import gg.flyte.pluginportal.plugin.PortalApplication
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor.*
-import revxrsal.commands.annotation.*
-import revxrsal.commands.node.ExecutionContext
 
-@Command("pp network", "ppnetwork")
-@CommandPermission("pluginportal.network")
-class NetworkCommands {
+/** Shared presentation for the short server commands; this class registers no command paths. */
+internal class NetworkMessages {
     private val client get() = PortalApplication.network
 
-    @CommandPlaceholder
-    fun root(actor: PortalCommandActor, context: ExecutionContext<PortalCommandActor>) {
-        val path = context.input().source().substringAfter(' ', "").trim()
-        val action = (if (path.startsWith("network")) path.substringAfter(' ', "") else path).substringBefore(' ')
-        if (action.isEmpty()) help(actor)
-        else if (!showCommandHelp(actor, action)) actor.audience.sendFailure("Unknown network command. Use /pp network help for available actions.")
-    }
-
-    fun showCommandHelp(actor: PortalCommandActor, action: String): Boolean {
-        val help = commandHelp[action.lowercase()] ?: return false
-        actor.audience.sendMessage(Component.empty().append(textPrimary(help.first).bold())
-            .appendNewline().append(textSecondary(help.second))
-            .appendNewline().append(textDark("Restart nodes to apply JAR changes.")).boxed())
-        return true
-    }
-
-    private val commandHelp = mapOf(
-        "help" to ("/pp network help" to "Show network actions and usage hints."),
-        "status" to ("/pp network status" to "Show this node's connection, ID, and role."),
-        "list" to ("/pp network list [--page <number>] [--full]" to "Show enrolled nodes. Use --page or --full, not both."),
-        "operations" to ("/pp network operations [--page <number>] [--full]" to "Show recent results. Use --page or --full, not both."),
-        "operation" to ("/pp network operation <operationId> [--page <number>] [--full]" to "Show outcomes for one operation. Copy its full UUID from operations."),
-        "refresh" to ("/pp network refresh <nodeIds>" to "Refresh inventories. Use comma-separated node UUIDs without spaces."),
-        "install" to ("/pp network install <nodeIds> <platform> <pluginId> [version]" to "Install a catalog plugin on explicit targets. Use comma-separated node UUIDs."),
-        "update" to ("/pp network update <nodeIds> <platform> <pluginId> [version]" to "Update a catalog plugin on explicit targets. Use comma-separated node UUIDs."),
-        "uninstall" to ("/pp network uninstall <nodeIds> <platform> <pluginId>" to "Remove a managed plugin and retain its data folder."),
-        "enroll" to ("/pp network enroll <code|confirm|cancel>" to "Console only. Review the destination account and network, then confirm explicitly."),
-        "leave" to ("/pp network leave" to "Console only. Remove this node's local credential; revoke it in the dashboard too."),
-    )
-
-    @Subcommand("help")
-    fun help(actor: PortalCommandActor) {
-        var message: Component = Component.empty().append(textPrimary("Network management").bold())
-            .append(textDark("  /  Paid"))
-        listOf("status" to "This node's connection", "list" to "Nodes and online state",
-            "operations" to "Recent results", "refresh" to "Refresh inventories",
-            "install" to "Install a catalog plugin", "update" to "Update a catalog plugin",
-            "uninstall" to "Remove a managed plugin").forEach { (command, description) ->
-            val usage = when (command) {
-                "refresh" -> "<nodeIds>"
-                "install", "update" -> "<nodeIds> <platform> <pluginId> [version]"
-                "uninstall" -> "<nodeIds> <platform> <pluginId>"
-                else -> ""
-            }
-            message = message.appendNewline().append(textPrimary("/pp network $command")
-                .clickEvent(ClickEvent.suggestCommand("/pp network $command" + if (usage.isEmpty()) "" else " "))
-                .hoverEvent(HoverEvent.showText(textPrimary("/pp network $command $usage".trim())
-                    .appendNewline().append(textSecondary("Use comma-separated node UUIDs.")))))
-                .append(textSecondary("  $description"))
-        }
-        message = message.appendNewline().appendNewline().append(textDark("Restart each node to apply JAR changes."))
-        if (actor.isConsole) message = message.appendNewline().append(textSecondary("Enrollment: /pp network enroll <code> | leave"))
-        actor.audience.sendMessage(message.boxed())
-    }
-
-    @Subcommand("enroll")
-    fun enroll(actor: PortalCommandActor, @Named("code") code: String) {
+    fun reviewLink(actor: PortalCommandActor, code: String) {
         if (!actor.isConsole) return actor.audience.sendFailure("Run enrollment in the server or proxy console.")
         work(actor) {
             when (code.lowercase()) {
@@ -106,23 +47,29 @@ class NetworkCommands {
         }
     }
 
-    @Subcommand("leave")
-    fun leave(actor: PortalCommandActor) {
-        if (!actor.isConsole) return actor.audience.sendFailure("Run network leave in the console.")
+    fun unlink(actor: PortalCommandActor) {
+        if (!actor.isConsole) return actor.audience.sendFailure("Run /pp unlink in the console.")
         work(actor) { client.leave(); actor.audience.sendSuccess(client.status) }
     }
 
-    @Subcommand("status")
-    fun status(actor: PortalCommandActor) {
-        var message: Component = Component.empty().append(textPrimary("Network connection").bold())
-            .appendNewline().append(textSecondary("Status  ")).append(textPrimary(client.status))
-            .appendNewline().append(textSecondary("Role  ")).append(textPrimary(client.role ?: "Not enrolled"))
-        client.nodeId?.let { message = message.appendNewline().append(textSecondary("Node  ")).append(identifier(it, actor)) }
-        actor.audience.sendMessage(message.boxed())
+    fun showLinkStatus(actor: PortalCommandActor) {
+        val id = client.nodeId ?: return actor.audience.sendInfo("Not linked. In the dashboard, choose Add server to get a code, then run /pp link <code> in this console.")
+        work(actor) {
+            var message: Component = Component.empty().append(textPrimary("Server link").bold())
+            client.ownerName?.let { message = message.appendNewline().append(textSecondary("Account  ")).append(textPrimary(it)) }
+            message = message.appendNewline().append(textSecondary("Network  ")).append(textPrimary(client.networkName ?: client.networkId ?: "Unknown"))
+                .appendNewline().append(textSecondary("Node  ")).append(textPrimary(id.take(8))).append(textSecondary("  ")).append(identifier(id, actor))
+                .appendNewline().append(textSecondary("Role  ")).append(textPrimary(client.role ?: "Unknown"))
+                .appendNewline().append(textSecondary("Connection  ")).append(textPrimary(client.connectionState))
+            client.lastError?.let { message = message.appendNewline().append(textSecondary("Last error  ")).append(textPrimary(it)) }
+            val count = PortalApplication.runtime.inventory.snapshot().restartCount
+            message = message.appendNewline().append(textSecondary("Remote plugin changes  "))
+                .append(textPrimary(if (Config.allowsRemoteWrites()) "Approved" else "Off"))
+                .appendNewline().append(textDark("Approve in this console: /pp control enable"))
+                .appendNewline().append(textSecondary("Restart needed: $count ${if (count == 1) "change applies" else "changes apply"} after restart"))
+            actor.audience.sendMessage(message.boxed())
+        }
     }
-
-    @Subcommand("list")
-    fun list(actor: PortalCommandActor, @Optional @Flag("page") page: Int? = null, @Switch("full") full: Boolean = false) = showServers(actor, page, full, "/pp network list")
 
     fun showServers(actor: PortalCommandActor, page: Int?, full: Boolean, commandPath: String) = work(actor) {
         if (!validPage(actor, page, full)) return@work
@@ -144,9 +91,6 @@ class NetworkCommands {
         sendPagedRows(actor.audience, rows, page, full, commandPath)
     }
 
-    @Subcommand("operations")
-    fun operations(actor: PortalCommandActor, @Optional @Flag("page") page: Int? = null, @Switch("full") full: Boolean = false) = showOperations(actor, page, full, "/pp network operations")
-
     fun showOperations(actor: PortalCommandActor, page: Int?, full: Boolean, commandPath: String) = work(actor) {
         if (!validPage(actor, page, full)) return@work
         val operations = client.state().getAsJsonArray("operations").map { it.asJsonObject }
@@ -156,15 +100,11 @@ class NetworkCommands {
             operationSummary(operation)
                 .append(textSecondary("  ")).append(identifier(id, actor))
                 .append(textPrimary("  [Results]")
-                    .clickEvent(ClickEvent.runCommand(if (commandPath == "/pp history") "/pp history $id" else "/pp network operation $id"))
+                    .clickEvent(ClickEvent.runCommand("/pp history $id"))
                     .hoverEvent(HoverEvent.showText(textSecondary("Show outcomes for each target"))))
         } }
         sendPagedRows(actor.audience, rows, page, full, commandPath)
     }
-
-    @Subcommand("operation")
-    fun operation(actor: PortalCommandActor, @Named("operationId") operationId: String,
-                  @Optional @Flag("page") page: Int? = null, @Switch("full") full: Boolean = false) = showOperation(actor, operationId, page, full, "/pp network operation $operationId")
 
     fun showOperation(actor: PortalCommandActor, operationId: String, page: Int?, full: Boolean, commandPath: String) = work(actor) {
         if (!validPage(actor, page, full)) return@work
@@ -187,29 +127,6 @@ class NetworkCommands {
             }
         }
         sendPagedRows(actor.audience, rows, page, full, commandPath)
-    }
-
-    @Subcommand("refresh")
-    fun refresh(actor: PortalCommandActor, @Named("nodeIds") targetIds: String) = operate(actor, targetIds, NetworkClient.jsonObject("kind" to "inventory"))
-    @Subcommand("install")
-    fun install(actor: PortalCommandActor, @Named("nodeIds") targetIds: String, @Named("platform") platform: String, @Named("pluginId") pluginId: String,
-                @Optional @Named("version") version: String?) = operate(actor, targetIds, action("install", platform, pluginId, version))
-    @Subcommand("update")
-    fun update(actor: PortalCommandActor, @Named("nodeIds") targetIds: String, @Named("platform") platform: String, @Named("pluginId") pluginId: String,
-               @Optional @Named("version") version: String?) = operate(actor, targetIds, action("update", platform, pluginId, version))
-    @Subcommand("uninstall")
-    fun uninstall(actor: PortalCommandActor, @Named("nodeIds") targetIds: String, @Named("platform") platform: String, @Named("pluginId") pluginId: String) = operate(actor, targetIds, action("uninstall", platform, pluginId, null))
-
-    private fun action(kind: String, platform: String, id: String, version: String?) = NetworkClient.jsonObject("kind" to kind, "platform" to platform.uppercase(), "id" to id).apply { version?.let { addProperty("version", it) } }
-
-    private fun operate(actor: PortalCommandActor, targetIds: String, action: JsonObject) = work(actor) {
-        val operation = client.submit(targetIds.split(','), action)
-        val id = operation.get("id").asString
-        actor.audience.sendMessage(Component.empty().append(textPrimary("Operation submitted").bold())
-            .appendNewline().append(operationSummary(operation))
-            .appendNewline().append(identifier(id, actor)).append(textPrimary("  [Results]")
-                .clickEvent(ClickEvent.runCommand("/pp network operation $id")))
-            .appendNewline().append(textDark("Offline targets are skipped." )).boxed())
     }
 
     private fun operationSummary(operation: JsonObject): Component {

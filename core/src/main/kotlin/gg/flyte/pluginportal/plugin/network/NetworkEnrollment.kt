@@ -31,6 +31,9 @@ internal class NetworkEnrollment(
             "confirmation" to current.review.confirmation,
         )).also { response ->
             require(response.get("nodeId").asString == current.review.nodeId && response.get("networkId").asString == current.review.networkId && response.get("role").asString == current.review.role) { "Enrollment identity changed" }
+            response.addProperty("ownerId", current.review.ownerId)
+            response.addProperty("ownerName", current.review.ownerName)
+            response.addProperty("networkName", current.review.networkName)
         }
     }
 

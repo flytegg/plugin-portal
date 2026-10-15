@@ -12,7 +12,6 @@ import revxrsal.commands.annotation.Named
 import revxrsal.commands.annotation.Optional
 import gg.flyte.pluginportal.common.commands.lamp.CommandPermission
 import gg.flyte.pluginportal.common.commands.lamp.PortalCommandActor
-import gg.flyte.pluginportal.plugin.network.NetworkCommands
 import revxrsal.commands.node.ExecutionContext
 
 @Command("pp", "pluginportal", "ppm")
@@ -24,19 +23,6 @@ class HelpSubCommand {
     fun rootCommand(actor: PortalCommandActor, context: ExecutionContext<PortalCommandActor>) {
         val path = context.input().source().substringAfter(' ', "").trim()
         val topic = path.substringBefore(' ')
-        if (topic.equals("network", ignoreCase = true)) {
-            if (!actor.hasPermission("pluginportal.network")) {
-                actor.audience.sendFailure("You do not have permission to use network commands.")
-                return
-            }
-            val action = path.substringAfter(' ', "").trim().substringBefore(' ')
-            val network = NetworkCommands()
-            if (action.isEmpty()) network.help(actor)
-            else if (!network.showCommandHelp(actor, action)) {
-                actor.audience.sendFailure("Unknown network command. Use /pp network help for available actions.")
-            }
-            return
-        }
         if (topic.isEmpty()) helpCommand(actor)
         else if (!showCommandHelp(actor, topic)) {
             actor.audience.sendFailure("Unknown command. Use /pp help for available commands.")
@@ -87,7 +73,7 @@ class HelpSubCommand {
     }
 
     private fun helpPermission(command: String): String = when (command) {
-        "network", "servers", "link", "unlink", "history" -> "pluginportal.network"
+        "refresh", "servers", "link", "unlink", "history" -> "pluginportal.network"
         "control", "dashboard" -> "pluginportal.admin"
         else -> "pluginportal.view"
     }
@@ -115,7 +101,9 @@ class HelpSubCommand {
         ),
         "Settings and network" to listOf(
             "servers" to "Connected servers",
-            "link <code>" to "Link this server to your account",
+            "link [code]" to "Link status or link this server",
+            "unlink" to "Disconnect this server",
+            "refresh --servers <names>" to "Refresh selected inventories",
             "history" to "Network operation results",
             "control" to "Remote plugin writes, console only",
             "reload" to "Reload configuration",
@@ -129,8 +117,9 @@ class HelpSubCommand {
     )
 
     private val commandHelp = mapOf(
+        "refresh" to ("/pp refresh --servers <name,name>" to listOf("Controller only. Refresh inventories on explicit servers by name or UUID.", "Use --server as an alias. Offline servers are skipped; no implicit all-server target.")),
         "servers" to ("/pp servers [--page <number>] [--full]" to listOf("List connected servers. Controller access is required.", "Use names or UUIDs with --server and --servers.")),
-        "link" to ("/pp link <code|confirm|cancel>" to listOf("Console only. Review the account, network and role from your dashboard link command.", "Confirm with /pp link confirm or discard with /pp link cancel. Writes start disabled.")),
+        "link" to ("/pp link [code|confirm|cancel]" to listOf("Without arguments, show account, network, connection, write approval and restart count.", "Get a link code from Add server in the dashboard.", "Link changes are console only. Review the account, network and role from your dashboard link command.", "Confirm with /pp link confirm or discard with /pp link cancel. Writes start disabled.")),
         "unlink" to ("/pp unlink" to listOf("Console only. Disconnect this server and remove its local credential.", "Revoke the server in your dashboard as well.")),
         "history" to ("/pp history [operationId] [--page <number>] [--full]" to listOf("Show recent operations, or results for one operation.")),
         "control" to ("/pp control <enable|disable|status>" to listOf("Console only. Remote plugin changes start disabled.", "Approve or disable dashboard and controller writes on this server.")),
@@ -167,7 +156,8 @@ class HelpSubCommand {
             "--external shows only configured external plugins.",
             "Chat shows eight entries per page. Console shows all entries by default.",
             "Use --full or --page, not both.",
-            "Add --server <name> or --servers <name,name> to view remote inventories."
+            "Add --server <name> or --servers <name,name> to view remote inventories.",
+            "Pending changes show Restart to apply, with the staged version for updates."
         )),
         "search" to ("/pp search <query> [platform] [--page <number>] [--full]" to listOf(
             "Search the marketplace. Quote queries with spaces.",
@@ -247,19 +237,12 @@ class HelpSubCommand {
             "This does not reload installed plugins or apply staged updates."
         )),
         "info" to ("/pp info" to listOf(
-            "Show the exact version, platform, local tools, and network connection.",
+            "Show the exact version, platform, local tools, network connection, and pending restart count.",
             "Alias: /pp version."
         )),
         "dump" to ("/pp dump" to listOf(
             "Upload sanitized diagnostic information for support.",
             "Review diagnostic files before sharing them publicly."
-        )),
-        "network" to ("/pp network" to listOf(
-            "Paid network management. Local tools remain free.",
-            "Status: /pp network status",
-            "Nodes: /pp network list [--page <number>] [--full]",
-            "History: /pp network operations [--page <number>] [--full]",
-            "Use /pp network help for actions and enrollment."
         )),
         "support" to ("/pp support" to listOf(
             "Show the support link."

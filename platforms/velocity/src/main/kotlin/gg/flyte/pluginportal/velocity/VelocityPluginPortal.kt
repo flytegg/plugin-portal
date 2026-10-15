@@ -44,16 +44,7 @@ class VelocityPluginPortal @Inject constructor(
             override fun suggestAsync(invocation: SimpleCommand.Invocation): CompletableFuture<List<String>> =
                 CompletableFuture.supplyAsync({ suggest(invocation) }, PortalApplication.runtime.executor)
         })
-        proxy.commandManager.register(proxy.commandManager.metaBuilder("ppnetwork").plugin(this).build(), object : SimpleCommand {
-            override fun hasPermission(invocation: SimpleCommand.Invocation) = allows(invocation.source(), "pluginportal.network")
-            override fun execute(invocation: SimpleCommand.Invocation) {
-                PluginPortalBase.lamp.dispatch(actor(invocation), "pp network " + invocation.arguments().joinToString(" "))
-            }
-            override fun suggest(invocation: SimpleCommand.Invocation): List<String> =
-                PluginPortalBase.lamp.autoCompleter().complete(actor(invocation), "pp network " + invocation.arguments().joinToString(" "))
-            override fun suggestAsync(invocation: SimpleCommand.Invocation): CompletableFuture<List<String>> =
-                CompletableFuture.supplyAsync({ suggest(invocation) }, PortalApplication.runtime.executor)
-        })
+
     }
 
     private fun allows(source: CommandSource, permission: String) =
@@ -74,9 +65,7 @@ class VelocityPluginPortal @Inject constructor(
             override fun sendMessage(identity: Identity, message: Component, type: MessageType) = source.sendMessage(identity, message, type)
         }
         val alias = invocation.alias()
-        val localRoot = if (alias.equals("ppnetwork", ignoreCase = true)) "ppv" else alias
-        val networkRoot = if (alias.equals("ppnetwork", ignoreCase = true)) alias else "$alias network"
-        return PortalCommandActor(CommandAliasAudience(audience, localRoot, networkRoot), name, id, player == null) { permission ->
+        return PortalCommandActor(CommandAliasAudience(audience, alias), name, id, player == null) { permission ->
             allows(source, permission)
         }
     }

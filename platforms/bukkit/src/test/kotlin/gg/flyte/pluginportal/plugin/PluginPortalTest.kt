@@ -1,5 +1,8 @@
 package gg.flyte.pluginportal.plugin
 
+import gg.flyte.pluginportal.common.PluginPortalBase
+import gg.flyte.pluginportal.common.commands.lamp.CommandAliasAudience
+import gg.flyte.pluginportal.common.commands.lamp.PortalCommandActor
 import gg.flyte.pluginportal.common.chat.sendPagedRows
 import gg.flyte.pluginportal.common.commands.lamp.CommandSenderAudience
 import net.kyori.adventure.text.Component
@@ -104,6 +107,65 @@ class PluginPortalTest {
                 .serialize(requireNotNull(server.consoleSender.nextComponentMessage()))
             assertTrue(message.contains("--refresh"), message)
             assertTrue(message.contains("--ignoreOutdated"), message)
+        }
+    }
+
+    @Test
+    fun `short server commands provide status and require explicit refresh targets`() {
+        val plain = PlainTextComponentSerializer.plainText()
+        for (alias in listOf("pp", "pluginportal", "ppm")) {
+            assertTrue(server.dispatchCommand(server.consoleSender, "$alias link"))
+            val status = plain.serialize(requireNotNull(server.consoleSender.nextComponentMessage()))
+            assertTrue(status.contains("Not linked"), status)
+            assertTrue(status.contains("Add server"), status)
+            assertTrue(status.contains("/$alias link <code>"), status)
+            assertTrue(server.dispatchCommand(server.consoleSender, "$alias refresh"))
+            val refresh = plain.serialize(requireNotNull(server.consoleSender.nextComponentMessage()))
+            assertTrue(refresh.contains("/$alias refresh --servers"), refresh)
+            assertTrue(server.dispatchCommand(server.consoleSender, "$alias refresh --server a --servers b"))
+            val conflict = plain.serialize(requireNotNull(server.consoleSender.nextComponentMessage()))
+            assertTrue(conflict.contains("Use --server or --servers, not both"), conflict)
+        }
+    }
+
+    @Test
+    fun `legacy network commands disappear from registration completion and help`() {
+        assertNull(server.getPluginCommand("ppnetwork"))
+        val actor = PortalCommandActor(net.kyori.adventure.audience.Audience.empty(), "CONSOLE", java.util.UUID(0, 0), true) { true }
+        val completions = PluginPortalBase.lamp.autoCompleter().complete(actor, "pp ")
+        assertFalse(completions.contains("network"), completions.toString())
+        assertTrue(completions.containsAll(listOf("link", "refresh", "servers", "history")), completions.toString())
+        assertTrue(server.dispatchCommand(server.consoleSender, "pp network status"))
+        val message = PlainTextComponentSerializer.plainText().serialize(requireNotNull(server.consoleSender.nextComponentMessage()))
+        assertTrue(message.contains("Unknown command"), message)
+    }
+
+    @Test
+    fun `server help preserves command aliases in text clicks and hover hints`() {
+        for (alias in listOf("pp", "ppm", "pluginportal", "ppv", "pluginportalvelocity")) {
+            val messages = mutableListOf<Component>()
+            val audience = object : net.kyori.adventure.audience.Audience {
+                override fun sendMessage(message: Component) { messages += message }
+            }
+            val actor = PortalCommandActor(CommandAliasAudience(audience, alias), "CONSOLE", java.util.UUID(0, 0), true) { true }
+            PluginPortalBase.lamp.dispatch(actor, "pp help 3")
+            val message = messages.single()
+            val plain = PlainTextComponentSerializer.plainText()
+            assertTrue(plain.serialize(message).contains("/$alias link [code]"))
+            fun inspect(component: Component) {
+                component.clickEvent()?.let {
+                    if (it.action() == net.kyori.adventure.text.event.ClickEvent.Action.RUN_COMMAND ||
+                        it.action() == net.kyori.adventure.text.event.ClickEvent.Action.SUGGEST_COMMAND) {
+                        assertTrue(it.value().startsWith("/$alias "), it.value())
+                    }
+                }
+                (component.hoverEvent()?.value() as? Component)?.let { hover ->
+                    val text = plain.serialize(hover)
+                    assertFalse(Regex("/pp(?: |$)").containsMatchIn(text) && alias != "pp", text)
+                }
+                component.children().forEach(::inspect)
+            }
+            inspect(message)
         }
     }
 

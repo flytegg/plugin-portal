@@ -12,10 +12,8 @@ import java.util.regex.Pattern
 class CommandAliasAudience(
     private val delegate: Audience,
     commandRoot: String,
-    networkRoot: String = "$commandRoot network",
 ) : Audience {
     private val localCommand = "/$commandRoot"
-    private val networkCommand = "/$networkRoot"
 
     override fun pointers() = delegate.pointers()
     override fun sendMessage(message: Component) = delegate.sendMessage(render(message))
@@ -23,10 +21,8 @@ class CommandAliasAudience(
     override fun sendMessage(identity: Identity, message: Component) = delegate.sendMessage(identity, render(message))
     override fun sendMessage(identity: Identity, message: Component, type: MessageType) = delegate.sendMessage(identity, render(message), type)
 
-    private fun command(reference: String) = if (reference == "pp") localCommand else networkCommand
-
     private fun render(message: Component): Component = actions(message.replaceText {
-        it.match(COMMAND_REFERENCE).replacement { match, builder -> builder.content(command(match.group(1))) }
+        it.match(COMMAND_REFERENCE).replacement { _, builder -> builder.content(localCommand) }
     })
 
     private fun actions(message: Component): Component {
@@ -34,19 +30,19 @@ class CommandAliasAudience(
         message.clickEvent()?.let { click ->
             if (click.action() == ClickEvent.Action.RUN_COMMAND || click.action() == ClickEvent.Action.SUGGEST_COMMAND) {
                 val value = COMMAND_ACTION.matcher(click.value()).let { match ->
-                    if (match.find()) command(match.group(1)) + click.value().substring(match.end()) else click.value()
+                    if (match.find()) localCommand + click.value().substring(match.end()) else click.value()
                 }
                 result = result.clickEvent(ClickEvent.clickEvent(click.action(), value))
             }
         }
         (message.hoverEvent()?.value() as? Component)?.let { hover ->
-            result = result.hoverEvent(HoverEvent.showText(actions(hover)))
+            result = result.hoverEvent(HoverEvent.showText(render(hover)))
         }
         return result
     }
 
     private companion object {
-        val COMMAND_REFERENCE: Pattern = Pattern.compile("(?<![\\w:/])/(ppnetwork|pp(?:\\s+network)?)(?=\\s|$|[.,!?;:)\\]])")
-        val COMMAND_ACTION: Pattern = Pattern.compile("^/(ppnetwork|pp(?:\\s+network)?)(?=\\s|$)")
+        val COMMAND_REFERENCE: Pattern = Pattern.compile("(?<![\\w:/])/pp(?=\\s|$|[.,!?;:)\\]])")
+        val COMMAND_ACTION: Pattern = Pattern.compile("^/pp(?=\\s|$)")
     }
 }

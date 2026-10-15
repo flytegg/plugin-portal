@@ -46,6 +46,11 @@ object ServerTargets {
         return selected
     }
 
+    fun refresh(actor: PortalCommandActor, selection: String) {
+        check(PortalApplication.network.role == "controller") { "This node is not a controller" }
+        submit(actor, resolve(selection), NetworkClient.jsonObject("kind" to "inventory"))
+    }
+
     fun install(actor: PortalCommandActor, selection: String, name: String, platform: MarketplacePlatform?, byId: Boolean, exact: Boolean, version: String?, channel: String?) {
         val targets = resolve(selection)
         MarketplacePluginCache.handlePluginSearchFeedback(actor.audience, name, platform, byId,
@@ -95,7 +100,8 @@ object ServerTargets {
         actor.audience.sendMessage(Component.empty().append(textPrimary("Operation submitted").bold())
             .appendNewline().append(textSecondary(nodes.joinToString(", ") { it.get("name").asString }))
             .appendNewline().append(textPrimary("[Results]").clickEvent(ClickEvent.runCommand("/pp history ${operation.get("id").asString}")))
-            .appendNewline().append(textDark("Offline servers are skipped. Restart to apply JAR changes.")).boxed())
+            .appendNewline().append(textDark(if (action.get("kind").asString == "inventory") "Offline servers are skipped."
+                else "Offline servers are skipped. Restart to apply JAR changes.")).boxed())
     }
     private fun work(actor: PortalCommandActor, task: () -> Unit) {
         PortalApplication.runtime.executor.execute { try { task() } catch (failure: Exception) { actor.audience.sendFailure(failure.message ?: "Server request failed") } }
