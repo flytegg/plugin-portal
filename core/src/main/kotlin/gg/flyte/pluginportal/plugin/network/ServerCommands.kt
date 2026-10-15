@@ -56,12 +56,12 @@ class ServerCommands {
             "status" -> Unit
             else -> return actor.audience.sendInfo("Use /pp control <enable|disable|status>. Only this server's console can approve remote plugin changes.")
         }
-        actor.audience.sendMessage(Component.empty().append(textPrimary("Remote plugin control").bold())
-            .appendNewline().append(textSecondary("Writes  ")).append(textPrimary(if (Config.allowsRemoteWrites()) "Approved" else "Disabled"))
-            .appendNewline().append(textDark("Applies to dashboard and network controller plugin changes on this server."))
-            .appendNewline().append(textSecondary("Enable  ")).append(textPrimary("/pp control enable"))
-            .appendNewline().append(textSecondary("Disable  ")).append(textPrimary("/pp control disable"))
-            .appendNewline().append(textDark("Local commands stay available. Restart to apply JAR changes."))
+        // Same words as the dashboard: one approval covers dashboard and proxy changes.
+        val allowed = Config.allowsRemoteWrites()
+        actor.audience.sendMessage(Component.empty().append(textPrimary("Plugin changes").bold())
+            .appendNewline().append(textSecondary("Status  ")).append(textPrimary(if (allowed) "Allowed" else "Off"))
+            .appendNewline().append(textDark("Covers changes sent from the dashboard and from a proxy in this network. Local commands are unaffected."))
+            .appendNewline().append(textSecondary(if (allowed) "Turn off  " else "Allow  ")).append(textPrimary(if (allowed) "/pp control disable" else "/pp control enable"))
             .boxed())
     }
 }

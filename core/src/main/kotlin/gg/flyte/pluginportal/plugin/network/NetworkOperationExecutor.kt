@@ -45,7 +45,7 @@ internal class NetworkOperationExecutor(
         val source = operation.get("source")?.asString ?: "dashboard"
         if (source !in setOf("dashboard", "controller")) return
         if (action.get("kind")?.asString != "inventory" && !Config.allowsRemoteWrites()) {
-            sendResult(id, result("failed", "Remote plugin control is disabled. Run pp control enable in this console first."))
+            sendResult(id, result("failed", "Plugin changes are off on this server. Allow them from its console with control enable."))
             return
         }
         if (action.get("kind")?.asString != "inventory" && LocalPluginCache.any {

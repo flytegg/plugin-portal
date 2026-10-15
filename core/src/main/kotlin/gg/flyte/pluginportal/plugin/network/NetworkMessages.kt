@@ -59,14 +59,20 @@ internal class NetworkMessages {
             client.ownerName?.let { message = message.appendNewline().append(textSecondary("Account  ")).append(textPrimary(it)) }
             message = message.appendNewline().append(textSecondary("Network  ")).append(textPrimary(client.networkName ?: client.networkId ?: "Unknown"))
                 .appendNewline().append(textSecondary("Node  ")).append(textPrimary(id.take(8))).append(textSecondary("  ")).append(identifier(id, actor))
-                .appendNewline().append(textSecondary("Role  ")).append(textPrimary(client.role ?: "Unknown"))
+                .appendNewline().append(textSecondary("Role  ")).append(textPrimary(when (client.role) {
+                    "controller" -> "Proxy · can send changes to servers that allow them"
+                    "node" -> "Server"
+                    else -> "Unknown"
+                }))
                 .appendNewline().append(textSecondary("Connection  ")).append(textPrimary(client.connectionState))
             client.lastError?.let { message = message.appendNewline().append(textSecondary("Last error  ")).append(textPrimary(it)) }
             val count = PortalApplication.runtime.inventory.snapshot().restartCount
-            message = message.appendNewline().append(textSecondary("Remote plugin changes  "))
-                .append(textPrimary(if (Config.allowsRemoteWrites()) "Approved" else "Off"))
-                .appendNewline().append(textDark("Approve in this console: /pp control enable"))
-                .appendNewline().append(textSecondary("Restart needed: $count ${if (count == 1) "change applies" else "changes apply"} after restart"))
+            val allowed = Config.allowsRemoteWrites()
+            message = message.appendNewline().append(textSecondary("Plugin changes  "))
+                .append(textPrimary(if (allowed) "Allowed" else "Off"))
+            if (!allowed) message = message.appendNewline().append(textDark("Allow dashboard and proxy changes: /pp control enable"))
+            if (count > 0) message = message.appendNewline().append(textSecondary("Restart  "))
+                .append(textPrimary("$count ${if (count == 1) "change applies" else "changes apply"} after restart"))
             actor.audience.sendMessage(message.boxed())
         }
     }
