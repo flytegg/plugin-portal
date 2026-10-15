@@ -75,19 +75,19 @@ On Modrinth, use the project ID, such as `P1OZGk5p`, instead of the URL slug.
 | `/pp install <name> [platform] [channel] [--byId] [--exact] [--version <version>]` | `pluginportal.manage.install` | Downloads a compatible plugin JAR. |
 | `/pp update <name> [--byId] [--ignoreOutdated] [--refresh] [--channel <name>] [--version <version>]` | `pluginportal.maintain.update` | Updates one tracked plugin. |
 | `/pp updateAll [--ignoreOutdated]` | `pluginportal.maintain.update` | Updates tracked marketplace plugins. |
-| `/pp blacklist [name] [--byId]` | `pluginportal.maintain.update` | Changes the exclusion from `updateAll`. Lists exclusions if you omit the name. |
+| `/pp blacklist [name] [--byId]` | `pluginportal.maintain.update` | Changes the exclusion from `updateAll`. If you omit the name, lists exclusions. |
 | `/pp platform <name> <platform> [--byId]` | `pluginportal.maintain.update` | Downloads a compatible version from another linked marketplace. |
 | `/pp uninstall <name> [--byId]` | `pluginportal.manage.uninstall` | Removes a tracked plugin JAR. Alias: `/pp delete`. |
 | `/pp install-url <url>` | `pluginportal.manage.install-url` | Downloads a JAR from a direct URL. Requires the console. |
 | `/pp upgrade [--yes] [--channel <name>]` | `pluginportal.admin` | Checks for a Plugin Portal update. Add `--yes` to download it. |
 
-Restart after an install, update, uninstall, platform change, or self-upgrade.
+After an install, update, uninstall, platform change, or self-upgrade, restart the server or proxy.
 Plugin Portal stages Paper updates in its update folder, normally `plugins/update/`.
 It stages Velocity updates in `plugins/pluginportal/pending-updates/`.
 
 `/pp list` marks installs, updates, and removals that require a restart with `Restart to apply`.
 For updates, it also shows the staged version.
-A removed plugin stays in the list while the server or proxy still has it loaded.
+While the server or proxy still has a removed plugin loaded, the plugin stays in the list.
 `/pp info` reports how many changes apply after a restart.
 `/pp reload` does not load JARs.
 
@@ -116,7 +116,7 @@ The review step records this choice. The choice does not change future compatibi
 
 `--refresh` bypasses the local two-hour marketplace cache.
 It does not force the API scanner to get new upstream data.
-`--ignoreOutdated` permits a reinstall even when the selected compatible version is current.
+Even when the selected compatible version is current, `--ignoreOutdated` permits a reinstall.
 It does not bypass compatibility.
 
 `updateAll` uses exclusions and each plugin's saved channel.

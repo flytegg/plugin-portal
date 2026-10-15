@@ -42,9 +42,9 @@ Run `pp control enable` in the server console or `ppv control enable` in the pro
 `RemoteControl.AllowWrites` defaults to false. The editor cannot change it.
 A purchase link or server link never grants this approval.
 
-The API identifies the operation source. The JAR checks approval again before it changes files.
+The API identifies the operation source. Before the JAR changes files, it checks approval again.
 Disable and unlink clear approval. A normal restart retains approval.
-The dashboard requires explicit target selection and review before it sends a change.
+Before the dashboard sends a change, it requires explicit target selection and review.
 Inventory views are read-only.
 
 A proxy credential permits inventory access in its network.
@@ -93,7 +93,7 @@ They never load arbitrary plugin code into the active process.
 
 Paper uses its update directory.
 Velocity stages replacements in `plugins/pluginportal/pending-updates`.
-At graceful shutdown, it applies them after plugin workers stop.
+At graceful shutdown, after plugin workers stop, it applies the replacements.
 After a crash, it retains staged replacements until a successful graceful shutdown.
 While the proxy is stopped, inspect retained failures manually.
 
@@ -102,7 +102,7 @@ It refuses ambiguous duplicate plugin identities.
 
 Inventories report each plugin as `running`, `staged-install`, `staged-update`, or `staged-removal`.
 They include `stagedVersion` for a staged replacement.
-Removed managed plugins remain in the inventory while the current JVM has them loaded.
+While the current JVM has removed managed plugins loaded, they remain in the inventory.
 `restartRequired` also covers staged files with no identified plugin.
 Inventories retain the 500-entry limit. Restart detection checks all entries and staged files.
 

@@ -19,7 +19,7 @@ It cannot make untrusted executable code safe.
 The notes below describe historical 3.x behavior only.
 They do not describe the v4 runtime or its release acceptance process.
 
-Plugin Portal imports delivery credentials before it checks premium entitlement.
+Before Plugin Portal checks premium entitlement, it imports delivery credentials.
 An imported credential does not grant access.
 `/premium/validate` remains the authority for premium actions.
 
@@ -29,7 +29,7 @@ An imported credential does not grant access.
 - It ignores blank or unrewritten placeholders.
 - Configured keys and legacy key files take precedence.
 
-The importer writes `plugins/PluginPortal/mclicense.txt` before it calls MCLicense.
+Before the importer calls MCLicense, it writes `plugins/PluginPortal/mclicense.txt`.
 It then saves the imported key in `Authentication.ApiKey`.
 This bypasses the library's discovery through markers.
 It preserves the library's validation and marketplace license creation.

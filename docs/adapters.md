@@ -79,7 +79,7 @@ plugins:
 The `asset` value is a regular expression. It must match the complete asset filename.
 Plugin Portal checks releases from newest to oldest. It skips drafts.
 Unless `prereleases` is `true`, it skips prereleases.
-It also skips a release if no asset matches.
+If no asset matches, it skips the release.
 
 If multiple assets in one release match, the check fails.
 Plugin Portal does not guess which JAR to install.
