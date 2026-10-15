@@ -40,10 +40,12 @@ class SocketActions {
         val platformPlugin = plugin.platform(marketplacePlatform)
             ?: return@SocketAction PluginActionResponse(false, "Plugin not found on $marketplacePlatform")
         val serverTypes = currentServerTypePreference()
-        val minecraftVersion = currentMinecraftVersion()
+        val actualMinecraftVersion = currentMinecraftVersion()
+        val minecraftVersion = if (data.get("ignoreMinecraftVersion")?.asBoolean == true && versionNumber != null) null else actualMinecraftVersion
         val version = if (versionNumber != null) {
+            var fetched: List<Version>? = null
             val selection = platformPlugin.exactCompatibleVersionWithFallback(versionNumber, channel, serverTypes, minecraftVersion) {
-                API.getPluginVersions(platformPlugin.platformWithId)?.toList()
+                API.getPluginVersions(platformPlugin.platformWithId)?.toList().also { fetched = it }
             }
 
             when (selection) {
@@ -51,13 +53,13 @@ class SocketActions {
                 is ExactVersionSelection.Ambiguous ->
                     return@SocketAction PluginActionResponse(false, "Multiple compatible versions named $versionNumber exist. Select a release channel.")
                 ExactVersionSelection.NotFound ->
-                    return@SocketAction PluginActionResponse(false, "No compatible version found for $versionNumber")
+                    return@SocketAction PluginActionResponse(false, (fetched ?: platformPlugin.versions).exactVersionFailure(versionNumber, channel, serverTypes, actualMinecraftVersion))
             }
         } else {
             platformPlugin.newestCompatibleVersionWithFallback(channel, serverTypes, minecraftVersion) {
                 API.getPluginVersions(platformPlugin.platformWithId)?.toList()
             }
-                ?: return@SocketAction PluginActionResponse(false, "No compatible version found")
+                ?: return@SocketAction PluginActionResponse(false, "No compatible version for Minecraft ${currentMinecraftVersion()} on ${currentServerTypePreference().first().name}. Choose an exact version to review compatibility or install anyway.")
         }
 
         val localPlugin = plugin.download(
@@ -66,6 +68,7 @@ class SocketActions {
             audience = Audience.empty(),
             version = version,
             preferredChannel = channel ?: version.releaseChannel,
+            excludedFromUpdates = versionNumber != null,
         )
         val response = ActionResponseString(localPlugin != null, if (localPlugin == null) "Installation failed" else null, localPlugin)
         
@@ -115,16 +118,18 @@ class SocketActions {
         val versionNumber = data.get("version")?.asString?.takeIf { it.isNotBlank() }
         val channel = data.get("channel")?.asString?.takeIf { it.isNotBlank() } ?: localPlugin.preferredChannel
         val types = currentServerTypePreference()
-        val minecraft = currentMinecraftVersion()
+        val actualMinecraft = currentMinecraftVersion()
+        val minecraft = if (data.get("ignoreMinecraftVersion")?.asBoolean == true && versionNumber != null) null else actualMinecraft
         val selected = if (versionNumber != null) {
-            when (val selection = platformPlugin.exactCompatibleVersionWithFallback(versionNumber, channel, types, minecraft) { API.getPluginVersions(platformPlugin.platformWithId)?.toList() }) {
+            var fetched: List<Version>? = null
+            when (val selection = platformPlugin.exactCompatibleVersionWithFallback(versionNumber, channel, types, minecraft) { API.getPluginVersions(platformPlugin.platformWithId)?.toList().also { fetched = it } }) {
                 is ExactVersionSelection.Found -> selection.version
                 is ExactVersionSelection.Ambiguous -> return@SocketAction PluginActionResponse(false, "Version is ambiguous; select a channel")
-                ExactVersionSelection.NotFound -> return@SocketAction PluginActionResponse(false, "No compatible version found")
+                ExactVersionSelection.NotFound -> return@SocketAction PluginActionResponse(false, (fetched ?: platformPlugin.versions).exactVersionFailure(versionNumber, channel, types, actualMinecraft))
             }
         } else if (data.has("channel")) {
             platformPlugin.newestCompatibleVersionWithFallback(channel, types, minecraft) { API.getPluginVersions(platformPlugin.platformWithId)?.toList() }
-                ?: return@SocketAction PluginActionResponse(false, "No compatible version found")
+                ?: return@SocketAction PluginActionResponse(false, "No compatible version for Minecraft ${currentMinecraftVersion()} on ${currentServerTypePreference().first().name}. Choose an exact version to review compatibility or install anyway.")
         } else localPlugin.targetUpdateVersion(remote)
             ?: return@SocketAction PluginActionResponse(true, "Plugin is already up to date")
         if (localPlugin.matchesVersion(selected)) return@SocketAction PluginActionResponse(true, "Plugin is already up to date")
@@ -178,7 +183,7 @@ class SocketActions {
         val version = platformPlugin.newestCompatibleVersionWithFallback(localPlugin.preferredChannel, serverTypes, minecraftVersion) {
             API.getPluginVersions(platformPlugin.platformWithId)?.toList()
         }
-            ?: return@SocketAction PluginActionResponse(false, "No compatible version found")
+            ?: return@SocketAction PluginActionResponse(false, "No compatible version for Minecraft ${currentMinecraftVersion()} on ${currentServerTypePreference().first().name}. Choose an exact version to review compatibility or install anyway.")
 
         val newPlugin = marketplacePlugin.download(
             update = true,

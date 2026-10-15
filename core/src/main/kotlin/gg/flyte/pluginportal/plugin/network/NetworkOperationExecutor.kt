@@ -106,7 +106,7 @@ internal class NetworkOperationExecutor(
         }
     }
     private fun canonicalAction(action: JsonObject): String? = runCatching {
-        val keys = setOf("kind", "platform", "id", "version", "channel")
+        val keys = setOf("kind", "platform", "id", "version", "channel", "ignoreMinecraftVersion")
         require(action.keySet().all { it in keys })
         val kind = action.get("kind").asString
         require(kind in setOf("inventory", "install", "update", "uninstall"))
@@ -116,6 +116,10 @@ internal class NetworkOperationExecutor(
         }
         action.get("version")?.let { require(it.asString.length in 1..100) }
         action.get("channel")?.let { require(it.asString in setOf("release", "beta", "alpha")) }
+        action.get("ignoreMinecraftVersion")?.let {
+            require(it.isJsonPrimitive && it.asJsonPrimitive.isBoolean)
+            require(kind in setOf("install", "update") && action.has("version"))
+        }
         JsonObject().apply { for (key in keys.sorted()) action.get(key)?.let { add(key, it) } }.toString()
     }.getOrNull()
 

@@ -327,6 +327,20 @@ class VersionSelectionTest {
         assertEquals(0, selection.version.bestServerTypeRank(listOf(ServerType.PAPER, ServerType.SPIGOT, ServerType.BUKKIT)))
     }
 
+    @Test
+    fun `Minecraft override keeps the requested release channel and server artifact`() {
+        val paper = version("5.7.1", "2026-01-18T00:00:00Z", ServerType.PAPER, minecraftVersions = listOf("1.21.10"))
+        val velocity = version("5.7.1", "2026-01-18T00:00:00Z", ServerType.VELOCITY)
+        val versions = listOf(paper, velocity)
+        assertEquals(ExactVersionSelection.NotFound, versions.exactCompatibleVersion("5.7.1", "release", listOf(ServerType.PAPER), "1.21.11"))
+        assertEquals(paper, (versions.exactCompatibleVersion("5.7.1", "release", listOf(ServerType.PAPER), null) as ExactVersionSelection.Found).version)
+        assertEquals(ExactVersionSelection.NotFound, listOf(velocity).exactCompatibleVersion("5.7.1", "release", listOf(ServerType.PAPER), null))
+        assertEquals(ExactVersionSelection.NotFound, versions.exactCompatibleVersion("5.7.1", "beta", listOf(ServerType.PAPER), null))
+        kotlin.test.assertTrue(versions.exactVersionFailure("5.7.1", "release", listOf(ServerType.PAPER), "1.21.11").contains("not marked compatible with Minecraft 1.21.11"))
+        kotlin.test.assertTrue(listOf(velocity).exactVersionFailure("5.7.1", "release", listOf(ServerType.PAPER), "1.21.11").contains("no PAPER-compatible JAR"))
+        kotlin.test.assertTrue(versions.exactVersionFailure("missing", "release", listOf(ServerType.PAPER), "1.21.11").contains("was not found"))
+    }
+
     private fun version(
         versionNumber: String,
         releasedAt: String,

@@ -83,3 +83,10 @@ storage, and entitlement services are separate closed-source infrastructure.
 The code uses the [Plugin Portal Source Available License](LICENSE.md). It is not
 an OSI-approved open-source license. The license includes the merged free and
 Premium code and historical names. [Trademark terms](TRADEMARKS.md) apply separately.
+
+Dashboard exact-version installs report missing releases, missing platform JARs,
+and Minecraft compatibility mismatches separately. After selecting an exact
+release, **Install anyway** bypasses only its Minecraft-version metadata check.
+The selected channel, Paper/Velocity artifact validation, marketplace controls,
+and per-server console approval still apply. This requires the updated dashboard,
+shared API contract and universal JAR.

@@ -98,6 +98,10 @@ The channel on `/pp update` is a flag.
 A selected channel is saved for future updates. An exact version must still be
 compatible. If a version label exists on more than one channel, specify the
 channel too. Exact command-selected versions are excluded from `updateAll`.
+The dashboard also excludes exact installs from automatic updates. Its **Install
+anyway** option bypasses Minecraft-version metadata for an exact release, while
+still requiring a matching server-platform JAR. The review step records this
+choice, and it does not change future compatibility checks.
 Use `/pp blacklist <name>` to remove that exclusion when you want bulk updates again.
 
 `--refresh` bypasses the local two-hour marketplace cache. It does not force the

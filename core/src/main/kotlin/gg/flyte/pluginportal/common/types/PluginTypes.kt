@@ -193,6 +193,15 @@ fun PlatformPlugin.exactCompatibleVersionWithFallback(
     }
 }
 
+/** Explain an exact-selection failure without confusing missing releases with Minecraft mismatches. */
+fun List<Version>.exactVersionFailure(versionNumber: String, channel: String?, serverTypes: List<ServerType>, minecraft: String?): String {
+    val matching = filter { it.versionNumber == versionNumber && (channel == null || it.releaseChannel.equals(channel, ignoreCase = true)) }
+    if (matching.isEmpty()) return "Version $versionNumber${channel?.let { " in the $it channel" } ?: ""} was not found. Refresh the version list and choose a published release."
+    val runtime = matching.exactCompatibleVersion(versionNumber, channel, serverTypes, null)
+    if (runtime == ExactVersionSelection.NotFound) return "Version $versionNumber has no ${serverTypes.first().name}-compatible JAR. Choose another version or marketplace."
+    return "Version $versionNumber is not marked compatible with Minecraft $minecraft on ${serverTypes.first().name}. Choose another version, or select Install anyway to bypass the Minecraft version check."
+}
+
 private fun List<Version>.preferMinecraftVersion(minecraftVersion: String?): List<Version> {
     val normalized = normalizeMinecraftVersion(minecraftVersion) ?: return this
     val explicitMatches = filter { version -> version.explicitlySupportsMinecraftVersion(normalized) }
