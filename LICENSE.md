@@ -127,6 +127,18 @@ from use of the software.
 Dependencies and third-party code remain subject to their own licenses. This
 license does not restrict rights those licenses grant for those components.
 
+## Version History
+
+This version replaces all earlier versions of this license. Every published
+release of Plugin Portal was distributed under version 1.0 of this license or
+under this version, and both protect Premium Features.
+
+Text titled "version 1.1" appeared only on an unreleased development branch,
+starting on 5 October 2026. It was a draft. It was never the license of any
+release, and it grants no rights to Premium Features or Network Features. That
+draft also forbade the removal or bypass of feature-gating and entitlement
+checks. Software obtained from that branch is subject to this version.
+
 ## Other Terms
 
 If you want to use Plugin Portal outside this license, including commercial
