@@ -1,5 +1,7 @@
 package gg.flyte.pluginportal.plugin.commands
 
+import gg.flyte.pluginportal.plugin.commands.lamp.RequiresAuth
+
 import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.Constants
 import gg.flyte.pluginportal.common.PlatformId
@@ -30,6 +32,7 @@ import gg.flyte.pluginportal.common.commands.lamp.CommandPermission
 class ImportSubCommand {
 
     @EnabledCommand(Features.IMPORT)
+    @RequiresAuth
     @Subcommand("import")
     @CommandPermission("pluginportal.manage.import")
     fun importCommand(

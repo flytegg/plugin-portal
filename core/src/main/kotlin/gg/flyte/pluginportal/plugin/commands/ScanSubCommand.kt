@@ -1,5 +1,7 @@
 package gg.flyte.pluginportal.plugin.commands
 
+import gg.flyte.pluginportal.plugin.commands.lamp.RequiresAuth
+
 import gg.flyte.pluginportal.common.Constants
 import gg.flyte.pluginportal.common.chat.*
 import gg.flyte.pluginportal.common.util.SharedComponents
@@ -23,6 +25,7 @@ import java.io.File
 @Command("pp", "pluginportal", "ppm")
 class ScanSubCommand {
 
+    @RequiresAuth
     @Subcommand("scan")
     @CommandPermission("pluginportal.manage.scan")
     fun scanCommand(audience: Audience, @Named("file")  @SuggestWith(PluginJarFilesSuggestionProvider ::class) @SafeFileName pluginFileName: String) {

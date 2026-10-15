@@ -1,5 +1,7 @@
 package gg.flyte.pluginportal.plugin.commands.recognize
 
+import gg.flyte.pluginportal.plugin.commands.lamp.RequiresAuth
+
 import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.Constants
 import gg.flyte.pluginportal.common.Hash
@@ -37,6 +39,7 @@ class RecognizeSubCommand {
     private val logger get() = PortalApplication.runtime.logger
 
     @EnabledCommand(Features.RECOGNISE)
+    @RequiresAuth
     @Subcommand("recognize")
     @CommandPermission("pluginportal.manage.recognize")
     fun recognizeCommand(

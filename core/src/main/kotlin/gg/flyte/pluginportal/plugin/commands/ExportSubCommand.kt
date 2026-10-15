@@ -1,5 +1,7 @@
 package gg.flyte.pluginportal.plugin.commands
 
+import gg.flyte.pluginportal.plugin.commands.lamp.RequiresAuth
+
 import gg.flyte.pluginportal.common.PlatformId
 import gg.flyte.pluginportal.common.chat.Status
 import gg.flyte.pluginportal.common.chat.boxed
@@ -20,6 +22,7 @@ import gg.flyte.pluginportal.common.commands.lamp.CommandPermission
 class ExportSubCommand {
 
     @EnabledCommand(Features.EXPORT)
+    @RequiresAuth
     @Subcommand("export")
     @CommandPermission("pluginportal.manage.export")
     fun exportCommand(audience: Audience) {

@@ -25,7 +25,8 @@ class VersionSubCommand {
         val networkStatus = PortalApplication.network.status
         val versionLine = textSecondary("Version: ").append(Component.text(version, WHITE))
         val platformLine = textSecondary("Platform: ").append(Component.text(plugin.server.name, WHITE))
-            .append(textDark("  |  ")).append(textSecondary("Local tools: ")).append(Component.text("Free", GREEN))
+            .append(textDark("  |  ")).append(textSecondary("Premium: ")).append(
+                if (PortalApplication.isAuthed()) Component.text("Active", GREEN) else Component.text("Locked", GRAY))
         val networkLine = textSecondary("Network: ").append(Component.text(networkStatus,
             if (networkStatus == "Connected") GREEN else GRAY))
         var message = Component.empty().decoration(TextDecoration.BOLD, false)

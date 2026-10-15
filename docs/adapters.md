@@ -3,7 +3,7 @@
 External adapters let Plugin Portal manage plugins from sources outside its marketplace catalog.
 The providers are GitHub Releases and the GeyserMC download API.
 
-External plugin commands are free. They require the `pluginportal.manage.external` permission.
+External plugin commands are Premium. They require a valid key and the `pluginportal.manage.external` permission.
 
 ## Configuration
 

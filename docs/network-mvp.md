@@ -1,7 +1,7 @@
 # Network management MVP
 
 Plugin Portal 4.0.0-beta.2 builds one JAR for Bukkit-family servers and Velocity.
-Local management is free. An active owner purchase enables hosted network management.
+Free and Premium local commands use the same JAR. A key unlocks Premium commands. An active owner purchase enables hosted network management.
 This release does not support BungeeCord. This candidate is not a published release.
 
 ## Enroll a network

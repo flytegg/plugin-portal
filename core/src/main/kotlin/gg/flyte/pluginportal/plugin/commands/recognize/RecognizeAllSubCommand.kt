@@ -1,5 +1,7 @@
 package gg.flyte.pluginportal.plugin.commands.recognize
 
+import gg.flyte.pluginportal.plugin.commands.lamp.RequiresAuth
+
 import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.Constants
 import gg.flyte.pluginportal.common.Hash
@@ -42,6 +44,7 @@ class RecognizeAllSubCommand {
     private val File.hash: Hash get() = Hash(HashType.SHA256.hash(this), HashType.SHA512.hash(this))
 
     @EnabledCommand(Features.RECOGNISE)
+    @RequiresAuth
     @Subcommand("recognizeAll")
     @CommandPermission("pluginportal.manage.recognize")
     fun recognizeAllCommand(

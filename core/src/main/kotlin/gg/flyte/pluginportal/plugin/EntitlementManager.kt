@@ -38,8 +38,25 @@ class EntitlementManager(private val plugin: PortalRuntime) {
             return it
         }
 
-        // JAR resources and marketplace placeholders never supply installation identity.
-        return null
+        // Marketplace downloads carry the buyer's key. It unlocks premium commands only;
+        // it never links a server to a network.
+        loadEmbeddedKey()?.let {
+            persistKey(it, if (it.startsWith("pp_")) pluginPortalPath else mcLicensePath)
+            return it
+        }
+        return MarketplaceKey.embedded()?.also { persistKey(it, mcLicensePath) }
+    }
+
+    private fun loadEmbeddedKey(): String? {
+        val entry = EntitlementManager::class.java.classLoader.getResource("mclicense.txt") ?: return null
+        return entry.readText().trim().takeUnless { it.isEmpty() || it.startsWith("%%__") }
+    }
+
+    private fun persistKey(key: String, target: java.io.File) {
+        target.parentFile.mkdirs()
+        target.writeText(key)
+        Config.setApiKey(key)
+        plugin.logger.info("Marketplace premium key was imported into plugin configuration.")
     }
 
     fun refresh(): EntitlementState {

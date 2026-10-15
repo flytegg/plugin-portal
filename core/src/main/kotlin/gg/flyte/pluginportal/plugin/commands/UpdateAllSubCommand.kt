@@ -1,5 +1,7 @@
 package gg.flyte.pluginportal.plugin.commands
 
+import gg.flyte.pluginportal.plugin.commands.lamp.RequiresAuth
+
 import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.chat.*
 import gg.flyte.pluginportal.common.commands.lamp.EnabledCommand
@@ -31,6 +33,7 @@ class UpdateAllSubCommand {
     private fun String.plural(list: Collection<*>, suffix: String = "s") = plural(list.size, suffix)
 
     @EnabledCommand(Features.UPDATE)
+    @RequiresAuth
     @Subcommand("updateAll")
     @CommandPermission("pluginportal.maintain.update")
     fun updateAllCommand(

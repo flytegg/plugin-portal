@@ -4,7 +4,9 @@ Use `/pp`, `/pluginportal`, or `/ppm`. In the server console, omit `/`.
 Use `/pp help <command>` for instructions, for example `/pp help update`.
 Quote names, filenames, or version labels that contain spaces.
 
-Plugin Portal uses one JAR. All local management is free.
+Plugin Portal uses one JAR for free and Premium features.
+Search, view, list, install, update, and uninstall are free.
+Premium commands require a valid key: `updateAll`, `recognize`, `recognizeAll`, `external`, `editor`, `import`, `export`, and `scan`.
 Network management requires an active account entitlement. The hosted API checks this entitlement.
 A permission does not grant network access. On Velocity, replace `/pp` with `/ppv`.
 
@@ -45,7 +47,7 @@ This release does not support BungeeCord or datapacks.
 | `/pp search <query> [platform] [--page <number>] [--full]` | Searches the marketplace catalog. |
 | `/pp view <name> [platform] [--byId] [--exact]` | Shows marketplace details and available actions. |
 | `/pp list [--all] [--untracked] [--outdated] [--external] [--detailed] [--page <number>] [--full]` | Lists local plugins and configured external plugins. |
-| `/pp info` | Shows the exact version, platform, free local tools, network connection, and number of changes that require a restart. Alias: `/pp version`. |
+| `/pp info` | Shows the exact version, platform, Premium status, network connection, and number of changes that require a restart. Alias: `/pp version`. |
 
 These commands require `pluginportal.view`.
 
@@ -74,7 +76,7 @@ On Modrinth, use the project ID, such as `P1OZGk5p`, instead of the URL slug.
 | --- | --- | --- |
 | `/pp install <name> [platform] [channel] [--byId] [--exact] [--version <version>]` | `pluginportal.manage.install` | Downloads a compatible plugin JAR. |
 | `/pp update <name> [--byId] [--ignoreOutdated] [--refresh] [--channel <name>] [--version <version>]` | `pluginportal.maintain.update` | Updates one tracked plugin. |
-| `/pp updateAll [--ignoreOutdated]` | `pluginportal.maintain.update` | Updates tracked marketplace plugins. |
+| `/pp updateAll [--ignoreOutdated]` | `pluginportal.maintain.update` | Updates tracked marketplace plugins. Premium. |
 | `/pp blacklist [name] [--byId]` | `pluginportal.maintain.update` | Changes the exclusion from `updateAll`. If you omit the name, lists exclusions. |
 | `/pp platform <name> <platform> [--byId]` | `pluginportal.maintain.update` | Downloads a compatible version from another linked marketplace. |
 | `/pp uninstall <name> [--byId]` | `pluginportal.manage.uninstall` | Removes a tracked plugin JAR. Alias: `/pp delete`. |
@@ -129,7 +131,7 @@ A manual update for one plugin still works. Plugin Portal refuses to uninstall i
 
 ## Recognize installed JARs
 
-These commands require `pluginportal.manage.recognize`.
+These commands require a Premium key and `pluginportal.manage.recognize`.
 
 ```text
 /pp recognize "Example.jar" [--channel <name>]
@@ -149,7 +151,7 @@ Before you replace manually installed files, make a backup of your server.
 
 ## External plugins
 
-External sources require `pluginportal.manage.external`.
+External sources require a Premium key and `pluginportal.manage.external`.
 They use `external-plugins.yml`, separate from the marketplace records.
 Plugin Portal supports GitHub Releases and GeyserMC. It does not support Jenkins.
 See [external source configuration](docs/adapters.md) for complete examples.
@@ -176,9 +178,10 @@ Use unique filenames. Plugin Portal rejects ambiguous asset matches and checks S
 It also supports GitHub assets without a digest.
 Do not add new entries to the old `adapters.yml` file.
 
-## Legacy API key support
+## Premium key
 
-Use `/pp key set <key>` to validate and save a key.
+A JAR from BuiltByBit or Polymart contains your key. Plugin Portal saves it at the first start.
+For other purchases, use `/pp key set <key>` to validate and save a key.
 Access refreshes in the same session. A restart is not normally necessary.
 Use `/pp info` to check the result.
 Key commands require `pluginportal.manage`.
@@ -190,18 +193,17 @@ Key commands require `pluginportal.manage`.
 | `/pp key get` | Shows masked key status. In chat, the copy action contains the full key. |
 | `/pp key clear` | Clears configured authentication and refreshes access. |
 
-At startup, Plugin Portal checks `Authentication.ApiKey` in `config.yml`, then `pluginportal.txt`, then `mclicense.txt` on disk.
+At startup, Plugin Portal checks `Authentication.ApiKey` in `config.yml`, then `pluginportal.txt`, then `mclicense.txt` on disk, then the key in a marketplace JAR.
 These files are in `plugins/PluginPortal/`.
-In v4, Plugin Portal ignores embedded JAR credentials and marketplace placeholders.
 Keys never enroll a server or grant remote control.
 See [marketplace license import](docs/marketplace-license-import.md).
 
 Do not post a key, editor link, or token in a public issue.
-Support only needs the license state from `/pp info`.
+Support only needs the Premium status from `/pp info`.
 
 ## Temporary web editor
 
-Editor commands require `pluginportal.manage.editor`.
+Editor commands require a Premium key and `pluginportal.manage.editor`.
 
 | Command | Purpose |
 | --- | --- |
@@ -220,9 +222,9 @@ Plugin Portal does not support `/pp connect`.
 
 | Command | Permission | Purpose |
 | --- | --- | --- |
-| `/pp export` | `pluginportal.manage.export` | Uploads tracked marketplace IDs to MCLogs. Is a free local tool. |
-| `/pp import <mclogs-url>` | `pluginportal.manage.import` | Installs the exported marketplace plugins. Is a free local tool. |
-| `/pp scan <file>` | `pluginportal.manage.scan` | Runs the bundled Hangar JAR scanner locally. Is a free local tool. |
+| `/pp export` | `pluginportal.manage.export` | Uploads tracked marketplace IDs to MCLogs. Premium. |
+| `/pp import <mclogs-url>` | `pluginportal.manage.import` | Installs the exported marketplace plugins. Premium. |
+| `/pp scan <file>` | `pluginportal.manage.scan` | Runs the bundled Hangar JAR scanner locally. Premium. |
 | `/pp dump` | `pluginportal.dump` | Uploads a support dump to MCLogs. |
 | `/pp support <code>` | `pluginportal.admin` | Uploads a diagnostic bundle with the 8-digit code from support. The bundle expires in 24 hours. |
 | `/pp reload` | `pluginportal.manage.config` | Reloads the configuration and local plugin records. |

@@ -80,8 +80,8 @@ val verifyUniversalJar by tasks.registering {
             check(Regex("(?m)^version: ['\"]?${Regex.escape(project.version.toString())}['\"]?\\s*$").containsMatchIn(bukkit)) { "Bukkit descriptor version mismatch" }
             check(Regex("\"version\"\\s*:\\s*\"${Regex.escape(project.version.toString())}\"").containsMatchIn(velocity)) { "Velocity descriptor version mismatch" }
             check(artifact.get().asFile.name == "PluginPortal-${project.version}.jar") { "Universal filename version mismatch" }
-            listOf("mclicense.txt", "pluginportal.txt", "network-node.json", "network-operations.json", "gg/flyte/pluginportal/plugin/MarketplaceKey.class").forEach { path ->
-                check(jar.getJarEntry(path) == null) { "Runtime identity or legacy embedded key present in universal JAR: $path" }
+            listOf("mclicense.txt", "pluginportal.txt", "network-node.json", "network-operations.json").forEach { path ->
+                check(jar.getJarEntry(path) == null) { "Runtime identity or buyer key present in universal JAR: $path" }
             }
         }
     }

@@ -2,9 +2,10 @@
 
 ## Universal v4
 
-Universal v4 JARs are identical for every account.
-They never import embedded resources or rewritten marketplace placeholders.
-All local tools are free.
+The JAR that Plugin Portal builds is identical for every account.
+A marketplace rewrites the placeholders in the downloaded copy.
+At the first start, Plugin Portal imports that key, as described below, and saves it.
+The key unlocks Premium commands only. `/premium/validate` decides access.
 To enable hosted networks, link a purchase to an account in the dashboard.
 
 Plugin Portal still supports `Authentication.ApiKey`, `pluginportal.txt`, and `mclicense.txt` on disk.
@@ -15,9 +16,6 @@ Review the link details. Run `link confirm` to confirm them.
 Use trusted artifacts. A malicious JAR can execute code with the server process's privileges.
 Enrollment prevents accidental account links from credentials in redistributed official JARs.
 It cannot make untrusted executable code safe.
-
-The notes below describe historical 3.x behavior only.
-They do not describe the v4 runtime or its release acceptance process.
 
 Before Plugin Portal checks premium entitlement, it imports delivery credentials.
 An imported credential does not grant access.

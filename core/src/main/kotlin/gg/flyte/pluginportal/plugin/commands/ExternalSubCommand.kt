@@ -1,5 +1,7 @@
 package gg.flyte.pluginportal.plugin.commands
 
+import gg.flyte.pluginportal.plugin.commands.lamp.RequiresAuth
+
 import gg.flyte.pluginportal.common.chat.sendFailure
 import gg.flyte.pluginportal.common.chat.sendInfo
 import gg.flyte.pluginportal.common.chat.sendSuccess
@@ -19,18 +21,21 @@ import gg.flyte.pluginportal.common.commands.lamp.CommandPermission
 @Command("pp", "pluginportal", "ppm")
 @CommandPermission("pluginportal.manage.external")
 class ExternalSubCommand {
+    @RequiresAuth
     @Subcommand("external check")
     fun check(
         audience: Audience,
         @Named("id") @SuggestWith(ExternalPluginSuggestionProvider::class) id: String
     ) = runAsync(audience) { ExternalPluginManager.check(id) }
 
+    @RequiresAuth
     @Subcommand("external install")
     fun install(
         audience: Audience,
         @Named("id") @SuggestWith(ExternalPluginSuggestionProvider::class) id: String
     ) = runAsync(audience) { ExternalPluginManager.install(id) }
 
+    @RequiresAuth
     @Subcommand("external add github")
     fun addGitHub(
         audience: Audience,
@@ -41,6 +46,7 @@ class ExternalSubCommand {
         @Optional @Switch("prereleases") prereleases: Boolean = false
     ) = runAsync(audience) { ExternalPluginManager.addGitHub(id, "$owner/$repository", asset, prereleases) }
 
+    @RequiresAuth
     @Subcommand("external add geysermc")
     fun addGeyser(
         audience: Audience,
@@ -49,6 +55,7 @@ class ExternalSubCommand {
         @Named("artifact") artifact: String
     ) = runAsync(audience) { ExternalPluginManager.addGeyser(id, project, artifact) }
 
+    @RequiresAuth
     @Subcommand("external import github")
     fun importGitHub(
         audience: Audience,
@@ -60,6 +67,7 @@ class ExternalSubCommand {
         @Optional @Switch("prereleases") prereleases: Boolean = false
     ) = runAsync(audience) { ExternalPluginManager.importGitHub(id, "$owner/$repository", asset, file, prereleases) }
 
+    @RequiresAuth
     @Subcommand("external import geysermc")
     fun importGeyser(
         audience: Audience,
@@ -69,24 +77,28 @@ class ExternalSubCommand {
         @Named("file") @SafeFileName file: String
     ) = runAsync(audience) { ExternalPluginManager.importGeyser(id, project, artifact, file) }
 
+    @RequiresAuth
     @Subcommand("external update")
     fun update(
         audience: Audience,
         @Named("id") @SuggestWith(ExternalPluginSuggestionProvider::class) id: String
     ) = runAsync(audience) { ExternalPluginManager.update(id) }
 
+    @RequiresAuth
     @Subcommand("external uninstall")
     fun uninstall(
         audience: Audience,
         @Named("id") @SuggestWith(ExternalPluginSuggestionProvider::class) id: String
     ) = runAsync(audience) { ExternalPluginManager.uninstall(id) }
 
+    @RequiresAuth
     @Subcommand("external invalidate")
     fun invalidate(
         audience: Audience,
         @Named("id") @SuggestWith(ExternalPluginSuggestionProvider::class) id: String
     ) = runAsync(audience) { ExternalPluginManager.invalidate(id) }
 
+    @RequiresAuth
     @Subcommand("external updateAll")
     fun updateAll(audience: Audience) {
         executeAsync(audience) {
@@ -102,6 +114,7 @@ class ExternalSubCommand {
         }
     }
 
+    @RequiresAuth
     @Subcommand("external reload")
     fun reload(audience: Audience) {
         executeAsync(audience) {

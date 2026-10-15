@@ -38,11 +38,13 @@ Other Bukkit-family adapters compile. Their runtime checks are separate.
 This release does not support Java 8, BungeeCord, datapacks, or paid Polymart downloads.
 A marketplace entry must supply a compatible JAR that you can download.
 
-## Free local tools and paid networks
+## Free, Premium, and paid networks
 
-All local commands are free.
-These include recognition, bulk updates, external sources, import/export, JAR scans, and the temporary web editor.
-Local command permissions still apply.
+Search, view, list, install, update, and uninstall are free.
+Premium commands require a valid key: `updateAll`, recognition, external sources, import/export, JAR scans, and the web editor.
+A JAR from BuiltByBit or Polymart contains your key. Plugin Portal saves it at the first start.
+For other purchases, run `/pp key set <key>`. `/pp info` shows `Premium: Active` or `Premium: Locked`.
+Command permissions still apply.
 
 Paid network management uses your account on the hosted Plugin Portal API.
 The dashboard lists your proxy and servers across networks.

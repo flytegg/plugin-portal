@@ -133,6 +133,7 @@ object PluginPortalBase {
                 revxrsal.commands.command.CommandPermission { actor -> actor.hasPermission(permission.value) }
             }
             .commandCondition(CommandEnabledConditionValidator())
+            .commandCondition(gg.flyte.pluginportal.plugin.commands.lamp.RequiresAuthValidator())
             .exceptionHandler(gg.flyte.pluginportal.common.commands.lamp.CommandUsageExceptionHandler(LampExceptionHandler()))
             .parameterTypes {
                 it.addParameterType(MarketplacePlatform::class.java, MarketplacePlatformType())

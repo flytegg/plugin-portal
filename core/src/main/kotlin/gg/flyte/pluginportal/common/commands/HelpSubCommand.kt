@@ -89,7 +89,7 @@ class HelpSubCommand {
             "uninstall <plugin>" to "Remove a plugin",
             "info" to "Version and connection"
         ),
-        "Local tools" to listOf(
+        "Premium tools" to listOf(
             "editor" to "Open the browser editor",
             "updateAll" to "Update tracked plugins",
             "recognize <file>" to "Track a local JAR",
@@ -237,7 +237,7 @@ class HelpSubCommand {
             "This does not reload installed plugins or apply staged updates."
         )),
         "info" to ("/pp info" to listOf(
-            "Show the exact version, platform, local tools, network connection, and pending restart count.",
+            "Show the exact version, platform, premium status, network connection, and pending restart count.",
             "Alias: /pp version."
         )),
         "dump" to ("/pp dump" to listOf(

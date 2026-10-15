@@ -1,5 +1,7 @@
 package gg.flyte.pluginportal.plugin.commands
 
+import gg.flyte.pluginportal.plugin.commands.lamp.RequiresAuth
+
 import gg.flyte.pluginportal.common.API
 import gg.flyte.pluginportal.common.Config
 import gg.flyte.pluginportal.common.MCServerMetadata
@@ -69,6 +71,7 @@ class EditorSubCommand {
 //        startTemporaryEditor(audience, isConsole)
 //    }
 
+    @RequiresAuth
     @Subcommand("editor")
     @CommandPermission("pluginportal.manage.editor")
     fun editorCommand(
@@ -121,6 +124,7 @@ class EditorSubCommand {
         )
     }
 
+    @RequiresAuth
     @Subcommand("editor status")
     @CommandPermission("pluginportal.manage.editor")
     fun editorStatusCommand(audience: Audience) {
@@ -167,6 +171,7 @@ class EditorSubCommand {
         audience.sendMessage(message.boxed())
     }
 
+    @RequiresAuth
     @Subcommand("editor stop")
     @CommandPermission("pluginportal.manage.editor")
     fun editorStopCommand(audience: Audience) {
@@ -178,6 +183,7 @@ class EditorSubCommand {
         audience.sendSuccess("Editor session stopped successfully.")
     }
 
+    @RequiresAuth
     @Subcommand("editor reconnect")
     @CommandPermission("pluginportal.manage.editor")
     fun editorReconnectCommand(audience: Audience) {
@@ -197,6 +203,7 @@ class EditorSubCommand {
         }
     }
 
+    @RequiresAuth
     @Subcommand("editor url")
     @CommandPermission("pluginportal.manage.editor")
     fun editorURLCommand(audience: Audience, @Switch("isConsole") isConsole: Boolean = false) {
