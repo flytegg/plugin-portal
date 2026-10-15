@@ -7,10 +7,8 @@ Quote names, filenames, or version labels that contain spaces.
 Plugin Portal uses one JAR. All local management is free. Network management
 requires an active account entitlement checked by the hosted API. A permission
 does not grant network access. On Velocity, replace `/pp` with `/ppv`.
-`/ppnetwork` is an alias for `/ppv network`.
 Help, hover hints, and command buttons keep the alias you entered. For example,
-`/ppnetwork help` suggests `/ppnetwork list`, while `/ppv network help` suggests
-`/ppv network list`.
+`/ppm help` suggests `/ppm list`, while `/ppv help` suggests `/ppv list`.
 Missing or invalid arguments show help for that command. For example,
 `/ppv platform` shows platform usage and an example.
 
@@ -44,7 +42,7 @@ BungeeCord, datapacks, and paid Polymart downloads are outside this release.
 | `/pp search <query> [platform] [--page <number>] [--full]` | Search the marketplace catalog. |
 | `/pp view <name> [platform] [--byId] [--exact]` | Show marketplace details and available actions. |
 | `/pp list [--all] [--untracked] [--outdated] [--external] [--detailed] [--page <number>] [--full]` | List local plugins and configured external plugins. |
-| `/pp info` | Show the exact version, platform, free local tools, and network connection. Alias: `/pp version`. |
+| `/pp info` | Show the exact version, platform, free local tools, network connection, and pending restart count. Alias: `/pp version`. |
 
 These commands require `pluginportal.view`.
 
@@ -80,8 +78,11 @@ use the project ID, such as `P1OZGk5p`, rather than the URL slug.
 | `/pp upgrade [--yes] [--channel <name>]` | `pluginportal.admin` | Check for a Plugin Portal update. Add `--yes` to download it. |
 
 Restart after an install, update, uninstall, platform change, or self-upgrade.
-Plugin Portal stages updates in `plugins/update/`. A staged version can appear
-in `/pp list` before the server loads it. `/pp reload` does not load JARs.
+Plugin Portal stages Paper updates in its update folder, normally `plugins/update/`,
+and Velocity updates in `plugins/pluginportal/pending-updates/`. `/pp list` marks
+pending installs, updates, and removals with `Restart to apply`, including the
+staged version for updates. A removed plugin stays listed while it is still loaded.
+`/pp info` reports how many changes apply after restart. `/pp reload` does not load JARs.
 
 Plugin Portal selects versions for the server software and Minecraft version.
 When the marketplace has release or stable builds, an install without a channel
@@ -280,11 +281,13 @@ names require UUIDs. Never infer an all-server target.
 
 | Command | Purpose |
 | --- | --- |
+| `/pp link` | Show account/network, node ID, role, connection and last error, remote write approval, and restart count. |
 | `/pp link <code>` | Review the account, network and role in this console. |
 | `/pp link confirm` | Consume the reviewed code and save the node credential. |
 | `/pp link cancel` | Discard the pending review without enrolling. |
 | `/pp unlink` | Remove the local credential and clear remote write approval. Console only. |
 | `/pp servers [--page <number>] [--full]` | List connected servers. Controller only. |
+| `/pp refresh --servers lobby,proxy` | Refresh inventories on explicit targets. Controller only; `--server` is an alias. |
 | `/pp history [operationId] [--page <number>] [--full]` | Inspect operations and per-server outcomes. Controller only. |
 | `/pp list --server lobby` | View a remote inventory. |
 | `/pp install LuckPerms MODRINTH --servers lobby,proxy` | Install on explicit targets. |
@@ -310,35 +313,22 @@ Normal restarts retain approval; unlinking and re-enrollment clear it. The old
 `network-node.json` from server templates and shared backups: it is a credential,
 not configuration. Pending enrollment reviews remain in memory only.
 
-### Compatibility commands
-
-Existing `/pp network`, `/ppv network`, and `/ppnetwork` commands remain available:
-
-| Command | Purpose |
-| --- | --- |
-| `/pp network [help]` | Show network actions and usage hints. |
-| `/pp network enroll <code\|confirm\|cancel>` | Review and confirm enrollment; same behavior as `link`. |
-| `/pp network leave` | Delete the local credential; revoke the old node in the dashboard too. |
-| `/pp network status` | Show local connection state, node ID, and role. |
-| `/pp network list [--page <number>] [--full]` | Show nodes and online state with copyable IDs. Controller only. |
-| `/pp network operations [--page <number>] [--full]` | Show recent operation summaries and clickable results. Controller only. |
-| `/pp network operation <operationId> [--page <number>] [--full]` | Show outcomes for each target. Controller only. |
-| `/pp network refresh <nodeIds>` | Refresh inventories on explicit targets. |
-| `/pp network install <nodeIds> <platform> <pluginId> [version]` | Install compatible catalog artifacts. |
-| `/pp network update <nodeIds> <platform> <pluginId> [version]` | Stage compatible updates; respect each node's blacklist. |
-| `/pp network uninstall <nodeIds> <platform> <pluginId>` | Remove managed JARs; retain data folders. |
-
 Network lists show eight entries per chat page. Hover for full IDs and result
 messages; click **Copy ID** to copy a full UUID. Console output includes full IDs
 and messages. Use `--page` or `--full` as with local lists.
 
-Use comma-separated UUIDs without spaces for `nodeIds`. On Velocity use
-`/ppv network` or `/ppnetwork`. Example:
+Use comma-separated server names or UUIDs for `--servers`; quote names with spaces.
+`refresh` always requires explicit targets. On Velocity, for example:
 
 ```text
-ppnetwork install <backend-uuid>,<proxy-uuid> MODRINTH Vebnzrzj
-ppnetwork operations
+ppv refresh --servers lobby,proxy
+ppv install Vebnzrzj MODRINTH --byId --servers lobby,proxy
+ppv history
 ```
+
+Run `pp link` or `ppv link` to check this server without making an API request.
+Older identities display the network UUID when a saved network name is unavailable.
+If unlinked, the command points to Add server in the dashboard to get a code.
 
 The dashboard also supports release-channel selection, enrollment, node revocation,
 inventory, operation history, and reviewing retry targets. Each retry creates a new

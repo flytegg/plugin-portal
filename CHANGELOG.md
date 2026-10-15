@@ -13,7 +13,11 @@
 - Complete quoted server names and comma-separated targets without blocking Bukkit on network requests.
 - Keep Plugin Portal self-upgrades local and report duplicate installs clearly.
 - Preserve released 3.x settings, tracking, blacklist, key files and plugin data on upgrade.
-- Retain older network aliases and local command behavior.
+- Add link status and explicit inventory refresh through `refresh --servers`.
+- Report running, staged install/update/removal, and restart-required inventory state;
+  show pending restart changes in list, info, and link output.
+- Breaking (beta): remove `/pp network …` and `/ppnetwork` in favor of the short
+  `link`, `unlink`, `servers`, `history`, `refresh`, and targeted plugin commands.
 
 ## Unreleased
 

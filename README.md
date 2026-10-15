@@ -12,8 +12,8 @@ or the server console.
 4. Run `/pp install ViaVersion MODRINTH`.
 5. Restart the server to load the plugin.
 
-On Velocity, use `/ppv` instead of `/pp`. The proxy also exposes `/ppnetwork` for
-network management and leaves backend `/pp` commands available.
+On Velocity, use `/ppv` instead of `/pp` for the same local and network commands.
+The proxy leaves backend `/pp` commands available.
 
 Use `/pp help <command>` for command details. Use `/pp list --outdated` to check
 for updates. Chat results have page controls. Console lists show all entries by

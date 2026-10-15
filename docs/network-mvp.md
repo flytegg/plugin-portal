@@ -14,8 +14,12 @@ BungeeCord is outside this release. This candidate is not a published release.
 6. Approve remote plugin writes with `pp control enable` in every target console. Use `/ppv servers`, `/ppv list --server lobby`, or `/ppv install LuckPerms MODRINTH --servers lobby,proxy` from the controller.
 7. Inspect `/ppv history` and restart affected servers to apply JAR changes.
 
-Use `/pp` on backends and `/ppv` on Velocity. Existing `/pp network`, `/ppv network`,
-and `/ppnetwork` commands remain compatible. The proxy leaves backend `/pp` available.
+Use `/pp` on backends and `/ppv` on Velocity. Both use the same command tree;
+the proxy leaves backend `/pp` available. Run `/pp link` without arguments to see
+the saved account/network, node ID, role, connection, write approval, and restart
+count. An unlinked server directs you to Add server in the dashboard.
+Use `/ppv refresh --servers lobby,proxy` to refresh explicit inventories from a
+controller. `--server` is an alias; omitting targets never selects every server.
 Names resolve within the controller's group; ambiguous names require UUIDs.
 
 Dashboard and controller writes require local approval on every target. Run
@@ -67,6 +71,14 @@ plugin workers stop. A crash retains pending replacements until a later successf
 graceful shutdown. Inspect retained failures manually while the proxy is stopped.
 Uninstall removes the verified installed and staged copies, including after a
 process restart, and refuses ambiguous duplicate plugin identities.
+
+Inventories report each plugin as `running`, `staged-install`, `staged-update`, or
+`staged-removal`, with `stagedVersion` for a pending replacement. Removed managed
+plugins remain in inventory while loaded in the current JVM. `restartRequired`
+also covers pending files that cannot be matched to a plugin. Inventories retain
+the 500-entry limit, but restart detection considers all entries and pending files.
+Local `/pp list` marks pending changes with `Restart to apply`; `/pp info` and
+`/pp link` show the restart-needed count.
 
 ## Architecture and authorization
 
