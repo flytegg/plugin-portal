@@ -75,10 +75,12 @@ The network skips offline nodes. It does not automatically retry plugin changes.
 Restart each affected server or proxy to apply file changes.
 See [network configuration and security](docs/network-mvp.md).
 
-Network access depends on the hosted API and a current entitlement. A modified
-client cannot grant itself access to the hosted service. Source is available under
-[LICENSE.md](LICENSE.md), which restricts entitlement bypass and unauthorized
-network service access. It does not make Java bytecode impossible to modify.
+Premium commands and network access require a valid entitlement from the hosted API.
+A modified client cannot grant itself access to the hosted service.
+Source is available under [LICENSE.md](LICENSE.md). The license forbids the use of
+Premium or network features without a valid entitlement, also in private forks.
+It forbids the removal or bypass of entitlement checks, and the distribution of
+builds or patches that unlock these features.
 
 ## Support and contributions
 
